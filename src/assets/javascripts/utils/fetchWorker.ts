@@ -1,16 +1,25 @@
 import { logger } from "~/utils"
-import cacheWorkerUrl from "~worker/cache_worker.ts?worker"
+
+const cacheWorkerUrl = new URL("cacheWorker.ts", import.meta.url).href
 
 // registers the service worker
-if ("serviceWorker" in navigator && window.isSecureContext && cacheWorker) {
+if ("serviceWorker" in navigator && window.isSecureContext) {
   logger.info("Registering service worker")
-  navigator.serviceWorker.register(cacheWorker, { scope: "/" }).then((registration) => {
-    if (registration.installing) {
-      logger.info("Service worker installing")
-    } else if (registration.waiting) {
-      logger.info("Service worker installed")
-    } else if (registration.active) {
-      logger.info("Service worker active")
-    }
-  })
+  const register = async () => {
+    navigator.serviceWorker
+      .register(cacheWorkerUrl, { scope: "/" })
+      .then((registration) => {
+        if (registration.installing) {
+          logger.info("Service worker installing")
+        } else if (registration.waiting) {
+          logger.info("Service worker installed")
+        } else if (registration.active) {
+          logger.info("Service worker active")
+        }
+      })
+      .catch((error) => {
+        logger.error("Service worker registration failed:", error)
+      })
+  }
+  Promise.resolve(register())
 }

@@ -12117,21 +12117,24 @@ function watchLicenseHash() {
   ]).pipe(filter(([first2, second]) => first2.pathname === second.pathname), map(([_, second]) => second), filter((url2) => isLicenseHash(url2)), tap(handleLicenseHash));
 }
 
-// src/assets/javascripts/utils/cacheWorkerUrl.ts
-var cacheWorkerUrl_default = new URL("../../../cache_worker", import.meta.url).href;
-
 // src/assets/javascripts/utils/fetchWorker.ts
-if ("serviceWorker" in navigator && window.isSecureContext && cacheWorkerUrl_default) {
+var cacheWorkerUrl = new URL("cacheWorker.TLOTYQGG.js", import.meta.url).href;
+if ("serviceWorker" in navigator && window.isSecureContext) {
   logger.info("Registering service worker");
-  navigator.serviceWorker.register(cacheWorkerUrl_default, { scope: "/" }).then((registration) => {
-    if (registration.installing) {
-      logger.info("Service worker installing");
-    } else if (registration.waiting) {
-      logger.info("Service worker installed");
-    } else if (registration.active) {
-      logger.info("Service worker active");
-    }
-  });
+  const register2 = async () => {
+    navigator.serviceWorker.register(cacheWorkerUrl, { scope: "/" }).then((registration) => {
+      if (registration.installing) {
+        logger.info("Service worker installing");
+      } else if (registration.waiting) {
+        logger.info("Service worker installed");
+      } else if (registration.active) {
+        logger.info("Service worker active");
+      }
+    }).catch((error) => {
+      logger.error("Service worker registration failed:", error);
+    });
+  };
+  Promise.resolve(register2());
 }
 
 // src/assets/javascripts/features/feedback/feedback.ts
@@ -16769,4 +16772,4 @@ gsap/ScrollToPlugin.js:
    * @author: Jack Doyle, jack@greensock.com
   *)
 */
-//# sourceMappingURL=index.6MM6I56T.js.map
+//# sourceMappingURL=index.6TPLBDPV.js.map

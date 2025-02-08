@@ -7,7 +7,7 @@
  */
 
 
-// src/cache_worker.ts
+// src/cacheWorker.ts
 import woff2Inter from "./assets/fonts/inter-v.5HMTI5F7.woff2";
 import woff2Bangers from "./assets/fonts/bangers-regular.BIV5PPSH.woff2";
 import woff2SourceCodePro from "./assets/fonts/sourcecodepro-regular.CK7SPIOU.woff2";
@@ -187,7 +187,9 @@ var CacheManager = class {
       url = normalizeUrl(url);
       const cache = await this.getCache();
       const baseName = await this.toBaseName(url);
-      const staleKeys = this.cacheKeys.filter((key) => key.includes(baseName) && url.toString() !== key);
+      const staleKeys = this.cacheKeys.filter(
+        (key) => key.includes(baseName) && url.toString() !== key
+      );
       if (staleKeys.length) {
         logger.info("Stale keys found: ".concat(staleKeys.join(", ")));
         await Promise.all(staleKeys.map((key) => cache.delete(key)));
@@ -202,7 +204,9 @@ var CacheManager = class {
    */
   async cleanup() {
     try {
-      const deletionPromises = await this.getCacheKeys().then((keys) => keys.filter((key) => key !== this.config.cacheName).map((key) => caches.delete(key)));
+      const deletionPromises = await this.getCacheKeys().then(
+        (keys) => keys.filter((key) => key !== this.config.cacheName).map((key) => caches.delete(key))
+      );
       await Promise.all(deletionPromises);
       logger.info("Old caches cleaned up");
     } catch (error) {
@@ -326,29 +330,33 @@ var CacheStrategies = class {
   }
 };
 self.addEventListener("install", (event) => {
-  event.waitUntil((async () => {
-    try {
-      await cacheManager.init();
-      await self.skipWaiting();
-      await cacheManager.precache();
-      logger.info("Service worker installed");
-    } catch (error) {
-      logger.error("Install failed:", error);
-      throw error;
-    }
-  })());
+  event.waitUntil(
+    (async () => {
+      try {
+        await cacheManager.init();
+        await self.skipWaiting();
+        await cacheManager.precache();
+        logger.info("Service worker installed");
+      } catch (error) {
+        logger.error("Install failed:", error);
+        throw error;
+      }
+    })()
+  );
 });
 self.addEventListener("activate", (event) => {
-  event.waitUntil((async () => {
-    try {
-      await cacheManager.cleanup();
-      await self.clients.claim();
-      logger.info("Service worker activated");
-    } catch (error) {
-      logger.error("Activation failed:", error);
-      throw error;
-    }
-  })());
+  event.waitUntil(
+    (async () => {
+      try {
+        await cacheManager.cleanup();
+        await self.clients.claim();
+        logger.info("Service worker activated");
+      } catch (error) {
+        logger.error("Activation failed:", error);
+        throw error;
+      }
+    })()
+  );
 });
 self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") {
@@ -359,7 +367,9 @@ self.addEventListener("fetch", (event) => {
     return;
   }
   const isRefreshAsset = /\.(js|css|html|json)$/i.test(url.pathname);
-  event.respondWith(isRefreshAsset ? CacheStrategies.staleWhileRevalidate(event.request) : CacheStrategies.cacheFirst(event.request));
+  event.respondWith(
+    isRefreshAsset ? CacheStrategies.staleWhileRevalidate(event.request) : CacheStrategies.cacheFirst(event.request)
+  );
   logger.info("Fetching: ".concat(url.pathname));
 });
 self.addEventListener("message", (event) => {
@@ -379,4 +389,4 @@ self.addEventListener("message", (event) => {
  * @author Adam Poulemanos <adam<at>plainlicense<dot>org>
  * @copyright No rights reserved.
  */
-//# sourceMappingURL=cache_worker.DK4NR55K.js.map
+//# sourceMappingURL=cacheWorker.TLOTYQGG.js.map

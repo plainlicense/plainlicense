@@ -3,15 +3,12 @@ import globby from "globby"
 import * as fs from "fs/promises"
 import {
   HERO_VIDEO_TEMPLATE,
-  allExtensions,
   basePath,
   cssLocs,
   cssSrc,
-  fontLoc,
   hashPattern,
   imageTypes,
   mediaExtensionPattern,
-  placeholderMap,
   resPattern,
   tsTemplate,
   videoCodecs,
@@ -53,6 +50,19 @@ export async function fileExists(filePath: string): Promise<boolean> {
     .access(filePath)
     .then(() => true)
     .catch(() => false)
+}
+
+export async function isDir(filePath: string): Promise<boolean> {
+  return await fs
+    .stat(filePath)
+    .then((stat) => stat.isDirectory())
+    .catch(() => false)
+}
+
+export function getHash(filePath: string): string {
+  const pattern = new RegExp(hashPattern)
+  const match = filePath.match(pattern)
+  return match ? match[1] : ""
 }
 
 /**
@@ -133,7 +143,6 @@ export async function deconstructPath(pathStr: string): Promise<HeroFile> {
   const { base, ext, dir, name, root } = path.parse(pathStr)
   const baseName = getBaseName({ base, dir, ext, name, root })
   const width = parseInt(new RegExp(resPattern).exec(base)[0], 10) as VideoWidth
-  const hash = name.match(hashPattern) ? name.match(hashPattern)[0] : await getmd5Hash(pathStr)
   const type = videoExtensions.includes(ext.slice(1)) ? "video" : "image"
   const codec = type === "video" ? videoCodecs.find((c) => base.includes(c)) : undefined
   const parentPath = srcToDocs(dir)
@@ -141,21 +150,13 @@ export async function deconstructPath(pathStr: string): Promise<HeroFile> {
   return {
     baseName,
     extension: ext.slice(1) as MediaFileExtension,
-    hash,
     width,
     srcPath: pathStr,
     type,
     ...(codec && { codec }), // omits codec if type is "image"
     parentPath,
-    get destPath(): string {
-      const assembled =
-        this.type === "video" ?
-          `${this.baseName}_${this.codec}_${this.width}.${this.hash}.${this.extension}`
-        : `${this.baseName}_${this.width}.${this.hash}.${this.extension}`
-      return `${srcToDocs(this.parentPath)}/${assembled}`
-    },
     get parsed(): path.ParsedPath {
-      return path.parse(this.destPath)
+      return path.parse(this.srcPath) // changed from this.destPath to this.srcPath
     },
     get filename() {
       return this.parsed.base
@@ -229,7 +230,7 @@ export async function getFileHash(fullPath: string): Promise<string> {
   const parsed = path.parse(fullPath)
   const fileName = parsed.name
   const hash = fileName.match(hashPattern)
-  return hash ? hash[0] : ""
+  return hash ? hash[1] : ""
 }
 
 /**
@@ -340,82 +341,6 @@ export function getParents(files: HeroFile[]): string[] {
 }
 
 /**
- * Constructs a HeroImage object from an array of HeroFile objects.
- * Copies image files, generates srcset properties, and populates the HeroImage object.
- * @param {HeroFile[]} posterImages An array of HeroFile objects representing poster images.
- * @returns {HeroImage} The constructed HeroImage object.
- */
-export async function constructPoster(posterImages: HeroFile[]): Promise<ImageIndex> {
-  let imageIndex: ImageIndex = { ...basePosterObj }
-  posterImages.forEach(async (imageFile) => {
-    const { destPath, srcPath, width, extension } = imageFile
-    await copyFile(srcPath, destPath)
-    const destPathValue = destPath.replace("docs/", "")
-    let { widths } = imageIndex[extension]
-    widths[width] = destPathValue
-    const widthValues = [...Object.entries(imageIndex[extension].widths)].sort(sortWidths)
-    if (widthValues.every(([_, v]) => v !== "")) {
-      const sortedWidths = Object.fromEntries(widthValues.map(([k, v]) => [parseInt(k, 10), v]))
-      imageIndex[extension]["srcset"] = await generateSrcset(sortedWidths as HeroPaths)
-      widths = sortedWidths
-    }
-    imageIndex[extension].widths = widths
-  })
-
-  return imageIndex
-}
-
-/**
- * Constructs a CodecVariants object from an array of HeroFile objects.
- * Copies video files and populates the CodecVariants object.
- * @param {HeroFile[]} videoFiles An array of HeroFile objects representing video files.
- * @returns {CodecVariants} The constructed CodecVariants object.
- */
-export function constructVariants(videoFiles: HeroFile[]): CodecVariants {
-  const { variants } = HERO_VIDEO_TEMPLATE
-  videoFiles.forEach((video) => {
-    const { codec, srcPath, destPath, width } = video
-    copyFile(srcPath, destPath)
-    const destPathValue = destPath.replace("docs/", "")
-    variants[codec][width] = destPathValue
-  })
-  videoCodecs.forEach((codec) => {
-    const codecVariants = variants[codec]
-    const sorted = Array.from(Object.entries(codecVariants))
-      .sort(sortWidths)
-      .map(([k, v]) => [parseInt(k, 10), v])
-    const sortedVariants = Object.fromEntries(sorted)
-    variants[codec] = sortedVariants
-  })
-  return variants
-}
-
-/**
- * @description Removes hashed files in the src directory. This shouldn't happen, but
- * sometimes in dev, it does -- so this is a failsafe.
- */
-export async function removeHashedFilesInSrc() {
-  const hashedFiles = await resolveGlob("src/assets/*", {
-    onlyFiles: true,
-    unique: true,
-    expandDirectories: {
-      extensions: allExtensions,
-    },
-  })
-  const extPat = allExtensions.join("|")
-  const testPattern = new RegExp(`.+\\.${hashPattern}\\.(${extPat}|min\\`)
-  for (const file of hashedFiles) {
-    if (testPattern.test(file)) {
-      try {
-        await fs.rm(file)
-      } catch (err) {
-        console.error(err)
-      }
-    }
-  }
-}
-
-/**
  * Resolves CSS files and generates a map of placeholders to their hashed filenames.
  * Retrieves CSS files, calculates their hashes, and creates a map of placeholders to the new filenames.
  * @returns {Promise<Partial<PlaceholderMap>>} A promise that resolves to a partial PlaceholderMap containing CSS file information.
@@ -492,48 +417,4 @@ export async function generatePlaceholderMap(): Promise<void> {
   //const fontHashMap = await resolveFontFiles()
   const newContent = cssHashMap
   await replacePlaceholders(newContent)
-}
-
-// Write the file to the output ts file
-const tsFileOutputPath = path.join(
-  "src",
-  "assets",
-  "javascripts",
-  "features",
-  "hero",
-  "video",
-  "data.ts",
-)
-
-/**
- * Exports the hero videos to a TypeScript file
- */
-export async function exportVideosToTS(videos: HeroVideo[], noScriptImage: ImageIndex) {
-  const fileContent = tsTemplate(videos, noScriptImage)
-
-  if (!(await fileExists(tsFileOutputPath))) {
-    await fs.mkdir(path.dirname(tsFileOutputPath), { recursive: true })
-  }
-  await fs.writeFile(tsFileOutputPath, fileContent, "utf8")
-
-  const runLint = async () => {
-    // Run ESLint on the generated file to strip the quotes from keys
-    try {
-      exec(`bunx --bun eslint --cache --fix ${tsFileOutputPath}`, (error, stdout, stderr) => {
-        if (error) {
-          console.error(`Error running ESLint: ${error.message}`)
-          return
-        }
-        if (stderr) {
-          console.error(`ESLint stderr: ${stderr}`)
-          return
-        }
-        console.log(`ESLint stdout: ${stdout}`)
-      })
-    } catch (err) {
-      console.error(err)
-      return
-    }
-  }
-  await runLint()
 }

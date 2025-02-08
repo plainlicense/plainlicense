@@ -141,8 +141,6 @@ export interface HeroFile {
   extension: MediaFileExtension
   filename: string
   srcPath: string
-  destPath: string
-  hash: string | EmptyString
   parentPath: string
   parsed: path.ParsedPath
   type: "image" | "video"

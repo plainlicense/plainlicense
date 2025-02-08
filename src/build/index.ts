@@ -29,10 +29,9 @@ import * as esbuild from "esbuild"
 import * as fs from "fs/promises"
 import * as path from "path"
 import { Observable, from } from "rxjs"
-import { PROJECTS, basePosterObj, baseProject, noDelete, webConfig } from "./config/"
-import { FileHashes, , ImageIndex, Project, buildJson, esbuildOutputs } from "./types"
+import { PROJECTS, basePosterObj, baseProject, clearGlobs, clearOpts, webConfig } from "./config/"
+import { FileHashes, HeroFiles, ImageIndex, Project, buildJson, esbuildOutputs } from "./types"
 import * as utils from "./utils"
-import { resolveGlob } from "./utils"
 
 // TODO: Refactor to use esbuild's transform API and reduce the number of file reads and writes
 
@@ -51,8 +50,6 @@ const projects = PROJECTS
 const remainingProjects = () => projects.length - (projects.indexOf(currentProject) + 1)
 let newFileLocs: FileHashes = {}
 let outputMeta = {}
-let precache_urls = []
-let metaCache = {}
 
 /**
  * @param {Project} project - the project to build
@@ -73,7 +70,6 @@ async function build(project: Project): Promise<Observable<unknown>> {
           if (output) {
             outputMeta = { ...outputMeta, ...output }
             if (remainingProjects() === 0) {
-              await writeMeta(outputMeta)
               await metaOutputMap(outputMeta)
             }
           }
@@ -92,38 +88,17 @@ async function build(project: Project): Promise<Observable<unknown>> {
 async function clearDirs() {
   const files = await heroFiles
   const parents = utils.getParents(files.videos)
-  const destParents = parents.map((parent) => utils.srcToDocs(parent))
-  const dirs = [
-    "docs/assets/stylesheets",
-    "docs/assets/javascripts",
-    "docs/assets/images",
-    "docs/assets/fonts",
-    "docs/assets/videos",
-    "docs/chunks",
-    ...destParents,
-  ]
-  const filesToDelete = new Set()
-  try {
-    const workerGlob = await resolveGlob("docs/cache_*")
-    if (workerGlob) {
-      workerGlob.forEach((file) => filesToDelete.add(file))
-    }
-  } catch (err) {
-    console.log("No workers found to delete")
-  }
-  for (const dir of dirs) {
-    const dirFiles = await fs.readdir(dir)
-    dirFiles
-      .filter((file) => {
-        const parsed = path.parse(file)
-        return !noDelete.includes(parsed.name)
-      })
-      .forEach((file) => filesToDelete.add(path.join(dir, file)))
-  }
+  const destParents = parents
+    .map((parent) => (utils.isDir(parent) ? null : utils.srcToDocs(parent)))
+    .filter((parent) => !!parent)
+  const returnedGlobs = await Promise.all(
+    clearGlobs.map(async (dir) => await utils.resolveGlob(dir, clearOpts)),
+  )
+  const filesToDelete = new Set([...returnedGlobs.flat(), ...destParents])
   for (const file of filesToDelete) {
-    if (typeof file === "string" && file !== "" && !(await fs.lstat(file)).isDirectory()) {
+    if (typeof file === "string" && file !== "") {
       try {
-        await fs.rm(file)
+        await fs.rm(file, { force: true })
       } catch (err) {
         console.error(`Error removing file ${file}: ${err}`)
       }
@@ -182,24 +157,6 @@ const metaOutputMap = async (output: esbuildOutputs): Promise<buildJson> => {
 }
 
 /**
- * @param {Object} metaOutput - the meta output
- * @description Writes the meta output to a file
- */
-const writeMeta = async (metaOutput: {}) => {
-  const mappedOutputs = {
-    ...metaOutput,
-    ...Object.fromEntries(
-      Object.entries(newFileLocs).map(([_, val]) => [
-        _,
-        Array.isArray(val) ? val.flat().map((val) => val.replace("docs/", "")) : val,
-      ]),
-    ),
-  }
-  const metaJson = JSON.stringify(mappedOutputs, null, 2)
-  await fs.writeFile(path.join("docs", "meta.json"), metaJson)
-}
-
-/**
  * @description Builds all projects
  * @returns {Promise<void>}
  */
@@ -231,56 +188,13 @@ async function buildAll(): Promise<any[]> {
   return buildPromises
 }
 
-async function findAndWriteCache(): Promise<boolean> {
-  try {
-    const result = await resolveGlob("docs/*").then((files) =>
-      files.filter((file) => file.match(/cache_worker\.[A-Z0-9]{8}\.js/)),
-    )
-    if (result && result.length > 0 && typeof metaCache === "string") {
-      const cacheLoc = result[0]
-      await fs.writeFile(cacheLoc, metaCache)
-      return true
-    }
-    return false
-  } catch (error) {
-    console.error("Error writing cache:", error)
-    return false
-  }
-}
-
-async function replaceBadPath(): Promise<void> {
-  const indexJs = await resolveGlob("docs/assets/javascripts/index.*.js")
-  if (
-    indexJs &&
-    indexJs.length > 0 &&
-    metaCache["worker"] &&
-    typeof metaCache["worker"] === "string"
-  ) {
-    try {
-      const jsContent = await fs.readFile(indexJs[0], "utf8")
-      const replaced = jsContent.replace(/\.\/cache_worker\.ts/g, metaCache["worker"])
-      await fs.writeFile(indexJs[0], replaced, "utf8")
-      console.log("Bad path replaced")
-    } catch (error) {
-      console.error("Error replacing bad path:", error)
-    }
-  }
-}
-
 async function main(): Promise<void> {
   try {
     console.log("Building Plain License...")
     const buildPromises = await buildAll()
     await Promise.allSettled(buildPromises).then(async () => {
       console.log("Plain License built")
-
-      await replaceBadPath()
-      const cacheResult = await findAndWriteCache()
-      Promise.resolve(cacheResult)
-
-      console.log(cacheResult ? "Cache written" : "Cache not written")
     })
-    console.log("Build process completed")
   } catch (error) {
     console.error("Build process failed:", error)
     throw error

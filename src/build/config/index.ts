@@ -18,8 +18,11 @@
  */
 
 import { cssModulesPlugin } from "@asn.aeb/esbuild-css-modules-plugin"
+import manifestPlugin from "esbuild-plugin-manifest"
+import { promises as fs } from "fs"
 // @ts-ignore
 import * as esbuild from "esbuild"
+import globby from "globby"
 import { tsconfigPathsPlugin } from "esbuild-plugin-tsconfig-paths"
 // import { copy } from 'esbuild-plugin-copy'
 
@@ -35,6 +38,8 @@ import type {
   VideoConfig,
   VideoResolution,
 } from "../types.ts"
+import { createHash } from "crypto"
+import { resolveGlob } from "../utils/index.js"
 
 export const placeholderMap: PlaceholderMap = {
   "src/assets/stylesheets/_bundle_template.css": {
@@ -52,18 +57,14 @@ export const cssLocs = {
   },
 }
 
-export const fontLoc = "src/assets/fonts/*"
-export const cacheMetaPath = "cache_meta.json"
-export const noDelete = [
-  "fonts",
-  "images",
-  "videos",
-  "javascripts",
-  "stylesheets",
-  "workers",
-  "poster",
-  "meta",
-]
+export const fontLoc = "src/assets/fonts/*" as const
+export const clearGlobs = ["docs/*.{js,json}", "docs/*js.map", "docs/assets"] as const
+export const clearOpts: globby.GlobbyOptions = {
+  expandDirectories: true,
+  onlyFiles: true,
+  suppressErrors: true,
+  unique: true,
+} as const
 
 export const videoConfig = {
   resolutions: [
@@ -146,7 +147,7 @@ export const imageExtensionPattern = (isRegex: boolean = true) => {
 export const mediaExtensionPattern = (isRegex: boolean = true) => {
   return `${videoExtensionPattern(isRegex)}|${imageExtensionPattern(isRegex)}`
 }
-export const hashPattern = "[A-Fa-f0-9]{8}"
+export const hashPattern = "\.([0-9a-fA-F]{8})\."
 
 export const videoMessages = {
   tokyo_shuffle: "Stop the Nonsense",
@@ -170,6 +171,12 @@ const cssBanner = `/**
   *
   */
 `
+async function replaceWorkerUrl(cacheWorkerKey: string, indexKey: string): Promise<void> {
+  const indexContents = await fs.readFile(indexKey, "utf-8")
+  const newContents = indexContents.replace(/cacheWorker\.ts/g, cacheWorkerKey.replace("docs/", ""))
+  await fs.writeFile(indexKey, newContents)
+}
+
 /**
  * @description esbuild configuration for the web platform.
  */
@@ -215,6 +222,44 @@ export const webConfig: esbuild.BuildOptions = {
         filename: "bundle.css",
       },
     }),
+    manifestPlugin({
+      // The `entries` object is what the contents of the manifest would normally be without using a custom `generate` function.
+      // It is a string to string mapping of the original asset name to the output file name.
+      generate: (entries) => {
+        const manifest = {}
+
+        for (const [source, file] of Object.entries(entries)) {
+          manifest[source] = {
+            file: file.replace("docs/", ""),
+            integrity:
+              "sha384-" +
+              createHash("sha384")
+                .update(file as string)
+                .digest("base64"),
+          }
+        }
+        return manifest
+      },
+    }),
+    {
+      name: "findAndReplaceWorkerUrl",
+      setup(build) {
+        build.onEnd(async (results: esbuild.BuildResult) => {
+          const outputs = Array.from(Object.keys(results.metafile?.outputs))
+          const workerOutput = outputs.find(
+            (key) => key.includes("cacheWorker") && !key.includes("map"),
+          )
+          const indexOutput = outputs.find(
+            (key) => key.includes("index") && !key.includes("map") && key.includes("js"),
+          )
+          if (!workerOutput || !indexOutput) {
+            return
+          }
+          await replaceWorkerUrl(workerOutput, indexOutput)
+          return
+        })
+      },
+    },
   ],
 }
 
@@ -222,7 +267,7 @@ export const baseProject: Project = {
   entryPoints: [
     "src/assets/javascripts/index.ts",
     "src/assets/stylesheets/bundle.css",
-    "src/cache_worker.ts",
+    "src/cacheWorker.ts",
   ],
   tsconfig: "tsconfig.json",
   entryNames: "[dir]/[name].[hash]",

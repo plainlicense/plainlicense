@@ -27,7 +27,7 @@
     "noUnusedParameters": true,
     "strict": true,
     "verbatimModuleSyntax": false,
-    "allowImportingTsExtensions": true,
+    "allowImportingTsExtensions": false,
     "noEmit": false,
     "paths": {
       "~/*": [
@@ -63,7 +63,7 @@
     "./external/mkdocs-material/material/src/templates/assets/javascripts/bundle.ts",
     "./external/mkdocs-material/material/src/templates/assets/javascripts/**/*.ts",
     "./external/mkdocs-material/material/src/overrides/assets/javascripts/**/*.ts",
-    "src/cache_worker.ts"
+    "src/cacheWorker.ts"
   ],
   "exclude": [
     "src/build/*.ts",

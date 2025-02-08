@@ -24,4 +24,8 @@ extend-exclude = [
     ".git",
     "/usr/share/code/**/*",
     "eslint.config.mjs",
+    "docs/manifest.json",
+    "src/assets/videos/**/*",
+    "src/assets/fonts/**/*",
+    "src/assets/images/**/*",
 ]
