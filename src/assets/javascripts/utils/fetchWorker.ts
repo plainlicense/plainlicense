@@ -1,10 +1,10 @@
 import { logger } from "~/utils"
-import { worker } from "~worker/cache_meta.json"
+import cacheWorkerUrl from "~worker/cache_worker.ts?worker"
 
 // registers the service worker
-if ("serviceWorker" in navigator && window.isSecureContext) {
+if ("serviceWorker" in navigator && window.isSecureContext && cacheWorker) {
   logger.info("Registering service worker")
-  navigator.serviceWorker.register(worker, { scope: "/" }).then((registration) => {
+  navigator.serviceWorker.register(cacheWorker, { scope: "/" }).then((registration) => {
     if (registration.installing) {
       logger.info("Service worker installing")
     } else if (registration.waiting) {

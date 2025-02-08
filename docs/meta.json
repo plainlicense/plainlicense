@@ -1,18 +1,599 @@
 {
-  "docs/cache_meta.3OJKREVG.json": {
-    "bytes": 383,
+  "docs/assets/videos/hero/break_free/break_free_av1_1280.MHR3ZGJM.webm": {
+    "bytes": 2046212,
     "inputs": [
-      "src/cache_meta.json"
+      "src/assets/videos/hero/break_free/break_free_av1_1280.webm"
     ],
     "exports": []
   },
-  "docs/assets/javascripts/index.ZKBAC6EB.js.map": {
-    "bytes": 1761286,
+  "docs/assets/videos/hero/break_free/break_free_av1_1920.ZBJ6I55Y.webm": {
+    "bytes": 2530846,
+    "inputs": [
+      "src/assets/videos/hero/break_free/break_free_av1_1920.webm"
+    ],
+    "exports": []
+  },
+  "docs/assets/videos/hero/break_free/break_free_av1_2560.HXMDT5GO.webm": {
+    "bytes": 2675476,
+    "inputs": [
+      "src/assets/videos/hero/break_free/break_free_av1_2560.webm"
+    ],
+    "exports": []
+  },
+  "docs/assets/videos/hero/break_free/break_free_av1_3840.5V2V4VJR.webm": {
+    "bytes": 3011518,
+    "inputs": [
+      "src/assets/videos/hero/break_free/break_free_av1_3840.webm"
+    ],
+    "exports": []
+  },
+  "docs/assets/videos/hero/break_free/break_free_av1_426.XMIUTUPS.webm": {
+    "bytes": 555858,
+    "inputs": [
+      "src/assets/videos/hero/break_free/break_free_av1_426.webm"
+    ],
+    "exports": []
+  },
+  "docs/assets/videos/hero/break_free/break_free_av1_640.W4QED7UF.webm": {
+    "bytes": 907171,
+    "inputs": [
+      "src/assets/videos/hero/break_free/break_free_av1_640.webm"
+    ],
+    "exports": []
+  },
+  "docs/assets/videos/hero/break_free/break_free_av1_854.HN3WTVPV.webm": {
+    "bytes": 1338941,
+    "inputs": [
+      "src/assets/videos/hero/break_free/break_free_av1_854.webm"
+    ],
+    "exports": []
+  },
+  "docs/assets/videos/hero/break_free/break_free_h264_1280.P7H5AFXW.mp4": {
+    "bytes": 1580901,
+    "inputs": [
+      "src/assets/videos/hero/break_free/break_free_h264_1280.mp4"
+    ],
+    "exports": []
+  },
+  "docs/assets/videos/hero/break_free/break_free_h264_1920.VD3OTIVQ.mp4": {
+    "bytes": 3077022,
+    "inputs": [
+      "src/assets/videos/hero/break_free/break_free_h264_1920.mp4"
+    ],
+    "exports": []
+  },
+  "docs/assets/videos/hero/break_free/break_free_h264_2560.SBX24NRJ.mp4": {
+    "bytes": 3800452,
+    "inputs": [
+      "src/assets/videos/hero/break_free/break_free_h264_2560.mp4"
+    ],
+    "exports": []
+  },
+  "docs/assets/videos/hero/break_free/break_free_h264_3840.L6D346UN.mp4": {
+    "bytes": 8359303,
+    "inputs": [
+      "src/assets/videos/hero/break_free/break_free_h264_3840.mp4"
+    ],
+    "exports": []
+  },
+  "docs/assets/videos/hero/break_free/break_free_h264_426.N7UKN7DL.mp4": {
+    "bytes": 241393,
+    "inputs": [
+      "src/assets/videos/hero/break_free/break_free_h264_426.mp4"
+    ],
+    "exports": []
+  },
+  "docs/assets/videos/hero/break_free/break_free_h264_640.VS54S5EL.mp4": {
+    "bytes": 472796,
+    "inputs": [
+      "src/assets/videos/hero/break_free/break_free_h264_640.mp4"
+    ],
+    "exports": []
+  },
+  "docs/assets/videos/hero/break_free/break_free_h264_854.AKGTMYW6.mp4": {
+    "bytes": 781966,
+    "inputs": [
+      "src/assets/videos/hero/break_free/break_free_h264_854.mp4"
+    ],
+    "exports": []
+  },
+  "docs/assets/videos/hero/break_free/break_free_vp9_1280.BI7P3W4T.webm": {
+    "bytes": 1451123,
+    "inputs": [
+      "src/assets/videos/hero/break_free/break_free_vp9_1280.webm"
+    ],
+    "exports": []
+  },
+  "docs/assets/videos/hero/break_free/break_free_vp9_1920.UQIEAJZ4.webm": {
+    "bytes": 2435871,
+    "inputs": [
+      "src/assets/videos/hero/break_free/break_free_vp9_1920.webm"
+    ],
+    "exports": []
+  },
+  "docs/assets/videos/hero/break_free/break_free_vp9_2560.FOFH4KAS.webm": {
+    "bytes": 2808504,
+    "inputs": [
+      "src/assets/videos/hero/break_free/break_free_vp9_2560.webm"
+    ],
+    "exports": []
+  },
+  "docs/assets/videos/hero/break_free/break_free_vp9_3840.VKNFLIWB.webm": {
+    "bytes": 4707783,
+    "inputs": [
+      "src/assets/videos/hero/break_free/break_free_vp9_3840.webm"
+    ],
+    "exports": []
+  },
+  "docs/assets/videos/hero/break_free/break_free_vp9_426.CWEZUEQQ.webm": {
+    "bytes": 343816,
+    "inputs": [
+      "src/assets/videos/hero/break_free/break_free_vp9_426.webm"
+    ],
+    "exports": []
+  },
+  "docs/assets/videos/hero/break_free/break_free_vp9_640.X5H75VBM.webm": {
+    "bytes": 583672,
+    "inputs": [
+      "src/assets/videos/hero/break_free/break_free_vp9_640.webm"
+    ],
+    "exports": []
+  },
+  "docs/assets/videos/hero/break_free/break_free_vp9_854.L7KXRADV.webm": {
+    "bytes": 856389,
+    "inputs": [
+      "src/assets/videos/hero/break_free/break_free_vp9_854.webm"
+    ],
+    "exports": []
+  },
+  "docs/assets/videos/hero/break_free/posters/break_free_1280.WQ46YIY6.avif": {
+    "bytes": 26607,
+    "inputs": [
+      "src/assets/videos/hero/break_free/posters/break_free_1280.avif"
+    ],
+    "exports": []
+  },
+  "docs/assets/videos/hero/break_free/posters/break_free_1280.V35JZ763.png": {
+    "bytes": 624977,
+    "inputs": [
+      "src/assets/videos/hero/break_free/posters/break_free_1280.png"
+    ],
+    "exports": []
+  },
+  "docs/assets/videos/hero/break_free/posters/break_free_1280.DWFB27YG.webp": {
+    "bytes": 33028,
+    "inputs": [
+      "src/assets/videos/hero/break_free/posters/break_free_1280.webp"
+    ],
+    "exports": []
+  },
+  "docs/assets/videos/hero/break_free/posters/break_free_1920.FZMHEY63.avif": {
+    "bytes": 41612,
+    "inputs": [
+      "src/assets/videos/hero/break_free/posters/break_free_1920.avif"
+    ],
+    "exports": []
+  },
+  "docs/assets/videos/hero/break_free/posters/break_free_1920.WBZ3NBFU.png": {
+    "bytes": 1204546,
+    "inputs": [
+      "src/assets/videos/hero/break_free/posters/break_free_1920.png"
+    ],
+    "exports": []
+  },
+  "docs/assets/videos/hero/break_free/posters/break_free_1920.3GCUVDAP.webp": {
+    "bytes": 55158,
+    "inputs": [
+      "src/assets/videos/hero/break_free/posters/break_free_1920.webp"
+    ],
+    "exports": []
+  },
+  "docs/assets/videos/hero/break_free/posters/break_free_2560.LPKYWG2I.avif": {
+    "bytes": 62253,
+    "inputs": [
+      "src/assets/videos/hero/break_free/posters/break_free_2560.avif"
+    ],
+    "exports": []
+  },
+  "docs/assets/videos/hero/break_free/posters/break_free_2560.3L44PPVD.png": {
+    "bytes": 1665952,
+    "inputs": [
+      "src/assets/videos/hero/break_free/posters/break_free_2560.png"
+    ],
+    "exports": []
+  },
+  "docs/assets/videos/hero/break_free/posters/break_free_2560.JM4UI52R.webp": {
+    "bytes": 88888,
+    "inputs": [
+      "src/assets/videos/hero/break_free/posters/break_free_2560.webp"
+    ],
+    "exports": []
+  },
+  "docs/assets/videos/hero/break_free/posters/break_free_3840.PEEQKWAO.avif": {
+    "bytes": 91751,
+    "inputs": [
+      "src/assets/videos/hero/break_free/posters/break_free_3840.avif"
+    ],
+    "exports": []
+  },
+  "docs/assets/videos/hero/break_free/posters/break_free_3840.IHJWGFLI.png": {
+    "bytes": 3424256,
+    "inputs": [
+      "src/assets/videos/hero/break_free/posters/break_free_3840.png"
+    ],
+    "exports": []
+  },
+  "docs/assets/videos/hero/break_free/posters/break_free_3840.VNNHBF4O.webp": {
+    "bytes": 147254,
+    "inputs": [
+      "src/assets/videos/hero/break_free/posters/break_free_3840.webp"
+    ],
+    "exports": []
+  },
+  "docs/assets/videos/hero/break_free/posters/break_free_426.A3KD2OWB.avif": {
+    "bytes": 8996,
+    "inputs": [
+      "src/assets/videos/hero/break_free/posters/break_free_426.avif"
+    ],
+    "exports": []
+  },
+  "docs/assets/videos/hero/break_free/posters/break_free_426.GHKJUUS4.png": {
+    "bytes": 99065,
+    "inputs": [
+      "src/assets/videos/hero/break_free/posters/break_free_426.png"
+    ],
+    "exports": []
+  },
+  "docs/assets/videos/hero/break_free/posters/break_free_426.SJ76L2AA.webp": {
+    "bytes": 9322,
+    "inputs": [
+      "src/assets/videos/hero/break_free/posters/break_free_426.webp"
+    ],
+    "exports": []
+  },
+  "docs/assets/videos/hero/break_free/posters/break_free_640.BZMJNMOS.avif": {
+    "bytes": 13394,
+    "inputs": [
+      "src/assets/videos/hero/break_free/posters/break_free_640.avif"
+    ],
+    "exports": []
+  },
+  "docs/assets/videos/hero/break_free/posters/break_free_640.7RM4H6NV.png": {
+    "bytes": 195936,
+    "inputs": [
+      "src/assets/videos/hero/break_free/posters/break_free_640.png"
+    ],
+    "exports": []
+  },
+  "docs/assets/videos/hero/break_free/posters/break_free_640.6W5EO4MO.webp": {
+    "bytes": 15028,
+    "inputs": [
+      "src/assets/videos/hero/break_free/posters/break_free_640.webp"
+    ],
+    "exports": []
+  },
+  "docs/assets/videos/hero/break_free/posters/break_free_854.T7N3S3Q2.avif": {
+    "bytes": 17827,
+    "inputs": [
+      "src/assets/videos/hero/break_free/posters/break_free_854.avif"
+    ],
+    "exports": []
+  },
+  "docs/assets/videos/hero/break_free/posters/break_free_854.44NAZCIU.png": {
+    "bytes": 314172,
+    "inputs": [
+      "src/assets/videos/hero/break_free/posters/break_free_854.png"
+    ],
+    "exports": []
+  },
+  "docs/assets/videos/hero/break_free/posters/break_free_854.SBEKVABD.webp": {
+    "bytes": 20718,
+    "inputs": [
+      "src/assets/videos/hero/break_free/posters/break_free_854.webp"
+    ],
+    "exports": []
+  },
+  "docs/assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_1280.ZLQHM4VG.avif": {
+    "bytes": 17918,
+    "inputs": [
+      "src/assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_1280.avif"
+    ],
+    "exports": []
+  },
+  "docs/assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_1280.OYFSUR65.png": {
+    "bytes": 563355,
+    "inputs": [
+      "src/assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_1280.png"
+    ],
+    "exports": []
+  },
+  "docs/assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_1280.EEEVR5AA.webp": {
+    "bytes": 25614,
+    "inputs": [
+      "src/assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_1280.webp"
+    ],
+    "exports": []
+  },
+  "docs/assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_1920.AGNLWXP5.avif": {
+    "bytes": 25329,
+    "inputs": [
+      "src/assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_1920.avif"
+    ],
+    "exports": []
+  },
+  "docs/assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_1920.C5GVT334.png": {
+    "bytes": 966309,
+    "inputs": [
+      "src/assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_1920.png"
+    ],
+    "exports": []
+  },
+  "docs/assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_1920.A6XB2PAB.webp": {
+    "bytes": 40894,
+    "inputs": [
+      "src/assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_1920.webp"
+    ],
+    "exports": []
+  },
+  "docs/assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_2560.BOHJXWWH.avif": {
+    "bytes": 36010,
+    "inputs": [
+      "src/assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_2560.avif"
+    ],
+    "exports": []
+  },
+  "docs/assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_2560.B7WTBGPV.png": {
+    "bytes": 2931579,
+    "inputs": [
+      "src/assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_2560.png"
+    ],
+    "exports": []
+  },
+  "docs/assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_2560.K223UIDG.webp": {
+    "bytes": 60738,
+    "inputs": [
+      "src/assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_2560.webp"
+    ],
+    "exports": []
+  },
+  "docs/assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_3840.6YTTSAWO.avif": {
+    "bytes": 56579,
+    "inputs": [
+      "src/assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_3840.avif"
+    ],
+    "exports": []
+  },
+  "docs/assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_3840.KWJHCM5F.png": {
+    "bytes": 4847588,
+    "inputs": [
+      "src/assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_3840.png"
+    ],
+    "exports": []
+  },
+  "docs/assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_3840.WPHZ3N2S.webp": {
+    "bytes": 104522,
+    "inputs": [
+      "src/assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_3840.webp"
+    ],
+    "exports": []
+  },
+  "docs/assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_426.JEFZFOJK.avif": {
+    "bytes": 6987,
+    "inputs": [
+      "src/assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_426.avif"
+    ],
+    "exports": []
+  },
+  "docs/assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_426.36AKL4KN.png": {
+    "bytes": 106344,
+    "inputs": [
+      "src/assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_426.png"
+    ],
+    "exports": []
+  },
+  "docs/assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_426.VQWFGCSR.webp": {
+    "bytes": 7956,
+    "inputs": [
+      "src/assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_426.webp"
+    ],
+    "exports": []
+  },
+  "docs/assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_640.KF7GISVX.avif": {
+    "bytes": 9709,
+    "inputs": [
+      "src/assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_640.avif"
+    ],
+    "exports": []
+  },
+  "docs/assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_640.Q7RF6Q5K.png": {
+    "bytes": 197474,
+    "inputs": [
+      "src/assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_640.png"
+    ],
+    "exports": []
+  },
+  "docs/assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_640.3AQWY55B.webp": {
+    "bytes": 12202,
+    "inputs": [
+      "src/assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_640.webp"
+    ],
+    "exports": []
+  },
+  "docs/assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_854.R5Q7G7ZO.avif": {
+    "bytes": 12390,
+    "inputs": [
+      "src/assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_854.avif"
+    ],
+    "exports": []
+  },
+  "docs/assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_854.AHAG6T2U.png": {
+    "bytes": 308906,
+    "inputs": [
+      "src/assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_854.png"
+    ],
+    "exports": []
+  },
+  "docs/assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_854.OH5ALQCN.webp": {
+    "bytes": 16542,
+    "inputs": [
+      "src/assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_854.webp"
+    ],
+    "exports": []
+  },
+  "docs/assets/videos/hero/tokyo_shuffle/tokyo_shuffle_av1_1280.LTL754GX.webm": {
+    "bytes": 8038246,
+    "inputs": [
+      "src/assets/videos/hero/tokyo_shuffle/tokyo_shuffle_av1_1280.webm"
+    ],
+    "exports": []
+  },
+  "docs/assets/videos/hero/tokyo_shuffle/tokyo_shuffle_av1_1920.HCHG3L6F.webm": {
+    "bytes": 9509749,
+    "inputs": [
+      "src/assets/videos/hero/tokyo_shuffle/tokyo_shuffle_av1_1920.webm"
+    ],
+    "exports": []
+  },
+  "docs/assets/videos/hero/tokyo_shuffle/tokyo_shuffle_av1_2560.VZLSLY3T.webm": {
+    "bytes": 9268564,
+    "inputs": [
+      "src/assets/videos/hero/tokyo_shuffle/tokyo_shuffle_av1_2560.webm"
+    ],
+    "exports": []
+  },
+  "docs/assets/videos/hero/tokyo_shuffle/tokyo_shuffle_av1_3840.IRQNSZL3.webm": {
+    "bytes": 8762161,
+    "inputs": [
+      "src/assets/videos/hero/tokyo_shuffle/tokyo_shuffle_av1_3840.webm"
+    ],
+    "exports": []
+  },
+  "docs/assets/videos/hero/tokyo_shuffle/tokyo_shuffle_av1_426.VLHMAUSF.webm": {
+    "bytes": 2744150,
+    "inputs": [
+      "src/assets/videos/hero/tokyo_shuffle/tokyo_shuffle_av1_426.webm"
+    ],
+    "exports": []
+  },
+  "docs/assets/videos/hero/tokyo_shuffle/tokyo_shuffle_av1_640.UJYTIEMI.webm": {
+    "bytes": 4279363,
+    "inputs": [
+      "src/assets/videos/hero/tokyo_shuffle/tokyo_shuffle_av1_640.webm"
+    ],
+    "exports": []
+  },
+  "docs/assets/videos/hero/tokyo_shuffle/tokyo_shuffle_av1_854.T4JUCEGM.webm": {
+    "bytes": 5962380,
+    "inputs": [
+      "src/assets/videos/hero/tokyo_shuffle/tokyo_shuffle_av1_854.webm"
+    ],
+    "exports": []
+  },
+  "docs/assets/videos/hero/tokyo_shuffle/tokyo_shuffle_h264_1280.T7YZV75R.mp4": {
+    "bytes": 5925060,
+    "inputs": [
+      "src/assets/videos/hero/tokyo_shuffle/tokyo_shuffle_h264_1280.mp4"
+    ],
+    "exports": []
+  },
+  "docs/assets/videos/hero/tokyo_shuffle/tokyo_shuffle_h264_1920.IYJ32LIS.mp4": {
+    "bytes": 10644384,
+    "inputs": [
+      "src/assets/videos/hero/tokyo_shuffle/tokyo_shuffle_h264_1920.mp4"
+    ],
+    "exports": []
+  },
+  "docs/assets/videos/hero/tokyo_shuffle/tokyo_shuffle_h264_2560.EWUECAZU.mp4": {
+    "bytes": 12436847,
+    "inputs": [
+      "src/assets/videos/hero/tokyo_shuffle/tokyo_shuffle_h264_2560.mp4"
+    ],
+    "exports": []
+  },
+  "docs/assets/videos/hero/tokyo_shuffle/tokyo_shuffle_h264_3840.7IMTXTLT.mp4": {
+    "bytes": 22673809,
+    "inputs": [
+      "src/assets/videos/hero/tokyo_shuffle/tokyo_shuffle_h264_3840.mp4"
+    ],
+    "exports": []
+  },
+  "docs/assets/videos/hero/tokyo_shuffle/tokyo_shuffle_h264_426.L7AX42QP.mp4": {
+    "bytes": 1182626,
+    "inputs": [
+      "src/assets/videos/hero/tokyo_shuffle/tokyo_shuffle_h264_426.mp4"
+    ],
+    "exports": []
+  },
+  "docs/assets/videos/hero/tokyo_shuffle/tokyo_shuffle_h264_640.VLIHCIGJ.mp4": {
+    "bytes": 2132004,
+    "inputs": [
+      "src/assets/videos/hero/tokyo_shuffle/tokyo_shuffle_h264_640.mp4"
+    ],
+    "exports": []
+  },
+  "docs/assets/videos/hero/tokyo_shuffle/tokyo_shuffle_h264_854.4V5TCTNN.mp4": {
+    "bytes": 3217633,
+    "inputs": [
+      "src/assets/videos/hero/tokyo_shuffle/tokyo_shuffle_h264_854.mp4"
+    ],
+    "exports": []
+  },
+  "docs/assets/videos/hero/tokyo_shuffle/tokyo_shuffle_vp9_1280.OZ63FAA6.webm": {
+    "bytes": 5718102,
+    "inputs": [
+      "src/assets/videos/hero/tokyo_shuffle/tokyo_shuffle_vp9_1280.webm"
+    ],
+    "exports": []
+  },
+  "docs/assets/videos/hero/tokyo_shuffle/tokyo_shuffle_vp9_1920.BL4HBHVE.webm": {
+    "bytes": 8521389,
+    "inputs": [
+      "src/assets/videos/hero/tokyo_shuffle/tokyo_shuffle_vp9_1920.webm"
+    ],
+    "exports": []
+  },
+  "docs/assets/videos/hero/tokyo_shuffle/tokyo_shuffle_vp9_2560.HQFL3XZA.webm": {
+    "bytes": 12167349,
+    "inputs": [
+      "src/assets/videos/hero/tokyo_shuffle/tokyo_shuffle_vp9_2560.webm"
+    ],
+    "exports": []
+  },
+  "docs/assets/videos/hero/tokyo_shuffle/tokyo_shuffle_vp9_3840.AMTWROJH.webm": {
+    "bytes": 18548161,
+    "inputs": [
+      "src/assets/videos/hero/tokyo_shuffle/tokyo_shuffle_vp9_3840.webm"
+    ],
+    "exports": []
+  },
+  "docs/assets/videos/hero/tokyo_shuffle/tokyo_shuffle_vp9_426.MROBMCDW.webm": {
+    "bytes": 1727957,
+    "inputs": [
+      "src/assets/videos/hero/tokyo_shuffle/tokyo_shuffle_vp9_426.webm"
+    ],
+    "exports": []
+  },
+  "docs/assets/videos/hero/tokyo_shuffle/tokyo_shuffle_vp9_640.YMSOWHCY.webm": {
+    "bytes": 2705541,
+    "inputs": [
+      "src/assets/videos/hero/tokyo_shuffle/tokyo_shuffle_vp9_640.webm"
+    ],
+    "exports": []
+  },
+  "docs/assets/videos/hero/tokyo_shuffle/tokyo_shuffle_vp9_854.MXKV5CQO.webm": {
+    "bytes": 3692828,
+    "inputs": [
+      "src/assets/videos/hero/tokyo_shuffle/tokyo_shuffle_vp9_854.webm"
+    ],
+    "exports": []
+  },
+  "docs/assets/javascripts/index.6MM6I56T.js.map": {
+    "bytes": 1757369,
     "inputs": [],
     "exports": []
   },
-  "docs/assets/javascripts/index.ZKBAC6EB.js": {
-    "bytes": 656524,
+  "docs/assets/javascripts/index.6MM6I56T.js": {
+    "bytes": 628331,
     "inputs": [
       "node_modules/focus-visible/dist/focus-visible.js",
       "node_modules/escape-html/index.js",
@@ -256,7 +837,8 @@
       "external/mkdocs-material/src/templates/assets/javascripts/polyfills/index.ts",
       "src/assets/javascripts/utils/eventHandlers.ts",
       "src/assets/javascripts/utils/index.ts",
-      "src/assets/javascripts/fetchWorker.ts",
+      "src/assets/javascripts/utils/cacheWorkerUrl.ts",
+      "src/assets/javascripts/utils/fetchWorker.ts",
       "src/assets/javascripts/features/feedback/feedback.ts",
       "src/assets/javascripts/features/feedback/index.ts",
       "src/assets/javascripts/features/licenses/tabManager.ts",
@@ -352,13 +934,13 @@
     ],
     "exports": []
   },
-  "docs/assets/stylesheets/bundle.Q2SW77BY.css.map": {
-    "bytes": 323555,
+  "docs/assets/stylesheets/bundle.G7JCRUA6.css.map": {
+    "bytes": 324956,
     "inputs": [],
     "exports": []
   },
-  "docs/assets/stylesheets/bundle.Q2SW77BY.css": {
-    "bytes": 208444,
+  "docs/assets/stylesheets/bundle.G7JCRUA6.css": {
+    "bytes": 210018,
     "inputs": [
       "external/mkdocs-material/material/templates/assets/stylesheets/palette.06af60db.min.css",
       "external/mkdocs-material/material/templates/assets/stylesheets/main.0253249f.min.css",
@@ -372,20 +954,24 @@
     ],
     "entryPoint": "src/assets/stylesheets/bundle.css"
   },
-  "docs/cache_worker.2SGCXR4P.js.map": {
-    "bytes": 23706,
+  "docs/assets/images/logo_named.YIWHC445.svg": {
+    "bytes": 6460,
+    "inputs": [
+      "src/assets/images/logo_named.svg"
+    ],
+    "exports": []
+  },
+  "docs/cache_worker.DK4NR55K.js.map": {
+    "bytes": 24439,
     "inputs": [],
     "exports": []
   },
-  "docs/cache_worker.2SGCXR4P.js": {
-    "bytes": 12737,
+  "docs/cache_worker.DK4NR55K.js": {
+    "bytes": 12474,
     "inputs": [
       "src/cache_worker.ts"
     ],
     "exports": [],
     "entryPoint": "src/cache_worker.ts"
-  },
-  "src/assets/images/logo_named.svg": [
-    "assets/images/logo_named.6fe3b615.svg"
-  ]
+  }
 }

@@ -13,7 +13,7 @@
  * - Subscriptions to page-specific observables
  *========================================================================*
  */
-import "./fetchWorker"
+import "./utils/fetchWorker"
 // @ts-ignore - TODO: figure out how to fix this annoying error
 import "@/bundle"
 import "./config"

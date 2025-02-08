@@ -6,30 +6,41 @@
  * @author Adam Poulemanos <adam<at>plainlicense<dot>org>
  * @copyright No rights reserved.
  */
-import { urls, version, cacheName } from "~worker/cache_meta.json"
 
 export type {}
 
 declare const self: ServiceWorkerGlobalScope
 
+import woff2Inter from "./assets/fonts/inter-v.woff2"
+import woff2Bangers from "./assets/fonts/bangers-regular.woff2"
+import woff2SourceCodePro from "./assets/fonts/sourcecodepro-regular.woff2"
+import woff2Raleway from "./assets/fonts/raleway.woff2"
+import svgLogo from "./assets/images/logo_named.svg"
+
 // Configuration types
 interface CacheConfig {
   cacheName: string
-  urls: string[]
+  preCacheUrls: string[]
   version: number
 }
 
-type CacheUrls = { urls: string[] }
+type CachePreCacheUrls = { preCacheUrls: string[] }
 
 interface Payload {
   type: "CACHE_CONFIG" | "CACHE_URLS"
-  payload: CacheConfig | CacheUrls
+  payload: CacheConfig | CachePreCacheUrls
 }
 
 let CONFIG: CacheConfig = {
-  cacheName: cacheName || "plain-license-v1",
-  urls: urls || [],
-  version: version || Date.now(),
+  cacheName: "plain-license-v1",
+  preCacheUrls: [
+    new URL(woff2Inter, import.meta.url).href,
+    new URL(woff2Bangers, import.meta.url).href,
+    new URL(woff2SourceCodePro, import.meta.url).href,
+    new URL(woff2Raleway, import.meta.url).href,
+    new URL(svgLogo, import.meta.url).href,
+  ],
+  version: Date.now(),
 }
 
 /**
@@ -147,7 +158,7 @@ const normalizeRequest = (url: string | URL | Request): Request => {
  *
  * @method init - Initialize cache configuration
  * @method cleanup - Cleanup old caches
- * @method precache - Precache all the urls in the cache configuration
+ * @method precache - Precache all the preCacheUrls in the cache configuration
  */
 class CacheManager {
   private config: CacheConfig = CONFIG
@@ -217,7 +228,7 @@ class CacheManager {
     if (!this.config.cacheName || !this.config.cacheName.length || !this.config.cacheName.trim()) {
       throw new CacheError("Cache name is required")
     }
-    if (!this.config.urls || !this.config.urls.length) {
+    if (!this.config.preCacheUrls || !this.config.preCacheUrls.length) {
       throw new CacheError("At least one url is required. Our poor cache worker has nothing to do.")
     }
     logger.info("Cache configuration validated")
@@ -277,18 +288,18 @@ class CacheManager {
   }
 
   /**
-   * Precache all the urls in the cache configuration
+   * Precache all the preCacheUrls in the cache configuration
    */
   async precache(): Promise<void> {
     try {
       const cache = await this.getCache()
-      await cache.addAll(this.config.urls)
-      for (const url of this.config.urls) {
+      await cache.addAll(this.config.preCacheUrls)
+      for (const url of this.config.preCacheUrls) {
         await this.checkForStaleKey(url)
       }
       logger.info("Precaching complete")
     } catch (error) {
-      throw new CacheError("Failed to precache urls", error as Error)
+      throw new CacheError("Failed to precache preCacheUrls", error as Error)
     }
   }
 
@@ -337,7 +348,7 @@ class CacheManager {
         const name = parts?.slice(0, -1).join(".")
         const ext = parts?.slice(-1)[0]
         const hashlessUrl = new RegExp(`${name}\.[a-fA-F0-9]{8}\.${ext}`)
-        const inConfig = this.config.urls.find((u) => hashlessUrl.test(u))
+        const inConfig = this.config.preCacheUrls.find((u) => hashlessUrl.test(u))
         if (inConfig) {
           return this.tryFetch(inConfig, init)
         }
@@ -468,9 +479,9 @@ self.addEventListener("fetch", (event: FetchEvent) => {
 
 self.addEventListener("message", (event: ExtendableMessageEvent) => {
   const payload = event.data as Payload
-  if (payload.type === "CACHE_URLS" && payload.payload && payload.payload.urls) {
-    CONFIG.urls.push(...payload.payload.urls)
-    for (const url of payload.payload.urls) {
+  if (payload.type === "CACHE_URLS" && payload.payload && payload.payload.preCacheUrls) {
+    CONFIG.preCacheUrls.push(...payload.payload.preCacheUrls)
+    for (const url of payload.payload.preCacheUrls) {
       CacheStrategies.cacheFirst(new Request(url))
     }
   }
