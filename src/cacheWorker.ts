@@ -24,6 +24,14 @@ interface CacheConfig {
   version: number
 }
 
+interface Manifest {
+  [oldPath: string]: {
+    file: string // new path
+    integrity: string // integrity hash (sha384)
+  }
+}
+
+type RequestLike = string | URL | Request
 type CachePreCacheUrls = { preCacheUrls: string[] }
 
 interface Payload {
@@ -33,15 +41,11 @@ interface Payload {
 
 let CONFIG: CacheConfig = {
   cacheName: "plain-license-v1",
-  preCacheUrls: [
-    new URL(woff2Inter, import.meta.url).href,
-    new URL(woff2Bangers, import.meta.url).href,
-    new URL(woff2SourceCodePro, import.meta.url).href,
-    new URL(woff2Raleway, import.meta.url).href,
-    new URL(svgLogo, import.meta.url).href,
-  ],
+  preCacheUrls: [woff2Inter, woff2Bangers, woff2SourceCodePro, woff2Raleway, svgLogo],
   version: Date.now(),
 }
+
+const preCacheExts = ["js", "css", "html", "json", "svg", "woff", "woff2"]
 
 /**
  * Check if we're in development mode
@@ -122,26 +126,30 @@ class NetworkError extends Error {
   }
 }
 
-/**
- * Get the hash from a file path
- * @param s string - file path
- * @returns string | null
- */
-const get_hash = (s: string): string | null => {
+// Load the manifest file
+async function loadManifest(url: URL): Promise<string | undefined> {
   try {
-    const split = s.split("/")[s.split("/").length - 1].split(".")
-    if (split.length >= 3) {
-      return split[split.length - 2]
-    } else {
-      return null
+    const response = await fetch(url)
+    if (!response.ok) {
+      throw new NetworkError("Failed to fetch the manifest", response.status)
     }
-  } catch (_error) {
-    logger.error("Failed to get hash from string:", _error as Error)
-    return null
+    return await response.json()
+  } catch (error) {
+    logger.error("Error loading manifest:", error as Error)
+    return undefined
   }
 }
 
-const normalizeUrl = (url: string | URL | Request): URL => {
+const MANIFEST: Manifest = {}
+;(async () => {
+  const data = await loadManifest(new URL("manifest.json", self.location.origin))
+  if (!data) {
+    throw new CacheError("Failed to load manifest file")
+  }
+  Object.assign(MANIFEST, data)
+})()
+
+const normalizeUrl = (url: RequestLike): URL => {
   return (
     url instanceof URL ? url
     : url instanceof Request ? new URL(url.url)
@@ -149,7 +157,7 @@ const normalizeUrl = (url: string | URL | Request): URL => {
   )
 }
 
-const normalizeRequest = (url: string | URL | Request): Request => {
+const normalizeRequest = (url: RequestLike): Request => {
   return url instanceof Request ? url : new Request(url)
 }
 
@@ -166,39 +174,58 @@ class CacheManager {
   public cacheKeys: string[] = []
 
   constructor() {
-    this.init()
+    ;(async () => {
+      try {
+        await this.init()
+      } catch (error) {
+        logger.error("Failed to initialize cache manager:", error as Error)
+      }
+    })()
   }
 
   // gets the cache configuration
   async init(): Promise<void> {
     this.config = CONFIG
     this.cache = await caches.open(this.config.cacheName)
-    this.cacheKeys = await caches.keys()
+    this.cacheKeys = await this.getCacheKeys()
     this.validateConfig()
   }
 
   public async getCache(): Promise<Cache> {
-    if (!this.cache) {
+    if (!this.cache || !(this.cache instanceof Cache)) {
       this.cache = await caches.open(this.config.cacheName)
     }
     return this.cache
   }
 
   public async updateKeys(): Promise<string[]> {
-    this.cacheKeys = await caches.keys()
-    return this.cacheKeys
-  }
-
-  public async getCacheKeys(): Promise<string[]> {
-    if (!this.cacheKeys.length) {
-      this.cacheKeys = await caches.keys()
+    const newKeys = await caches.keys()
+    if (newKeys.length && newKeys.some((key) => !this.cacheKeys.includes(key))) {
+      this.cacheKeys = newKeys
       logger.info(`Cache keys updated, keys: ${this.cacheKeys.join(", ")}`)
     }
     return this.cacheKeys
   }
 
-  public async cacheIt(request: string | URL | Request, response?: Response): Promise<void> {
+  public async getCacheKeys(): Promise<string[]> {
+    if (!this.cacheKeys || !this.cacheKeys.length) {
+      await this.updateKeys()
+    }
+    return this.cacheKeys
+  }
+
+  public async cacheIt(request: RequestLike | RequestLike[], response?: Response): Promise<void> {
+    if (Array.isArray(request)) {
+      const promises = request.map((req) => this.cacheIt(req, response))
+      await Promise.all(promises)
+      return
+    }
     request = normalizeRequest(request)
+    const keys = await this.getCacheKeys()
+    if (keys.includes(request.toString())) {
+      logger.info("Resource already cached")
+      return
+    }
     const cache = await this.getCache()
     if (response && response.ok) {
       await cache.put(request, response.clone())
@@ -234,7 +261,7 @@ class CacheManager {
     logger.info("Cache configuration validated")
   }
 
-  private async toBaseName(s: string | URL | Request): Promise<string> {
+  private async toBaseName(s: RequestLike): Promise<string> {
     try {
       const url = normalizeUrl(s)
       const file = url.pathname.split("/")?.pop()
@@ -254,7 +281,7 @@ class CacheManager {
    * Checks for and deletes stale cache keys.
    * @param url The URL/string/Request to check for stale keys against.
    */
-  private async checkForStaleKey(url: string | URL | Request): Promise<void> {
+  private async checkForStaleKey(url: RequestLike): Promise<void> {
     try {
       url = normalizeUrl(url)
       const cache = await this.getCache()
@@ -291,16 +318,21 @@ class CacheManager {
    * Precache all the preCacheUrls in the cache configuration
    */
   async precache(): Promise<void> {
-    try {
-      const cache = await this.getCache()
-      await cache.addAll(this.config.preCacheUrls)
-      for (const url of this.config.preCacheUrls) {
-        await this.checkForStaleKey(url)
+    await this.cacheIt(this.config.preCacheUrls)
+    // Handle manifest entries
+    const manifestKeys = Object.keys(MANIFEST)
+    const manifestPromises = manifestKeys.map(async (key) => {
+      if (this.config.preCacheUrls.includes(MANIFEST[key].file)) {
+        return
       }
-      logger.info("Precaching complete")
-    } catch (error) {
-      throw new CacheError("Failed to precache preCacheUrls", error as Error)
-    }
+      if (preCacheExts.some((ext) => key.endsWith(ext))) {
+        const url = new URL(MANIFEST[key].file)
+        await this.cacheIt(url)
+      }
+    })
+
+    await Promise.all(manifestPromises)
+    logger.info("Precaching complete")
   }
 
   /**
@@ -340,20 +372,19 @@ class CacheManager {
       const errorMessage = response instanceof Response ? await response.json() : "No response"
       logger.error("Failed to fetch:", new Error(errorMessage))
       logger.error("Attempting fallback fetch")
-      const url = normalizeUrl(request)
-      const hash = get_hash(url.pathname)
-      if (!hash && url.origin === self.location.origin) {
-        const file = url.pathname.split("/")?.pop()
-        const parts = file?.split(".")
-        const name = parts?.slice(0, -1).join(".")
-        const ext = parts?.slice(-1)[0]
-        const hashlessUrl = new RegExp(`${name}\.[a-fA-F0-9]{8}\.${ext}`)
-        const inConfig = this.config.preCacheUrls.find((u) => hashlessUrl.test(u))
+      const url = new URL(request.toString())
+      if (MANIFEST && Object.keys(MANIFEST).includes(url.pathname)) {
+        const inConfig = MANIFEST.hasOwnProperty(url.pathname)
         if (inConfig) {
-          return this.tryFetch(inConfig, init)
+          const newLocation = MANIFEST[url.pathname].file
+          return this.tryFetch(newLocation, init)
         }
       }
-      return this.tryFetch(url.pathname.replace(`.${hash}`, ""), init)
+      if (url.hash && url.hash.length) {
+        url.hash = ""
+        return this.tryFetch(url, init)
+      }
+      return response
     }
   }
 }
@@ -367,6 +398,47 @@ const cacheManager = new CacheManager()
  * @method @static staleWhileRevalidate
  */
 class CacheStrategies {
+  public static cacheExts = [
+    "avif",
+    "css",
+    "html",
+    "jpeg",
+    "jpg",
+    "js",
+    "json",
+    "mp4",
+    "png",
+    "svg",
+    "webm",
+    "webp",
+    "woff",
+    "woff2",
+  ]
+  public static staleWhileRevalidateExts = ["html", "json", "css", "js"]
+
+  static async routeToStrategy(request: Request): Promise<Response> {
+    if (request.method !== "GET") {
+      return fetch(request)
+    }
+    const url = new URL(request.url)
+    if (url.pathname.includes("livereload")) {
+      return new Response("Blocked", { status: 200, statusText: "OK" })
+    }
+    if (url.origin !== self.location.origin) {
+      return fetch(request)
+    }
+    // spellchecker:off
+    const strat = CacheStrategies
+    const ext = url.pathname.split(".").pop()
+    if (!strat.cacheExts.some((ext) => url.pathname.endsWith(ext)) || !ext) {
+      return fetch(request)
+    }
+    if (strat.staleWhileRevalidateExts.includes(ext)) {
+      return strat.staleWhileRevalidate(request)
+    }
+    return strat.cacheFirst(request)
+    // spellchecker:on
+  }
   /**
    * Cache first strategy
    * @param request Request
@@ -402,13 +474,15 @@ class CacheStrategies {
     const cache = await cacheManager.getCache()
     const cached = await cache.match(request)
 
-    const networkPromise = await cacheManager
+    // Create network promise without awaiting
+    const networkPromise = cacheManager
       .fallbackFetch(request)
-      .then((response) => {
+      .then(async (response) => {
         if (!response.ok) {
           throw new NetworkError("Network response was not ok", response.status)
         }
-        cacheManager.cacheIt(request, response.clone())
+        // Cache the new response in background
+        await cacheManager.cacheIt(request, response.clone())
         return response
       })
       .catch((error) => {
@@ -416,21 +490,48 @@ class CacheStrategies {
         throw error
       })
 
-    return cached ?? networkPromise
+    if (cached) {
+      // Start revalidation in background
+      networkPromise.catch((error) => {
+        logger.error("Background revalidation failed:", error as Error)
+      })
+      logger.info("Returning cached response while revalidating")
+      return cached
+    }
+
+    logger.info("No cached response, waiting for network")
+    return networkPromise
   }
 }
 
-// install the service worker
-self.addEventListener("install", (event: ExtendableEvent) => {
+/**
+ * Fetch event listener for handling requests
+ */
+self.addEventListener("install", (event: ExtendableEvent): void => {
   event.waitUntil(
     (async () => {
       try {
-        await cacheManager.init()
+        await cacheManager.precache() // Add precaching during install
         await self.skipWaiting()
-        await cacheManager.precache()
         logger.info("Service worker installed")
       } catch (error) {
         logger.error("Install failed:", error as Error)
+        throw error
+      }
+    })(),
+  )
+})
+
+/**
+ * Fetch event listener for handling requests
+ */
+self.addEventListener("fetch", (event: FetchEvent) => {
+  event.respondWith(
+    (async () => {
+      try {
+        return await CacheStrategies.routeToStrategy(event.request)
+      } catch (error) {
+        logger.error("Fetch failed:", error as Error)
         throw error
       }
     })(),
@@ -455,34 +556,19 @@ self.addEventListener("activate", (event: ExtendableEvent) => {
   )
 })
 
-/**
- * Fetch event listener for handling requests
- */
-self.addEventListener("fetch", (event: FetchEvent) => {
-  if (event.request.method !== "GET") {
-    return
-  }
-  const url = new URL(event.request.url)
-  if (!url.origin.startsWith(self.location.origin)) {
-    return
-  }
-  // We use stale-while-revalidate for assets that are more regularly updated
-  const isRefreshAsset = /\.(js|css|html|json)$/i.test(url.pathname)
-
-  event.respondWith(
-    isRefreshAsset ?
-      CacheStrategies.staleWhileRevalidate(event.request)
-    : CacheStrategies.cacheFirst(event.request),
-  )
-  logger.info(`Fetching: ${url.pathname}`)
-})
-
 self.addEventListener("message", (event: ExtendableMessageEvent) => {
   const payload = event.data as Payload
   if (payload.type === "CACHE_URLS" && payload.payload && payload.payload.preCacheUrls) {
     CONFIG.preCacheUrls.push(...payload.payload.preCacheUrls)
-    for (const url of payload.payload.preCacheUrls) {
-      CacheStrategies.cacheFirst(new Request(url))
-    }
+    ;(async () => {
+      try {
+        await cacheManager.precache()
+      } catch (error) {
+        logger.error("Precaching failed:", error as Error)
+      }
+    })()
+  } else {
+    logger.info("Received unsupported message type or missing payload")
+    return
   }
 })

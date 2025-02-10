@@ -40,6 +40,7 @@ import type {
 } from "../types.ts"
 import { createHash } from "crypto"
 import { resolveGlob } from "../utils/index.js"
+import { Manifest, ReplacersPlugin } from "../localPlugins/index.js"
 
 export const placeholderMap: PlaceholderMap = {
   "src/assets/stylesheets/_bundle_template.css": {
@@ -58,7 +59,13 @@ export const cssLocs = {
 }
 
 export const fontLoc = "src/assets/fonts/*" as const
-export const clearGlobs = ["docs/*.{js,json}", "docs/*js.map", "docs/assets"] as const
+export const clearGlobs = [
+  "docs/*.{js,json}",
+  "docs/*js.map",
+  "docs/assets",
+  "docs/manifest.json",
+] as const
+
 export const clearOpts: globby.GlobbyOptions = {
   expandDirectories: true,
   onlyFiles: true,
@@ -149,6 +156,15 @@ export const mediaExtensionPattern = (isRegex: boolean = true) => {
 }
 export const hashPattern = "\.([0-9a-fA-F]{8})\."
 
+const removeDefaultPattern = (content: string, variable: string) => {
+  const pattern = new RegExp(`${variable}.default`, "g")
+  let newContent = content
+  for (const match of content.matchAll(pattern)) {
+    newContent = newContent.replace(match[0], variable)
+  }
+  return newContent
+}
+
 export const videoMessages = {
   tokyo_shuffle: "Stop the Nonsense",
   break_free: "Understanding shouldn't require a degree.",
@@ -171,11 +187,6 @@ const cssBanner = `/**
   *
   */
 `
-async function replaceWorkerUrl(cacheWorkerKey: string, indexKey: string): Promise<void> {
-  const indexContents = await fs.readFile(indexKey, "utf-8")
-  const newContents = indexContents.replace(/cacheWorker\.ts/g, cacheWorkerKey.replace("docs/", ""))
-  await fs.writeFile(indexKey, newContents)
-}
 
 /**
  * @description esbuild configuration for the web platform.
@@ -190,6 +201,7 @@ export const webConfig: esbuild.BuildOptions = {
   format: "esm",
   target: ["chrome72", "firefox65", "safari12", "edge88"],
   outbase: "src",
+  logLevel: "info",
   chunkNames: "[dir]/chunks/[name].[hash]",
   assetNames: "[dir]/[name].[hash]",
   loader: {
@@ -222,44 +234,8 @@ export const webConfig: esbuild.BuildOptions = {
         filename: "bundle.css",
       },
     }),
-    manifestPlugin({
-      // The `entries` object is what the contents of the manifest would normally be without using a custom `generate` function.
-      // It is a string to string mapping of the original asset name to the output file name.
-      generate: (entries) => {
-        const manifest = {}
-
-        for (const [source, file] of Object.entries(entries)) {
-          manifest[source] = {
-            file: file.replace("docs/", ""),
-            integrity:
-              "sha384-" +
-              createHash("sha384")
-                .update(file as string)
-                .digest("base64"),
-          }
-        }
-        return manifest
-      },
-    }),
-    {
-      name: "findAndReplaceWorkerUrl",
-      setup(build) {
-        build.onEnd(async (results: esbuild.BuildResult) => {
-          const outputs = Array.from(Object.keys(results.metafile?.outputs))
-          const workerOutput = outputs.find(
-            (key) => key.includes("cacheWorker") && !key.includes("map"),
-          )
-          const indexOutput = outputs.find(
-            (key) => key.includes("index") && !key.includes("map") && key.includes("js"),
-          )
-          if (!workerOutput || !indexOutput) {
-            return
-          }
-          await replaceWorkerUrl(workerOutput, indexOutput)
-          return
-        })
-      },
-    },
+    Manifest,
+    ReplacersPlugin,
   ],
 }
 

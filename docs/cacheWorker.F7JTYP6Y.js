@@ -7,23 +7,18 @@
  */
 
 
-// src/cacheWorker.ts
-import woff2Inter from "./assets/fonts/inter-v.5HMTI5F7.woff2";
-import woff2Bangers from "./assets/fonts/bangers-regular.BIV5PPSH.woff2";
-import woff2SourceCodePro from "./assets/fonts/sourcecodepro-regular.CK7SPIOU.woff2";
-import woff2Raleway from "./assets/fonts/raleway.FJCY4DUZ.woff2";
-import svgLogo from "./assets/images/logo_named.YIWHC445.svg";
+// src/cacheWorker.F7JTYP6Y.js
+var woff2Inter = new URL("assets/fonts/inter-v.5HMTI5F7.woff2", self.location.origin);
+var woff2Bangers = new URL("assets/fonts/bangers-regular.BIV5PPSH.woff2", self.location.origin);
+var woff2SourceCodePro = new URL("assets/fonts/sourcecodepro-regular.CK7SPIOU.woff2", self.location.origin);
+var woff2Raleway = new URL("assets/fonts/raleway.FJCY4DUZ.woff2", self.location.origin);
+var svgLogo = new URL("assets/images/logo_named.YIWHC445.svg", self.location.origin);
 var CONFIG = {
   cacheName: "plain-license-v1",
-  preCacheUrls: [
-    new URL(woff2Inter, import.meta.url).href,
-    new URL(woff2Bangers, import.meta.url).href,
-    new URL(woff2SourceCodePro, import.meta.url).href,
-    new URL(woff2Raleway, import.meta.url).href,
-    new URL(svgLogo, import.meta.url).href
-  ],
+  preCacheUrls: [woff2Inter, woff2Bangers, woff2SourceCodePro, woff2Raleway, svgLogo],
   version: Date.now()
 };
+var preCacheExts = ["js", "css", "html", "json", "svg", "woff", "woff2"];
 var isDev = () => {
   const { origin, hostname, port } = self.location;
   return hostname === "localhost" || hostname === "127.0.0.1" || port === "8000" || origin.includes("localhost");
@@ -77,19 +72,26 @@ var NetworkError = class extends Error {
     }
   }
 };
-var get_hash = (s) => {
+async function loadManifest(url) {
   try {
-    const split = s.split("/")[s.split("/").length - 1].split(".");
-    if (split.length >= 3) {
-      return split[split.length - 2];
-    } else {
-      return null;
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new NetworkError("Failed to fetch the manifest", response.status);
     }
-  } catch (_error) {
-    logger.error("Failed to get hash from string:", _error);
-    return null;
+    return await response.json();
+  } catch (error) {
+    logger.error("Error loading manifest:", error);
+    return void 0;
   }
-};
+}
+var MANIFEST = {};
+(async () => {
+  const data = await loadManifest(new URL("manifest.json", self.location.origin));
+  if (!data) {
+    throw new CacheError("Failed to load manifest file");
+  }
+  Object.assign(MANIFEST, data);
+})();
 var normalizeUrl = (url) => {
   return url instanceof URL ? url : url instanceof Request ? new URL(url.url) : new URL(url);
 };
@@ -101,34 +103,54 @@ var CacheManager = class {
     this.config = CONFIG;
     this.cache = null;
     this.cacheKeys = [];
-    this.init();
+    ;
+    (async () => {
+      try {
+        await this.init();
+      } catch (error) {
+        logger.error("Failed to initialize cache manager:", error);
+      }
+    })();
   }
   // gets the cache configuration
   async init() {
     this.config = CONFIG;
     this.cache = await caches.open(this.config.cacheName);
-    this.cacheKeys = await caches.keys();
+    this.cacheKeys = await this.getCacheKeys();
     this.validateConfig();
   }
   async getCache() {
-    if (!this.cache) {
+    if (!this.cache || !(this.cache instanceof Cache)) {
       this.cache = await caches.open(this.config.cacheName);
     }
     return this.cache;
   }
   async updateKeys() {
-    this.cacheKeys = await caches.keys();
-    return this.cacheKeys;
-  }
-  async getCacheKeys() {
-    if (!this.cacheKeys.length) {
-      this.cacheKeys = await caches.keys();
+    const newKeys = await caches.keys();
+    if (newKeys.length && newKeys.some((key) => !this.cacheKeys.includes(key))) {
+      this.cacheKeys = newKeys;
       logger.info("Cache keys updated, keys: ".concat(this.cacheKeys.join(", ")));
     }
     return this.cacheKeys;
   }
+  async getCacheKeys() {
+    if (!this.cacheKeys || !this.cacheKeys.length) {
+      await this.updateKeys();
+    }
+    return this.cacheKeys;
+  }
   async cacheIt(request, response) {
+    if (Array.isArray(request)) {
+      const promises = request.map((req) => this.cacheIt(req, response));
+      await Promise.all(promises);
+      return;
+    }
     request = normalizeRequest(request);
+    const keys = await this.getCacheKeys();
+    if (keys.includes(request.toString())) {
+      logger.info("Resource already cached");
+      return;
+    }
     const cache = await this.getCache();
     if (response && response.ok) {
       await cache.put(request, response.clone());
@@ -217,16 +239,19 @@ var CacheManager = class {
    * Precache all the preCacheUrls in the cache configuration
    */
   async precache() {
-    try {
-      const cache = await this.getCache();
-      await cache.addAll(this.config.preCacheUrls);
-      for (const url of this.config.preCacheUrls) {
-        await this.checkForStaleKey(url);
+    await this.cacheIt(this.config.preCacheUrls);
+    const manifestKeys = Object.keys(MANIFEST);
+    const manifestPromises = manifestKeys.map(async (key) => {
+      if (this.config.preCacheUrls.includes(MANIFEST[key].file)) {
+        return;
       }
-      logger.info("Precaching complete");
-    } catch (error) {
-      throw new CacheError("Failed to precache preCacheUrls", error);
-    }
+      if (preCacheExts.some((ext) => key.endsWith(ext))) {
+        const url = new URL(MANIFEST[key].file);
+        await this.cacheIt(url);
+      }
+    });
+    await Promise.all(manifestPromises);
+    logger.info("Precaching complete");
   }
   /**
    * Attempt to fetch a resource
@@ -256,7 +281,6 @@ var CacheManager = class {
    * @returns Promise<Response> - response
    */
   async fallbackFetch(request, init) {
-    var _a;
     request = normalizeRequest(request);
     const response = await fetch(request, init);
     if (response.ok) {
@@ -265,25 +289,45 @@ var CacheManager = class {
       const errorMessage = response instanceof Response ? await response.json() : "No response";
       logger.error("Failed to fetch:", new Error(errorMessage));
       logger.error("Attempting fallback fetch");
-      const url = normalizeUrl(request);
-      const hash = get_hash(url.pathname);
-      if (!hash && url.origin === self.location.origin) {
-        const file = (_a = url.pathname.split("/")) == null ? void 0 : _a.pop();
-        const parts = file == null ? void 0 : file.split(".");
-        const name = parts == null ? void 0 : parts.slice(0, -1).join(".");
-        const ext = parts == null ? void 0 : parts.slice(-1)[0];
-        const hashlessUrl = new RegExp("".concat(name, ".[a-fA-F0-9]{8}.").concat(ext));
-        const inConfig = this.config.preCacheUrls.find((u) => hashlessUrl.test(u));
+      const url = new URL(request.toString());
+      if (MANIFEST && Object.keys(MANIFEST).includes(url.pathname)) {
+        const inConfig = MANIFEST.hasOwnProperty(url.pathname);
         if (inConfig) {
-          return this.tryFetch(inConfig, init);
+          const newLocation = MANIFEST[url.pathname].file;
+          return this.tryFetch(newLocation, init);
         }
       }
-      return this.tryFetch(url.pathname.replace(".".concat(hash), ""), init);
+      if (url.hash && url.hash.length) {
+        url.hash = "";
+        return this.tryFetch(url, init);
+      }
+      return response;
     }
   }
 };
 var cacheManager = new CacheManager();
-var CacheStrategies = class {
+var _CacheStrategies = class _CacheStrategies {
+  static async routeToStrategy(request) {
+    if (request.method !== "GET") {
+      return fetch(request);
+    }
+    const url = new URL(request.url);
+    if (url.pathname.includes("livereload")) {
+      return new Response("Blocked", { status: 200, statusText: "OK" });
+    }
+    if (url.origin !== self.location.origin) {
+      return fetch(request);
+    }
+    const strat = _CacheStrategies;
+    const ext = url.pathname.split(".").pop();
+    if (!strat.cacheExts.some((ext2) => url.pathname.endsWith(ext2)) || !ext) {
+      return fetch(request);
+    }
+    if (strat.staleWhileRevalidateExts.includes(ext)) {
+      return strat.staleWhileRevalidate(request);
+    }
+    return strat.cacheFirst(request);
+  }
   /**
    * Cache first strategy
    * @param request Request
@@ -316,29 +360,66 @@ var CacheStrategies = class {
   static async staleWhileRevalidate(request) {
     const cache = await cacheManager.getCache();
     const cached = await cache.match(request);
-    const networkPromise = await cacheManager.fallbackFetch(request).then((response) => {
+    const networkPromise = cacheManager.fallbackFetch(request).then(async (response) => {
       if (!response.ok) {
         throw new NetworkError("Network response was not ok", response.status);
       }
-      cacheManager.cacheIt(request, response.clone());
+      await cacheManager.cacheIt(request, response.clone());
       return response;
     }).catch((error) => {
       logger.error("Network fetch failed:", error);
       throw error;
     });
-    return cached != null ? cached : networkPromise;
+    if (cached) {
+      networkPromise.catch((error) => {
+        logger.error("Background revalidation failed:", error);
+      });
+      logger.info("Returning cached response while revalidating");
+      return cached;
+    }
+    logger.info("No cached response, waiting for network");
+    return networkPromise;
   }
 };
+_CacheStrategies.cacheExts = [
+  "avif",
+  "css",
+  "html",
+  "jpeg",
+  "jpg",
+  "js",
+  "json",
+  "mp4",
+  "png",
+  "svg",
+  "webm",
+  "webp",
+  "woff",
+  "woff2"
+];
+_CacheStrategies.staleWhileRevalidateExts = ["html", "json", "css", "js"];
+var CacheStrategies = _CacheStrategies;
 self.addEventListener("install", (event) => {
   event.waitUntil(
     (async () => {
       try {
-        await cacheManager.init();
-        await self.skipWaiting();
         await cacheManager.precache();
+        await self.skipWaiting();
         logger.info("Service worker installed");
       } catch (error) {
         logger.error("Install failed:", error);
+        throw error;
+      }
+    })()
+  );
+});
+self.addEventListener("fetch", (event) => {
+  event.respondWith(
+    (async () => {
+      try {
+        return await CacheStrategies.routeToStrategy(event.request);
+      } catch (error) {
+        logger.error("Fetch failed:", error);
         throw error;
       }
     })()
@@ -358,27 +439,20 @@ self.addEventListener("activate", (event) => {
     })()
   );
 });
-self.addEventListener("fetch", (event) => {
-  if (event.request.method !== "GET") {
-    return;
-  }
-  const url = new URL(event.request.url);
-  if (!url.origin.startsWith(self.location.origin)) {
-    return;
-  }
-  const isRefreshAsset = /\.(js|css|html|json)$/i.test(url.pathname);
-  event.respondWith(
-    isRefreshAsset ? CacheStrategies.staleWhileRevalidate(event.request) : CacheStrategies.cacheFirst(event.request)
-  );
-  logger.info("Fetching: ".concat(url.pathname));
-});
 self.addEventListener("message", (event) => {
   const payload = event.data;
   if (payload.type === "CACHE_URLS" && payload.payload && payload.payload.preCacheUrls) {
     CONFIG.preCacheUrls.push(...payload.payload.preCacheUrls);
-    for (const url of payload.payload.preCacheUrls) {
-      CacheStrategies.cacheFirst(new Request(url));
-    }
+    (async () => {
+      try {
+        await cacheManager.precache();
+      } catch (error) {
+        logger.error("Precaching failed:", error);
+      }
+    })();
+  } else {
+    logger.info("Received unsupported message type or missing payload");
+    return;
   }
 });
 /**
@@ -389,4 +463,4 @@ self.addEventListener("message", (event) => {
  * @author Adam Poulemanos <adam<at>plainlicense<dot>org>
  * @copyright No rights reserved.
  */
-//# sourceMappingURL=cacheWorker.TLOTYQGG.js.map
+//# sourceMappingURL=cacheWorker.F7JTYP6Y.js.map

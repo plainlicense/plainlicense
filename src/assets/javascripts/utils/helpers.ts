@@ -110,13 +110,13 @@ export function parsePath(path: string): ParsedURLPath {
  * Detects and replaces circular references in objects with the string "[Circular]".
  * @returns A replacer function for JSON.stringify.
  */
-export function getCircularReplacer() {
+function getCircularReplacer() {
   const seen = new WeakSet()
   return (_key: string, value: unknown) => {
     if (typeof value === "object" && value !== null) {
       if (seen.has(value)) {
         try {
-          return JSON.parse(JSON.stringify(value))
+          return JSON.parse(JSON.stringify(value, null, 2))
         } catch (err) {
           return "[Circular]"
         }
@@ -125,4 +125,34 @@ export function getCircularReplacer() {
     }
     return value
   }
+}
+const piSmasher = getCircularReplacer()
+export const stringify = (obj: any) => JSON.stringify(obj, piSmasher, 2)
+
+export function fixSvgDimensions(): void {
+  const svgs = Array.from(document.getElementsByTagName("svg"))
+  if (!svgs || svgs.length === 0) {
+    return
+  }
+  const valueMap = svgs
+    .map((svg: SVGElement, i: number) => {
+      const width = svg.getAttribute("width")
+      const height = svg.getAttribute("height")
+      if (width || height) {
+        const value = width && width !== "NaN" ? width : height
+        return { index: i, value: value !== "NaN" && value !== "0" ? value : "24" }
+      }
+      return
+    })
+    .filter(Boolean)
+  if (valueMap.length === 0) {
+    return
+  }
+  requestAnimationFrame(() => {
+    valueMap.forEach((item: any) => {
+      const svg = svgs[item.index]
+      svg.setAttribute("width", item.value)
+      svg.setAttribute("height", item.value)
+    })
+  })
 }

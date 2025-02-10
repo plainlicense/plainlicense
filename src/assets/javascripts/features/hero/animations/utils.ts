@@ -82,16 +82,30 @@ export function hasLabel(tl: gsap.core.Timeline, label: string): boolean {
   }
 }
 
-
 /**
  * Retrieves the content-containing elements of an element.
  * @param element - The element to retrieve content-containing elements from.
  * @returns The content-containing elements of the element.
  */
 export function getContentElements(element: Element): Element[] {
-  return gsap.utils
-    .toArray(element.querySelectorAll("*"))
-    .filter((el) => isValidElement(el, element)) as Element[]
+  // First get all child elements
+  const allElements = Array.from(element.querySelectorAll("*"))
+
+  // Filter out elements that should be excluded
+  return allElements.filter((el: Element): boolean => {
+    // Check if element is valid and visible
+    if (!isValidElement(el, element)) {
+      return false
+    }
+    // Exclude wrapper elements and utility classes
+    const excludedClasses = ["outer", "inner", "bg"]
+    const hasExcludedClass = excludedClasses.some((cls) => el.classList.contains(cls))
+
+    // Get only elements that contain actual content
+    const hasContent =
+      (el.textContent?.trim()?.length ?? 0) > 0 || el.querySelector("img, svg, video") !== null
+    return !hasExcludedClass && hasContent
+  })
 }
 /**
  * Attempts to retrieve an object's values as elements.
@@ -99,8 +113,8 @@ export function getContentElements(element: Element): Element[] {
  * @returns The object's values as elements.
  */
 function tryObject(obj: any) {
-  if (obj === null || typeof obj !== "object") {
-    return null
+  if (obj === null || typeof obj !== "object" || obj.length === 0) {
+    return []
   }
   const values = Object.values(obj)
   const newValues = []
@@ -130,10 +144,8 @@ export function getTargetsArray(targets: gsap.TweenTarget): Element[] {
       : typeof target === "string" ? document.querySelector(target)
       : tryObject(target),
     )
-    .map((target) => {
-      return target instanceof Element ? target : null
-    })
-    .filter((target) => target !== null)
+    .flat()
+    .filter((el): el is Element => el !== null && el !== undefined && el instanceof Element)
 }
 
 /**

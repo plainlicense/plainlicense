@@ -6,7 +6,7 @@ import globals from "globals"
 import eslintPluginUnicorn from "eslint-plugin-unicorn"
 import sonarjs from "eslint-plugin-sonarjs"
 import { parser } from "typescript-eslint"
- 
+
 import tseslint from "typescript-eslint"
 
 // General rules
@@ -38,6 +38,8 @@ const localConfig = {
     "**/build",
     "**/MANIFEST",
     "**/manifest.json",
+    "docs/*.js",
+    "docs/**/*.js",
     "**/site",
     "**/typings",
     "**/webpack.config.ts",

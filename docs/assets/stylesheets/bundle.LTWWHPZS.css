@@ -7137,6 +7137,14 @@ p.md-nav__description.license {
     background: none;
   }
 }
+header#header-target {
+  visibility: hidden;
+  opacity: 0;
+}
+#hero-tabs {
+  visibility: hidden;
+  opacity: 0;
+}
 section.hero {
   position: fixed;
   top: 0;
@@ -7475,4 +7483,4 @@ section.hero .md-typeset.hero-grid .middle {
 }
 
 /* src/assets/stylesheets/bundle.css */
-/*# sourceMappingURL=bundle.G7JCRUA6.css.map */
+/*# sourceMappingURL=bundle.LTWWHPZS.css.map */

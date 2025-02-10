@@ -10,17 +10,22 @@
 
 import { gsap } from "gsap"
 import { Observer } from "gsap/Observer"
-import { distinctUntilChanged, filter, map } from "rxjs/operators"
-import { OBSERVER_CONFIG, ObserverConfig } from "~/config"
-import { HeroStore } from "~/state"
-import { getContentElements } from "./utils"
 import { Subscription } from "rxjs"
-import { Direction, Section } from "./types"
+import { distinctUntilChanged, filter, map } from "rxjs/operators"
+import {
+  OBSERVER_CONFIG,
+  ObserverConfig,
+  STRONG_EMPHASIS_CONFIG,
+  SUBTLE_EMPHASIS_CONFIG,
+} from "~/config"
+import { HeroStore } from "~/state"
 import type { HeroState } from "~/state/types"
+import { Direction, Section } from "./types"
+import { getContentElements } from "./utils"
 // Make sure we have the effects registered
-import "./effects"
+import { isHome, isValidElement, navigationEvents$, stringify } from "~/utils"
 import { logger } from "~/utils/log"
-import { getCircularReplacer, isHome, isValidElement, navigationEvents$ } from "~/utils"
+import "./effects"
 
 gsap.registerPlugin(Observer)
 
@@ -65,6 +70,8 @@ export class HeroObservation {
   private firstLoad: boolean = true
 
   private footer: Element | null = document.querySelector(".md-footer")
+
+  private header: Element | null = document.querySelector("#header-target #hero-tabs")
 
   private constructor() {
     this.defaultTimelineVars = {
@@ -113,9 +120,11 @@ export class HeroObservation {
   private onLoad() {
     this.transitionTl.pause()
     gsap.set(this.footer, { autoAlpha: 0 })
+    gsap.set(this.header, { autoAlpha: 0 })
     this.subscriptions.add(
       navigationEvents$.pipe(filter((url) => !isHome(url))).subscribe(() => {
         gsap.set(this.footer, { autoAlpha: 1 })
+        gsap.set(this.header, { autoAlpha: 1 })
       }),
     )
     const outerWrappers = gsap.utils.toArray(".outer")
@@ -129,19 +138,15 @@ export class HeroObservation {
       gsap.set(outerWrappers, { yPercent: 100 })
       gsap.set(innerWrappers, { yPercent: -100 })
     })
-
+    const { hash } = window.location
+    const target = document.getElementById(hash.substring(1))
     if (!this.initialized) {
       this.setupSections()
       this.wrapper = gsap.utils.wrap([...Array(this.sectionCount).keys()])
-      this.setupFirstLoad()
       this.setupObserver()
-    }
-    const { hash } = window.location
-    if (hash !== "") {
-      this.goToSection(0, 1)
+      this.setupFirstSection(!target)
     } else {
       // if there's a hash we need to transition to the correct section
-      const target = document.getElementById(hash.substring(1))
       if (target) {
         const sectionTarget = this.sections.find((section) => section.content.includes(target))
         if (sectionTarget) {
@@ -159,9 +164,9 @@ export class HeroObservation {
    * Filters out the emphasis targets and fades in the content.
    * Emphasis animations are handled in videoManager.ts.
    */
-  private setupFirstLoad() {
+  private setupFirstSection(startImmediately: boolean = false) {
     const firstSection = this.sections[0]
-    const { content } = firstSection
+    let { content } = firstSection
     const { subtle, strong } = this.config.emphasisTargets
     const subtleTargets = gsap.utils
       .toArray(document.querySelectorAll(subtle))
@@ -170,11 +175,20 @@ export class HeroObservation {
       .toArray(document.querySelectorAll(strong))
       .filter((el) => this.isValidContentTarget(el))
     const emphasisTargets = [...subtleTargets, ...strongTargets]
-    const filteredContent = content.filter(
+    logger.info("Emphasis targets:", stringify(emphasisTargets))
+    content = content.filter(
       (content) => !emphasisTargets.includes(content) && this.isValidContentTarget(content),
     )
-    gsap.to(filteredContent, { autoAlpha: 1, duration: 0.75 })
-    gsap.to(subtleTargets, { autoAlpha: 0.7, duration: 1 })
+    logger.info("Filtered content:", stringify(content))
+    const tl = gsap.timeline({ paused: !startImmediately, callbackScope: this })
+    tl.addLabel("start")
+    tl.add(["subtleEmphasis", gsap["emphasize"](subtleTargets, SUBTLE_EMPHASIS_CONFIG)], 2)
+    tl.add(["strongEmphasis", gsap["emphasize"](strongTargets, STRONG_EMPHASIS_CONFIG)], 4)
+    this.registerAnimation(tl, firstSection.element)
+    if (startImmediately) {
+      this.goToSection(0, 1)
+    }
+    this.firstLoad = false
   }
 
   /**
@@ -193,37 +207,59 @@ export class HeroObservation {
    * @description Set up the Section objects for the Hero feature.
    */
   private setupSections() {
-    const sectionEls = this.config.fades.fadeInSections
-    this.sections = sectionEls.map((el, index) => {
+    // Get all section elements
+    const sectionEls = gsap.utils.toArray("section.hero")
+    this.sections = (sectionEls as Element[]).map((el, index) => {
+      // Find the main containers
+      const outerWrapper = el.querySelector(".outer")
+      const innerWrapper = el.querySelector(".inner")
+      const bg = el.querySelector(".bg")
+
+      // Get content elements, excluding structural wrappers
+      const content = getContentElements(el).filter(
+        (element) => element !== outerWrapper && element !== innerWrapper && element !== bg,
+      )
+
       return {
         index,
         element: el,
-        content: getContentElements(el),
-        outerWrapper: el.querySelector(".outer"),
-        innerWrapper: el.querySelector(".inner"),
-        bg: el.querySelector(".bg"),
+        outerWrapper,
+        innerWrapper,
+        bg,
+        content,
         animation: gsap
           .timeline({
-            paused: !(index === 0), // Only play the first section
+            paused: index !== 0, // Only play first section
+            callbackScope: this,
           })
           .addLabel("start"),
       }
     }) as Section[]
-    logger.info(`Sections set up: ${JSON.stringify(this.sections, getCircularReplacer(), 2)}`)
+
+    // Debug log the sections
+    logger.info("Sections set up:", {
+      count: this.sections.length,
+      sections: this.sections.map((section) => ({
+        index: section.index,
+        elementId: section.element.id,
+        contentCount: section.content.length,
+        contentElements: section.content.map((el) => ({
+          tagName: el.tagName,
+          className: el.className,
+          id: el.id,
+        })),
+      })),
+    })
+
+    // Filter out ignored elements from first section
     const ignores = gsap.utils.toArray(this.config.fades.fadeInIgnore)
-    this.sections[0].content.filter(
+    this.sections[0].content = this.sections[0].content.filter(
       (content) => !ignores.includes(content) && this.isValidContentTarget(content),
     )
-    this.sections.forEach((section, _) => {
-      const { content } = section
-      requestAnimationFrame(() => {
-        gsap.set(content, { autoAlpha: 0 })
-      })
-    })
+
     this.sectionCount = this.sections.length
     this.sectionIndexLength = this.sectionCount - 1
   }
-
   /**
    * @description Transition to the next section based on the direction and whether the scenicRoute is enabled.
    * @param direction
@@ -273,10 +309,13 @@ export class HeroObservation {
     if (this.currentIndex >= 0) {
       // the first time this runs, currentIndex will be -1
       logger.info(`Setting section ${this.currentIndex} to section ${index}`)
-      tl.setSection({ direction, section: nextSection })
+      tl["setSection"]({ direction, section: nextSection })
     }
     logger.info(`Animating section ${index} in direction ${direction}`)
-    tl.transitionSection({ direction, section: nextSection })
+    tl["transitionSection"]({ direction, section: nextSection })
+    if (nextSection.animation) {
+      tl.add(nextSection.animation, ">")
+    }
     return tl
   }
 
@@ -285,7 +324,6 @@ export class HeroObservation {
     if (this.animating || index === this.currentIndex) {
       return
     }
-    this.animating = true
     logger.info(`Going to section ${index} in direction ${direction}`)
     let tl = gsap.timeline({
       defaults: {
@@ -293,9 +331,11 @@ export class HeroObservation {
         ease: "power2.inOut",
         onComplete: () => {
           this.animating = false
+          logger.info(`Completed transition to section ${index}`)
         },
         onStart: () => {
           this.animating = true
+          this.currentIndex = index
         },
         callbackScope: this,
       },

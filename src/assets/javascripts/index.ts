@@ -39,6 +39,7 @@ import { feedback } from "~/features/feedback"
 import { initLicenseFeature } from "~/features/licenses"
 import {
   createScript,
+  fixSvgDimensions,
   isHelpingIndex,
   isHome,
   isLicense,
@@ -94,6 +95,7 @@ const license$ = navigationEvents$.pipe(
   filter(isLicense),
   switchMap(() => initLicenseFeature()),
 )
+const fixSvg$ = onDom$(of(() => fixSvgDimensions()))
 const windowEvents$ = from(windowEvents())
 
 // Define page configurations
@@ -116,7 +118,7 @@ const pageConfigs: PageConfig[] = [
   {
     matcher: isOnSite,
     location: "all",
-    observables: [analytic$, feedback$, licenseHashHandler$, windowEvents$],
+    observables: [analytic$, feedback$, fixSvg$, licenseHashHandler$, windowEvents$],
   },
 ]
 

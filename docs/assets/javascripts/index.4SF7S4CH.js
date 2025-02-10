@@ -5591,7 +5591,7 @@ function getCircularReplacer() {
     if (typeof value === "object" && value !== null) {
       if (seen.has(value)) {
         try {
-          return JSON.parse(JSON.stringify(value));
+          return JSON.parse(JSON.stringify(value, null, 2));
         } catch (err) {
           return "[Circular]";
         }
@@ -5600,6 +5600,33 @@ function getCircularReplacer() {
     }
     return value;
   };
+}
+var piSmasher = getCircularReplacer();
+var stringify = (obj) => JSON.stringify(obj, piSmasher, 2);
+function fixSvgDimensions() {
+  const svgs = Array.from(document.getElementsByTagName("svg"));
+  if (!svgs || svgs.length === 0) {
+    return;
+  }
+  const valueMap = svgs.map((svg, i) => {
+    const width = svg.getAttribute("width");
+    const height = svg.getAttribute("height");
+    if (width || height) {
+      const value = width && width !== "NaN" ? width : height;
+      return { index: i, value: value !== "NaN" && value !== "0" ? value : "24" };
+    }
+    return;
+  }).filter(Boolean);
+  if (valueMap.length === 0) {
+    return;
+  }
+  requestAnimationFrame(() => {
+    valueMap.forEach((item) => {
+      const svg = svgs[item.index];
+      svg.setAttribute("width", item.value);
+      svg.setAttribute("height", item.value);
+    });
+  });
 }
 
 // external/mkdocs-material/src/templates/assets/javascripts/bundle.ts
@@ -12073,7 +12100,7 @@ async function windowEvents() {
     component$: component$2
   };
   let observablesMissing = false;
-  for (const key in observables) {
+  for (const key of Object.keys(observables)) {
     if (!globalThis[key]) {
       observablesMissing = true;
     }
@@ -12118,7 +12145,7 @@ function watchLicenseHash() {
 }
 
 // src/assets/javascripts/utils/fetchWorker.ts
-var cacheWorkerUrl = new URL("cacheWorker.TLOTYQGG.js", import.meta.url).href;
+var cacheWorkerUrl = "cacheWorker.F7JTYP6Y.js";
 if ("serviceWorker" in navigator && window.isSecureContext) {
   logger.info("Registering service worker");
   const register2 = async () => {
@@ -12419,23 +12446,18 @@ var _HeroStore = class _HeroStore {
     if (weAreDev) {
       this.debugStateChange(update);
     }
-    const keys = Object.keys(update);
-    if (keys[0] in this.state$.value) {
-      this.state$.next({ ...this.state$.value, ...update });
+    if (update === null || update === void 0) {
       return;
     }
-    switch (component) {
-      case "video" /* Video */:
-        this.videoState$.next(update);
-        break;
-      // there were more cases, but we simplified it by moving to the video.
-      // keeping this to make it easier to add components in the future.
-      case void 0:
-        try {
-          this.state$.next({ ...this.state$.value, ...update });
-        } catch (error) {
-          logger.error("Error updating state: ".concat(error, "\nUpdate: ").concat(update));
-        }
+    const changes = Object.entries(update).filter(([key, value]) => value !== null && key in this.state$.value && this.state$.value[key] !== value);
+    if (changes.length === 0) {
+      return;
+    }
+    this.state$.next({ ...this.state$.value, ...update });
+    if (component && component === "video" /* Video */) {
+      logger.info("updating video state; update:", update);
+      this.videoState$.next(update);
+      return;
     }
   }
   /**
@@ -12578,8 +12600,11 @@ var _HeroStore = class _HeroStore {
     if (weAreDev) {
       const oldState = this.state$.value;
       const changes = Object.entries(updates).filter(([key, value]) => oldState[key] !== value);
-      logger.info("Changes:", Object.fromEntries(changes));
-      logger.info("New State:", { ...oldState, ...updates });
+      if (changes.length === 0) {
+        return;
+      }
+      logger.info("Changes:", stringify(changes));
+      logger.info("New State:", stringify({ ...oldState, ...updates }));
       Object.entries(predicates_exports).filter(([_, value]) => typeof value === "function").forEach(([name, predicate]) => {
         logger.info("".concat(name, ":"), predicate({ ...oldState, ...updates }));
       });
@@ -12615,7 +12640,17 @@ function getDistanceToViewport(target, edge = "bottom") {
   return distanceMap[edge];
 }
 function getContentElements(element) {
-  return gsapWithCSS.utils.toArray(element.querySelectorAll("*")).filter((el) => isValidElement(el, element));
+  const allElements = Array.from(element.querySelectorAll("*"));
+  return allElements.filter((el) => {
+    var _a2, _b, _c;
+    if (!isValidElement(el, element)) {
+      return false;
+    }
+    const excludedClasses = ["outer", "inner", "bg"];
+    const hasExcludedClass = excludedClasses.some((cls) => el.classList.contains(cls));
+    const hasContent = ((_c = (_b = (_a2 = el.textContent) == null ? void 0 : _a2.trim()) == null ? void 0 : _b.length) != null ? _c : 0) > 0 || el.querySelector("img, svg, video") !== null;
+    return !hasExcludedClass && hasContent;
+  });
 }
 function modifyDurationForReducedMotion(duration) {
   let newDuration = duration;
@@ -12686,7 +12721,7 @@ gsapWithCSS.registerEffect({
   defaults: { extendTimeline: true },
   effect: (config6) => {
     const { direction, section } = config6;
-    logger.info("setSection: direction: ".concat(direction.toString(), ", section: ").concat((JSON.stringify(section), getCircularReplacer(), 2)));
+    logger.info("setSection: direction: ".concat(direction, ", section: ").concat(stringify(section)));
     const dFactor = getDFactor(direction);
     const tl = gsapWithCSS.timeline();
     tl.add(gsapWithCSS.set(section.element, { zIndex: 0 })).add(gsapWithCSS.to(section.bg, { yPercent: -15 * dFactor })).add(gsapWithCSS.set(section.element, { autoAlpha: 0 })).add(gsapWithCSS.set(section.content, { autoAlpha: 0 }));
@@ -12698,8 +12733,8 @@ gsapWithCSS.registerEffect({
   defaults: { extendTimeline: true },
   effect: (config6) => {
     const { direction, section } = config6;
-    logger.info("transitionSection: direction: ".concat(direction.toString(), ", section: ").concat(JSON.stringify(section, getCircularReplacer(), 2)));
-    logger.info("config object: ".concat(JSON.stringify(config6, getCircularReplacer(), 2)));
+    logger.info("transitionSection: direction: ".concat(direction, ", section: ").concat(stringify(section)));
+    logger.info("config object: ".concat(stringify(config6)));
     const dFactor = getDFactor(direction);
     const tl = gsapWithCSS.timeline();
     tl.fromTo([section.outerWrapper, section.innerWrapper], {
@@ -12729,7 +12764,7 @@ gsapWithCSS.registerEffect({
   }
 });
 var fade = (targets, config6 = { out: false, direction: 1, fromConfig: {}, toConfig: {} }) => {
-  logger.info("fade: targets: ".concat(targets, ", config: ").concat(JSON.stringify(config6, getCircularReplacer(), 2)));
+  logger.info("fade: targets: ".concat(targets, ", config: ").concat(stringify(config6)));
   const media = getMatchMediaInstance();
   const tl = gsapWithCSS.timeline();
   media.add({ reducedMotion: "(prefers-reduced-motion: reduce)" }, (context4) => {
@@ -12765,7 +12800,7 @@ gsapWithCSS.registerEffect({
   name: "fadeIn",
   extendTimeline: true,
   effect: (targets, config6) => {
-    logger.info("fadeIn: targets: ".concat(targets, ", config: ").concat(JSON.stringify(config6, getCircularReplacer(), 2)));
+    logger.info("fadeIn: targets: ".concat(targets, ", config: ").concat(stringify(config6)));
     const { direction, fromConfig, toConfig } = config6;
     targets = targets instanceof Array ? targets : [targets];
     return fade(targets, { out: false, direction, fromConfig, toConfig });
@@ -12776,13 +12811,13 @@ gsapWithCSS.registerEffect({
   extendTimeline: true,
   defaults: { extendTimeline: true },
   effect: (targets, config6) => {
-    logger.info("fadeOut: targets: ".concat(targets, ", config: ").concat(JSON.stringify(config6, getCircularReplacer(), 2)));
+    logger.info("fadeOut: targets: ".concat(targets, ", config: ").concat(stringify(config6)));
     const { direction, fromConfig, toConfig } = config6;
     return fade(targets, { out: true, direction, fromConfig, toConfig });
   }
 });
 var blink = (targets, config6 = {}) => {
-  logger.info("blink: targets: ".concat(targets, ", config: ").concat(JSON.stringify(config6)));
+  logger.info("blink: targets: ".concat(targets, ", config: ").concat(stringify(config6), " "));
   const duration = modifyDurationForReducedMotion(config6.duration || 0.5);
   return gsapWithCSS.to(targets, {
     autoAlpha: 0,
@@ -12793,7 +12828,7 @@ var blink = (targets, config6 = {}) => {
   });
 };
 var jump = (targets, config6 = {}) => {
-  logger.info("jump: targets: ".concat(targets, ", config: ").concat(JSON.stringify(config6, getCircularReplacer(), 2)));
+  logger.info("jump: targets: ".concat(targets, ", config: ").concat(stringify(config6)));
   config6.y ? config6["delete"]("y") : null;
   const duration = modifyDurationForReducedMotion(config6.duration || 0.5);
   return gsapWithCSS.to(targets, {
@@ -12809,7 +12844,7 @@ var jump = (targets, config6 = {}) => {
   });
 };
 var scaleUp = (targets, config6 = {}) => {
-  logger.info("scaleUp: targets: ".concat(targets, ", config: ").concat(JSON.stringify(config6, getCircularReplacer(), 2)));
+  logger.info("scaleUp: targets: ".concat(targets, ", config: ").concat(stringify(config6)));
   const duration = modifyDurationForReducedMotion(config6.duration || 0.5);
   return gsapWithCSS.to(targets, { scale: 1.5, ease: "elastic", ...config6, duration });
 };
@@ -12818,7 +12853,7 @@ gsapWithCSS.registerEffect({
   extendTimeline: true,
   defaults: { repeat: -1, yoyo: true, extendTimeline: true },
   effect: (targets, config6) => {
-    logger.info("emphasize: targets: ".concat(targets, ", config: ").concat(JSON.stringify(config6, getCircularReplacer(), 2)));
+    logger.info("emphasize: targets: ".concat(targets, ", config: ").concat(stringify(config6)));
     if (!targets) {
       return null;
     }
@@ -12843,7 +12878,7 @@ gsapWithCSS.registerEffect({
   extendTimeline: true,
   defaults: { extendTimeline: true, repeat: 0 },
   effect: (target, config6) => {
-    logger.info("animateMessage: target: ".concat(target, ", config: ").concat(JSON.stringify(config6, getCircularReplacer(), 2)));
+    logger.info("animateMessage: target: ".concat(target, ", config: ").concat(stringify(config6)));
     target = target instanceof Array ? target : gsapWithCSS.utils.toArray(target);
     if (!target || !(target instanceof Array)) {
       return gsapWithCSS.timeline();
@@ -13406,6 +13441,7 @@ var HeroObservation = class _HeroObservation {
     this.initialized = false;
     this.firstLoad = true;
     this.footer = document.querySelector(".md-footer");
+    this.header = document.querySelector("#header-target #hero-tabs");
     this.defaultTimelineVars = {
       repeat: 0,
       duration: this.config.slides.slideDuration,
@@ -13442,8 +13478,10 @@ var HeroObservation = class _HeroObservation {
   onLoad() {
     this.transitionTl.pause();
     gsapWithCSS.set(this.footer, { autoAlpha: 0 });
+    gsapWithCSS.set(this.header, { autoAlpha: 0 });
     this.subscriptions.add(navigationEvents$.pipe(filter((url2) => !isHome(url2))).subscribe(() => {
       gsapWithCSS.set(this.footer, { autoAlpha: 1 });
+      gsapWithCSS.set(this.header, { autoAlpha: 1 });
     }));
     const outerWrappers = gsapWithCSS.utils.toArray(".outer");
     const innerWrappers = gsapWithCSS.utils.toArray(".inner");
@@ -13453,17 +13491,14 @@ var HeroObservation = class _HeroObservation {
       gsapWithCSS.set(outerWrappers, { yPercent: 100 });
       gsapWithCSS.set(innerWrappers, { yPercent: -100 });
     });
+    const { hash } = window.location;
+    const target = document.getElementById(hash.substring(1));
     if (!this.initialized) {
       this.setupSections();
       this.wrapper = gsapWithCSS.utils.wrap([...Array(this.sectionCount).keys()]);
-      this.setupFirstLoad();
       this.setupObserver();
-    }
-    const { hash } = window.location;
-    if (hash !== "") {
-      this.goToSection(0, 1);
+      this.setupFirstSection(!target);
     } else {
-      const target = document.getElementById(hash.substring(1));
       if (target) {
         const sectionTarget = this.sections.find((section) => section.content.includes(target));
         if (sectionTarget) {
@@ -13480,16 +13515,25 @@ var HeroObservation = class _HeroObservation {
    * Filters out the emphasis targets and fades in the content.
    * Emphasis animations are handled in videoManager.ts.
    */
-  setupFirstLoad() {
+  setupFirstSection(startImmediately = false) {
     const firstSection = this.sections[0];
-    const { content } = firstSection;
+    let { content } = firstSection;
     const { subtle, strong } = this.config.emphasisTargets;
     const subtleTargets = gsapWithCSS.utils.toArray(document.querySelectorAll(subtle)).filter((el) => this.isValidContentTarget(el));
     const strongTargets = gsapWithCSS.utils.toArray(document.querySelectorAll(strong)).filter((el) => this.isValidContentTarget(el));
     const emphasisTargets = [...subtleTargets, ...strongTargets];
-    const filteredContent = content.filter((content2) => !emphasisTargets.includes(content2) && this.isValidContentTarget(content2));
-    gsapWithCSS.to(filteredContent, { autoAlpha: 1, duration: 0.75 });
-    gsapWithCSS.to(subtleTargets, { autoAlpha: 0.7, duration: 1 });
+    logger.info("Emphasis targets:", stringify(emphasisTargets));
+    content = content.filter((content2) => !emphasisTargets.includes(content2) && this.isValidContentTarget(content2));
+    logger.info("Filtered content:", stringify(content));
+    const tl = gsapWithCSS.timeline({ paused: !startImmediately, callbackScope: this });
+    tl.addLabel("start");
+    tl.add(["subtleEmphasis", gsapWithCSS["emphasize"](subtleTargets, SUBTLE_EMPHASIS_CONFIG)], 2);
+    tl.add(["strongEmphasis", gsapWithCSS["emphasize"](strongTargets, STRONG_EMPHASIS_CONFIG)], 4);
+    this.registerAnimation(tl, firstSection.element);
+    if (startImmediately) {
+      this.goToSection(0, 1);
+    }
+    this.firstLoad = false;
   }
   /**
    * @param animation - The animation to register (gsap.core.Timeline)
@@ -13506,30 +13550,41 @@ var HeroObservation = class _HeroObservation {
    * @description Set up the Section objects for the Hero feature.
    */
   setupSections() {
-    const sectionEls = this.config.fades.fadeInSections;
+    const sectionEls = gsapWithCSS.utils.toArray("section.hero");
     this.sections = sectionEls.map((el, index) => {
+      const outerWrapper = el.querySelector(".outer");
+      const innerWrapper = el.querySelector(".inner");
+      const bg = el.querySelector(".bg");
+      const content = getContentElements(el).filter((element) => element !== outerWrapper && element !== innerWrapper && element !== bg);
       return {
         index,
         element: el,
-        content: getContentElements(el),
-        outerWrapper: el.querySelector(".outer"),
-        innerWrapper: el.querySelector(".inner"),
-        bg: el.querySelector(".bg"),
+        outerWrapper,
+        innerWrapper,
+        bg,
+        content,
         animation: gsapWithCSS.timeline({
-          paused: !(index === 0)
-          // Only play the first section
+          paused: index !== 0,
+          // Only play first section
+          callbackScope: this
         }).addLabel("start")
       };
     });
-    logger.info("Sections set up: ".concat(JSON.stringify(this.sections, getCircularReplacer(), 2)));
-    const ignores = gsapWithCSS.utils.toArray(this.config.fades.fadeInIgnore);
-    this.sections[0].content.filter((content) => !ignores.includes(content) && this.isValidContentTarget(content));
-    this.sections.forEach((section, _) => {
-      const { content } = section;
-      requestAnimationFrame(() => {
-        gsapWithCSS.set(content, { autoAlpha: 0 });
-      });
+    logger.info("Sections set up:", {
+      count: this.sections.length,
+      sections: this.sections.map((section) => ({
+        index: section.index,
+        elementId: section.element.id,
+        contentCount: section.content.length,
+        contentElements: section.content.map((el) => ({
+          tagName: el.tagName,
+          className: el.className,
+          id: el.id
+        }))
+      }))
     });
+    const ignores = gsapWithCSS.utils.toArray(this.config.fades.fadeInIgnore);
+    this.sections[0].content = this.sections[0].content.filter((content) => !ignores.includes(content) && this.isValidContentTarget(content));
     this.sectionCount = this.sections.length;
     this.sectionIndexLength = this.sectionCount - 1;
   }
@@ -13573,10 +13628,13 @@ var HeroObservation = class _HeroObservation {
     const nextSection = this.sections[index];
     if (this.currentIndex >= 0) {
       logger.info("Setting section ".concat(this.currentIndex, " to section ").concat(index));
-      tl.setSection({ direction, section: nextSection });
+      tl["setSection"]({ direction, section: nextSection });
     }
     logger.info("Animating section ".concat(index, " in direction ").concat(direction));
-    tl.transitionSection({ direction, section: nextSection });
+    tl["transitionSection"]({ direction, section: nextSection });
+    if (nextSection.animation) {
+      tl.add(nextSection.animation, ">");
+    }
     return tl;
   }
   // Go to the next section based on the index and direction
@@ -13584,7 +13642,6 @@ var HeroObservation = class _HeroObservation {
     if (this.animating || index === this.currentIndex) {
       return;
     }
-    this.animating = true;
     logger.info("Going to section ".concat(index, " in direction ").concat(direction));
     let tl = gsapWithCSS.timeline({
       defaults: {
@@ -13592,9 +13649,11 @@ var HeroObservation = class _HeroObservation {
         ease: "power2.inOut",
         onComplete: () => {
           this.animating = false;
+          logger.info("Completed transition to section ".concat(index));
         },
         onStart: () => {
           this.animating = true;
+          this.currentIndex = index;
         },
         callbackScope: this
       }
@@ -13672,92 +13731,92 @@ var HeroObservation = class _HeroObservation {
 };
 
 // src/assets/javascripts/features/hero/video/data.ts
-import breakFreeAv11280 from "../videos/hero/break_free/break_free_av1_1280.MHR3ZGJM.webm";
-import breakFreeAv11920 from "../videos/hero/break_free/break_free_av1_1920.ZBJ6I55Y.webm";
-import breakFreeAv12560 from "../videos/hero/break_free/break_free_av1_2560.HXMDT5GO.webm";
-import breakFreeAv13840 from "../videos/hero/break_free/break_free_av1_3840.5V2V4VJR.webm";
-import breakFreeAv1426 from "../videos/hero/break_free/break_free_av1_426.XMIUTUPS.webm";
-import breakFreeAv1640 from "../videos/hero/break_free/break_free_av1_640.W4QED7UF.webm";
-import breakFreeAv1854 from "../videos/hero/break_free/break_free_av1_854.HN3WTVPV.webm";
-import breakFreeH2641280 from "../videos/hero/break_free/break_free_h264_1280.P7H5AFXW.mp4";
-import breakFreeH2641920 from "../videos/hero/break_free/break_free_h264_1920.VD3OTIVQ.mp4";
-import breakFreeH2642560 from "../videos/hero/break_free/break_free_h264_2560.SBX24NRJ.mp4";
-import breakFreeH2643840 from "../videos/hero/break_free/break_free_h264_3840.L6D346UN.mp4";
-import breakFreeH264426 from "../videos/hero/break_free/break_free_h264_426.N7UKN7DL.mp4";
-import breakFreeH264640 from "../videos/hero/break_free/break_free_h264_640.VS54S5EL.mp4";
-import breakFreeH264854 from "../videos/hero/break_free/break_free_h264_854.AKGTMYW6.mp4";
-import breakFreeVp91280 from "../videos/hero/break_free/break_free_vp9_1280.BI7P3W4T.webm";
-import breakFreeVp91920 from "../videos/hero/break_free/break_free_vp9_1920.UQIEAJZ4.webm";
-import breakFreeVp92560 from "../videos/hero/break_free/break_free_vp9_2560.FOFH4KAS.webm";
-import breakFreeVp93840 from "../videos/hero/break_free/break_free_vp9_3840.VKNFLIWB.webm";
-import breakFreeVp9426 from "../videos/hero/break_free/break_free_vp9_426.CWEZUEQQ.webm";
-import breakFreeVp9640 from "../videos/hero/break_free/break_free_vp9_640.X5H75VBM.webm";
-import breakFreeVp9854 from "../videos/hero/break_free/break_free_vp9_854.L7KXRADV.webm";
-import breakFreeAvif1280 from "../videos/hero/break_free/posters/break_free_1280.WQ46YIY6.avif";
-import breakFreePng1280 from "../videos/hero/break_free/posters/break_free_1280.V35JZ763.png";
-import breakFreeWebp1280 from "../videos/hero/break_free/posters/break_free_1280.DWFB27YG.webp";
-import breakFreeAvif1920 from "../videos/hero/break_free/posters/break_free_1920.FZMHEY63.avif";
-import breakFreePng1920 from "../videos/hero/break_free/posters/break_free_1920.WBZ3NBFU.png";
-import breakFreeWebp1920 from "../videos/hero/break_free/posters/break_free_1920.3GCUVDAP.webp";
-import breakFreeAvif2560 from "../videos/hero/break_free/posters/break_free_2560.LPKYWG2I.avif";
-import breakFreePng2560 from "../videos/hero/break_free/posters/break_free_2560.3L44PPVD.png";
-import breakFreeWebp2560 from "../videos/hero/break_free/posters/break_free_2560.JM4UI52R.webp";
-import breakFreeAvif3840 from "../videos/hero/break_free/posters/break_free_3840.PEEQKWAO.avif";
-import breakFreePng3840 from "../videos/hero/break_free/posters/break_free_3840.IHJWGFLI.png";
-import breakFreeWebp3840 from "../videos/hero/break_free/posters/break_free_3840.VNNHBF4O.webp";
-import breakFreeAvif426 from "../videos/hero/break_free/posters/break_free_426.A3KD2OWB.avif";
-import breakFreePng426 from "../videos/hero/break_free/posters/break_free_426.GHKJUUS4.png";
-import breakFreeWebp426 from "../videos/hero/break_free/posters/break_free_426.SJ76L2AA.webp";
-import breakFreeAvif640 from "../videos/hero/break_free/posters/break_free_640.BZMJNMOS.avif";
-import breakFreePng640 from "../videos/hero/break_free/posters/break_free_640.7RM4H6NV.png";
-import breakFreeWebp640 from "../videos/hero/break_free/posters/break_free_640.6W5EO4MO.webp";
-import breakFreeAvif854 from "../videos/hero/break_free/posters/break_free_854.T7N3S3Q2.avif";
-import breakFreePng854 from "../videos/hero/break_free/posters/break_free_854.44NAZCIU.png";
-import breakFreeWebp854 from "../videos/hero/break_free/posters/break_free_854.SBEKVABD.webp";
-import tokyoShuffleAvif1280 from "../videos/hero/tokyo_shuffle/posters/tokyo_shuffle_1280.ZLQHM4VG.avif";
-import tokyoShufflePng1280 from "../videos/hero/tokyo_shuffle/posters/tokyo_shuffle_1280.OYFSUR65.png";
-import tokyoShuffleWebp1280 from "../videos/hero/tokyo_shuffle/posters/tokyo_shuffle_1280.EEEVR5AA.webp";
-import tokyoShuffleAvif1920 from "../videos/hero/tokyo_shuffle/posters/tokyo_shuffle_1920.AGNLWXP5.avif";
-import tokyoShufflePng1920 from "../videos/hero/tokyo_shuffle/posters/tokyo_shuffle_1920.C5GVT334.png";
-import tokyoShuffleWebp1920 from "../videos/hero/tokyo_shuffle/posters/tokyo_shuffle_1920.A6XB2PAB.webp";
-import tokyoShuffleAvif2560 from "../videos/hero/tokyo_shuffle/posters/tokyo_shuffle_2560.BOHJXWWH.avif";
-import tokyoShufflePng2560 from "../videos/hero/tokyo_shuffle/posters/tokyo_shuffle_2560.B7WTBGPV.png";
-import tokyoShuffleWebp2560 from "../videos/hero/tokyo_shuffle/posters/tokyo_shuffle_2560.K223UIDG.webp";
-import tokyoShuffleAvif3840 from "../videos/hero/tokyo_shuffle/posters/tokyo_shuffle_3840.6YTTSAWO.avif";
-import tokyoShufflePng3840 from "../videos/hero/tokyo_shuffle/posters/tokyo_shuffle_3840.KWJHCM5F.png";
-import tokyoShuffleWebp3840 from "../videos/hero/tokyo_shuffle/posters/tokyo_shuffle_3840.WPHZ3N2S.webp";
-import tokyoShuffleAvif426 from "../videos/hero/tokyo_shuffle/posters/tokyo_shuffle_426.JEFZFOJK.avif";
-import tokyoShufflePng426 from "../videos/hero/tokyo_shuffle/posters/tokyo_shuffle_426.36AKL4KN.png";
-import tokyoShuffleWebp426 from "../videos/hero/tokyo_shuffle/posters/tokyo_shuffle_426.VQWFGCSR.webp";
-import tokyoShuffleAvif640 from "../videos/hero/tokyo_shuffle/posters/tokyo_shuffle_640.KF7GISVX.avif";
-import tokyoShufflePng640 from "../videos/hero/tokyo_shuffle/posters/tokyo_shuffle_640.Q7RF6Q5K.png";
-import tokyoShuffleWebp640 from "../videos/hero/tokyo_shuffle/posters/tokyo_shuffle_640.3AQWY55B.webp";
-import tokyoShuffleAvif854 from "../videos/hero/tokyo_shuffle/posters/tokyo_shuffle_854.R5Q7G7ZO.avif";
-import tokyoShufflePng854 from "../videos/hero/tokyo_shuffle/posters/tokyo_shuffle_854.AHAG6T2U.png";
-import tokyoShuffleWebp854 from "../videos/hero/tokyo_shuffle/posters/tokyo_shuffle_854.OH5ALQCN.webp";
-import tokyoShuffleAv11280 from "../videos/hero/tokyo_shuffle/tokyo_shuffle_av1_1280.LTL754GX.webm";
-import tokyoShuffleAv11920 from "../videos/hero/tokyo_shuffle/tokyo_shuffle_av1_1920.HCHG3L6F.webm";
-import tokyoShuffleAv12560 from "../videos/hero/tokyo_shuffle/tokyo_shuffle_av1_2560.VZLSLY3T.webm";
-import tokyoShuffleAv13840 from "../videos/hero/tokyo_shuffle/tokyo_shuffle_av1_3840.IRQNSZL3.webm";
-import tokyoShuffleAv1426 from "../videos/hero/tokyo_shuffle/tokyo_shuffle_av1_426.VLHMAUSF.webm";
-import tokyoShuffleAv1640 from "../videos/hero/tokyo_shuffle/tokyo_shuffle_av1_640.UJYTIEMI.webm";
-import tokyoShuffleAv1854 from "../videos/hero/tokyo_shuffle/tokyo_shuffle_av1_854.T4JUCEGM.webm";
-import tokyoShuffleH2641280 from "../videos/hero/tokyo_shuffle/tokyo_shuffle_h264_1280.T7YZV75R.mp4";
-import tokyoShuffleH2641920 from "../videos/hero/tokyo_shuffle/tokyo_shuffle_h264_1920.IYJ32LIS.mp4";
-import tokyoShuffleH2642560 from "../videos/hero/tokyo_shuffle/tokyo_shuffle_h264_2560.EWUECAZU.mp4";
-import tokyoShuffleH2643840 from "../videos/hero/tokyo_shuffle/tokyo_shuffle_h264_3840.7IMTXTLT.mp4";
-import tokyoShuffleH264426 from "../videos/hero/tokyo_shuffle/tokyo_shuffle_h264_426.L7AX42QP.mp4";
-import tokyoShuffleH264640 from "../videos/hero/tokyo_shuffle/tokyo_shuffle_h264_640.VLIHCIGJ.mp4";
-import tokyoShuffleH264854 from "../videos/hero/tokyo_shuffle/tokyo_shuffle_h264_854.4V5TCTNN.mp4";
-import tokyoShuffleVp91280 from "../videos/hero/tokyo_shuffle/tokyo_shuffle_vp9_1280.OZ63FAA6.webm";
-import tokyoShuffleVp91920 from "../videos/hero/tokyo_shuffle/tokyo_shuffle_vp9_1920.BL4HBHVE.webm";
-import tokyoShuffleVp92560 from "../videos/hero/tokyo_shuffle/tokyo_shuffle_vp9_2560.HQFL3XZA.webm";
-import tokyoShuffleVp93840 from "../videos/hero/tokyo_shuffle/tokyo_shuffle_vp9_3840.AMTWROJH.webm";
-import tokyoShuffleVp9426 from "../videos/hero/tokyo_shuffle/tokyo_shuffle_vp9_426.MROBMCDW.webm";
-import tokyoShuffleVp9640 from "../videos/hero/tokyo_shuffle/tokyo_shuffle_vp9_640.YMSOWHCY.webm";
-import tokyoShuffleVp9854 from "../videos/hero/tokyo_shuffle/tokyo_shuffle_vp9_854.MXKV5CQO.webm";
-var rawHeroVideos = {
-  tokyo_shuffle: {
+var breakFreeAv11280 = new URL("assets/videos/hero/break_free/break_free_av1_1280.MHR3ZGJM.webm", window.location.origin);
+var breakFreeAv11920 = new URL("assets/videos/hero/break_free/break_free_av1_1920.ZBJ6I55Y.webm", window.location.origin);
+var breakFreeAv12560 = new URL("assets/videos/hero/break_free/break_free_av1_2560.HXMDT5GO.webm", window.location.origin);
+var breakFreeAv13840 = new URL("assets/videos/hero/break_free/break_free_av1_3840.5V2V4VJR.webm", window.location.origin);
+var breakFreeAv1426 = new URL("assets/videos/hero/break_free/break_free_av1_426.XMIUTUPS.webm", window.location.origin);
+var breakFreeAv1640 = new URL("assets/videos/hero/break_free/break_free_av1_640.W4QED7UF.webm", window.location.origin);
+var breakFreeAv1854 = new URL("assets/videos/hero/break_free/break_free_av1_854.HN3WTVPV.webm", window.location.origin);
+var breakFreeH2641280 = new URL("assets/videos/hero/break_free/break_free_h264_1280.P7H5AFXW.mp4", window.location.origin);
+var breakFreeH2641920 = new URL("assets/videos/hero/break_free/break_free_h264_1920.VD3OTIVQ.mp4", window.location.origin);
+var breakFreeH2642560 = new URL("assets/videos/hero/break_free/break_free_h264_2560.SBX24NRJ.mp4", window.location.origin);
+var breakFreeH2643840 = new URL("assets/videos/hero/break_free/break_free_h264_3840.L6D346UN.mp4", window.location.origin);
+var breakFreeH264426 = new URL("assets/videos/hero/break_free/break_free_h264_426.N7UKN7DL.mp4", window.location.origin);
+var breakFreeH264640 = new URL("assets/videos/hero/break_free/break_free_h264_640.VS54S5EL.mp4", window.location.origin);
+var breakFreeH264854 = new URL("assets/videos/hero/break_free/break_free_h264_854.AKGTMYW6.mp4", window.location.origin);
+var breakFreeVp91280 = new URL("assets/videos/hero/break_free/break_free_vp9_1280.BI7P3W4T.webm", window.location.origin);
+var breakFreeVp91920 = new URL("assets/videos/hero/break_free/break_free_vp9_1920.UQIEAJZ4.webm", window.location.origin);
+var breakFreeVp92560 = new URL("assets/videos/hero/break_free/break_free_vp9_2560.FOFH4KAS.webm", window.location.origin);
+var breakFreeVp93840 = new URL("assets/videos/hero/break_free/break_free_vp9_3840.VKNFLIWB.webm", window.location.origin);
+var breakFreeVp9426 = new URL("assets/videos/hero/break_free/break_free_vp9_426.CWEZUEQQ.webm", window.location.origin);
+var breakFreeVp9640 = new URL("assets/videos/hero/break_free/break_free_vp9_640.X5H75VBM.webm", window.location.origin);
+var breakFreeVp9854 = new URL("assets/videos/hero/break_free/break_free_vp9_854.L7KXRADV.webm", window.location.origin);
+var breakFreeAvif1280 = new URL("assets/videos/hero/break_free/posters/break_free_1280.WQ46YIY6.avif", window.location.origin);
+var breakFreePng1280 = new URL("assets/videos/hero/break_free/posters/break_free_1280.V35JZ763.png", window.location.origin);
+var breakFreeWebp1280 = new URL("assets/videos/hero/break_free/posters/break_free_1280.DWFB27YG.webp", window.location.origin);
+var breakFreeAvif1920 = new URL("assets/videos/hero/break_free/posters/break_free_1920.FZMHEY63.avif", window.location.origin);
+var breakFreePng1920 = new URL("assets/videos/hero/break_free/posters/break_free_1920.WBZ3NBFU.png", window.location.origin);
+var breakFreeWebp1920 = new URL("assets/videos/hero/break_free/posters/break_free_1920.3GCUVDAP.webp", window.location.origin);
+var breakFreeAvif2560 = new URL("assets/videos/hero/break_free/posters/break_free_2560.LPKYWG2I.avif", window.location.origin);
+var breakFreePng2560 = new URL("assets/videos/hero/break_free/posters/break_free_2560.3L44PPVD.png", window.location.origin);
+var breakFreeWebp2560 = new URL("assets/videos/hero/break_free/posters/break_free_2560.JM4UI52R.webp", window.location.origin);
+var breakFreeAvif3840 = new URL("assets/videos/hero/break_free/posters/break_free_3840.PEEQKWAO.avif", window.location.origin);
+var breakFreePng3840 = new URL("assets/videos/hero/break_free/posters/break_free_3840.IHJWGFLI.png", window.location.origin);
+var breakFreeWebp3840 = new URL("assets/videos/hero/break_free/posters/break_free_3840.VNNHBF4O.webp", window.location.origin);
+var breakFreeAvif426 = new URL("assets/videos/hero/break_free/posters/break_free_426.A3KD2OWB.avif", window.location.origin);
+var breakFreePng426 = new URL("assets/videos/hero/break_free/posters/break_free_426.GHKJUUS4.png", window.location.origin);
+var breakFreeWebp426 = new URL("assets/videos/hero/break_free/posters/break_free_426.SJ76L2AA.webp", window.location.origin);
+var breakFreeAvif640 = new URL("assets/videos/hero/break_free/posters/break_free_640.BZMJNMOS.avif", window.location.origin);
+var breakFreePng640 = new URL("assets/videos/hero/break_free/posters/break_free_640.7RM4H6NV.png", window.location.origin);
+var breakFreeWebp640 = new URL("assets/videos/hero/break_free/posters/break_free_640.6W5EO4MO.webp", window.location.origin);
+var breakFreeAvif854 = new URL("assets/videos/hero/break_free/posters/break_free_854.T7N3S3Q2.avif", window.location.origin);
+var breakFreePng854 = new URL("assets/videos/hero/break_free/posters/break_free_854.44NAZCIU.png", window.location.origin);
+var breakFreeWebp854 = new URL("assets/videos/hero/break_free/posters/break_free_854.SBEKVABD.webp", window.location.origin);
+var tokyoShuffleAvif1280 = new URL("assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_1280.ZLQHM4VG.avif", window.location.origin);
+var tokyoShufflePng1280 = new URL("assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_1280.OYFSUR65.png", window.location.origin);
+var tokyoShuffleWebp1280 = new URL("assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_1280.EEEVR5AA.webp", window.location.origin);
+var tokyoShuffleAvif1920 = new URL("assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_1920.AGNLWXP5.avif", window.location.origin);
+var tokyoShufflePng1920 = new URL("assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_1920.C5GVT334.png", window.location.origin);
+var tokyoShuffleWebp1920 = new URL("assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_1920.A6XB2PAB.webp", window.location.origin);
+var tokyoShuffleAvif2560 = new URL("assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_2560.BOHJXWWH.avif", window.location.origin);
+var tokyoShufflePng2560 = new URL("assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_2560.B7WTBGPV.png", window.location.origin);
+var tokyoShuffleWebp2560 = new URL("assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_2560.K223UIDG.webp", window.location.origin);
+var tokyoShuffleAvif3840 = new URL("assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_3840.6YTTSAWO.avif", window.location.origin);
+var tokyoShufflePng3840 = new URL("assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_3840.KWJHCM5F.png", window.location.origin);
+var tokyoShuffleWebp3840 = new URL("assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_3840.WPHZ3N2S.webp", window.location.origin);
+var tokyoShuffleAvif426 = new URL("assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_426.JEFZFOJK.avif", window.location.origin);
+var tokyoShufflePng426 = new URL("assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_426.36AKL4KN.png", window.location.origin);
+var tokyoShuffleWebp426 = new URL("assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_426.VQWFGCSR.webp", window.location.origin);
+var tokyoShuffleAvif640 = new URL("assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_640.KF7GISVX.avif", window.location.origin);
+var tokyoShufflePng640 = new URL("assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_640.Q7RF6Q5K.png", window.location.origin);
+var tokyoShuffleWebp640 = new URL("assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_640.3AQWY55B.webp", window.location.origin);
+var tokyoShuffleAvif854 = new URL("assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_854.R5Q7G7ZO.avif", window.location.origin);
+var tokyoShufflePng854 = new URL("assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_854.AHAG6T2U.png", window.location.origin);
+var tokyoShuffleWebp854 = new URL("assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_854.OH5ALQCN.webp", window.location.origin);
+var tokyoShuffleAv11280 = new URL("assets/videos/hero/tokyo_shuffle/tokyo_shuffle_av1_1280.LTL754GX.webm", window.location.origin);
+var tokyoShuffleAv11920 = new URL("assets/videos/hero/tokyo_shuffle/tokyo_shuffle_av1_1920.HCHG3L6F.webm", window.location.origin);
+var tokyoShuffleAv12560 = new URL("assets/videos/hero/tokyo_shuffle/tokyo_shuffle_av1_2560.VZLSLY3T.webm", window.location.origin);
+var tokyoShuffleAv13840 = new URL("assets/videos/hero/tokyo_shuffle/tokyo_shuffle_av1_3840.IRQNSZL3.webm", window.location.origin);
+var tokyoShuffleAv1426 = new URL("assets/videos/hero/tokyo_shuffle/tokyo_shuffle_av1_426.VLHMAUSF.webm", window.location.origin);
+var tokyoShuffleAv1640 = new URL("assets/videos/hero/tokyo_shuffle/tokyo_shuffle_av1_640.UJYTIEMI.webm", window.location.origin);
+var tokyoShuffleAv1854 = new URL("assets/videos/hero/tokyo_shuffle/tokyo_shuffle_av1_854.T4JUCEGM.webm", window.location.origin);
+var tokyoShuffleH2641280 = new URL("assets/videos/hero/tokyo_shuffle/tokyo_shuffle_h264_1280.T7YZV75R.mp4", window.location.origin);
+var tokyoShuffleH2641920 = new URL("assets/videos/hero/tokyo_shuffle/tokyo_shuffle_h264_1920.IYJ32LIS.mp4", window.location.origin);
+var tokyoShuffleH2642560 = new URL("assets/videos/hero/tokyo_shuffle/tokyo_shuffle_h264_2560.EWUECAZU.mp4", window.location.origin);
+var tokyoShuffleH2643840 = new URL("assets/videos/hero/tokyo_shuffle/tokyo_shuffle_h264_3840.7IMTXTLT.mp4", window.location.origin);
+var tokyoShuffleH264426 = new URL("assets/videos/hero/tokyo_shuffle/tokyo_shuffle_h264_426.L7AX42QP.mp4", window.location.origin);
+var tokyoShuffleH264640 = new URL("assets/videos/hero/tokyo_shuffle/tokyo_shuffle_h264_640.VLIHCIGJ.mp4", window.location.origin);
+var tokyoShuffleH264854 = new URL("assets/videos/hero/tokyo_shuffle/tokyo_shuffle_h264_854.4V5TCTNN.mp4", window.location.origin);
+var tokyoShuffleVp91280 = new URL("assets/videos/hero/tokyo_shuffle/tokyo_shuffle_vp9_1280.OZ63FAA6.webm", window.location.origin);
+var tokyoShuffleVp91920 = new URL("assets/videos/hero/tokyo_shuffle/tokyo_shuffle_vp9_1920.BL4HBHVE.webm", window.location.origin);
+var tokyoShuffleVp92560 = new URL("assets/videos/hero/tokyo_shuffle/tokyo_shuffle_vp9_2560.HQFL3XZA.webm", window.location.origin);
+var tokyoShuffleVp93840 = new URL("assets/videos/hero/tokyo_shuffle/tokyo_shuffle_vp9_3840.AMTWROJH.webm", window.location.origin);
+var tokyoShuffleVp9426 = new URL("assets/videos/hero/tokyo_shuffle/tokyo_shuffle_vp9_426.MROBMCDW.webm", window.location.origin);
+var tokyoShuffleVp9640 = new URL("assets/videos/hero/tokyo_shuffle/tokyo_shuffle_vp9_640.YMSOWHCY.webm", window.location.origin);
+var tokyoShuffleVp9854 = new URL("assets/videos/hero/tokyo_shuffle/tokyo_shuffle_vp9_854.MXKV5CQO.webm", window.location.origin);
+var rawHeroVideos = [
+  {
     variants: {
       av1: {
         3840: tokyoShuffleAv13840,
@@ -13787,42 +13846,48 @@ var rawHeroVideos = {
         426: tokyoShuffleH264426
       }
     },
-    posters: {
+    poster: {
       avif: {
-        3840: tokyoShuffleAvif3840,
-        2560: tokyoShuffleAvif2560,
-        1920: tokyoShuffleAvif1920,
-        1280: tokyoShuffleAvif1280,
-        854: tokyoShuffleAvif854,
-        640: tokyoShuffleAvif640,
-        426: tokyoShuffleAvif426,
+        widths: {
+          3840: tokyoShuffleAvif3840,
+          2560: tokyoShuffleAvif2560,
+          1920: tokyoShuffleAvif1920,
+          1280: tokyoShuffleAvif1280,
+          854: tokyoShuffleAvif854,
+          640: tokyoShuffleAvif640,
+          426: tokyoShuffleAvif426
+        },
         srcset: "".concat(tokyoShuffleAvif3840, " 3840w, ").concat(tokyoShuffleAvif2560, " 2560w, ").concat(tokyoShuffleAvif1920, " 1920w, ").concat(tokyoShuffleAvif1280, " 1280w, ").concat(tokyoShuffleAvif854, " 854w, ").concat(tokyoShuffleAvif640, " 640w, ").concat(tokyoShuffleAvif426, " 426w")
       },
       webp: {
-        3840: tokyoShuffleWebp3840,
-        2560: tokyoShuffleWebp2560,
-        1920: tokyoShuffleWebp1920,
-        1280: tokyoShuffleWebp1280,
-        854: tokyoShuffleWebp854,
-        640: tokyoShuffleWebp640,
-        426: tokyoShuffleWebp426,
+        widths: {
+          3840: tokyoShuffleWebp3840,
+          2560: tokyoShuffleWebp2560,
+          1920: tokyoShuffleWebp1920,
+          1280: tokyoShuffleWebp1280,
+          854: tokyoShuffleWebp854,
+          640: tokyoShuffleWebp640,
+          426: tokyoShuffleWebp426
+        },
         srcset: "".concat(tokyoShuffleWebp3840, " 3840w, ").concat(tokyoShuffleWebp2560, " 2560w, ").concat(tokyoShuffleWebp1920, " 1920w, ").concat(tokyoShuffleWebp1280, " 1280w, ").concat(tokyoShuffleWebp854, " 854w, ").concat(tokyoShuffleWebp640, " 640w, ").concat(tokyoShuffleWebp426, " 426w")
       },
       png: {
-        3840: tokyoShufflePng3840,
-        2560: tokyoShufflePng2560,
-        1920: tokyoShufflePng1920,
-        1280: tokyoShufflePng1280,
-        854: tokyoShufflePng854,
-        640: tokyoShufflePng640,
-        426: tokyoShufflePng426,
+        widths: {
+          3840: tokyoShufflePng3840,
+          2560: tokyoShufflePng2560,
+          1920: tokyoShufflePng1920,
+          1280: tokyoShufflePng1280,
+          854: tokyoShufflePng854,
+          640: tokyoShufflePng640,
+          426: tokyoShufflePng426
+        },
         srcset: "".concat(tokyoShufflePng3840, " 3840w, ").concat(tokyoShufflePng2560, " 2560w, ").concat(tokyoShufflePng1920, " 1920w, ").concat(tokyoShufflePng1280, " 1280w, ").concat(tokyoShufflePng854, " 854w, ").concat(tokyoShufflePng640, " 640w, ").concat(tokyoShufflePng426, " 426w")
       }
     },
-    parentPath: "../../../../videos/hero/tokyo_shuffle",
+    parentPath: "~assets/videos/hero/tokyo_shuffle",
     baseName: "tokyo_shuffle" /* TokyoShuffle */
   },
-  break_free: {
+  {
     variants: {
       av1: {
         3840: breakFreeAv13840,
@@ -13852,46 +13917,52 @@ var rawHeroVideos = {
         426: breakFreeH264426
       }
     },
-    posters: {
+    poster: {
       avif: {
-        3840: breakFreeAvif3840,
-        2560: breakFreeAvif2560,
-        1920: breakFreeAvif1920,
-        1280: breakFreeAvif1280,
-        854: breakFreeAvif854,
-        640: breakFreeAvif640,
-        426: breakFreeAvif426,
+        widths: {
+          3840: breakFreeAvif3840,
+          2560: breakFreeAvif2560,
+          1920: breakFreeAvif1920,
+          1280: breakFreeAvif1280,
+          854: breakFreeAvif854,
+          640: breakFreeAvif640,
+          426: breakFreeAvif426
+        },
         srcset: "".concat(breakFreeAvif3840, " 3840w, ").concat(breakFreeAvif2560, " 2560w, ").concat(breakFreeAvif1920, " 1920w, ").concat(breakFreeAvif1280, " 1280w, ").concat(breakFreeAvif854, " 854w, ").concat(breakFreeAvif640, " 640w, ").concat(breakFreeAvif426, " 426w")
       },
       webp: {
-        3840: breakFreeWebp3840,
-        2560: breakFreeWebp2560,
-        1920: breakFreeWebp1920,
-        1280: breakFreeWebp1280,
-        854: breakFreeWebp854,
-        640: breakFreeWebp640,
-        426: breakFreeWebp426,
+        widths: {
+          3840: breakFreeWebp3840,
+          2560: breakFreeWebp2560,
+          1920: breakFreeWebp1920,
+          1280: breakFreeWebp1280,
+          854: breakFreeWebp854,
+          640: breakFreeWebp640,
+          426: breakFreeWebp426
+        },
         srcset: "".concat(breakFreeWebp3840, " 3840w, ").concat(breakFreeWebp2560, " 2560w, ").concat(breakFreeWebp1920, " 1920w, ").concat(breakFreeWebp1280, " 1280w, ").concat(breakFreeWebp854, " 854w, ").concat(breakFreeWebp640, " 640w, ").concat(breakFreeWebp426, " 426w")
       },
       png: {
-        3840: breakFreePng3840,
-        2560: breakFreePng2560,
-        1920: breakFreePng1920,
-        1280: breakFreePng1280,
-        854: breakFreePng854,
-        640: breakFreePng640,
-        426: breakFreePng426,
+        widths: {
+          3840: breakFreePng3840,
+          2560: breakFreePng2560,
+          1920: breakFreePng1920,
+          1280: breakFreePng1280,
+          854: breakFreePng854,
+          640: breakFreePng640,
+          426: breakFreePng426
+        },
         srcset: "".concat(breakFreePng3840, " 3840w, ").concat(breakFreePng2560, " 2560w, ").concat(breakFreePng1920, " 1920w, ").concat(breakFreePng1280, " 1280w, ").concat(breakFreePng854, " 854w, ").concat(breakFreePng640, " 640w, ").concat(breakFreePng426, " 426w")
       }
     },
     parentPath: "assets/videos/hero/break_free",
     baseName: "break_free" /* BreakFree */
   }
-};
+];
 
 // src/assets/javascripts/features/hero/video/utils.ts
 function getHeroVideos() {
-  return [...rawHeroVideos];
+  return rawHeroVideos;
 }
 var getAv1MediaType = (width) => {
   const seqlevelMap = {
@@ -13994,7 +14065,7 @@ var VideoElement = class {
   // construct the video element
   constructVideoElement() {
     const { video } = this;
-    for (const prop in this.properties) {
+    for (const prop of Object.keys(this.properties)) {
       const key = typeof prop === "string" ? prop : "".concat(prop);
       try {
         video.setAttribute(prop, this.properties[key]);
@@ -14010,10 +14081,10 @@ var VideoElement = class {
     let srcs = [];
     const widths = Object.keys(MAX_WIDTHS);
     for (const [_, variant] of Object.entries(heroVideo.variants)) {
-      for (const codec in variant) {
+      for (const codec of Object.keys(variant)) {
         if (codec === "av1" || codec === "vp9" || codec === "h264") {
           const codecKey = codec;
-          for (const width in widths) {
+          for (const width of widths) {
             const w = parseInt(width, 10);
             const src = document.createElement("source");
             const codecVariant = variant[codecKey];
@@ -14056,21 +14127,21 @@ var VideoElement = class {
     const { png } = poster;
     const { widths } = png;
     let sizes = "";
-    for (const width in widths) {
+    for (const width of Object.keys(widths)) {
       const w = parseInt(width, 10);
-      if (Array.from(Object.keys(MAX_WIDTHS)).includes(width)) {
+      if (width in MAX_WIDTHS) {
         sizes += w !== 3840 ? "(max-width: ".concat(MAX_WIDTHS[width], "px) ").concat(width, "px, ") : "".concat(width, "px");
       }
     }
-    return sizes;
+    return sizes.trim().replace(/,$/, "");
   }
   // construct the picture element
   constructPictureElement() {
     const { picture, poster } = this;
     let srcs = [];
-    for (const type in Object.keys(poster)) {
+    for (const type of Object.keys(poster)) {
       if (type === "webp" || type === "avif") {
-        const { srcset } = poster[type.toString()];
+        const { srcset } = poster[type];
         const source = document.createElement("source");
         source.srcset = srcset;
         source.type = "image/".concat(type);
@@ -16486,6 +16557,7 @@ var observer$4 = of(HeroObservation.getInstance());
 var videoManager$ = of(VideoManager.getInstance());
 var licenseHashHandler$ = onDom$(watchLicenseHash());
 var license$ = navigationEvents$.pipe(filter(isLicense), switchMap(() => initLicenseFeature()));
+var fixSvg$ = onDom$(of(() => fixSvgDimensions()));
 var windowEvents$ = from(windowEvents());
 var pageConfigs = [
   {
@@ -16506,7 +16578,7 @@ var pageConfigs = [
   {
     matcher: isOnSite,
     location: "all",
-    observables: [analytic$, feedback$, licenseHashHandler$, windowEvents$]
+    observables: [analytic$, feedback$, fixSvg$, licenseHashHandler$, windowEvents$]
   }
 ];
 var pageSubscription$ = navigationEvents$.pipe(map((url2) => {
@@ -16772,4 +16844,4 @@ gsap/ScrollToPlugin.js:
    * @author: Jack Doyle, jack@greensock.com
   *)
 */
-//# sourceMappingURL=index.6TPLBDPV.js.map
+//# sourceMappingURL=index.4SF7S4CH.js.map

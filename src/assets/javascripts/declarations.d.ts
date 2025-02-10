@@ -1,44 +1,54 @@
-declare module "*.svg" {
-  const content: string
-  export default content
-}
-declare module "*.png" {
-  const content: string
-  export default content
-}
-declare module "*.jpg" {
-  const content: string
-  export default content
-}
-declare module "*.jpeg" {
-  const content: string
-  export default content
-}
-declare module "*.avif" {
-  const content: string
-  export default content
-}
-declare module "*.webp" {
-  const content: string
-  export default content
-}
-declare module "*.mp4" {
-  const content: string
-  export default content
-}
 declare module "*.webm" {
-  const content: string
-  export default content
+  const src: string
+  export default src
 }
+
+declare module "*.mp4" {
+  const src: string
+  export default src
+}
+
+declare module "*.avif" {
+  const src: string
+  export default src
+}
+
+declare module "*.png" {
+  const src: string
+  export default src
+}
+
+declare module "*.jpg" {
+  const src: string
+  export default src
+}
+
+declare module "*.jpeg" {
+  const src: string
+  export default src
+}
+
+declare module "*.webp" {
+  const src: string
+  export default src
+}
+
+declare module "*.svg" {
+  const src: string
+  export default src
+}
+
 declare module "*.woff" {
-  const content: string
-  export default content
+  const src: string
+  export default src
 }
+
 declare module "*.woff2" {
-  const content: string
-  export default content
+  const src: string
+  export default src
 }
-declare module "*.ts" {
-  const content: string
-  export default content
+
+declare module "*.css" {
+  const src: string
+  export default src
 }

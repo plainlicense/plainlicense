@@ -1,6 +1,6 @@
 import { logger } from "~/utils"
 
-const cacheWorkerUrl = new URL("cacheWorker.ts", import.meta.url).href
+const cacheWorkerUrl = "cacheWorker.ts"
 
 // registers the service worker
 if ("serviceWorker" in navigator && window.isSecureContext) {

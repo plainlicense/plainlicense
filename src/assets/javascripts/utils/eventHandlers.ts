@@ -50,6 +50,7 @@ import Tablesort from "tablesort"
 import { isLicenseHash, isValidEvent } from "./conditionChecks"
 import { getLocation, watchViewportAt } from "~/browser"
 import { getComponentElement, watchHeader } from "~/components"
+import { logger } from "~/utils"
 
 export const NAV_EXIT_DELAY = 60000
 export const PAGE_CLEANUP_DELAY = 20000
@@ -274,7 +275,7 @@ export async function windowEvents() {
     component$,
   }
   let observablesMissing = false
-  for (const key in observables) {
+  for (const key of Object.keys(observables)) {
     if (!(globalThis as any)[key]) {
       observablesMissing = true
     }
@@ -347,5 +348,9 @@ export function watchLicenseHash() {
  * @param urls array of URLs to cache
  */
 export function postUrlsForWorker(urls: string[]) {
+  if (!urls.length) {
+    return
+  }
   customWindow.postMessage({ type: "CACHE_URLS", payload: urls })
+  logger.info(`Cached URLs: ${urls.join(", ")}`)
 }

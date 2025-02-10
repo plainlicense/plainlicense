@@ -2,6 +2,27 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "name": "Launch Chrome",
+      "request": "attach",
+      "type": "chrome",
+      "preLaunchTask": "prepare-chrome",
+      "pathMapping": {
+        "/": "${workspaceFolder}/docs"
+      },
+      "url": "http://localhost:8000",
+      "webRoot": "${workspaceFolder}/src",
+      "outFiles": [
+        "${workspaceFolder}/docs/**",
+        "!**/node_modules/**"
+      ],
+      "smartStep": true,
+      "skipFiles": [
+        "**/node_modules/**",
+        "${workspaceFolder}/external/**"
+      ]
+
+    },
+    {
       "name": "bun debug",
       "type": "bun",
       "request": "launch",

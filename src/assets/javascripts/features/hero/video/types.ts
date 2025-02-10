@@ -5,11 +5,11 @@
  */
 export type AnimationType = "video" | "scrollTrigger"
 
-/**
- * @exports @type {Animations}
- * @description Animations for the Hero feature.
- * @type {Map<symbol, gsap.core.Timeline>}
- */
+export enum HeroName {
+  TokyoShuffle = "tokyo_shuffle",
+  BreakFree = "break_free",
+}
+
 export type Animations = Map<symbol, gsap.core.Timeline>
 
 export type VideoWidth = 426 | 640 | 854 | 1280 | 1920 | 2560 | 3840
@@ -38,7 +38,7 @@ export interface VideoResolution {
 }
 
 export interface HeroVideo {
-  baseName: string
+  baseName: HeroName
   parentPath: string // Path to the parent directory of the video
   variants: CodecVariants
   poster: ImageIndex

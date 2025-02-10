@@ -28,13 +28,13 @@ export enum Direction {
  * @exports @interface Section
  * @description Section element and content for Observer animation.
  */
-
 export interface Section {
+  readonly index: number
   readonly element: Element
-  readonly outerWrapper: Element
-  readonly innerWrapper: Element
-  readonly bg: Element
-  readonly content: Element[]
+  readonly outerWrapper: Element | null
+  readonly innerWrapper: Element | null
+  readonly bg: Element | null
+  content: Element[]
   animation?: gsap.core.Timeline
 }
 

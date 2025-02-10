@@ -34,8 +34,8 @@
         "./src/assets/javascripts/*",
         "./external/mkdocs-material/src/templates/assets/javascripts/*"
       ],
-      "~worker/*": [
-        "./src/*"
+      "~assets/*": [
+        "./src/assets/*"
       ],
       "@/*": [
         "./external/mkdocs-material/src/templates/assets/javascripts/*"

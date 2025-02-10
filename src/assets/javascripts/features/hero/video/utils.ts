@@ -7,7 +7,7 @@ import { parsePath } from "~/utils"
  * @returns The hero videos
  */
 export function getHeroVideos(): HeroVideo[] {
-  return [...rawHeroVideos]
+  return rawHeroVideos
 }
 
 /**

@@ -45,7 +45,7 @@ import {
   watchMediaQuery,
 } from "~/utils/eventHandlers"
 import { isDev, isHome } from "~/utils/conditionChecks"
-import { setCssVariable } from "~/utils/helpers"
+import { stringify, setCssVariable } from "~/utils/helpers"
 import { logger } from "~/utils/log"
 import * as predicates from "./predicates"
 import { getViewportOffset, getViewportSize } from "~/browser"
@@ -123,23 +123,23 @@ export class HeroStore {
     if (weAreDev) {
       this.debugStateChange(update)
     }
-    const keys = Object.keys(update)
-    if (keys[0] in this.state$.value) {
-      this.state$.next({ ...this.state$.value, ...update })
+    if (update === null || update === undefined) {
       return
     }
-    switch (component) {
-      case AnimationComponent.Video:
-        this.videoState$.next(update as VideoState)
-        break
-      // there were more cases, but we simplified it by moving to the video.
-      // keeping this to make it easier to add components in the future.
-      case undefined:
-        try {
-          this.state$.next({ ...this.state$.value, ...update })
-        } catch (error) {
-          logger.error(`Error updating state: ${error}\nUpdate: ${update}`)
-        }
+    const changes = Object.entries(update).filter(
+      ([key, value]) =>
+        value !== null &&
+        key in this.state$.value &&
+        this.state$.value[key as keyof HeroState] !== value,
+    )
+    if (changes.length === 0) {
+      return
+    }
+    this.state$.next({ ...this.state$.value, ...update })
+    if (component && component === AnimationComponent.Video) {
+      logger.info("updating video state; update:", update)
+      this.videoState$.next(update as VideoState)
+      return
     }
   }
 
@@ -352,9 +352,11 @@ export class HeroStore {
       const changes = Object.entries(updates).filter(
         ([key, value]) => oldState[key as keyof HeroState] !== value,
       )
-
-      logger.info("Changes:", Object.fromEntries(changes))
-      logger.info("New State:", { ...oldState, ...updates })
+      if (changes.length === 0) {
+        return
+      }
+      logger.info("Changes:", stringify(changes))
+      logger.info("New State:", stringify({ ...oldState, ...updates }))
       Object.entries(predicates)
         .filter(([_, value]) => typeof value === "function")
         .forEach(([name, predicate]) => {

@@ -21,6 +21,7 @@
  */
 
 import path from "path"
+import { BuildResult } from "esbuild"
 
 // regex separator ("|") or minimatch separator (",")
 export type Separator = "|" | ","
@@ -145,4 +146,20 @@ export interface HeroFile {
   parsed: path.ParsedPath
   type: "image" | "video"
   width: VideoWidth | EmptyString
+}
+
+export type EsbuildOutput = { [path: string]: MetaFileOutputs }
+
+export type ReplacerFunction = (match: RegExpExecArray) => string
+
+export interface ReplacerConfig {
+  name: string
+  pattern: RegExp
+  replacer?: ReplacerFunction
+  simple?: boolean
+  description?: string
+  replacement?: string
+  getOutputFile?: () => Promise<string | undefined>
+  pathFilter?: (path: string) => boolean
+  custom?: string[] // name of a custom property function
 }

@@ -54,6 +54,16 @@ These are basic customizations for the home page.
   }
 }
 
+header#header-target {
+  visibility: hidden;
+  opacity: 0;
+}
+
+#hero-tabs {
+  visibility: hidden;
+  opacity: 0;
+}
+
 /* let's test without this
 
 header#header-target.md-header {

@@ -34,7 +34,7 @@ import {
   ReducedMotionCondition,
   TransitionConfig,
 } from "./types"
-import { getCircularReplacer, logger } from "~/utils"
+import { stringify, logger } from "~/utils"
 
 /**
  * Retrieves the fade variables for autoAlpha and yPercent.
@@ -56,7 +56,7 @@ function getDFactor(direction: Direction) {
   return direction === Direction.UP ? Direction.UP : Direction.DOWN
 }
 
-// ! WARNING: gsap warns about nesting effects within an effect.
+// ! WARNING: gsap warns about nesting effects within effects.
 // ! I Don't know what happens if you do...implosion of the multiverse?
 // ! We avoid that be creating tweens/timelines and then creating effects from those tweens/timelines.
 
@@ -69,9 +69,7 @@ gsap.registerEffect({
   defaults: { extendTimeline: true },
   effect: (config: TransitionConfig) => {
     const { direction, section } = config
-    logger.info(
-      `setSection: direction: ${direction.toString()}, section: ${(JSON.stringify(section), getCircularReplacer(), 2)}`,
-    )
+    logger.info(`setSection: direction: ${direction}, section: ${stringify(section)}`)
     const dFactor = getDFactor(direction)
     const tl = gsap.timeline()
     tl.add(gsap.set(section.element, { zIndex: 0 }))
@@ -90,10 +88,8 @@ gsap.registerEffect({
   defaults: { extendTimeline: true },
   effect: (config: TransitionConfig) => {
     const { direction, section } = config
-    logger.info(
-      `transitionSection: direction: ${direction.toString()}, section: ${JSON.stringify(section, getCircularReplacer(), 2)}`,
-    )
-    logger.info(`config object: ${JSON.stringify(config, getCircularReplacer(), 2)}`)
+    logger.info(`transitionSection: direction: ${direction}, section: ${stringify(section)}`)
+    logger.info(`config object: ${stringify(config)}`)
     const dFactor = getDFactor(direction)
     const tl = gsap.timeline()
     tl.fromTo(
@@ -151,9 +147,7 @@ const fade = (
   targets: gsap.TweenTarget,
   config: FadeEffectConfig = { out: false, direction: 1, fromConfig: {}, toConfig: {} },
 ) => {
-  logger.info(
-    `fade: targets: ${targets}, config: ${JSON.stringify(config, getCircularReplacer(), 2)}`,
-  )
+  logger.info(`fade: targets: ${targets}, config: ${stringify(config)}`)
   const media = getMatchMediaInstance()
   const tl = gsap.timeline()
   media.add({ reducedMotion: "(prefers-reduced-motion: reduce)" }, (context: gsap.Context) => {
@@ -201,9 +195,7 @@ gsap.registerEffect({
   name: "fadeIn",
   extendTimeline: true,
   effect: (targets: gsap.TweenTarget, config: FadeEffectConfig) => {
-    logger.info(
-      `fadeIn: targets: ${targets}, config: ${JSON.stringify(config, getCircularReplacer(), 2)}`,
-    )
+    logger.info(`fadeIn: targets: ${targets}, config: ${stringify(config)}`)
     const { direction, fromConfig, toConfig } = config
     targets = targets instanceof Array ? targets : [targets]
     return fade(targets, { out: false, direction, fromConfig, toConfig })
@@ -215,9 +207,7 @@ gsap.registerEffect({
   extendTimeline: true,
   defaults: { extendTimeline: true },
   effect: (targets: gsap.TweenTarget, config: FadeEffectConfig) => {
-    logger.info(
-      `fadeOut: targets: ${targets}, config: ${JSON.stringify(config, getCircularReplacer(), 2)}`,
-    )
+    logger.info(`fadeOut: targets: ${targets}, config: ${stringify(config)}`)
     const { direction, fromConfig, toConfig } = config
     return fade(targets, { out: true, direction, fromConfig, toConfig })
   },
@@ -230,7 +220,7 @@ gsap.registerEffect({
  * @returns The blink effect.
  */
 const blink = (targets: gsap.TweenTarget, config: gsap.TweenVars = {}) => {
-  logger.info(`blink: targets: ${targets}, config: ${JSON.stringify(config)}`)
+  logger.info(`blink: targets: ${targets}, config: ${stringify(config)} `)
   const duration = modifyDurationForReducedMotion(config.duration || 0.5)
   return gsap.to(targets, {
     autoAlpha: 0,
@@ -248,9 +238,7 @@ const blink = (targets: gsap.TweenTarget, config: gsap.TweenVars = {}) => {
  * @returns The jump effect.
  */
 const jump = (targets: gsap.TweenTarget, config: gsap.TweenVars = {}) => {
-  logger.info(
-    `jump: targets: ${targets}, config: ${JSON.stringify(config, getCircularReplacer(), 2)}`,
-  )
+  logger.info(`jump: targets: ${targets}, config: ${stringify(config)}`)
   config.y ? config["delete"]("y") : null
   const duration = modifyDurationForReducedMotion(config.duration || 0.5)
   return gsap.to(targets, {
@@ -274,9 +262,7 @@ const jump = (targets: gsap.TweenTarget, config: gsap.TweenVars = {}) => {
  * @returns The scale up effect.
  */
 const scaleUp = (targets: gsap.TweenTarget, config: gsap.TweenVars = {}) => {
-  logger.info(
-    `scaleUp: targets: ${targets}, config: ${JSON.stringify(config, getCircularReplacer(), 2)}`,
-  )
+  logger.info(`scaleUp: targets: ${targets}, config: ${stringify(config)}`)
   const duration = modifyDurationForReducedMotion(config.duration || 0.5)
   return gsap.to(targets, { scale: 1.5, ease: "elastic", ...config, duration })
 }
@@ -292,9 +278,7 @@ gsap.registerEffect({
   extendTimeline: true,
   defaults: { repeat: -1, yoyo: true, extendTimeline: true },
   effect: (targets: gsap.TweenTarget, config: EmphasisConfig) => {
-    logger.info(
-      `emphasize: targets: ${targets}, config: ${JSON.stringify(config, getCircularReplacer(), 2)}`,
-    )
+    logger.info(`emphasize: targets: ${targets}, config: ${stringify(config)}`)
     if (!targets) {
       return null
     }
@@ -333,9 +317,7 @@ gsap.registerEffect({
   extendTimeline: true,
   defaults: { extendTimeline: true, repeat: 0 },
   effect: (target: gsap.TweenTarget, config: AnimateMessageConfig) => {
-    logger.info(
-      `animateMessage: target: ${target}, config: ${JSON.stringify(config, getCircularReplacer(), 2)}`,
-    )
+    logger.info(`animateMessage: target: ${target}, config: ${stringify(config)}`)
     target = target instanceof Array ? target : gsap.utils.toArray(target)
     if (!target || !(target instanceof Array)) {
       return gsap.timeline()

@@ -111,7 +111,11 @@
 				"wix.vscode-import-cost",
 				"wmontalvo.vsc-jsonsnippets",
 				"yzhang.markdown-all-in-one",
-				"foxundermoon.shell-format"
+				"foxundermoon.shell-format",
+				"Perkovec.emoji",
+				"bierner.markdown-emoji",
+				"Gydunhn.vsc-essentials",
+				"bierner.emojisense"
 			]
 		}
 	}

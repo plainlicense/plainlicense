@@ -81,7 +81,7 @@ export class VideoElement {
   // construct the video element
   private constructVideoElement() {
     const { video } = this
-    for (const prop in this.properties) {
+    for (const prop of Object.keys(this.properties)) {
       const key = typeof prop === "string" ? prop : `${prop}`
       try {
         video.setAttribute(prop, this.properties[key])
@@ -98,10 +98,10 @@ export class VideoElement {
     let srcs = []
     const widths = Object.keys(MAX_WIDTHS)
     for (const [_, variant] of Object.entries(heroVideo.variants)) {
-      for (const codec in variant) {
+      for (const codec of Object.keys(variant)) {
         if (codec === "av1" || codec === "vp9" || codec === "h264") {
           const codecKey = codec as unknown as CodecVariants
-          for (const width in widths) {
+          for (const width of widths) {
             const w = parseInt(width, 10) as VideoWidth
             const src = document.createElement("source")
             // @ts-ignore
@@ -148,24 +148,24 @@ export class VideoElement {
     const { png } = poster
     const { widths } = png
     let sizes = ""
-    for (const width in widths) {
+    for (const width of Object.keys(widths)) {
       const w = parseInt(width, 10) as VideoWidth
-      if (Array.from(Object.keys(MAX_WIDTHS)).includes(width)) {
+      if (width in MAX_WIDTHS) {
         // @ts-ignore
         sizes += w !== 3840 ? `(max-width: ${MAX_WIDTHS[width]}px) ${width}px, ` : `${width}px`
       }
     }
-    return sizes
+    return sizes.trim().replace(/,$/, "")
   }
 
   // construct the picture element
   private constructPictureElement() {
     const { picture, poster } = this
     let srcs = []
-    for (const type in Object.keys(poster)) {
+    for (const type of Object.keys(poster)) {
       // type guard
       if (type === "webp" || type === "avif") {
-        const { srcset } = poster[type.toString() as keyof ImageIndex]
+        const { srcset } = poster[type as keyof ImageIndex]
         const source = document.createElement("source")
         source.srcset = srcset
         source.type = `image/${type}`
