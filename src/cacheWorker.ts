@@ -127,7 +127,9 @@ class NetworkError extends Error {
 }
 
 // Load the manifest file
-async function loadManifest(url: URL): Promise<string | undefined> {
+async function loadManifest(
+  url: URL,
+): Promise<Record<string, { file: string; integrity: string }> | undefined> {
   try {
     const response = await fetch(url)
     if (!response.ok) {
@@ -146,7 +148,8 @@ const MANIFEST: Manifest = {}
   if (!data) {
     throw new CacheError("Failed to load manifest file")
   }
-  Object.assign(MANIFEST, data)
+  const editedKeys = Object.keys(data).map((key) => key.replace("docs/", ""))
+  Object.assign(MANIFEST, Object.fromEntries(editedKeys.map((key) => [key, data[`docs/${key}`]])))
 })()
 
 const normalizeUrl = (url: RequestLike): URL => {

@@ -108,7 +108,7 @@ export const SUBTLE_EMPHASIS_CONFIG: EmphasisConfig = {
 } as const
 
 export const STRONG_EMPHASIS_CONFIG: EmphasisConfig = {
-  blinkConfig: { yoyoEase: "power1.in", repeat: -1, repeatDelay: 0.5, autoAlpha: 0.4 },
+  blinkConfig: { yoyoEase: "power1.in", repeat: -1, repeatDelay: 0.5, autoAlpha: 0.4},
   jumpConfig: {},
   scaleUpConfig: { duration: 1 },
 } as const

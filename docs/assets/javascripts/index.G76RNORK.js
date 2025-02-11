@@ -12145,7 +12145,7 @@ function watchLicenseHash() {
 }
 
 // src/assets/javascripts/utils/fetchWorker.ts
-var cacheWorkerUrl = "cacheWorker.F7JTYP6Y.js";
+var cacheWorkerUrl = "cacheWorker.NF2ZB7G3.js";
 if ("serviceWorker" in navigator && window.isSecureContext) {
   logger.info("Registering service worker");
   const register2 = async () => {
@@ -13527,8 +13527,8 @@ var HeroObservation = class _HeroObservation {
     logger.info("Filtered content:", stringify(content));
     const tl = gsapWithCSS.timeline({ paused: !startImmediately, callbackScope: this });
     tl.addLabel("start");
-    tl.add(["subtleEmphasis", gsapWithCSS["emphasize"](subtleTargets, SUBTLE_EMPHASIS_CONFIG)], 2);
-    tl.add(["strongEmphasis", gsapWithCSS["emphasize"](strongTargets, STRONG_EMPHASIS_CONFIG)], 4);
+    tl.add(["subtleEmphasis", gsapWithCSS.emphasize(subtleTargets, SUBTLE_EMPHASIS_CONFIG)], 2);
+    tl.add(["strongEmphasis", gsapWithCSS.emphasize(strongTargets, STRONG_EMPHASIS_CONFIG)], 4);
     this.registerAnimation(tl, firstSection.element);
     if (startImmediately) {
       this.goToSection(0, 1);
@@ -13628,10 +13628,10 @@ var HeroObservation = class _HeroObservation {
     const nextSection = this.sections[index];
     if (this.currentIndex >= 0) {
       logger.info("Setting section ".concat(this.currentIndex, " to section ").concat(index));
-      tl["setSection"]({ direction, section: nextSection });
+      tl.setSection({ direction, section: nextSection });
     }
     logger.info("Animating section ".concat(index, " in direction ").concat(direction));
-    tl["transitionSection"]({ direction, section: nextSection });
+    tl.transitionSection({ direction, section: nextSection });
     if (nextSection.animation) {
       tl.add(nextSection.animation, ">");
     }
@@ -16844,4 +16844,4 @@ gsap/ScrollToPlugin.js:
    * @author: Jack Doyle, jack@greensock.com
   *)
 */
-//# sourceMappingURL=index.4SF7S4CH.js.map
+//# sourceMappingURL=index.G76RNORK.js.map

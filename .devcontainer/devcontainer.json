@@ -6,14 +6,30 @@
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	"forwardPorts": [
 		6499,
-		8000
+		8000,
+		9222
 	],
 	"portsAttributes": {
 		"6499": {
 			"label": "Bun debug"
 		},
 		"8000": {
-			"label": "MKDocs dev server"
+			"label": "MKDocs dev server",
+			"protocol": "http",
+			"icon": "globe",
+			"openMode": "openBrowser",
+			"onAutoForward": "notify",
+			"requireLocalPort": true,
+			"elevateIfNeeded": true
+		},
+		"9222": {
+			"label": "Chrome Debugger",
+			"protocol": "http",
+			"icon": "chrome",
+			"openMode": "openBrowser",
+			"onAutoForward": "notify",
+			"requireLocalPort": true,
+			"elevateIfNeeded": true
 		}
 	},
 	"runArgs": [
@@ -24,7 +40,8 @@
 		"--dns",
 		"103.247.36.36",
 		"--dns",
-		"103.247.37.37"
+		"103.247.37.37",
+		"--add-host=host.docker.internal:host-gateway"
 	],
 	"containerEnv": {
 		"UV_LINK_MODE": "copy",

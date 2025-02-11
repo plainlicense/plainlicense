@@ -18,8 +18,7 @@
  */
 
 import { cssModulesPlugin } from "@asn.aeb/esbuild-css-modules-plugin"
-import manifestPlugin from "esbuild-plugin-manifest"
-import { promises as fs } from "fs"
+
 // @ts-ignore
 import * as esbuild from "esbuild"
 import globby from "globby"
@@ -38,8 +37,6 @@ import type {
   VideoConfig,
   VideoResolution,
 } from "../types.ts"
-import { createHash } from "crypto"
-import { resolveGlob } from "../utils/index.js"
 import { Manifest, ReplacersPlugin } from "../localPlugins/index.js"
 
 export const placeholderMap: PlaceholderMap = {

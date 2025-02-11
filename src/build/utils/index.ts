@@ -2,7 +2,6 @@ import * as crypto from "crypto"
 import globby from "globby"
 import * as fs from "fs/promises"
 import {
-  HERO_VIDEO_TEMPLATE,
   basePath,
   cssLocs,
   cssSrc,
@@ -10,16 +9,13 @@ import {
   imageTypes,
   mediaExtensionPattern,
   resPattern,
-  tsTemplate,
   videoCodecs,
   videoExtensions,
 } from "../config"
 import type {
-  CodecVariants,
   HeroFile,
   HeroFiles,
   HeroPaths,
-  HeroVideo,
   ImageIndex,
   MediaFileExtension,
   PlaceholderMap,
@@ -27,9 +23,13 @@ import type {
 } from "../types"
 import { optimize } from "svgo"
 import path, { ParsedPath } from "path"
-import { exec } from "child_process"
 
-const basePosterObj = HERO_VIDEO_TEMPLATE.poster
+
+export async function calculateIntegrity(content: Buffer): Promise<string> {
+  const hash = crypto.createHash("sha384")
+  hash.update(content)
+  return `sha384-${hash.digest("base64")}`
+}
 
 /**
  * Replace the src path with the docs path.

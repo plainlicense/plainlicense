@@ -182,8 +182,8 @@ export class HeroObservation {
     logger.info("Filtered content:", stringify(content))
     const tl = gsap.timeline({ paused: !startImmediately, callbackScope: this })
     tl.addLabel("start")
-    tl.add(["subtleEmphasis", gsap["emphasize"](subtleTargets, SUBTLE_EMPHASIS_CONFIG)], 2)
-    tl.add(["strongEmphasis", gsap["emphasize"](strongTargets, STRONG_EMPHASIS_CONFIG)], 4)
+    tl.add(["subtleEmphasis", gsap.emphasize(subtleTargets, SUBTLE_EMPHASIS_CONFIG)], 2)
+    tl.add(["strongEmphasis", gsap.emphasize(strongTargets, STRONG_EMPHASIS_CONFIG)], 4)
     this.registerAnimation(tl, firstSection.element)
     if (startImmediately) {
       this.goToSection(0, 1)
@@ -309,10 +309,10 @@ export class HeroObservation {
     if (this.currentIndex >= 0) {
       // the first time this runs, currentIndex will be -1
       logger.info(`Setting section ${this.currentIndex} to section ${index}`)
-      tl["setSection"]({ direction, section: nextSection })
+      tl.setSection({ direction, section: nextSection })
     }
     logger.info(`Animating section ${index} in direction ${direction}`)
-    tl["transitionSection"]({ direction, section: nextSection })
+    tl.transitionSection({ direction, section: nextSection })
     if (nextSection.animation) {
       tl.add(nextSection.animation, ">")
     }

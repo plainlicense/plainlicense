@@ -29,8 +29,8 @@ import * as esbuild from "esbuild"
 import * as fs from "fs/promises"
 import * as path from "path"
 import { Observable, from } from "rxjs"
-import { PROJECTS, basePosterObj, baseProject, clearGlobs, clearOpts, webConfig } from "./config/"
-import { FileHashes, HeroFiles, ImageIndex, Project, buildJson, esbuildOutputs } from "./types"
+import { PROJECTS, basePosterObj, baseProject, webConfig } from "./config/"
+import { FileHashes, ImageIndex, Manifest, Project, buildJson, esbuildOutputs } from "./types"
 import * as utils from "./utils"
 
 // TODO: Refactor to use esbuild's transform API and reduce the number of file reads and writes
@@ -42,8 +42,6 @@ import * as utils from "./utils"
 const noScriptImage: ImageIndex = {
   ...basePosterObj,
 }
-
-const heroFiles: Promise<HeroFiles> = utils.getHeroFiles()
 
 let currentProject: Project = baseProject
 const projects = PROJECTS
@@ -86,23 +84,26 @@ async function build(project: Project): Promise<Observable<unknown>> {
  * @description Clears the directories in the docs folder
  */
 async function clearDirs() {
-  const files = await heroFiles
-  const parents = utils.getParents(files.videos)
-  const destParents = parents
-    .map((parent) => (utils.isDir(parent) ? null : utils.srcToDocs(parent)))
-    .filter((parent) => !!parent)
-  const returnedGlobs = await Promise.all(
-    clearGlobs.map(async (dir) => await utils.resolveGlob(dir, clearOpts)),
-  )
-  const filesToDelete = new Set([...returnedGlobs.flat(), ...destParents])
-  for (const file of filesToDelete) {
-    if (typeof file === "string" && file !== "") {
-      try {
-        await fs.rm(file, { force: true })
-      } catch (err) {
-        console.error(`Error removing file ${file}: ${err}`)
+  try {
+    const manifest = await fs.readFile("docs/manifest.json", "utf-8")
+    const parsedManifest: Manifest = JSON.parse(manifest)
+    const deletionPromises: Promise<void>[] = []
+    for (const [key, value] of Object.entries(parsedManifest)) {
+      if (key.endsWith(".js") || key.endsWith(".css") || key.endsWith(".map")) {
+        deletionPromises.push(Promise.resolve(await fs.rm(`docs/${value.file}`, { force: true })))
+        continue
+      }
+      const srcFile = key.replace("docs/", "src/")
+      const { file, integrity } = value
+      const srcFileContent = await fs.readFile(srcFile)
+      const srcIntegrity = await utils.calculateIntegrity(srcFileContent)
+      if (srcIntegrity !== integrity) {
+        deletionPromises.push(Promise.resolve(await fs.rm(`docs/${file}`, { force: true })))
       }
     }
+    return deletionPromises
+  } catch (error) {
+    console.error("Error clearing directories:", error)
   }
 }
 
@@ -170,8 +171,6 @@ async function buildAll(): Promise<any[]> {
   }
   const buildPromises: Promise<Observable<any> | any>[] = []
   console.log("Building all projects...")
-  buildPromises.push(clearDirs())
-  console.log("Directories cleared")
   console.log("generating placeholder map")
   buildPromises.push(utils.generatePlaceholderMap())
   console.log("retrieving hero videos")
@@ -191,9 +190,14 @@ async function buildAll(): Promise<any[]> {
 async function main(): Promise<void> {
   try {
     console.log("Building Plain License...")
-    const buildPromises = await buildAll()
-    await Promise.allSettled(buildPromises).then(async () => {
-      console.log("Plain License built")
+    console.log("Clearing directories...")
+    const deletePromises = await clearDirs()
+    await Promise.allSettled(deletePromises).then(async () => {
+      console.log("Directories cleared")
+      const buildPromises = await buildAll()
+      await Promise.allSettled(buildPromises).then(async () => {
+        console.log("Plain License built")
+      })
     })
   } catch (error) {
     console.error("Build process failed:", error)

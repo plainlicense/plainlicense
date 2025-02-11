@@ -163,3 +163,10 @@ export interface ReplacerConfig {
   pathFilter?: (path: string) => boolean
   custom?: string[] // name of a custom property function
 }
+
+export interface Manifest {
+  [filePath: string]: {
+    file: string
+    integrity: string
+  }
+}
