@@ -79,5 +79,5 @@
 {% block content %}
 {% endblock %}
 {% block scripts %}
-<script async fetch-priority="high" src="{{ js_bundle | url }}"></script>
+<script async fetch-priority="high" type="module" src="{{ js_bundle | url }}"></script>
 {% endblock %}

@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 /**
  * Build Configuration Module
  * @module config/index
@@ -19,29 +18,60 @@
  */
 
 import { cssModulesPlugin } from "@asn.aeb/esbuild-css-modules-plugin"
+import manifestPlugin from "esbuild-plugin-manifest"
+import { promises as fs } from "fs"
 // @ts-ignore
-import { tsconfigPathsPlugin } from "esbuild-plugin-tsconfig-paths"
 import * as esbuild from "esbuild"
+import globby from "globby"
+import { tsconfigPathsPlugin } from "esbuild-plugin-tsconfig-paths"
 // import { copy } from 'esbuild-plugin-copy'
 
-import type { HeroPaths, HeroVideo, ImageType, PlaceholderMap, Project, VideoCodec, VideoConfig, VideoResolution } from "../types.ts"
+import type {
+  HeroPaths,
+  HeroVideo,
+  ImageIndex,
+  ImageType,
+  PlaceholderMap,
+  Project,
+  Separator,
+  VideoCodec,
+  VideoConfig,
+  VideoResolution,
+} from "../types.ts"
+import { createHash } from "crypto"
+import { resolveGlob } from "../utils/index.js"
+import { Manifest, ReplacersPlugin } from "../localPlugins/index.js"
 
 export const placeholderMap: PlaceholderMap = {
   "src/assets/stylesheets/_bundle_template.css": {
     "{{ palette-hash }}": "",
-    "{{ main-hash }}": ""
+    "{{ main-hash }}": "",
   },
-  "src/assets/stylesheets/_bodyfont_template.css": {
-    "{{ inter-v.woff2 }}": "",
-    "{{ inter-v.woff }}": "",
-    "{{ bangers-regular.woff2 }}": "",
-    "{{ bangers-regular.woff }}": "",
-    "{{ sourcecodepro-regular.woff2 }}": "",
-    "{{ sourcecodepro-regular.woff }}": "",
-    "{{ raleway.woff2 }}": "",
-    "{{ raleway.woff }}": "",
-  }
 }
+
+export const cssLocs = {
+  "src/assets/stylesheets/_bundle_template.css": {
+    "{{ palette-hash }}":
+      "external/mkdocs-material/material/templates/assets/stylesheets/palette.*.min.css",
+    "{{ main-hash }}":
+      "external/mkdocs-material/material/templates/assets/stylesheets/main.*.min.css",
+  },
+}
+
+export const fontLoc = "src/assets/fonts/*" as const
+export const clearGlobs = [
+  "docs/*.{js,json}",
+  "docs/*js.map",
+  "docs/assets",
+  "docs/manifest.json",
+] as const
+
+export const clearOpts: globby.GlobbyOptions = {
+  expandDirectories: true,
+  onlyFiles: true,
+  suppressErrors: true,
+  unique: true,
+} as const
 
 export const videoConfig = {
   resolutions: [
@@ -53,52 +83,92 @@ export const videoConfig = {
     { width: 640, height: 360 },
     { width: 426, height: 240 },
   ] as VideoResolution[],
-  codecs: ['av1', 'vp9', 'h264'] as VideoCodec[],
-  baseDir: 'src/assets/videos/hero'
+  codecs: ["av1", "vp9", "h264"] as VideoCodec[],
+  baseDir: "src/assets/videos/hero",
 } as VideoConfig
 
 export const imageTypes = ["avif", "webp", "png"] as ImageType[]
 export const videoExtensions = ["webm", "mp4"]
+export const otherExtensions = ["woff", "woff2", "svg", "css", "js", "jpg", "jpeg", "gif", "ico"]
+export const allExtensions = [...imageTypes, ...videoExtensions, ...otherExtensions]
 export const videoCodecs = videoConfig.codecs
 
-export const backupImage = 'break_free'
+export const backupImage = "break_free"
 export const cssSrc = "src/assets/stylesheets/bundle.css"
 export const basePath = videoConfig.baseDir
 
-export const resKeys: HeroPaths = Object.fromEntries(videoConfig.resolutions.map(res => [res.width, ""])) as HeroPaths
-const resolutionWidth = Object.keys(resKeys).map(key => { return key.toString() })
+export const resKeys: HeroPaths = Object.fromEntries(
+  videoConfig.resolutions.map((res) => [res.width, ""]),
+) as HeroPaths
+export const resolutions = Object.keys(resKeys).map((key) => {
+  return parseInt(key, 10)
+})
+const resolutionWidths = Object.keys(resKeys).map((key) => {
+  return key.toString()
+})
+export const resPattern = resolutionWidths.join("|")
 
-const heroPathsTemplate = Object.fromEntries(videoConfig.resolutions.map(res => [res.width, ""])) as HeroPaths
+const heroPathsTemplate = Object.fromEntries(
+  videoConfig.resolutions.map((res) => [res.width, ""]),
+) as HeroPaths
 
 export const HERO_VIDEO_TEMPLATE = {
-  baseName: "",
-  parent: "",
   variants: {
     av1: { ...heroPathsTemplate },
     vp9: { ...heroPathsTemplate },
-    h264: { ...heroPathsTemplate }
+    h264: { ...heroPathsTemplate },
   },
   poster: {
-    parent: "",
-    imageName: "",
-    images: {
-      avif: { widths: { ...heroPathsTemplate }, srcset: ""},
-      webp: { widths: { ...heroPathsTemplate }, srcset: ""},
-      png: { widths: { ...heroPathsTemplate }, srcset: "" }
-    }
-  }
-} as HeroVideo
+    avif: { widths: { ...heroPathsTemplate }, srcset: "" },
+    webp: { widths: { ...heroPathsTemplate }, srcset: "" },
+    png: { widths: { ...heroPathsTemplate }, srcset: "" },
+  },
+} as Partial<HeroVideo>
 
 export const basePosterObj = HERO_VIDEO_TEMPLATE.poster
 
+/**
+ * @description Get the separator for the pattern
+ * @param {boolean} isRegex - Whether the pattern is a regex (true) or a minimatch (false)
+ * @returns {string} - The separator for the pattern
+ */
 
-export const widthPattern = (sep: string = "|") => { return resolutionWidth.join(sep) }
+const getSep = (isRegex: boolean): Separator => {
+  return isRegex ? "|" : ","
+}
+
+export const widthPattern = (isRegex: boolean = true) => {
+  return resolutionWidths.join(getSep(isRegex))
+}
+export const codecPattern = (isRegex: boolean = true) => {
+  return videoCodecs.join(getSep(isRegex))
+}
+
+export const videoExtensionPattern = (isRegex: boolean = true) => {
+  return videoExtensions.join(getSep(isRegex))
+}
+
+export const imageExtensionPattern = (isRegex: boolean = true) => {
+  return imageTypes.join(getSep(isRegex))
+}
+export const mediaExtensionPattern = (isRegex: boolean = true) => {
+  return `${videoExtensionPattern(isRegex)}|${imageExtensionPattern(isRegex)}`
+}
+export const hashPattern = "\.([0-9a-fA-F]{8})\."
+
+const removeDefaultPattern = (content: string, variable: string) => {
+  const pattern = new RegExp(`${variable}.default`, "g")
+  let newContent = content
+  for (const match of content.matchAll(pattern)) {
+    newContent = newContent.replace(match[0], variable)
+  }
+  return newContent
+}
 
 export const videoMessages = {
-  "tokyo_shuffle": "Stop the Nonsense",
-  "break_free": "Understanding shouldn't require a degree.",
+  tokyo_shuffle: "Stop the Nonsense",
+  break_free: "Understanding shouldn't require a degree.",
 } as Record<string, string>
-
 
 const jsBanner = `/**
  * ---DO NOT EDIT THIS FILE---
@@ -117,6 +187,7 @@ const cssBanner = `/**
   *
   */
 `
+
 /**
  * @description esbuild configuration for the web platform.
  */
@@ -126,66 +197,90 @@ export const webConfig: esbuild.BuildOptions = {
   sourcemap: true,
   metafile: true,
   banner: { js: jsBanner, css: cssBanner },
-  format: "esm",
   platform: "browser",
-  target: "es2020",
+  format: "esm",
+  target: ["chrome72", "firefox65", "safari12", "edge88"],
   outbase: "src",
-  chunkNames: "[dir]/assets/javascripts/chunks/[name].[hash]",
+  logLevel: "info",
+  chunkNames: "[dir]/chunks/[name].[hash]",
   assetNames: "[dir]/[name].[hash]",
-
   loader: {
-    ".avif": "file",
+    ".avif": "copy",
     ".css": "css",
     ".js": "js",
-    ".mp4": "file",
-    ".png": "file",
+    ".json": "copy",
+    ".mp4": "copy",
+    ".png": "copy",
     ".sass": "css",
     ".scss": "css",
-    ".svg": "file",
+    ".svg": "copy",
     ".ts": "ts",
     ".tsx": "tsx",
-    ".webm": "file",
-    ".webp": "file",
-    ".woff": "file",
-    ".woff2": "file",
+    ".webm": "copy",
+    ".webp": "copy",
+    ".woff": "copy",
+    ".woff2": "copy",
   },
-  outExtension: {".js": ".js", ".css": ".css"},
+  outExtension: { ".js": ".js", ".css": ".css" },
   splitting: false,
   plugins: [
     tsconfigPathsPlugin({
       cwd: process.cwd(),
       tsconfig: "tsconfig.json",
-      filter: /src\/assets\/javascripts\/index.ts/
+      filter: /src\/assets\/javascripts\/.*|src\/cache_worker.*/,
     }),
     cssModulesPlugin({
       emitCssBundle: {
         filename: "bundle.css",
       },
     }),
-    /**
-     * Taking this offline for now; will revisit later
-    copy({
-      watch: true,
-      verbose: true,
-      resolveFrom: "cwd",
-      globbyOptions: { gitignore: true, extglob: true, unique: true, expandDirectories: { extensions: ["svg", "woff", "woff2"]} },
-      assets: [
-        { from: "./src/assets/images/**", to: "./docs/assets/images" },
-        { from: "./src/assets/fonts/**", to: "./docs/assets/fonts" },
-
-      ],
-    }),
-      */
+    Manifest,
+    ReplacersPlugin,
   ],
 }
 
 export const baseProject: Project = {
-  entryPoints: ["src/assets/javascripts/index.ts",
-    "src/assets/javascripts/workers/cache_worker.ts",
-    "src/assets/stylesheets/bundle.css"
+  entryPoints: [
+    "src/assets/javascripts/index.ts",
+    "src/assets/stylesheets/bundle.css",
+    "src/cacheWorker.ts",
   ],
   tsconfig: "tsconfig.json",
   entryNames: "[dir]/[name].[hash]",
   platform: "browser",
   outdir: "docs",
+}
+
+export const PROJECTS = [baseProject] as const
+
+/**
+ * @param {string} str - the string to convert
+ * @returns {string} the enum string
+ */
+function toEnumString(str: string): string {
+  return `${str.toUpperCase()} = "${str}"`
+}
+
+export const tsTemplate = (videos: HeroVideo[], noScriptImage: ImageIndex) => {
+  const keyPattern = /"(\w+?)":|"[\[\](){}]|[\[\](){}]"/g
+  return `
+/**
+ *! NOTE: The build process generates this file.
+ *! DO NOT EDIT THIS FILE DIRECTLY.
+ * Edit the build script instead (src/build/config/index.ts).
+ *
+ * @module data
+ * @description A collection of hero videos for the landing page.
+ */
+
+export const rawHeroVideos = ${JSON.stringify(videos, null, 2)} as const;
+
+export enum HeroName {
+    ${videos.map((video) => toEnumString(video.baseName)).join(",\n    ")}
+    }
+
+export const backupImage = "${JSON.stringify(noScriptImage, null, 2)}" as const;
+`.replace(keyPattern, (match) => {
+    return match.replace(/"/g, "")
+  })
 }

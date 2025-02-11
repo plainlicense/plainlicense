@@ -6,20 +6,44 @@
     {
       "type": "typescript",
       "tsconfig": "tsconfig.json",
-      "problemMatcher": ["$tsc"],
+      "problemMatcher": [
+        "$tsc"
+      ],
       "group": {
         "kind": "build",
         "isDefault": true
       }
     },
-        {
-            "label": "Run Python",
-            "type": "shell",
-            "command": "${command:python.interpreterPath}",
-            "args": [
-                "${file}"
-            ],
-            "problemMatcher": "$python"
-        }
-    ]
+    {
+      "label": "Run Python",
+      "type": "shell",
+      "command": "${command:python.interpreterPath}",
+      "args": [
+        "${file}"
+      ],
+      "problemMatcher": "$python"
+    },
+    {
+      "type": "bun",
+      "script": "bun -b run src/build/index.ts",
+      "problemMatcher": [],
+      "label": "bun: build",
+      "detail": "bun run bun -b run src/build/index.ts - package.json"
+    },
+    {
+      "type": "shell",
+      "label": "mkdocs serve live",
+      "command": "source .venv/bin/activate && mkdocs serve",
+      "problemMatcher": [],
+      "detail": "Serve the documentation with live reload"
+    },
+      {
+        "label": "prepare-chrome",
+        "dependsOn": [
+          "bun: build",
+          "mkdocs serve live"
+        ],
+        "dependsOrder": "sequence"
+      }
+  ]
 }

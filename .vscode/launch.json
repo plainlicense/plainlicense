@@ -2,6 +2,27 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "name": "Launch Chrome",
+      "request": "attach",
+      "type": "chrome",
+      "preLaunchTask": "prepare-chrome",
+      "pathMapping": {
+        "/": "${workspaceFolder}/docs"
+      },
+      "url": "http://localhost:8000",
+      "webRoot": "${workspaceFolder}/src",
+      "outFiles": [
+        "${workspaceFolder}/docs/**",
+        "!**/node_modules/**"
+      ],
+      "smartStep": true,
+      "skipFiles": [
+        "**/node_modules/**",
+        "${workspaceFolder}/external/**"
+      ]
+
+    },
+    {
       "name": "bun debug",
       "type": "bun",
       "request": "launch",
@@ -12,6 +33,20 @@
         "--inspect-brk"
       ],
       "program": "${file}",
+      "internalConsoleOptions": "openOnSessionStart",
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "name": "bun build debug",
+      "type": "bun",
+      "request": "launch",
+      "runtime": "bun",
+      "runtimeArgs": [
+        "run",
+        "build",
+        "--inspect-brk"
+      ],
+      "program": "src/build/index.ts",
       "internalConsoleOptions": "openOnSessionStart",
       "cwd": "${workspaceFolder}"
     },

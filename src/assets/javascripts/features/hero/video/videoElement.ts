@@ -6,11 +6,10 @@
  * @copyright No rights reserved
  */
 
-import { logger } from '~/utils'
-import { CodecVariants, HeroImage, HeroVideo, VideoWidth } from './types'
-import { MAX_WIDTHS } from '~/config'
-import { get_media_type, srcToAttributes } from './utils'
-
+import { logger } from "~/utils"
+import { CodecVariants, ImageIndex, HeroVideo, VideoWidth } from "./types"
+import { MAX_WIDTHS } from "~/config"
+import { get_media_type, srcToAttributes } from "./utils"
 
 /**
  * @class VideoElement
@@ -18,7 +17,7 @@ import { get_media_type, srcToAttributes } from './utils'
  * @param heroVideo - The hero video object (required)
  */
 export class VideoElement {
-  public video: HTMLVideoElement = document.createElement('video')
+  public video: HTMLVideoElement = document.createElement("video")
 
   private sources: HTMLSourceElement[]
 
@@ -28,7 +27,7 @@ export class VideoElement {
 
   private playsinline: "true" | "false" = "true"
 
-  private preload: string = 'metadata'
+  private preload: string = "metadata"
 
   private muted: "true" | "false" = "true"
 
@@ -36,20 +35,28 @@ export class VideoElement {
 
   private autoplay: "true" | "false" = "true"
 
-  private poster: HeroImage
+  private poster: ImageIndex
 
-  public picture = document.createElement('picture')
+  public picture = document.createElement("picture")
 
   private properties: { [key: string]: string } = {}
 
-  public message: string = ''
+  public message: string = ""
 
   constructor(heroVideo: HeroVideo, properties?: { [key: string]: string }) {
-    this.video.classList.add('hero__video')
+    this.video.classList.add("hero__video")
     this.heroVideo = heroVideo
     this.poster = heroVideo.poster
-    this.message = heroVideo.message || ''
-    let props = properties ? Object.fromEntries(Object.entries(properties).map(([key, value]) => [key, (value === "true" || value === "false") ? value : this[key as keyof this] || "true"])) : {}
+    this.message = heroVideo.message || ""
+    let props =
+      properties ?
+        Object.fromEntries(
+          Object.entries(properties).map(([key, value]) => [
+            key,
+            value === "true" || value === "false" ? value : this[key as keyof this] || "true",
+          ]),
+        )
+      : {}
     this.assignProperties(props as { [key: string]: string })
     this.video = this.constructVideoElement()
     this.sources = this.constructSources()
@@ -67,21 +74,22 @@ export class VideoElement {
       muted,
       loop,
       autoplay,
-      ...properties
+      ...properties,
     }
   }
 
   // construct the video element
   private constructVideoElement() {
-    const {video} = this
-    for (const prop in this.properties) {
+    const { video } = this
+    for (const prop of Object.keys(this.properties)) {
       const key = typeof prop === "string" ? prop : `${prop}`
       try {
         video.setAttribute(prop, this.properties[key])
       } catch (e) {
         logger.error(`Error setting property ${key} on video element: ${e}`)
       }
-    } return video
+    }
+    return video
   }
 
   // make the source elements for the video element
@@ -89,15 +97,22 @@ export class VideoElement {
     const { heroVideo } = this
     let srcs = []
     const widths = Object.keys(MAX_WIDTHS)
-    for (const variant of heroVideo.variants) {
-      for (const codec in variant as CodecVariants) {
-        if (codec === 'av1' || codec === 'vp9' || codec === 'h264') {
-          for (const width in widths) {
+    for (const [_, variant] of Object.entries(heroVideo.variants)) {
+      for (const codec of Object.keys(variant)) {
+        if (codec === "av1" || codec === "vp9" || codec === "h264") {
+          const codecKey = codec as unknown as CodecVariants
+          for (const width of widths) {
             const w = parseInt(width, 10) as VideoWidth
-            const src = document.createElement('source')
-            src.src = variant[codec][w]
+            const src = document.createElement("source")
+            // @ts-ignore
+            const codecVariant = variant[codecKey as keyof typeof variant]
+            if (typeof codecVariant === "string") {
+              src.src = codecVariant
+            } else {
+              src.src = codecVariant[w]
+            }
             src.type = get_media_type(codec, w)
-            src.media = w !== 3840 ? `(max-width: ${MAX_WIDTHS[w]}px)` : ''
+            src.media = w !== 3840 ? `(max-width: ${MAX_WIDTHS[w]}px)` : ""
             srcs.push(src)
           }
         }
@@ -108,13 +123,14 @@ export class VideoElement {
     return srcs.sort((a, b) => {
       const [aCodec, aWidth] = srcToAttributes(a.src)
       const [bCodec, bWidth] = srcToAttributes(b.src)
-      if (aWidth === bWidth) { // we're comparing the same width
+      if (aWidth === bWidth) {
+        // we're comparing the same width
         switch (aCodec) {
-          case 'av1':
+          case "av1":
             return -1
-          case 'vp9':
-            return bCodec === 'av1' ? 1 : -1
-          case 'h264':
+          case "vp9":
+            return bCodec === "av1" ? 1 : -1
+          case "h264":
             return 1 // h264 should always be last if widths are equal
           default:
             throw new Error(`Unknown codec: ${aCodec}`)
@@ -129,54 +145,52 @@ export class VideoElement {
   private getSizes() {
     const { heroVideo } = this
     const { poster } = heroVideo
-    const { images } = poster
-    const { png } = images
+    const { png } = poster
     const { widths } = png
-    let sizes = ''
-    for (const width in widths) {
+    let sizes = ""
+    for (const width of Object.keys(widths)) {
       const w = parseInt(width, 10) as VideoWidth
-      if (Array.from(Object.keys(MAX_WIDTHS)).includes(width)) {
+      if (width in MAX_WIDTHS) {
         // @ts-ignore
         sizes += w !== 3840 ? `(max-width: ${MAX_WIDTHS[width]}px) ${width}px, ` : `${width}px`
       }
     }
-    return sizes
+    return sizes.trim().replace(/,$/, "")
   }
 
   // construct the picture element
   private constructPictureElement() {
     const { picture, poster } = this
-    const { images } = poster
     let srcs = []
-    for (const type in images) {
+    for (const type of Object.keys(poster)) {
       // type guard
-      if (type === 'webp' || type === 'avif') {
-        const { srcset } = images[type]
-        const source = document.createElement('source')
+      if (type === "webp" || type === "avif") {
+        const { srcset } = poster[type as keyof ImageIndex]
+        const source = document.createElement("source")
         source.srcset = srcset
         source.type = `image/${type}`
         srcs.push(source)
       }
     }
     srcs = srcs.sort((a, b) => {
-      const aType = a.type.split('/')[1]
-      const bType = b.type.split('/')[1]
+      const aType = a.type.split("/")[1]
+      const bType = b.type.split("/")[1]
       if (aType === bType) {
         return 0
       } else {
-        if (aType === 'avif') {
+        if (aType === "avif") {
           return -1
         }
         return 1 // webp should always be last
       }
     })
     picture.append(...srcs)
-    const img = document.createElement('img')
-    img.src = images.png.widths[1280]
-    img.srcset = images.png.srcset
-    img.alt = ''
+    const img = document.createElement("img")
+    img.src = poster.png.widths[1280]
+    img.srcset = poster.png.srcset
+    img.alt = ""
     img.sizes = this.getSizes()
-    picture.classList.add('hero__poster')
+    picture.classList.add("hero__poster")
     picture.append(img)
     return picture
   }

@@ -75,7 +75,7 @@ def find_repo_root() -> Path:
     current_path = Path.cwd()
     while not (current_path / ".git").exists():
         if current_path.parent == current_path and current_path.stem != "PlainLicense":
-            raise FileNotFoundError("Could not find the repository root directory.")  # noqa: TRY003
+            raise FileNotFoundError("Could not find the repository root directory.")
         if current_path.stem == "PlainLicense":
             return current_path
         current_path = current_path.parent
@@ -98,7 +98,7 @@ def is_license_page(page: Page) -> bool:
     try:
         return bool(page_name and page_name in _status.expected_licenses)  # type: ignore
     except AttributeError as e:
-        raise AttributeError("Status not initialized.") from e  # noqa: TRY003
+        raise AttributeError("Status not initialized.") from e
 
 
 class Status:
