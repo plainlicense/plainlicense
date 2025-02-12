@@ -7137,11 +7137,9 @@ p.md-nav__description.license {
     background: none;
   }
 }
-header#header-target {
-  visibility: hidden;
-  opacity: 0;
-}
-#hero-tabs {
+header#header-target,
+nav.md-tabs,
+.md-footer {
   visibility: hidden;
   opacity: 0;
 }
@@ -7183,9 +7181,10 @@ section.hero h2 {
 section.hero a {
   text-decoration: none;
 }
-section.hero .bg {
+section.hero .hero__bg {
   position: absolute;
   top: 0;
+  z-index: 1;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -7483,4 +7482,4 @@ section.hero .md-typeset.hero-grid .middle {
 }
 
 /* src/assets/stylesheets/bundle.css */
-/*# sourceMappingURL=bundle.LTWWHPZS.css.map */
+/*# sourceMappingURL=bundle.TDST6L6U.css.map */

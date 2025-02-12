@@ -54,12 +54,9 @@ These are basic customizations for the home page.
   }
 }
 
-header#header-target {
-  visibility: hidden;
-  opacity: 0;
-}
-
-#hero-tabs {
+header#header-target,
+nav.md-tabs,
+.md-footer {
   visibility: hidden;
   opacity: 0;
 }
@@ -119,9 +116,10 @@ section.hero {
     text-decoration: none;
   }
 
-  .bg {
+  .hero__bg {
     position: absolute;
     top: 0;
+    z-index: 1;
     display: flex;
     align-items: center;
     justify-content: center;

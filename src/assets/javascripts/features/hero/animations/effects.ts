@@ -68,6 +68,9 @@ gsap.registerEffect({
   extendTimeline: true,
   defaults: { extendTimeline: true },
   effect: (config: TransitionConfig) => {
+    if (Object.entries(config).length === 1) {
+      config = config[0]
+    }
     const { direction, section } = config
     logger.info(`setSection: direction: ${direction}, section: ${stringify(section)}`)
     const dFactor = getDFactor(direction)
@@ -87,6 +90,9 @@ gsap.registerEffect({
   extendTimeline: true,
   defaults: { extendTimeline: true },
   effect: (config: TransitionConfig) => {
+    if (Object.entries(config).length === 1) {
+      config = config[0]
+    }
     const { direction, section } = config
     logger.info(`transitionSection: direction: ${direction}, section: ${stringify(section)}`)
     logger.info(`config object: ${stringify(config)}`)

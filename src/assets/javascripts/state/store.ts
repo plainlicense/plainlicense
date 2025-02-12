@@ -36,18 +36,18 @@ import {
   StatePredicate,
   VideoState,
 } from "./types"
-
 import {
+  isDev,
+  isHome,
+  logger,
+  stringify,
+  setCssVariable,
   isPageVisible$,
   isPartiallyInViewport,
   navigationEvents$,
   prefersReducedMotion$,
   watchMediaQuery,
-} from "~/utils/eventHandlers"
-import { isDev, isHome } from "~/utils/conditionChecks"
-import { stringify, setCssVariable } from "~/utils/helpers"
-import { logger } from "~/utils/log"
-import * as predicates from "./predicates"
+} from "~/utils"
 import { getViewportOffset, getViewportSize } from "~/browser"
 import { Header, getComponentElement, watchHeader } from "~/components"
 
@@ -75,7 +75,7 @@ const initialUrl = new URL(customWindow.location.href)
  * @method destroy - Unsubscribes from all observables and resets the singleton instance
  */
 export class HeroStore {
-  private static instance: HeroStore | undefined = new HeroStore()
+  private static instance: HeroStore | undefined
 
   // state$ is a BehaviorSubject that holds the current state of the hero section
   public state$ = new BehaviorSubject<HeroState>({
@@ -254,10 +254,6 @@ export class HeroStore {
       tap(this.createObserver("parallaxHeight$", (parallaxHeight) => ({ parallaxHeight }))),
     )
 
-    const location$ = navigationEvents$.pipe(
-      tap(this.createObserver("location$", (location) => ({ location }))),
-    )
-
     const video$ = this.getVideoState$((v) => this.videoState$.next(v as VideoState))
 
     this.subscriptions.add(atHome$.subscribe())
@@ -334,11 +330,11 @@ export class HeroStore {
   private getVideoState$(observerFunc: ComponentStateUpdateFunction): Observable<VideoState> {
     return this.state$.pipe(
       map((state) => ({
-        canPlay: predicates.videoPredicate.canPlay(state),
+        canPlay: videoPredicate.canPlay(state),
       })),
       distinctUntilKeyChanged("canPlay"),
       shareReplay(1),
-      tap(this.getComponentObserver("carouselState$", observerFunc)),
+      tap(this.getComponentObserver("videoState$", observerFunc)),
     )
   }
 
@@ -374,4 +370,34 @@ export class HeroStore {
     this.subscriptions.unsubscribe()
     HeroStore.instance = undefined
   }
+}
+
+/**
+ * @param {HeroState} state - Hero state
+ * @returns {boolean} Whether the hero is fully visible
+ * @description Checks if the hero is fully visible
+ */
+export const isFullyVisible = (state: HeroState): boolean =>
+  state.atHome && state.landingVisible && state.pageVisible
+
+export const noVideo = (state: HeroState): boolean => state.prefersReducedMotion
+
+/** ======================
+ **   COMPONENT PREDICATES
+ *========================**/
+// there used to be a lot more, but, we simplified it by moving to the video.
+
+/**
+ * @param {HeroState} state - Hero state
+ * @returns {VideoState} video state predicate
+ * @description Predicates for the video component
+ */
+export const videoPredicate = {
+  canPlay: (state: HeroState): boolean => isFullyVisible(state) && !noVideo(state),
+}
+
+const predicates = {
+  isFullyVisible,
+  noVideo,
+  videoPredicate,
 }

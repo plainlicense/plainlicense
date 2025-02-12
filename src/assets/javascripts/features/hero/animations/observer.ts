@@ -12,20 +12,14 @@ import { gsap } from "gsap"
 import { Observer } from "gsap/Observer"
 import { Subscription } from "rxjs"
 import { distinctUntilChanged, filter, map } from "rxjs/operators"
-import {
-  OBSERVER_CONFIG,
-  ObserverConfig,
-  STRONG_EMPHASIS_CONFIG,
-  SUBTLE_EMPHASIS_CONFIG,
-} from "~/config"
-import { HeroStore } from "~/state"
-import type { HeroState } from "~/state/types"
+import { OBSERVER_CONFIG, ObserverConfig } from "~/config"
+import { HeroStore, HeroState } from "~/state"
 import { Direction, Section } from "./types"
 import { getContentElements } from "./utils"
 // Make sure we have the effects registered
-import { isHome, isValidElement, navigationEvents$, stringify } from "~/utils"
-import { logger } from "~/utils/log"
+import { isHome, logger, isValidElement, navigationEvents$, stringify } from "~/utils"
 import "./effects"
+import { VideoManager } from "~/features"
 
 gsap.registerPlugin(Observer)
 
@@ -41,7 +35,7 @@ export class HeroObservation {
 
   private config: ObserverConfig = OBSERVER_CONFIG
 
-  private sections: Section[] = []
+  public sections: Section[] = []
 
   private static instance: HeroObservation
 
@@ -67,14 +61,17 @@ export class HeroObservation {
 
   private initialized: boolean = false
 
-  private firstLoad: boolean = true
-
   private footer: Element | null = document.querySelector(".md-footer")
 
-  private header: Element | null = document.querySelector("#header-target #hero-tabs")
+  private header: Element | null = document.querySelector("#header-target nav.md-tabs")
+
+  private blockbusterManager: VideoManager = VideoManager.getInstance()
 
   private constructor() {
     this.defaultTimelineVars = {
+      defaults: {
+        callbackScope: this,
+      },
       repeat: 0,
       duration: this.config.slides.slideDuration,
       ease: "power2.inOut",
@@ -96,7 +93,7 @@ export class HeroObservation {
    * @returns {HeroObservation}
    */
   public static getInstance(): HeroObservation {
-    return (HeroObservation.instance ??= HeroObservation.instance = new HeroObservation())
+    return (HeroObservation.instance ??= new HeroObservation())
   }
 
   // Sets up RxJs subscriptions to monitor the atHome state
@@ -150,7 +147,6 @@ export class HeroObservation {
       if (target) {
         const sectionTarget = this.sections.find((section) => section.content.includes(target))
         if (sectionTarget) {
-          this.firstLoad = false
           const index = this.sections.indexOf(sectionTarget)
           this.goToSection(index, index === this.sectionIndexLength ? Direction.UP : Direction.DOWN)
         }
@@ -166,29 +162,11 @@ export class HeroObservation {
    */
   private setupFirstSection(startImmediately: boolean = false) {
     const firstSection = this.sections[0]
-    let { content } = firstSection
-    const { subtle, strong } = this.config.emphasisTargets
-    const subtleTargets = gsap.utils
-      .toArray(document.querySelectorAll(subtle))
-      .filter((el) => this.isValidContentTarget(el))
-    const strongTargets = gsap.utils
-      .toArray(document.querySelectorAll(strong))
-      .filter((el) => this.isValidContentTarget(el))
-    const emphasisTargets = [...subtleTargets, ...strongTargets]
-    logger.info("Emphasis targets:", stringify(emphasisTargets))
-    content = content.filter(
-      (content) => !emphasisTargets.includes(content) && this.isValidContentTarget(content),
-    )
-    logger.info("Filtered content:", stringify(content))
-    const tl = gsap.timeline({ paused: !startImmediately, callbackScope: this })
-    tl.addLabel("start")
-    tl.add(["subtleEmphasis", gsap.emphasize(subtleTargets, SUBTLE_EMPHASIS_CONFIG)], 2)
-    tl.add(["strongEmphasis", gsap.emphasize(strongTargets, STRONG_EMPHASIS_CONFIG)], 4)
-    this.registerAnimation(tl, firstSection.element)
+    this.registerAnimation(this.blockbusterManager.timeline, firstSection.element)
     if (startImmediately) {
-      this.goToSection(0, 1)
+      this.currentIndex = 0
+      this.goToSection(0, Direction.DOWN)
     }
-    this.firstLoad = false
   }
 
   /**
@@ -213,12 +191,15 @@ export class HeroObservation {
       // Find the main containers
       const outerWrapper = el.querySelector(".outer")
       const innerWrapper = el.querySelector(".inner")
-      const bg = el.querySelector(".bg")
+      const bg = el.querySelector(".hero__bg")
 
       // Get content elements, excluding structural wrappers
-      const content = getContentElements(el).filter(
+      const initialContent = getContentElements(el).filter(
         (element) => element !== outerWrapper && element !== innerWrapper && element !== bg,
       )
+      const content = Array.from(new Set(initialContent))
+
+      logger.info(`Setting up section ${index}`, { outerWrapper, innerWrapper, bg, content })
 
       return {
         index,
@@ -268,6 +249,12 @@ export class HeroObservation {
    */
   public async transition(direction: Direction, scenicRoute?: boolean) {
     let index = this.getNextIndex(direction)
+    if (
+      (direction === Direction.UP && this.currentIndex === 0) ||
+      (direction === Direction.DOWN && this.currentIndex === this.sectionIndexLength)
+    ) {
+      return
+    }
     if (!this.animating && !scenicRoute) {
       this.goToSection(index, direction)
     } else if (!this.animating && scenicRoute && direction === Direction.DOWN) {
@@ -291,31 +278,40 @@ export class HeroObservation {
 
   // Get the next index based on the direction
   private getNextIndex(direction: Direction): number {
-    if (
-      (this.currentIndex === 0 || this.currentIndex === -1) &&
-      this.firstLoad &&
-      direction === Direction.UP
-    ) {
+    const nextIndex = this.wrapper(this.currentIndex + direction)
+
+    // Add bounds checking
+    if (nextIndex < 0) {
       return 0
     }
-    this.firstLoad = false
-    return this.wrapper(this.currentIndex + direction)
+    if (nextIndex >= this.sectionCount) {
+      return this.sectionCount - 1
+    }
+
+    return nextIndex
   }
 
   // Construct the transition timeline based on the direction and index
   // Uses registered effects from observerEffects.ts
   private constructTransitionTimeline(direction: Direction, index: number, tl: gsap.core.Timeline) {
-    const nextSection = this.sections[index]
+    const section = this.sections[index]
+    logger.info(
+      `Timeline state: currentIndex=${this.currentIndex}, targetIndex=${index}, direction=${direction}, sectionsCount=${this.sectionCount}`,
+    )
+
     if (this.currentIndex >= 0) {
       // the first time this runs, currentIndex will be -1
       logger.info(`Setting section ${this.currentIndex} to section ${index}`)
-      tl.setSection({ direction, section: nextSection })
+      tl.setSection({ direction, section })
     }
     logger.info(`Animating section ${index} in direction ${direction}`)
-    tl.transitionSection({ direction, section: nextSection })
-    if (nextSection.animation) {
-      tl.add(nextSection.animation, ">")
+    tl.transitionSection({ direction, section })
+    if (section.animation && section.animation.totalDuration() > 0) {
+      tl.add(section.animation, ">")
     }
+
+    logger.info(`Transition for section ${index} is set and will trigger now`)
+
     return tl
   }
 
@@ -324,24 +320,36 @@ export class HeroObservation {
     if (this.animating || index === this.currentIndex) {
       return
     }
+
+    // Add bounds validation
+    if (index < 0 || index >= this.sectionCount) {
+      logger.warn(`Invalid section index: ${index}`)
+      return
+    }
+
     logger.info(`Going to section ${index} in direction ${direction}`)
+
+    // Update currentIndex before creating timeline
+    this.currentIndex = index
+
     let tl = gsap.timeline({
       defaults: {
         duration: this.config.slides.slideDuration,
         ease: "power2.inOut",
         onComplete: () => {
           this.animating = false
-          logger.info(`Completed transition to section ${index}`)
+          logger.info(`Completed transition to section ${this.currentIndex}`)
         },
         onStart: () => {
           this.animating = true
-          this.currentIndex = index
         },
         callbackScope: this,
       },
     })
+
     tl = this.constructTransitionTimeline(direction, index, tl)
     this.transitionTl = tl
+
     if (!this.transitionTl.isActive()) {
       this.transitionTl.play()
     }

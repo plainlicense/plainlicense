@@ -118,6 +118,7 @@ export class VideoManager {
   }
 
   private constructor() {
+    this.store = HeroStore.getInstance()
     this.videoStore = getHeroVideos()
     this.initVideo()
     this.constructTimeline()
@@ -180,7 +181,7 @@ export class VideoManager {
   // sets initial timeline properties
   private constructTimeline(): void {
     this.timeline = gsap.timeline({
-      defaults: { paused: true },
+      defaults: { paused: true, callbackScope: this },
       paused: true,
       onStart: () => {
         this.status = "playing"
@@ -202,15 +203,15 @@ export class VideoManager {
     const { subtle, strong } = OBSERVER_CONFIG.emphasisTargets
     const subtleTargets = gsap.utils.toArray(document.querySelectorAll(subtle))
     const strongTargets = gsap.utils.toArray(document.querySelectorAll(strong))
-    this.timeline.add(
-      ["subtleEmphasis", gsap.emphasize(subtleTargets, SUBTLE_EMPHASIS_CONFIG)],
-      ">",
-    )
-    this.timeline.add(
-      ["strongEmphasis", gsap.emphasize(strongTargets, STRONG_EMPHASIS_CONFIG)],
-      ">=0.5",
-    )
-    gsap.to(strongTargets, STRONG_EMPHASIS_CONFIG)
+    this.timeline
+      .add(
+        ["subtleEmphasis", gsap.timeline.emphasize(subtleTargets, SUBTLE_EMPHASIS_CONFIG), ">"],
+        ">",
+      )
+      .add(
+        ["strongEmphasis", gsap.timeline.emphasize(strongTargets, STRONG_EMPHASIS_CONFIG), ">"],
+        ">=0.5",
+      )
   }
 
   private loadVideo(): void {
@@ -252,7 +253,10 @@ export class VideoManager {
           )
 
           this.timeline.add(
-            ["message", gsap.animateMessage(this.container, { message: this.message, repeat: 0 })],
+            [
+              "message",
+              gsap.timeline.animateMessage(this.container, { message: this.message, repeat: 0 }),
+            ],
             this.titleStart,
           )
           this.setEmphasisAnimations()

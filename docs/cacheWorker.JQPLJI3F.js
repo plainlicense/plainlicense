@@ -7,7 +7,7 @@
  */
 
 
-// src/cacheWorker.NF2ZB7G3.js
+// src/cacheWorker.JQPLJI3F.js
 var woff2Inter = new URL("assets/fonts/inter-v.5HMTI5F7.woff2", self.location.origin);
 var woff2Bangers = new URL("assets/fonts/bangers-regular.BIV5PPSH.woff2", self.location.origin);
 var woff2SourceCodePro = new URL("assets/fonts/sourcecodepro-regular.CK7SPIOU.woff2", self.location.origin);
@@ -313,9 +313,6 @@ var _CacheStrategies = class _CacheStrategies {
       return fetch(request);
     }
     const url = new URL(request.url);
-    if (url.pathname.includes("livereload")) {
-      return new Response("Blocked", { status: 200, statusText: "OK" });
-    }
     if (url.origin !== self.location.origin) {
       return fetch(request);
     }
@@ -464,4 +461,4 @@ self.addEventListener("message", (event) => {
  * @author Adam Poulemanos <adam<at>plainlicense<dot>org>
  * @copyright No rights reserved.
  */
-//# sourceMappingURL=cacheWorker.NF2ZB7G3.js.map
+//# sourceMappingURL=cacheWorker.JQPLJI3F.js.map

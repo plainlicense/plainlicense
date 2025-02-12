@@ -424,9 +424,6 @@ class CacheStrategies {
       return fetch(request)
     }
     const url = new URL(request.url)
-    if (url.pathname.includes("livereload")) {
-      return new Response("Blocked", { status: 200, statusText: "OK" })
-    }
     if (url.origin !== self.location.origin) {
       return fetch(request)
     }

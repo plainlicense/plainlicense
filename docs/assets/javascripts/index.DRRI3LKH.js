@@ -15,10 +15,6 @@ var __hasOwnProp = Object.prototype.hasOwnProperty;
 var __commonJS = (cb, mod) => function __require() {
   return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
 };
-var __export = (target, all) => {
-  for (var name in all)
-    __defProp(target, name, { get: all[name], enumerable: true });
-};
 var __copyProps = (to, from2, except, desc) => {
   if (from2 && typeof from2 === "object" || typeof from2 === "function") {
     for (let key of __getOwnPropNames(from2))
@@ -9147,10 +9143,10 @@ function setLocationHash(hash) {
   el.addEventListener("click", (ev) => ev.stopPropagation());
   el.click();
 }
-function watchLocationHash(location$3) {
+function watchLocationHash(location$4) {
   return merge(
     fromEvent(window, "hashchange"),
-    location$3
+    location$4
   ).pipe(
     map(getLocationHash),
     startWith(getLocationHash()),
@@ -9158,8 +9154,8 @@ function watchLocationHash(location$3) {
     shareReplay(1)
   );
 }
-function watchLocationTarget(location$3) {
-  return watchLocationHash(location$3).pipe(
+function watchLocationTarget(location$4) {
+  return watchLocationHash(location$4).pipe(
     map((id) => getOptionalElement('[id="'.concat(id, '"]'))),
     filter((el) => typeof el !== "undefined")
   );
@@ -10688,7 +10684,7 @@ function inject(next) {
     endWith(document)
   );
 }
-function setupInstantNavigation({ location$: location$3, viewport$: viewport$5, progress$: progress$2 }) {
+function setupInstantNavigation({ location$: location$4, viewport$: viewport$5, progress$: progress$2 }) {
   const config6 = configuration();
   if (location.protocol === "file:")
     return EMPTY;
@@ -10707,8 +10703,8 @@ function setupInstantNavigation({ location$: location$3, viewport$: viewport$5, 
     history.replaceState(offset, "");
     history.pushState(null, "", url2);
   });
-  merge(instant$, history$).subscribe(location$3);
-  const document$5 = location$3.pipe(
+  merge(instant$, history$).subscribe(location$4);
+  const document$5 = location$4.pipe(
     distinctUntilKeyChanged("pathname"),
     switchMap(
       (url2) => requestHTML(url2, { progress$: progress$2 }).pipe(
@@ -10725,7 +10721,7 @@ function setupInstantNavigation({ location$: location$3, viewport$: viewport$5, 
     share()
   );
   merge(
-    document$5.pipe(withLatestFrom(location$3, (_, url2) => url2)),
+    document$5.pipe(withLatestFrom(location$4, (_, url2) => url2)),
     // Handle instant navigation events that are triggered by the user clicking
     // on an anchor link with a hash fragment different from the current one, as
     // well as from popstate events, which are emitted when the user navigates
@@ -10734,9 +10730,9 @@ function setupInstantNavigation({ location$: location$3, viewport$: viewport$5, 
     // the viewport offset when the user navigates to a different page, as this
     // is already handled by the previous observable.
     document$5.pipe(
-      switchMap(() => location$3),
+      switchMap(() => location$4),
       distinctUntilKeyChanged("pathname"),
-      switchMap(() => location$3),
+      switchMap(() => location$4),
       distinctUntilKeyChanged("hash")
     ),
     // Handle instant navigation events that are triggered by the user clicking
@@ -10745,7 +10741,7 @@ function setupInstantNavigation({ location$: location$3, viewport$: viewport$5, 
     // events and not from history change events, or we'll end up in and endless
     // loop. The top-level history entry must be removed, as it will be replaced
     // with a new one, which would otherwise lead to a duplicate entry.
-    location$3.pipe(
+    location$4.pipe(
       distinctUntilChanged((a, b) => a.pathname === b.pathname && a.hash === b.hash),
       switchMap(() => instant$),
       tap(() => history.back())
@@ -10760,7 +10756,7 @@ function setupInstantNavigation({ location$: location$3, viewport$: viewport$5, 
       history.scrollRestoration = "manual";
     }
   });
-  location$3.subscribe(() => {
+  location$4.subscribe(() => {
     history.scrollRestoration = "manual";
   });
   fromEvent(window, "beforeunload").subscribe(() => {
@@ -11278,10 +11274,10 @@ function mountSearch(el, { index$: index$2, keyboard$: keyboard$2 }) {
 }
 
 // external/mkdocs-material/src/templates/assets/javascripts/components/search/highlight/index.ts
-function mountSearchHiglight(el, { index$: index$2, location$: location$3 }) {
+function mountSearchHiglight(el, { index$: index$2, location$: location$4 }) {
   return combineLatest([
     index$2,
-    location$3.pipe(
+    location$4.pipe(
       startWith(getLocation()),
       filter((url2) => !!url2.searchParams.get("h"))
     )
@@ -11940,8 +11936,8 @@ function fetchSearchIndex() {
 document.documentElement.classList.remove("no-js");
 document.documentElement.classList.add("js");
 var document$ = watchDocument();
-var location$ = watchLocation();
-var target$ = watchLocationTarget(location$);
+var location$2 = watchLocation();
+var target$ = watchLocationTarget(location$2);
 var keyboard$ = watchKeyboard();
 var viewport$2 = watchViewport();
 var tablet$ = watchMedia("(min-width: 960px)");
@@ -11953,11 +11949,11 @@ var alert$ = new Subject();
 setupClipboardJS({ alert$ });
 var progress$ = new Subject();
 if (feature("navigation.instant"))
-  setupInstantNavigation({ location$, viewport$: viewport$2, progress$ }).subscribe(document$);
+  setupInstantNavigation({ location$: location$2, viewport$: viewport$2, progress$ }).subscribe(document$);
 var _a;
 if (((_a = config5.version) == null ? void 0 : _a.provider) === "mike")
   setupVersionSelector({ document$ });
-merge(location$, target$).pipe(
+merge(location$2, target$).pipe(
   delay(125)
 ).subscribe(() => {
   setToggle("drawer", false);
@@ -12010,7 +12006,7 @@ var content$ = defer(() => merge(
   ...getComponentElements("announce").map((el) => mountAnnounce(el)),
   ...getComponentElements("content").map((el) => mountContent(el, { viewport$: viewport$2, target$, print$ })),
   ...getComponentElements("content").map(
-    (el) => feature("search.highlight") ? mountSearchHiglight(el, { index$, location$ }) : EMPTY
+    (el) => feature("search.highlight") ? mountSearchHiglight(el, { index$, location$: location$2 }) : EMPTY
   ),
   ...getComponentElements("header").map((el) => mountHeader(el, { viewport$: viewport$2, header$, main$ })),
   ...getComponentElements("header-title").map((el) => mountHeaderTitle(el, { viewport$: viewport$2, header$ })),
@@ -12033,7 +12029,7 @@ var component$ = document$.pipe(
 );
 component$.subscribe();
 window.document$ = document$;
-window.location$ = location$;
+window.location$ = location$2;
 window.target$ = target$;
 window.keyboard$ = keyboard$;
 window.viewport$ = viewport$2;
@@ -12047,7 +12043,7 @@ window.component$ = component$;
 // src/assets/javascripts/utils/eventHandlers.ts
 var import_tablesort = __toESM(require_tablesort());
 var customWindow = window;
-var { location$: location$2, viewport$: viewport$3 } = customWindow;
+var { location$: location$3, viewport$: viewport$3 } = customWindow;
 var preventDefault = (ev) => {
   ev.preventDefault();
   return ev;
@@ -12083,12 +12079,12 @@ var navigationEvents$ = "navigation" in customWindow ? (
   }), startWith(getLocation()), shareReplay(1), share())
 ) : merge(merge(fromEvent(customWindow, "popstate"), fromEvent(customWindow, "hashchange"), fromEvent(customWindow, "pageshow"), fromEvent(customWindow, "beforeunload")).pipe(filter((event) => isValidEvent(event)), map((event) => {
   return mapLocation(event);
-})), location$2.pipe(distinctUntilChanged())).pipe(startWith(getLocation()), shareReplay(1), share());
+})), location$3.pipe(distinctUntilChanged())).pipe(startWith(getLocation()), shareReplay(1), share());
 async function windowEvents() {
-  const { document$: document$5, location$: location$3, target$: target$2, keyboard$: keyboard$2, viewport$: viewport$5, tablet$: tablet$2, screen$: screen$2, print$: print$2, alert$: alert$2, progress$: progress$2, component$: component$2 } = customWindow;
+  const { document$: document$5, location$: location$4, target$: target$2, keyboard$: keyboard$2, viewport$: viewport$5, tablet$: tablet$2, screen$: screen$2, print$: print$2, alert$: alert$2, progress$: progress$2, component$: component$2 } = customWindow;
   const observables = {
     document$: document$5,
-    location$: location$3,
+    location$: location$4,
     target$: target$2,
     keyboard$: keyboard$2,
     viewport$: viewport$5,
@@ -12145,7 +12141,7 @@ function watchLicenseHash() {
 }
 
 // src/assets/javascripts/utils/fetchWorker.ts
-var cacheWorkerUrl = "cacheWorker.NF2ZB7G3.js";
+var cacheWorkerUrl = "cacheWorker.JQPLJI3F.js";
 if ("serviceWorker" in navigator && window.isSecureContext) {
   logger.info("Registering service worker");
   const register2 = async () => {
@@ -12163,793 +12159,6 @@ if ("serviceWorker" in navigator && window.isSecureContext) {
   };
   Promise.resolve(register2());
 }
-
-// src/assets/javascripts/features/feedback/feedback.ts
-var feedback = () => {
-  var _a2;
-  const feedbackForm = (_a2 = document.forms) == null ? void 0 : _a2.namedItem("feedback");
-  if (feedbackForm && feedbackForm instanceof HTMLFormElement) {
-    return fromEvent(feedbackForm, "submit").pipe(filter(isValidEvent), map((ev) => {
-      return ev;
-    }), tap(() => preventDefault), throttleTime(3e3), tap((ev) => {
-      var _a3;
-      const page = document.location.pathname;
-      const data = (_a3 = ev.submitter) == null ? void 0 : _a3.getAttribute("data-md-value");
-      logger.info(page, data);
-      if (feedbackForm.firstElementChild && feedbackForm.firstElementChild instanceof HTMLButtonElement) {
-        feedbackForm.firstElementChild.disabled = true;
-      }
-      const note = feedbackForm.querySelector(".md-feedback__note [data-md-value='".concat(data, "']"));
-      if (note && note instanceof HTMLElement) {
-        note.hidden = false;
-      }
-    }));
-  } else {
-    return of(null);
-  }
-};
-
-// src/assets/javascripts/features/licenses/tabManager.ts
-var TabManager = class {
-  /**
-   * @description Initializes tab elements and sets up interactions
-   */
-  constructor() {
-    this.selectors = {
-      inputs: '.tabbed-set input[type="radio"]',
-      iconPrefix: "#icon-"
-    };
-    this.disclaimerTabSelectors = {
-      inputs: "#not-advice-warning-checkbox, #not-official-warning-checkbox",
-      labelAnchors: "#not-advice-warning-label, #not-official-warning-label"
-    };
-    this.subscription = new Subscription();
-    this.tabs = this.initializeTabs();
-    this.childTabs = this.initializeChildTabs();
-    this.init();
-  }
-  /**
-   * @returns {TabElement[]} Collection of initialized tab elements
-   * @description Initializes tab elements by querying the DOM for input, label, and icon elements
-   */
-  initializeTabs() {
-    const inputs = Array.from(document.querySelectorAll(this.selectors.inputs));
-    return inputs.map((input) => {
-      var _a2;
-      const { id } = input;
-      const label = document.querySelector('label[for="'.concat(id, '"]'));
-      const elements = {
-        input,
-        label,
-        labelAnchor: label.querySelector("a"),
-        iconAnchor: document.querySelector("".concat(this.selectors.iconPrefix).concat(id)),
-        iconSVG: (_a2 = document.querySelector("".concat(this.selectors.iconPrefix).concat(id))) == null ? void 0 : _a2.querySelector("svg"),
-        contentElement: document.querySelector("#".concat(id)),
-        tablistElement: document.querySelector(".tabbed-set")
-      };
-      return Object.values(elements).every((el) => el) ? elements : null;
-    }).filter((tab) => tab !== null);
-  }
-  initializeChildTabs() {
-    const inputs = Array.from(document.querySelectorAll(this.disclaimerTabSelectors.inputs));
-    const labels = Array.from(document.querySelectorAll(this.disclaimerTabSelectors.labelAnchors));
-    return inputs.map((input) => {
-      const { id } = input;
-      const idPrefix = id.split("-")[1];
-      const label = labels.find((label2) => label2.id.includes(idPrefix));
-      const elements = {
-        labelAnchor: label,
-        input
-      };
-      return Object.values(elements).every((el) => el) ? elements : null;
-    }).filter((tab) => tab !== null);
-  }
-  setAria() {
-    this.tabs.forEach((tab) => {
-      const { contentElement, input, labelAnchor, label, iconAnchor, iconSVG, tablistElement } = tab;
-      tablistElement.setAttribute("role", "tablist");
-      contentElement.setAttribute("role", "tabpanel");
-      contentElement.setAttribute("aria-labelledby", "".concat(label.id || labelAnchor.id, " ").concat(iconAnchor.id));
-      input.setAttribute("aria-hidden", "true");
-      labelAnchor.setAttribute("role", "tab");
-      labelAnchor.setAttribute("aria-selected", input.checked ? "true" : "false");
-      labelAnchor.setAttribute("aria-controls", contentElement.id);
-      labelAnchor.setAttribute("tabindex", labelAnchor.href === "#reader" ? "0" : "-1");
-      iconSVG.setAttribute("role", "button");
-      iconAnchor.setAttribute("role", "tab");
-      iconAnchor.setAttribute("aria-selected", input.checked ? "true" : "false");
-      iconAnchor.setAttribute("aria-controls", contentElement.id);
-    });
-  }
-  toggleAriaSelected(tabEls) {
-    const checkedState = tabEls.map((tab) => tab.input.checked);
-    const anchors = tabEls.map((tab) => {
-      if ("iconAnchor" in tab) {
-        return [tab.labelAnchor, tab.iconAnchor];
-      }
-      return [tab.labelAnchor];
-    });
-    checkedState.forEach((checked, index) => {
-      anchors[index].forEach((anchor) => {
-        anchor.setAttribute("aria-selected", checked ? "true" : "false");
-      });
-    });
-  }
-  /**
-   * @param {TabElement} tab - Tab element to style
-   * @param {TabState} state - Tab state object
-   * @description Styles tab elements based on state
-   */
-  styleTab(tab, { isSelected, state }) {
-    const { label, iconAnchor, iconSVG } = tab;
-    const fillColor = state === "normal" ? "" : "var(--hover-color)";
-    const selectedColor = "var(--selected-color)";
-    iconAnchor.classList.toggle("selected", isSelected);
-    iconSVG.style.fill = isSelected ? selectedColor : fillColor;
-    label.style.color = isSelected ? selectedColor : fillColor;
-  }
-  /**
-   * @returns {Observable<void>} Observable for tab interactions
-   * @description Sets up interaction streams for tab elements
-   */
-  setupInteractions() {
-    const createEventStream = (elements, eventName) => {
-      const streams = elements.flatMap(({ label, iconAnchor }) => [
-        fromEvent(label, eventName).pipe(map(() => ({ id: label.getAttribute("for"), event: eventName }))),
-        fromEvent(iconAnchor, eventName).pipe(map(() => ({ id: iconAnchor.id.replace("icon-", ""), event: eventName })))
-      ]);
-      return merge(...streams).pipe(share());
-    };
-    const eventStateMap = {
-      mouseenter: "hover",
-      mouseleave: "normal",
-      focus: "focus",
-      "focus-visible": "focus-visible",
-      blur: "normal"
-    };
-    const events = ["mouseenter", "mouseleave", "focus", "focus-visible", "blur"];
-    const interactionStreams = events.map((event) => createEventStream(this.tabs, event));
-    const iconClicks = this.tabs.map(({ iconAnchor, input, labelAnchor }) => merge(fromEvent(labelAnchor, "click"), fromEvent(iconAnchor, "click")).pipe(tap(() => {
-      preventDefault;
-      if (!input.checked) {
-        input.checked = true;
-        this.toggleAriaSelected(this.tabs);
-        input.dispatchEvent(new Event("change"));
-      }
-    }), map(() => ({ id: input.id, event: "click" }))));
-    const childClicks = this.childTabs.map(({ input, labelAnchor }) => fromEvent(labelAnchor, "click").pipe(tap(() => {
-      preventDefault;
-      if (!input.checked) {
-        input.checked = true;
-        this.toggleAriaSelected(this.childTabs);
-        input.dispatchEvent(new Event("change"));
-      }
-    }), map(() => ({ id: input.id, event: "click" }))));
-    const selections = this.tabs.map(({ input }) => fromEvent(input, "change").pipe(map(() => input.id), filter((id) => !!id)));
-    return merge(...interactionStreams, ...iconClicks, ...childClicks, ...selections).pipe(filter((event) => typeof event === "object" && "id" in event && "event" in event), debounceTime(30), tap((event) => {
-      const { id, event: eventName } = event;
-      const tab = this.tabs.find((t) => t.input.id === id);
-      if (tab) {
-        this.styleTab(tab, {
-          isSelected: tab.input.checked,
-          state: eventStateMap[eventName] || "normal"
-        });
-      }
-    }), map(() => void 0));
-  }
-  /**
-   * @description Initializes tab styles and sets up interaction streams
-   */
-  init() {
-    logger.info("Initializing license tabs");
-    this.setAria();
-    this.tabs.forEach((tab) => {
-      this.styleTab(tab, { isSelected: tab.input.checked, state: "normal" });
-    });
-    this.subscription = this.setupInteractions().subscribe({
-      error: (err) => logger.error("Error setting up license tabs:", err)
-    });
-    const allAnchors = [];
-    this.tabs.forEach((tab) => {
-      allAnchors.push(tab.labelAnchor, tab.iconAnchor);
-    });
-    this.childTabs.forEach((tab) => {
-      allAnchors.push(tab.labelAnchor);
-    });
-    allAnchors.forEach((anchor) => {
-      anchor.addEventListener("click", preventDefault);
-    });
-  }
-  /**
-   * @description Unsubscribes from event streams and performs cleanup
-   */
-  cleanup() {
-    logger.info("Cleaning up license tabs");
-    if (this.subscription) {
-      this.subscription.unsubscribe();
-    }
-  }
-};
-
-// src/assets/javascripts/features/licenses/index.ts
-var customWindow2 = window;
-var { document$: document$2 } = customWindow2;
-function initLicenseFeature() {
-  let tabManager = null;
-  return document$2.pipe(tap(() => {
-    var _a2;
-    (_a2 = tabManager == null ? void 0 : tabManager.cleanup) == null ? void 0 : _a2.call(tabManager);
-    tabManager = new TabManager();
-    logger.info("License feature initialized");
-  }), map(() => {
-    return tabManager == null ? void 0 : tabManager.subscription;
-  }));
-}
-
-// src/assets/javascripts/state/predicates.ts
-var predicates_exports = {};
-__export(predicates_exports, {
-  isFullyVisible: () => isFullyVisible,
-  noVideo: () => noVideo,
-  videoPredicate: () => videoPredicate
-});
-var isFullyVisible = (state) => state.atHome && state.landingVisible && state.pageVisible;
-var noVideo = (state) => state.prefersReducedMotion;
-var videoPredicate = {
-  canPlay: (state) => isFullyVisible(state) && !noVideo(state)
-};
-
-// src/assets/javascripts/state/store.ts
-var customWindow3 = window;
-var weAreDev = isDev(new URL(customWindow3.location.href));
-var { viewport$: viewport$4 } = customWindow3;
-var initialUrl = new URL(customWindow3.location.href);
-var _HeroStore = class _HeroStore {
-  /**
-   * @description Initializes the HeroStore singleton instance
-   */
-  constructor() {
-    // state$ is a BehaviorSubject that holds the current state of the hero section
-    this.state$ = new BehaviorSubject({
-      atHome: isHome(initialUrl),
-      landingVisible: isHome(initialUrl),
-      pageVisible: !document.hidden || document.visibilityState === "visible",
-      prefersReducedMotion: customWindow3.matchMedia("(prefers-reduced-motion: reduce)").matches,
-      viewport: {
-        offset: getViewportOffset(),
-        size: getViewportSize()
-      },
-      header: { height: 0, hidden: true },
-      parallaxHeight: getViewportOffset().y * 1.4,
-      location: initialUrl,
-      tearDown: false
-    });
-    this.videoState$ = new BehaviorSubject({ canPlay: false });
-    this.parallaxHeight$ = new BehaviorSubject(getViewportOffset().y * 1.4);
-    this.subscriptions = new Subscription();
-    this.initSubscriptions();
-  }
-  /**
-   * @returns {HeroStore} Singleton instance of the HeroStore
-   * @description Static singleton instance getter
-   */
-  static getInstance() {
-    var _a2;
-    return (_a2 = _HeroStore.instance) != null ? _a2 : _HeroStore.instance = new _HeroStore();
-  }
-  /**
-   * @param {Partial<HeroState>} update - Partial state object to update the hero state
-   * @param {AnimationComponent} component Optional component to update
-   * @description Updates the hero state with a partial state
-   */
-  updateState(update, component) {
-    if (weAreDev) {
-      this.debugStateChange(update);
-    }
-    if (update === null || update === void 0) {
-      return;
-    }
-    const changes = Object.entries(update).filter(([key, value]) => value !== null && key in this.state$.value && this.state$.value[key] !== value);
-    if (changes.length === 0) {
-      return;
-    }
-    this.state$.next({ ...this.state$.value, ...update });
-    if (component && component === "video" /* Video */) {
-      logger.info("updating video state; update:", update);
-      this.videoState$.next(update);
-      return;
-    }
-  }
-  /**
-   * @param {Partial<HeroState>} updates - Partial state object to update the hero state
-   * @param {AnimationComponent} component Optional component to update state
-   * @description Updates the hero state with a partial state
-   */
-  updateHeroState(updates, component) {
-    logger.info("external component updating state; updates:", updates);
-    this.updateState(updates, component);
-  }
-  /**
-   * @param {string} name - Name of the observable
-   * @param {(T) => Partial<HeroState>} updateFn - Function to update state based on observable value
-   * @returns {Observer<T>} - Observer for the observable
-   * @description Creates an observer for an observable
-   */
-  createObserver(name, updateFn, component) {
-    return {
-      next: (value) => {
-        logger.info("".concat(name, " received:"), value);
-        this.updateState(updateFn(value), component);
-      },
-      error: (error) => logger.error("Error in ".concat(name, ":"), error),
-      complete: () => logger.info("".concat(name, " completed"))
-    };
-  }
-  /**
-   * @description Initializes all observables and subscriptions
-   */
-  initSubscriptions() {
-    const atHome$ = navigationEvents$.pipe(map(isHome), distinctUntilChanged(), startWith(isHome(initialUrl)), shareReplay(1), tap(this.createObserver("atHome$", (atHome) => ({ atHome }))));
-    const landing$ = isPartiallyInViewport(document.getElementById("parallax-hero-image-layer")).pipe(filter((landing) => landing !== void 0 && landing !== null));
-    const landingVisible$ = atHome$.pipe(filter((atHome) => atHome), switchMap(() => landing$), filter((landingVisible) => landingVisible && landingVisible !== void 0 && landingVisible !== null), tap(this.createObserver("landingVisible$", (landingVisible) => ({ landingVisible }))));
-    const pageVisible$ = isPageVisible$.pipe(tap(this.createObserver("pageVisible$", (pageVisible) => ({ pageVisible }))));
-    const motion$ = prefersReducedMotion$.pipe(tap(this.createObserver("prefersReducedMotion$", (prefersReducedMotion) => ({
-      prefersReducedMotion
-    }))));
-    const view$ = viewport$4.pipe(distinctUntilChanged(), debounceTime(100), shareReplay(1), tap((viewport) => {
-      setCssVariable("--viewport-offset-height", "".concat(viewport.offset.y, "px"));
-      setCssVariable("--viewport-offset-width", "".concat(viewport.offset.x, "px"));
-    }), tap(this.createObserver("view$", (viewport) => ({ viewport }))));
-    const header$3 = watchHeader(getComponentElement("header"), { viewport$: viewport$4 }).pipe(tap((header) => {
-      setCssVariable("--header-height", header.hidden ? "0" : "".concat(header.height, "px"));
-    }), tap(this.createObserver("header$", (header) => ({ header }))));
-    const parallax$ = combineLatest([
-      viewport$4,
-      watchHeader(getComponentElement("header"), { viewport$: viewport$4 }),
-      watchMediaQuery("(orientation: portrait)")
-    ]).pipe(map(([viewport, header, portrait]) => {
-      return {
-        viewHeight: viewport.offset.y,
-        headerHeight: header.height,
-        portrait
-      };
-    }), map(({ viewHeight, headerHeight, portrait }) => {
-      const adjustedHeight = viewHeight - headerHeight;
-      return portrait ? adjustedHeight * 1.4 : adjustedHeight * 1.6;
-    }), distinctUntilChanged(), shareReplay(1), tap((parallaxHeight) => {
-      setCssVariable("--parallax-height", "".concat(parallaxHeight, "px"));
-    }), tap(this.createObserver("parallaxHeight$", (parallaxHeight) => ({ parallaxHeight }))));
-    const location$3 = navigationEvents$.pipe(tap(this.createObserver("location$", (location2) => ({ location: location2 }))));
-    const video$ = this.getVideoState$((v) => this.videoState$.next(v));
-    this.subscriptions.add(atHome$.subscribe());
-    this.subscriptions.add(landingVisible$.subscribe());
-    this.subscriptions.add(pageVisible$.subscribe());
-    this.subscriptions.add(motion$.subscribe());
-    this.subscriptions.add(view$.subscribe());
-    this.subscriptions.add(header$3.subscribe());
-    this.subscriptions.add(location$3.subscribe());
-    this.subscriptions.add(parallax$.subscribe());
-    this.subscriptions.add(video$.subscribe());
-  }
-  /**
-   * @returns {HeroState} Current state of the hero section
-   * @description Gets the current state of the hero section
-   */
-  getState() {
-    return this.state$.getValue();
-  }
-  /**
-   * @param {string} subject - Name of the state subject
-   * @returns {any} - Current value of the state subject
-   * @description Gets the current value of a specific state subject
-   */
-  getStateValue(subject) {
-    return this.state$.value[subject];
-  }
-  /**
-   * @param {string} component - Name of the component
-   * @returns {ComponentState} - Current state of the component
-   * @description Gets the current state of a specific
-   * component or landing permissions
-   */
-  getComponentValue(component) {
-    switch (component) {
-      case "video" /* Video */:
-        return this.videoState$.value;
-      default:
-        return this.videoState$.value;
-    }
-  }
-  /** ============================================
-   *          Component Specific Observables
-   *=============================================**/
-  /**
-   * @param {string} name - Name of the observable
-   * @param {ComponentStateUpdateFunction} func - Function to update the component state
-   * @returns {Observer<T>} - Observer for the observable
-   * @description Creates a standard observer for a component observable
-   */
-  getComponentObserver(name, func) {
-    return {
-      next: (value) => {
-        logger.info("".concat(name, " received:"), value);
-        if (func) {
-          ;
-          (value2) => func(value2);
-        }
-      },
-      error: (error) => logger.error("Error in ".concat(name, ":"), error),
-      complete: () => logger.info("".concat(name, " completed"))
-    };
-  }
-  /**
-   * @param {ComponentStateUpdateFunction} observerFunc Function to update the component state
-   * @returns {Observable<VideoState>} Observable for carousel state indicating play and pause conditions
-   * @description Creates an observable for the carousel state indicating play and pause conditions
-   */
-  getVideoState$(observerFunc) {
-    return this.state$.pipe(map((state) => ({
-      canPlay: videoPredicate.canPlay(state)
-    })), distinctUntilKeyChanged("canPlay"), shareReplay(1), tap(this.getComponentObserver("carouselState$", observerFunc)));
-  }
-  /**
-   * @param {Partial<HeroState>} updates - Partial state object to update the hero state
-   * @description Logs and updates state changes for debugging
-   */
-  debugStateChange(updates) {
-    if (weAreDev) {
-      const oldState = this.state$.value;
-      const changes = Object.entries(updates).filter(([key, value]) => oldState[key] !== value);
-      if (changes.length === 0) {
-        return;
-      }
-      logger.info("Changes:", stringify(changes));
-      logger.info("New State:", stringify({ ...oldState, ...updates }));
-      Object.entries(predicates_exports).filter(([_, value]) => typeof value === "function").forEach(([name, predicate]) => {
-        logger.info("".concat(name, ":"), predicate({ ...oldState, ...updates }));
-      });
-    }
-  }
-  /**
-   * @method destroy
-   * @public
-   * @description Unsubscribes from all observables and resets the singleton instance
-   */
-  destroy() {
-    this.subscriptions.unsubscribe();
-    _HeroStore.instance = void 0;
-  }
-};
-_HeroStore.instance = new _HeroStore();
-var HeroStore = _HeroStore;
-
-// src/assets/javascripts/features/hero/animations/utils.ts
-var store = HeroStore.getInstance();
-function getMatchMediaInstance(scope) {
-  return gsapWithCSS.matchMedia(scope || document.documentElement);
-}
-function getDistanceToViewport(target, edge = "bottom") {
-  const rect = target.getBoundingClientRect();
-  const { viewport } = store.state$.getValue();
-  const distanceMap = {
-    top: rect.top,
-    right: viewport.offset.x - rect.right,
-    bottom: viewport.offset.y - rect.bottom,
-    left: rect.left
-  };
-  return distanceMap[edge];
-}
-function getContentElements(element) {
-  const allElements = Array.from(element.querySelectorAll("*"));
-  return allElements.filter((el) => {
-    var _a2, _b, _c;
-    if (!isValidElement(el, element)) {
-      return false;
-    }
-    const excludedClasses = ["outer", "inner", "bg"];
-    const hasExcludedClass = excludedClasses.some((cls) => el.classList.contains(cls));
-    const hasContent = ((_c = (_b = (_a2 = el.textContent) == null ? void 0 : _a2.trim()) == null ? void 0 : _b.length) != null ? _c : 0) > 0 || el.querySelector("img, svg, video") !== null;
-    return !hasExcludedClass && hasContent;
-  });
-}
-function modifyDurationForReducedMotion(duration) {
-  let newDuration = duration;
-  getMatchMediaInstance().add({ reducedMotion: "(prefers-reduced-motion: reduce)" }, (context4) => {
-    const { reducedMotion } = context4.conditions;
-    if (reducedMotion) {
-      switch (typeof duration) {
-        case "number":
-          newDuration = duration * 2;
-          break;
-        case "string":
-          newDuration = parseFloat(duration) * 2;
-          break;
-        default:
-          newDuration = duration;
-      }
-    } else {
-      newDuration = duration;
-    }
-  });
-  return newDuration;
-}
-function wordsToLetterDivs(el) {
-  const docFragment = document.createDocumentFragment();
-  let text = "";
-  if (typeof el === "string") {
-    text = el;
-  } else {
-    text = el.innerText;
-  }
-  const letters = text.trim().split("");
-  letters.forEach((letter, idx) => {
-    if (idx === 0 && (letter === " " || letter === "\n")) {
-      return;
-    }
-    const textNode = document.createTextNode(letter);
-    if (letter === " " || letter === "\n") {
-      const lastEl = docFragment.lastChild;
-      lastEl == null ? void 0 : lastEl.appendChild(textNode);
-    }
-    const newDiv = document.createElement("div");
-    newDiv.appendChild(textNode);
-    newDiv.classList.add("hero__letter");
-    docFragment.appendChild(newDiv);
-  });
-  if (el instanceof HTMLElement) {
-    gsapWithCSS.set(el, { innerText: "" });
-  }
-  gsapWithCSS.set(docFragment.querySelectorAll("div"), { display: "inline-block", autoAlpha: 0 });
-  return docFragment;
-}
-
-// src/assets/javascripts/features/hero/animations/effects.ts
-function getFadeVars(out = false, yPercent, direction) {
-  const defaultDirection = out ? -1 /* UP */ : 1 /* DOWN */;
-  const pathDirection = direction || defaultDirection;
-  return {
-    from: { autoAlpha: out ? 1 : 0, yPercent: out ? 0 : pathDirection * yPercent },
-    to: { autoAlpha: out ? 0 : 1, yPercent: out ? pathDirection * yPercent : 0 }
-  };
-}
-function getDFactor(direction) {
-  return direction === -1 /* UP */ ? -1 /* UP */ : 1 /* DOWN */;
-}
-gsapWithCSS.registerEffect({
-  name: "setSection",
-  extendTimeline: true,
-  defaults: { extendTimeline: true },
-  effect: (config6) => {
-    const { direction, section } = config6;
-    logger.info("setSection: direction: ".concat(direction, ", section: ").concat(stringify(section)));
-    const dFactor = getDFactor(direction);
-    const tl = gsapWithCSS.timeline();
-    tl.add(gsapWithCSS.set(section.element, { zIndex: 0 })).add(gsapWithCSS.to(section.bg, { yPercent: -15 * dFactor })).add(gsapWithCSS.set(section.element, { autoAlpha: 0 })).add(gsapWithCSS.set(section.content, { autoAlpha: 0 }));
-  }
-});
-gsapWithCSS.registerEffect({
-  name: "transitionSection",
-  extendTimeline: true,
-  defaults: { extendTimeline: true },
-  effect: (config6) => {
-    const { direction, section } = config6;
-    logger.info("transitionSection: direction: ".concat(direction, ", section: ").concat(stringify(section)));
-    logger.info("config object: ".concat(stringify(config6)));
-    const dFactor = getDFactor(direction);
-    const tl = gsapWithCSS.timeline();
-    tl.fromTo([section.outerWrapper, section.innerWrapper], {
-      yPercent: (i) => i ? i * -100 * dFactor : 100 * dFactor
-    }, {
-      yPercent: 0
-    }, 0).fromTo(section.bg, {
-      yPercent: 15 * dFactor
-    }, {
-      yPercent: 0
-    }, 0).set(section.element, { zIndex: 1, autoAlpha: 1 }).fromTo(section.content, {
-      autoAlpha: 0,
-      yPercent: 50 * dFactor
-    }, {
-      autoAlpha: 1,
-      yPercent: 0,
-      stagger: {
-        each: 0.1,
-        axis: "y",
-        from: direction === -1 /* UP */ ? "start" : "end"
-      }
-    }, 0.2);
-    if (section.animation) {
-      tl.add(section.animation, ">=wrapperTransition");
-    }
-    return tl;
-  }
-});
-var fade = (targets, config6 = { out: false, direction: 1, fromConfig: {}, toConfig: {} }) => {
-  logger.info("fade: targets: ".concat(targets, ", config: ").concat(stringify(config6)));
-  const media = getMatchMediaInstance();
-  const tl = gsapWithCSS.timeline();
-  media.add({ reducedMotion: "(prefers-reduced-motion: reduce)" }, (context4) => {
-    const { out, direction, fromConfig, toConfig } = config6;
-    if (fromConfig && toConfig) {
-      const fadeVars = getFadeVars(out, Number(fromConfig.yPercent) || Number(toConfig == null ? void 0 : toConfig.yPercent) || 50, direction || null);
-      const fromVars = { ...fadeVars.from, ...fromConfig };
-      const toVars = { ...fadeVars.to, ...toConfig };
-      const { reducedMotion } = context4.conditions;
-      if (reducedMotion) {
-        const modifiedVars = [fromVars, toVars].map((vars) => {
-          let modified = { ...vars };
-          if (modified.yPercent) {
-            delete modified.yPercent;
-          } else if (modified.duration) {
-            modified.duration = modifyDurationForReducedMotion(vars.duration || 0.5);
-          }
-          return modified;
-        });
-        tl.add(gsapWithCSS.fromTo(targets, modifiedVars[0], modifiedVars[1]));
-      } else {
-        tl.add(gsapWithCSS.fromTo(targets, {
-          ...fromVars
-        }, {
-          ...toVars
-        }));
-      }
-    }
-  });
-  return tl;
-};
-gsapWithCSS.registerEffect({
-  name: "fadeIn",
-  extendTimeline: true,
-  effect: (targets, config6) => {
-    logger.info("fadeIn: targets: ".concat(targets, ", config: ").concat(stringify(config6)));
-    const { direction, fromConfig, toConfig } = config6;
-    targets = targets instanceof Array ? targets : [targets];
-    return fade(targets, { out: false, direction, fromConfig, toConfig });
-  }
-});
-gsapWithCSS.registerEffect({
-  name: "fadeOut",
-  extendTimeline: true,
-  defaults: { extendTimeline: true },
-  effect: (targets, config6) => {
-    logger.info("fadeOut: targets: ".concat(targets, ", config: ").concat(stringify(config6)));
-    const { direction, fromConfig, toConfig } = config6;
-    return fade(targets, { out: true, direction, fromConfig, toConfig });
-  }
-});
-var blink = (targets, config6 = {}) => {
-  logger.info("blink: targets: ".concat(targets, ", config: ").concat(stringify(config6), " "));
-  const duration = modifyDurationForReducedMotion(config6.duration || 0.5);
-  return gsapWithCSS.to(targets, {
-    autoAlpha: 0,
-    ease: "power4.in",
-    startAt: { filter: "brightness(1.3)" },
-    ...config6,
-    duration
-  });
-};
-var jump = (targets, config6 = {}) => {
-  logger.info("jump: targets: ".concat(targets, ", config: ").concat(stringify(config6)));
-  config6.y ? config6["delete"]("y") : null;
-  const duration = modifyDurationForReducedMotion(config6.duration || 0.5);
-  return gsapWithCSS.to(targets, {
-    y: (_index, target, _targets) => {
-      const distance = Math.abs(getDistanceToViewport(target));
-      return -gsapWithCSS.utils.clamp(distance > 10 ? 10 : distance, distance, 25);
-    },
-    yoyoEase: "bounce",
-    ease: "elastic",
-    repeatDelay: 2,
-    ...config6,
-    duration
-  });
-};
-var scaleUp = (targets, config6 = {}) => {
-  logger.info("scaleUp: targets: ".concat(targets, ", config: ").concat(stringify(config6)));
-  const duration = modifyDurationForReducedMotion(config6.duration || 0.5);
-  return gsapWithCSS.to(targets, { scale: 1.5, ease: "elastic", ...config6, duration });
-};
-gsapWithCSS.registerEffect({
-  name: "emphasize",
-  extendTimeline: true,
-  defaults: { repeat: -1, yoyo: true, extendTimeline: true },
-  effect: (targets, config6) => {
-    logger.info("emphasize: targets: ".concat(targets, ", config: ").concat(stringify(config6)));
-    if (!targets) {
-      return null;
-    }
-    const { blinkConfig, jumpConfig, scaleUpConfig } = config6;
-    const emphasisTimeline = gsapWithCSS.timeline();
-    getMatchMediaInstance().add({ reducedMotion: "(prefers-reduced-motion: reduce)" }, (context4) => {
-      const { reducedMotion } = context4.conditions;
-      if (reducedMotion) {
-        emphasisTimeline.add(blink(targets, { ...blinkConfig, ease: "power1.inOut" }));
-        emphasisTimeline.add(scaleUp(targets, { ...scaleUpConfig }));
-      } else {
-        emphasisTimeline.add(blink(targets, blinkConfig));
-        emphasisTimeline.add(jump(targets, jumpConfig));
-        emphasisTimeline.add(scaleUp(targets, scaleUpConfig));
-      }
-    });
-    return emphasisTimeline;
-  }
-});
-gsapWithCSS.registerEffect({
-  name: "animateMessage",
-  extendTimeline: true,
-  defaults: { extendTimeline: true, repeat: 0 },
-  effect: (target, config6) => {
-    logger.info("animateMessage: target: ".concat(target, ", config: ").concat(stringify(config6)));
-    target = target instanceof Array ? target : gsapWithCSS.utils.toArray(target);
-    if (!target || !(target instanceof Array)) {
-      return gsapWithCSS.timeline();
-    }
-    target = gsapWithCSS.utils.toArray(target).filter((el) => el !== null && el instanceof HTMLElement);
-    let msgFrag = document.createDocumentFragment();
-    let animationElements = [];
-    if (config6.message) {
-      msgFrag = wordsToLetterDivs(config6.message);
-      target = target.slice(0, 1);
-      if (target instanceof Array && target.length > 0 && target[0] && target[0] instanceof HTMLElement) {
-        requestAnimationFrame(() => {
-          const element = target[0];
-          element.append(msgFrag);
-          animationElements = gsapWithCSS.utils.toArray(element.querySelectorAll("div")).filter((el) => el !== null && el instanceof HTMLElement && el.innerText !== "");
-        });
-      } else {
-        return gsapWithCSS.timeline();
-      }
-    } else {
-      gsapWithCSS.utils.toArray(target).forEach((el) => {
-        if (el instanceof HTMLElement) {
-          const text = wordsToLetterDivs(el);
-          requestAnimationFrame(() => {
-            el.append(text);
-          });
-          animationElements.push(el);
-        }
-      });
-    }
-    const messageTimeline = gsapWithCSS.timeline();
-    messageTimeline.add(["setState", gsapWithCSS.set(animationElements, { autoAlpha: 0 })], 0);
-    let fromVars = config6.entranceFromVars || {};
-    let toVars = config6.entranceToVars || {};
-    let exitVars = config6.exitVars || {};
-    gsapWithCSS.matchMedia().add({ reducedMotion: "(prefers-reduced-motion: reduce)" }, (context4) => {
-      const { reducedMotion } = context4.conditions;
-      if (reducedMotion) {
-        fromVars.yPercent = 50;
-        toVars.ease = "power1.inOut";
-        toVars.stagger = { each: 0.04, from: "start" };
-        toVars.duration = modifyDurationForReducedMotion(toVars.duration || 1);
-        exitVars.duration = modifyDurationForReducedMotion(exitVars.duration || 0.5);
-        exitVars.yPercent = -50;
-        exitVars.ease = "power1.inOut";
-        exitVars.stagger = { each: 0.04, from: "end" };
-      }
-    });
-    messageTimeline.add([
-      "randomEntrance",
-      gsapWithCSS.fromTo(animationElements, { autoAlpha: 0, yPercent: 150, ...fromVars }, {
-        autoAlpha: 1,
-        yPercent: 0,
-        stagger: { each: 0.03, from: "random" },
-        duration: 1.2,
-        ...toVars
-      })
-    ], 0.02);
-    messageTimeline.add([
-      "randomExit",
-      gsapWithCSS.to(animationElements, {
-        autoAlpha: 0,
-        duration: 0.5,
-        yPercent: gsapWithCSS.utils.random(-150, 150, 10),
-        stagger: { each: 0.03, from: "random" },
-        ...exitVars
-      })
-    ], 4.5);
-    return messageTimeline;
-  }
-});
 
 // node_modules/gsap/Observer.js
 function _defineProperties(target, props) {
@@ -13133,8 +12342,8 @@ var _initCore3 = function _initCore4(core) {
     _context2 = gsap2.core.context || function() {
     };
     _pointerType = "onpointerenter" in _body ? "pointer" : "mouse";
-    _isTouch = Observer2.isTouch = _win3.matchMedia && _win3.matchMedia("(hover: none), (pointer: coarse)").matches ? 1 : "ontouchstart" in _win3 || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0 ? 2 : 0;
-    _eventTypes = Observer2.eventTypes = ("ontouchstart" in _docEl ? "touchstart,touchmove,touchcancel,touchend" : !("onpointerdown" in _docEl) ? "mousedown,mousemove,mouseup,mouseup" : "pointerdown,pointermove,pointercancel,pointerup").split(",");
+    _isTouch = Observer.isTouch = _win3.matchMedia && _win3.matchMedia("(hover: none), (pointer: coarse)").matches ? 1 : "ontouchstart" in _win3 || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0 ? 2 : 0;
+    _eventTypes = Observer.eventTypes = ("ontouchstart" in _docEl ? "touchstart,touchmove,touchcancel,touchend" : !("onpointerdown" in _docEl) ? "mousedown,mousemove,mouseup,mouseup" : "pointerdown,pointermove,pointercancel,pointerup").split(",");
     setTimeout(function() {
       return _startup = 0;
     }, 500);
@@ -13145,7 +12354,7 @@ var _initCore3 = function _initCore4(core) {
 };
 _horizontal.op = _vertical;
 _scrollers.cache = 0;
-var Observer2 = /* @__PURE__ */ function() {
+var Observer = /* @__PURE__ */ function() {
   function Observer3(vars) {
     this.init(vars);
   }
@@ -13410,1013 +12619,20 @@ var Observer2 = /* @__PURE__ */ function() {
   }]);
   return Observer3;
 }();
-Observer2.version = "3.12.7";
-Observer2.create = function(vars) {
-  return new Observer2(vars);
+Observer.version = "3.12.7";
+Observer.create = function(vars) {
+  return new Observer(vars);
 };
-Observer2.register = _initCore3;
-Observer2.getAll = function() {
+Observer.register = _initCore3;
+Observer.getAll = function() {
   return _observers.slice();
 };
-Observer2.getById = function(id) {
+Observer.getById = function(id) {
   return _observers.filter(function(o) {
     return o.vars.id === id;
   })[0];
 };
-_getGSAP() && gsap2.registerPlugin(Observer2);
-
-// src/assets/javascripts/features/hero/animations/observer.ts
-gsapWithCSS.registerPlugin(Observer2);
-var HeroObservation = class _HeroObservation {
-  constructor() {
-    this.store = HeroStore.getInstance();
-    this.currentIndex = -1;
-    this.config = OBSERVER_CONFIG;
-    this.sections = [];
-    this.subscriptions = new Subscription();
-    this.animating = false;
-    this.sectionCount = 0;
-    this.sectionIndexLength = 0;
-    this.defaultTimelineVars = {};
-    this.initialized = false;
-    this.firstLoad = true;
-    this.footer = document.querySelector(".md-footer");
-    this.header = document.querySelector("#header-target #hero-tabs");
-    this.defaultTimelineVars = {
-      repeat: 0,
-      duration: this.config.slides.slideDuration,
-      ease: "power2.inOut",
-      onComplete: () => {
-        this.animating = false;
-      },
-      onStart: () => {
-        this.animating = true;
-      },
-      callbackScope: this
-    };
-    this.transitionTl = gsapWithCSS.timeline(this.defaultTimelineVars);
-    this.setupSubscriptions();
-    logger.info("HeroObservation initialized");
-  }
-  /**
-   * @description Get the singleton instance of the HeroObservation class.
-   * @returns {HeroObservation}
-   */
-  static getInstance() {
-    var _a2;
-    return (_a2 = _HeroObservation.instance) != null ? _a2 : _HeroObservation.instance = _HeroObservation.instance = new _HeroObservation();
-  }
-  // Sets up RxJs subscriptions to monitor the atHome state
-  setupSubscriptions() {
-    const atHome$ = this.store.state$.pipe(map((state) => state.atHome), filter((atHome) => atHome), distinctUntilChanged());
-    this.subscriptions.add(atHome$.subscribe(() => {
-      this.onLoad();
-    }));
-  }
-  // A delayed initialization function that sets up the observers
-  // and the animations for the Hero feature -- when the user is at home
-  onLoad() {
-    this.transitionTl.pause();
-    gsapWithCSS.set(this.footer, { autoAlpha: 0 });
-    gsapWithCSS.set(this.header, { autoAlpha: 0 });
-    this.subscriptions.add(navigationEvents$.pipe(filter((url2) => !isHome(url2))).subscribe(() => {
-      gsapWithCSS.set(this.footer, { autoAlpha: 1 });
-      gsapWithCSS.set(this.header, { autoAlpha: 1 });
-    }));
-    const outerWrappers = gsapWithCSS.utils.toArray(".outer");
-    const innerWrappers = gsapWithCSS.utils.toArray(".inner");
-    requestAnimationFrame(() => {
-      document.body.style.overflow = "hidden";
-      gsapWithCSS.set(this.sections.map((section) => section.element), { autoAlpha: 0 });
-      gsapWithCSS.set(outerWrappers, { yPercent: 100 });
-      gsapWithCSS.set(innerWrappers, { yPercent: -100 });
-    });
-    const { hash } = window.location;
-    const target = document.getElementById(hash.substring(1));
-    if (!this.initialized) {
-      this.setupSections();
-      this.wrapper = gsapWithCSS.utils.wrap([...Array(this.sectionCount).keys()]);
-      this.setupObserver();
-      this.setupFirstSection(!target);
-    } else {
-      if (target) {
-        const sectionTarget = this.sections.find((section) => section.content.includes(target));
-        if (sectionTarget) {
-          this.firstLoad = false;
-          const index = this.sections.indexOf(sectionTarget);
-          this.goToSection(index, index === this.sectionIndexLength ? -1 /* UP */ : 1 /* DOWN */);
-        }
-      }
-      this.initialized = true;
-    }
-  }
-  /**
-   * @description Set up the first load of the Hero feature.
-   * Filters out the emphasis targets and fades in the content.
-   * Emphasis animations are handled in videoManager.ts.
-   */
-  setupFirstSection(startImmediately = false) {
-    const firstSection = this.sections[0];
-    let { content } = firstSection;
-    const { subtle, strong } = this.config.emphasisTargets;
-    const subtleTargets = gsapWithCSS.utils.toArray(document.querySelectorAll(subtle)).filter((el) => this.isValidContentTarget(el));
-    const strongTargets = gsapWithCSS.utils.toArray(document.querySelectorAll(strong)).filter((el) => this.isValidContentTarget(el));
-    const emphasisTargets = [...subtleTargets, ...strongTargets];
-    logger.info("Emphasis targets:", stringify(emphasisTargets));
-    content = content.filter((content2) => !emphasisTargets.includes(content2) && this.isValidContentTarget(content2));
-    logger.info("Filtered content:", stringify(content));
-    const tl = gsapWithCSS.timeline({ paused: !startImmediately, callbackScope: this });
-    tl.addLabel("start");
-    tl.add(["subtleEmphasis", gsapWithCSS.emphasize(subtleTargets, SUBTLE_EMPHASIS_CONFIG)], 2);
-    tl.add(["strongEmphasis", gsapWithCSS.emphasize(strongTargets, STRONG_EMPHASIS_CONFIG)], 4);
-    this.registerAnimation(tl, firstSection.element);
-    if (startImmediately) {
-      this.goToSection(0, 1);
-    }
-    this.firstLoad = false;
-  }
-  /**
-   * @param animation - The animation to register (gsap.core.Timeline)
-   * @param key - The section element to register the animation with
-   * @description Register an animation with a section element.
-   */
-  registerAnimation(animation, key) {
-    const section = this.sections.find((section2) => section2.element === key);
-    if (section) {
-      section.animation = section.animation ? section.animation.add(animation) : animation;
-    }
-  }
-  /**
-   * @description Set up the Section objects for the Hero feature.
-   */
-  setupSections() {
-    const sectionEls = gsapWithCSS.utils.toArray("section.hero");
-    this.sections = sectionEls.map((el, index) => {
-      const outerWrapper = el.querySelector(".outer");
-      const innerWrapper = el.querySelector(".inner");
-      const bg = el.querySelector(".bg");
-      const content = getContentElements(el).filter((element) => element !== outerWrapper && element !== innerWrapper && element !== bg);
-      return {
-        index,
-        element: el,
-        outerWrapper,
-        innerWrapper,
-        bg,
-        content,
-        animation: gsapWithCSS.timeline({
-          paused: index !== 0,
-          // Only play first section
-          callbackScope: this
-        }).addLabel("start")
-      };
-    });
-    logger.info("Sections set up:", {
-      count: this.sections.length,
-      sections: this.sections.map((section) => ({
-        index: section.index,
-        elementId: section.element.id,
-        contentCount: section.content.length,
-        contentElements: section.content.map((el) => ({
-          tagName: el.tagName,
-          className: el.className,
-          id: el.id
-        }))
-      }))
-    });
-    const ignores = gsapWithCSS.utils.toArray(this.config.fades.fadeInIgnore);
-    this.sections[0].content = this.sections[0].content.filter((content) => !ignores.includes(content) && this.isValidContentTarget(content));
-    this.sectionCount = this.sections.length;
-    this.sectionIndexLength = this.sectionCount - 1;
-  }
-  /**
-   * @description Transition to the next section based on the direction and whether the scenicRoute is enabled.
-   * @param direction
-   * @param scenicRoute
-   * @returns
-   */
-  async transition(direction, scenicRoute) {
-    let index = this.getNextIndex(direction);
-    if (!this.animating && !scenicRoute) {
-      this.goToSection(index, direction);
-    } else if (!this.animating && scenicRoute && direction === 1 /* DOWN */) {
-      this.goToSection(index, direction);
-      let remainingSections = this.sectionIndexLength - index;
-      while (remainingSections > 0) {
-        await new Promise((resolve3) => setTimeout(resolve3, 5e3));
-        if (this.currentIndex !== this.sectionIndexLength && this.currentIndex === index) {
-          this.goToSection(index + 1 /* DOWN */, direction);
-          index++;
-          remainingSections--;
-        } else {
-          break;
-        }
-      }
-    }
-    return;
-  }
-  // Get the next index based on the direction
-  getNextIndex(direction) {
-    if ((this.currentIndex === 0 || this.currentIndex === -1) && this.firstLoad && direction === -1 /* UP */) {
-      return 0;
-    }
-    this.firstLoad = false;
-    return this.wrapper(this.currentIndex + direction);
-  }
-  // Construct the transition timeline based on the direction and index
-  // Uses registered effects from observerEffects.ts
-  constructTransitionTimeline(direction, index, tl) {
-    const nextSection = this.sections[index];
-    if (this.currentIndex >= 0) {
-      logger.info("Setting section ".concat(this.currentIndex, " to section ").concat(index));
-      tl.setSection({ direction, section: nextSection });
-    }
-    logger.info("Animating section ".concat(index, " in direction ").concat(direction));
-    tl.transitionSection({ direction, section: nextSection });
-    if (nextSection.animation) {
-      tl.add(nextSection.animation, ">");
-    }
-    return tl;
-  }
-  // Go to the next section based on the index and direction
-  goToSection(index, direction) {
-    if (this.animating || index === this.currentIndex) {
-      return;
-    }
-    logger.info("Going to section ".concat(index, " in direction ").concat(direction));
-    let tl = gsapWithCSS.timeline({
-      defaults: {
-        duration: this.config.slides.slideDuration,
-        ease: "power2.inOut",
-        onComplete: () => {
-          this.animating = false;
-          logger.info("Completed transition to section ".concat(index));
-        },
-        onStart: () => {
-          this.animating = true;
-          this.currentIndex = index;
-        },
-        callbackScope: this
-      }
-    });
-    tl = this.constructTransitionTimeline(direction, index, tl);
-    this.transitionTl = tl;
-    if (!this.transitionTl.isActive()) {
-      this.transitionTl.play();
-    }
-  }
-  /**
-   * @description Checks if an element is a valid content target for animations.
-   * Ensures the element exists, is a valid element, has a parent, belongs to a section,
-   * and is not one of the excluded section elements (bg, wrappers, etc.).
-   * @param el - The element to check.
-   * @returns True if the element is a valid content target, false otherwise.
-   */
-  isValidContentTarget(el) {
-    if (!el || !(el instanceof Element) || !el.parentElement) {
-      return false;
-    }
-    const section = this.sections.find((section2) => section2.content.includes(el));
-    if (!section) {
-      return false;
-    }
-    return el !== section.bg && el !== section.outerWrapper && el !== section.innerWrapper && el !== section.element && isValidElement(el, section.element);
-  }
-  /**
-   * @description Set up the Observers for the Hero feature. The Observers are created only when the user is at home. There are two Observers:
-   * 1. The transitionObserver is the main Observer that handles all
-   * perceived up/down interactions to trigger transitions between sections.
-   * 2. The clickObserver handles the click-driven "guided tour" of the sections.
-   */
-  setupObserver() {
-    const clickTargets = gsapWithCSS.utils.toArray(document.querySelectorAll(this.config.clickTargets));
-    const ignoreTargets = gsapWithCSS.utils.toArray(document.querySelectorAll(this.config.ignoreTargets));
-    this.transitionObserver = Observer2.create({
-      type: "wheel,touch,pointer,scroll",
-      wheelSpeed: -1,
-      onDown: () => {
-        this.transition(1 /* DOWN */, false);
-      },
-      onUp: () => {
-        this.transition(-1 /* UP */, false);
-      },
-      preventDefault: true,
-      tolerance: 15,
-      ignore: clickTargets
-    });
-    this.transitionObserver.enable();
-    this.clickObserver = Observer2.create({
-      type: "click",
-      target: clickTargets,
-      ignore: ignoreTargets,
-      onClick: () => {
-        this.transition(1 /* DOWN */, true);
-      },
-      onRelease: () => {
-        this.transition(1 /* DOWN */, true);
-      },
-      preventDefault: true
-    });
-    this.clickObserver.enable();
-  }
-  // Destroy the Observers and subscriptions
-  destroy() {
-    if (this.transitionObserver) {
-      this.transitionObserver.disable();
-    }
-    if (this.clickObserver) {
-      this.clickObserver.disable();
-    }
-    this.subscriptions.unsubscribe();
-  }
-};
-
-// src/assets/javascripts/features/hero/video/data.ts
-var breakFreeAv11280 = new URL("assets/videos/hero/break_free/break_free_av1_1280.MHR3ZGJM.webm", window.location.origin);
-var breakFreeAv11920 = new URL("assets/videos/hero/break_free/break_free_av1_1920.ZBJ6I55Y.webm", window.location.origin);
-var breakFreeAv12560 = new URL("assets/videos/hero/break_free/break_free_av1_2560.HXMDT5GO.webm", window.location.origin);
-var breakFreeAv13840 = new URL("assets/videos/hero/break_free/break_free_av1_3840.5V2V4VJR.webm", window.location.origin);
-var breakFreeAv1426 = new URL("assets/videos/hero/break_free/break_free_av1_426.XMIUTUPS.webm", window.location.origin);
-var breakFreeAv1640 = new URL("assets/videos/hero/break_free/break_free_av1_640.W4QED7UF.webm", window.location.origin);
-var breakFreeAv1854 = new URL("assets/videos/hero/break_free/break_free_av1_854.HN3WTVPV.webm", window.location.origin);
-var breakFreeH2641280 = new URL("assets/videos/hero/break_free/break_free_h264_1280.P7H5AFXW.mp4", window.location.origin);
-var breakFreeH2641920 = new URL("assets/videos/hero/break_free/break_free_h264_1920.VD3OTIVQ.mp4", window.location.origin);
-var breakFreeH2642560 = new URL("assets/videos/hero/break_free/break_free_h264_2560.SBX24NRJ.mp4", window.location.origin);
-var breakFreeH2643840 = new URL("assets/videos/hero/break_free/break_free_h264_3840.L6D346UN.mp4", window.location.origin);
-var breakFreeH264426 = new URL("assets/videos/hero/break_free/break_free_h264_426.N7UKN7DL.mp4", window.location.origin);
-var breakFreeH264640 = new URL("assets/videos/hero/break_free/break_free_h264_640.VS54S5EL.mp4", window.location.origin);
-var breakFreeH264854 = new URL("assets/videos/hero/break_free/break_free_h264_854.AKGTMYW6.mp4", window.location.origin);
-var breakFreeVp91280 = new URL("assets/videos/hero/break_free/break_free_vp9_1280.BI7P3W4T.webm", window.location.origin);
-var breakFreeVp91920 = new URL("assets/videos/hero/break_free/break_free_vp9_1920.UQIEAJZ4.webm", window.location.origin);
-var breakFreeVp92560 = new URL("assets/videos/hero/break_free/break_free_vp9_2560.FOFH4KAS.webm", window.location.origin);
-var breakFreeVp93840 = new URL("assets/videos/hero/break_free/break_free_vp9_3840.VKNFLIWB.webm", window.location.origin);
-var breakFreeVp9426 = new URL("assets/videos/hero/break_free/break_free_vp9_426.CWEZUEQQ.webm", window.location.origin);
-var breakFreeVp9640 = new URL("assets/videos/hero/break_free/break_free_vp9_640.X5H75VBM.webm", window.location.origin);
-var breakFreeVp9854 = new URL("assets/videos/hero/break_free/break_free_vp9_854.L7KXRADV.webm", window.location.origin);
-var breakFreeAvif1280 = new URL("assets/videos/hero/break_free/posters/break_free_1280.WQ46YIY6.avif", window.location.origin);
-var breakFreePng1280 = new URL("assets/videos/hero/break_free/posters/break_free_1280.V35JZ763.png", window.location.origin);
-var breakFreeWebp1280 = new URL("assets/videos/hero/break_free/posters/break_free_1280.DWFB27YG.webp", window.location.origin);
-var breakFreeAvif1920 = new URL("assets/videos/hero/break_free/posters/break_free_1920.FZMHEY63.avif", window.location.origin);
-var breakFreePng1920 = new URL("assets/videos/hero/break_free/posters/break_free_1920.WBZ3NBFU.png", window.location.origin);
-var breakFreeWebp1920 = new URL("assets/videos/hero/break_free/posters/break_free_1920.3GCUVDAP.webp", window.location.origin);
-var breakFreeAvif2560 = new URL("assets/videos/hero/break_free/posters/break_free_2560.LPKYWG2I.avif", window.location.origin);
-var breakFreePng2560 = new URL("assets/videos/hero/break_free/posters/break_free_2560.3L44PPVD.png", window.location.origin);
-var breakFreeWebp2560 = new URL("assets/videos/hero/break_free/posters/break_free_2560.JM4UI52R.webp", window.location.origin);
-var breakFreeAvif3840 = new URL("assets/videos/hero/break_free/posters/break_free_3840.PEEQKWAO.avif", window.location.origin);
-var breakFreePng3840 = new URL("assets/videos/hero/break_free/posters/break_free_3840.IHJWGFLI.png", window.location.origin);
-var breakFreeWebp3840 = new URL("assets/videos/hero/break_free/posters/break_free_3840.VNNHBF4O.webp", window.location.origin);
-var breakFreeAvif426 = new URL("assets/videos/hero/break_free/posters/break_free_426.A3KD2OWB.avif", window.location.origin);
-var breakFreePng426 = new URL("assets/videos/hero/break_free/posters/break_free_426.GHKJUUS4.png", window.location.origin);
-var breakFreeWebp426 = new URL("assets/videos/hero/break_free/posters/break_free_426.SJ76L2AA.webp", window.location.origin);
-var breakFreeAvif640 = new URL("assets/videos/hero/break_free/posters/break_free_640.BZMJNMOS.avif", window.location.origin);
-var breakFreePng640 = new URL("assets/videos/hero/break_free/posters/break_free_640.7RM4H6NV.png", window.location.origin);
-var breakFreeWebp640 = new URL("assets/videos/hero/break_free/posters/break_free_640.6W5EO4MO.webp", window.location.origin);
-var breakFreeAvif854 = new URL("assets/videos/hero/break_free/posters/break_free_854.T7N3S3Q2.avif", window.location.origin);
-var breakFreePng854 = new URL("assets/videos/hero/break_free/posters/break_free_854.44NAZCIU.png", window.location.origin);
-var breakFreeWebp854 = new URL("assets/videos/hero/break_free/posters/break_free_854.SBEKVABD.webp", window.location.origin);
-var tokyoShuffleAvif1280 = new URL("assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_1280.ZLQHM4VG.avif", window.location.origin);
-var tokyoShufflePng1280 = new URL("assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_1280.OYFSUR65.png", window.location.origin);
-var tokyoShuffleWebp1280 = new URL("assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_1280.EEEVR5AA.webp", window.location.origin);
-var tokyoShuffleAvif1920 = new URL("assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_1920.AGNLWXP5.avif", window.location.origin);
-var tokyoShufflePng1920 = new URL("assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_1920.C5GVT334.png", window.location.origin);
-var tokyoShuffleWebp1920 = new URL("assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_1920.A6XB2PAB.webp", window.location.origin);
-var tokyoShuffleAvif2560 = new URL("assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_2560.BOHJXWWH.avif", window.location.origin);
-var tokyoShufflePng2560 = new URL("assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_2560.B7WTBGPV.png", window.location.origin);
-var tokyoShuffleWebp2560 = new URL("assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_2560.K223UIDG.webp", window.location.origin);
-var tokyoShuffleAvif3840 = new URL("assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_3840.6YTTSAWO.avif", window.location.origin);
-var tokyoShufflePng3840 = new URL("assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_3840.KWJHCM5F.png", window.location.origin);
-var tokyoShuffleWebp3840 = new URL("assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_3840.WPHZ3N2S.webp", window.location.origin);
-var tokyoShuffleAvif426 = new URL("assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_426.JEFZFOJK.avif", window.location.origin);
-var tokyoShufflePng426 = new URL("assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_426.36AKL4KN.png", window.location.origin);
-var tokyoShuffleWebp426 = new URL("assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_426.VQWFGCSR.webp", window.location.origin);
-var tokyoShuffleAvif640 = new URL("assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_640.KF7GISVX.avif", window.location.origin);
-var tokyoShufflePng640 = new URL("assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_640.Q7RF6Q5K.png", window.location.origin);
-var tokyoShuffleWebp640 = new URL("assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_640.3AQWY55B.webp", window.location.origin);
-var tokyoShuffleAvif854 = new URL("assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_854.R5Q7G7ZO.avif", window.location.origin);
-var tokyoShufflePng854 = new URL("assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_854.AHAG6T2U.png", window.location.origin);
-var tokyoShuffleWebp854 = new URL("assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_854.OH5ALQCN.webp", window.location.origin);
-var tokyoShuffleAv11280 = new URL("assets/videos/hero/tokyo_shuffle/tokyo_shuffle_av1_1280.LTL754GX.webm", window.location.origin);
-var tokyoShuffleAv11920 = new URL("assets/videos/hero/tokyo_shuffle/tokyo_shuffle_av1_1920.HCHG3L6F.webm", window.location.origin);
-var tokyoShuffleAv12560 = new URL("assets/videos/hero/tokyo_shuffle/tokyo_shuffle_av1_2560.VZLSLY3T.webm", window.location.origin);
-var tokyoShuffleAv13840 = new URL("assets/videos/hero/tokyo_shuffle/tokyo_shuffle_av1_3840.IRQNSZL3.webm", window.location.origin);
-var tokyoShuffleAv1426 = new URL("assets/videos/hero/tokyo_shuffle/tokyo_shuffle_av1_426.VLHMAUSF.webm", window.location.origin);
-var tokyoShuffleAv1640 = new URL("assets/videos/hero/tokyo_shuffle/tokyo_shuffle_av1_640.UJYTIEMI.webm", window.location.origin);
-var tokyoShuffleAv1854 = new URL("assets/videos/hero/tokyo_shuffle/tokyo_shuffle_av1_854.T4JUCEGM.webm", window.location.origin);
-var tokyoShuffleH2641280 = new URL("assets/videos/hero/tokyo_shuffle/tokyo_shuffle_h264_1280.T7YZV75R.mp4", window.location.origin);
-var tokyoShuffleH2641920 = new URL("assets/videos/hero/tokyo_shuffle/tokyo_shuffle_h264_1920.IYJ32LIS.mp4", window.location.origin);
-var tokyoShuffleH2642560 = new URL("assets/videos/hero/tokyo_shuffle/tokyo_shuffle_h264_2560.EWUECAZU.mp4", window.location.origin);
-var tokyoShuffleH2643840 = new URL("assets/videos/hero/tokyo_shuffle/tokyo_shuffle_h264_3840.7IMTXTLT.mp4", window.location.origin);
-var tokyoShuffleH264426 = new URL("assets/videos/hero/tokyo_shuffle/tokyo_shuffle_h264_426.L7AX42QP.mp4", window.location.origin);
-var tokyoShuffleH264640 = new URL("assets/videos/hero/tokyo_shuffle/tokyo_shuffle_h264_640.VLIHCIGJ.mp4", window.location.origin);
-var tokyoShuffleH264854 = new URL("assets/videos/hero/tokyo_shuffle/tokyo_shuffle_h264_854.4V5TCTNN.mp4", window.location.origin);
-var tokyoShuffleVp91280 = new URL("assets/videos/hero/tokyo_shuffle/tokyo_shuffle_vp9_1280.OZ63FAA6.webm", window.location.origin);
-var tokyoShuffleVp91920 = new URL("assets/videos/hero/tokyo_shuffle/tokyo_shuffle_vp9_1920.BL4HBHVE.webm", window.location.origin);
-var tokyoShuffleVp92560 = new URL("assets/videos/hero/tokyo_shuffle/tokyo_shuffle_vp9_2560.HQFL3XZA.webm", window.location.origin);
-var tokyoShuffleVp93840 = new URL("assets/videos/hero/tokyo_shuffle/tokyo_shuffle_vp9_3840.AMTWROJH.webm", window.location.origin);
-var tokyoShuffleVp9426 = new URL("assets/videos/hero/tokyo_shuffle/tokyo_shuffle_vp9_426.MROBMCDW.webm", window.location.origin);
-var tokyoShuffleVp9640 = new URL("assets/videos/hero/tokyo_shuffle/tokyo_shuffle_vp9_640.YMSOWHCY.webm", window.location.origin);
-var tokyoShuffleVp9854 = new URL("assets/videos/hero/tokyo_shuffle/tokyo_shuffle_vp9_854.MXKV5CQO.webm", window.location.origin);
-var rawHeroVideos = [
-  {
-    variants: {
-      av1: {
-        3840: tokyoShuffleAv13840,
-        2560: tokyoShuffleAv12560,
-        1920: tokyoShuffleAv11920,
-        1280: tokyoShuffleAv11280,
-        854: tokyoShuffleAv1854,
-        640: tokyoShuffleAv1640,
-        426: tokyoShuffleAv1426
-      },
-      vp9: {
-        3840: tokyoShuffleVp93840,
-        2560: tokyoShuffleVp92560,
-        1920: tokyoShuffleVp91920,
-        1280: tokyoShuffleVp91280,
-        854: tokyoShuffleVp9854,
-        640: tokyoShuffleVp9640,
-        426: tokyoShuffleVp9426
-      },
-      h264: {
-        3840: tokyoShuffleH2643840,
-        2560: tokyoShuffleH2642560,
-        1920: tokyoShuffleH2641920,
-        1280: tokyoShuffleH2641280,
-        854: tokyoShuffleH264854,
-        640: tokyoShuffleH264640,
-        426: tokyoShuffleH264426
-      }
-    },
-    poster: {
-      avif: {
-        widths: {
-          3840: tokyoShuffleAvif3840,
-          2560: tokyoShuffleAvif2560,
-          1920: tokyoShuffleAvif1920,
-          1280: tokyoShuffleAvif1280,
-          854: tokyoShuffleAvif854,
-          640: tokyoShuffleAvif640,
-          426: tokyoShuffleAvif426
-        },
-        srcset: "".concat(tokyoShuffleAvif3840, " 3840w, ").concat(tokyoShuffleAvif2560, " 2560w, ").concat(tokyoShuffleAvif1920, " 1920w, ").concat(tokyoShuffleAvif1280, " 1280w, ").concat(tokyoShuffleAvif854, " 854w, ").concat(tokyoShuffleAvif640, " 640w, ").concat(tokyoShuffleAvif426, " 426w")
-      },
-      webp: {
-        widths: {
-          3840: tokyoShuffleWebp3840,
-          2560: tokyoShuffleWebp2560,
-          1920: tokyoShuffleWebp1920,
-          1280: tokyoShuffleWebp1280,
-          854: tokyoShuffleWebp854,
-          640: tokyoShuffleWebp640,
-          426: tokyoShuffleWebp426
-        },
-        srcset: "".concat(tokyoShuffleWebp3840, " 3840w, ").concat(tokyoShuffleWebp2560, " 2560w, ").concat(tokyoShuffleWebp1920, " 1920w, ").concat(tokyoShuffleWebp1280, " 1280w, ").concat(tokyoShuffleWebp854, " 854w, ").concat(tokyoShuffleWebp640, " 640w, ").concat(tokyoShuffleWebp426, " 426w")
-      },
-      png: {
-        widths: {
-          3840: tokyoShufflePng3840,
-          2560: tokyoShufflePng2560,
-          1920: tokyoShufflePng1920,
-          1280: tokyoShufflePng1280,
-          854: tokyoShufflePng854,
-          640: tokyoShufflePng640,
-          426: tokyoShufflePng426
-        },
-        srcset: "".concat(tokyoShufflePng3840, " 3840w, ").concat(tokyoShufflePng2560, " 2560w, ").concat(tokyoShufflePng1920, " 1920w, ").concat(tokyoShufflePng1280, " 1280w, ").concat(tokyoShufflePng854, " 854w, ").concat(tokyoShufflePng640, " 640w, ").concat(tokyoShufflePng426, " 426w")
-      }
-    },
-    parentPath: "~assets/videos/hero/tokyo_shuffle",
-    baseName: "tokyo_shuffle" /* TokyoShuffle */
-  },
-  {
-    variants: {
-      av1: {
-        3840: breakFreeAv13840,
-        2560: breakFreeAv12560,
-        1920: breakFreeAv11920,
-        1280: breakFreeAv11280,
-        854: breakFreeAv1854,
-        640: breakFreeAv1640,
-        426: breakFreeAv1426
-      },
-      vp9: {
-        3840: breakFreeVp93840,
-        2560: breakFreeVp92560,
-        1920: breakFreeVp91920,
-        1280: breakFreeVp91280,
-        854: breakFreeVp9854,
-        640: breakFreeVp9640,
-        426: breakFreeVp9426
-      },
-      h264: {
-        3840: breakFreeH2643840,
-        2560: breakFreeH2642560,
-        1920: breakFreeH2641920,
-        1280: breakFreeH2641280,
-        854: breakFreeH264854,
-        640: breakFreeH264640,
-        426: breakFreeH264426
-      }
-    },
-    poster: {
-      avif: {
-        widths: {
-          3840: breakFreeAvif3840,
-          2560: breakFreeAvif2560,
-          1920: breakFreeAvif1920,
-          1280: breakFreeAvif1280,
-          854: breakFreeAvif854,
-          640: breakFreeAvif640,
-          426: breakFreeAvif426
-        },
-        srcset: "".concat(breakFreeAvif3840, " 3840w, ").concat(breakFreeAvif2560, " 2560w, ").concat(breakFreeAvif1920, " 1920w, ").concat(breakFreeAvif1280, " 1280w, ").concat(breakFreeAvif854, " 854w, ").concat(breakFreeAvif640, " 640w, ").concat(breakFreeAvif426, " 426w")
-      },
-      webp: {
-        widths: {
-          3840: breakFreeWebp3840,
-          2560: breakFreeWebp2560,
-          1920: breakFreeWebp1920,
-          1280: breakFreeWebp1280,
-          854: breakFreeWebp854,
-          640: breakFreeWebp640,
-          426: breakFreeWebp426
-        },
-        srcset: "".concat(breakFreeWebp3840, " 3840w, ").concat(breakFreeWebp2560, " 2560w, ").concat(breakFreeWebp1920, " 1920w, ").concat(breakFreeWebp1280, " 1280w, ").concat(breakFreeWebp854, " 854w, ").concat(breakFreeWebp640, " 640w, ").concat(breakFreeWebp426, " 426w")
-      },
-      png: {
-        widths: {
-          3840: breakFreePng3840,
-          2560: breakFreePng2560,
-          1920: breakFreePng1920,
-          1280: breakFreePng1280,
-          854: breakFreePng854,
-          640: breakFreePng640,
-          426: breakFreePng426
-        },
-        srcset: "".concat(breakFreePng3840, " 3840w, ").concat(breakFreePng2560, " 2560w, ").concat(breakFreePng1920, " 1920w, ").concat(breakFreePng1280, " 1280w, ").concat(breakFreePng854, " 854w, ").concat(breakFreePng640, " 640w, ").concat(breakFreePng426, " 426w")
-      }
-    },
-    parentPath: "assets/videos/hero/break_free",
-    baseName: "break_free" /* BreakFree */
-  }
-];
-
-// src/assets/javascripts/features/hero/video/utils.ts
-function getHeroVideos() {
-  return rawHeroVideos;
-}
-var getAv1MediaType = (width) => {
-  const seqlevelMap = {
-    426: "16",
-    640: "16",
-    854: "16",
-    1280: "16",
-    1920: "16",
-    2560: "16",
-    3840: "16"
-  };
-  const seqlevel = seqlevelMap[width];
-  return "video/webm;codecs=av01.0.".concat(seqlevel, "M.10.0.110.01.01.01.0");
-};
-var getH264MediaType = (width) => {
-  const baseString = "avc1.6E00";
-  const levelMap = {
-    426: "16",
-    640: "1F",
-    854: "28",
-    1280: "32",
-    1920: "33",
-    2560: "3C",
-    3840: "3C"
-  };
-  const level = levelMap[width];
-  return "video/mp4;codecs=".concat(baseString).concat(level);
-};
-var getVp9MediaType = (width) => {
-  const levelMap = {
-    486: 20,
-    640: 21,
-    854: 30,
-    1280: 31,
-    1920: 40,
-    2560: 50,
-    3840: 51
-  };
-  const level = levelMap[width];
-  return "video/webm;codecs=vp09.02.".concat(level, ".10.00.01.01.01.01");
-};
-function get_media_type(type, width) {
-  switch (type) {
-    case "av1":
-      return getAv1MediaType(width);
-    case "vp9":
-      return getVp9MediaType(width);
-    case "h264":
-      return getH264MediaType(width);
-  }
-}
-function srcToAttributes(src) {
-  const splitName = (s) => s.split("_");
-  const { name } = parsePath(src);
-  const width = parseInt(splitName(name).slice(-1)[0].split(".")[0], 10);
-  const codec = splitName(name).slice(-2)[0];
-  return [codec, width];
-}
-
-// src/assets/javascripts/features/hero/video/videoElement.ts
-var VideoElement = class {
-  constructor(heroVideo, properties) {
-    this.video = document.createElement("video");
-    this.disablePictureInPicture = "true";
-    this.playsinline = "true";
-    this.preload = "metadata";
-    this.muted = "true";
-    this.loop = "true";
-    this.autoplay = "true";
-    this.picture = document.createElement("picture");
-    this.properties = {};
-    this.message = "";
-    this.video.classList.add("hero__video");
-    this.heroVideo = heroVideo;
-    this.poster = heroVideo.poster;
-    this.message = heroVideo.message || "";
-    let props = properties ? Object.fromEntries(Object.entries(properties).map(([key, value]) => [
-      key,
-      value === "true" || value === "false" ? value : this[key] || "true"
-    ])) : {};
-    this.assignProperties(props);
-    this.video = this.constructVideoElement();
-    this.sources = this.constructSources();
-    this.video.append(...this.sources);
-    this.picture = this.constructPictureElement();
-  }
-  // assign properties to the video element
-  assignProperties(properties) {
-    const { disablePictureInPicture, playsinline, preload, muted, loop, autoplay } = this;
-    return {
-      disablePictureInPicture,
-      playsinline,
-      preload,
-      muted,
-      loop,
-      autoplay,
-      ...properties
-    };
-  }
-  // construct the video element
-  constructVideoElement() {
-    const { video } = this;
-    for (const prop of Object.keys(this.properties)) {
-      const key = typeof prop === "string" ? prop : "".concat(prop);
-      try {
-        video.setAttribute(prop, this.properties[key]);
-      } catch (e) {
-        logger.error("Error setting property ".concat(key, " on video element: ").concat(e));
-      }
-    }
-    return video;
-  }
-  // make the source elements for the video element
-  constructSources() {
-    const { heroVideo } = this;
-    let srcs = [];
-    const widths = Object.keys(MAX_WIDTHS);
-    for (const [_, variant] of Object.entries(heroVideo.variants)) {
-      for (const codec of Object.keys(variant)) {
-        if (codec === "av1" || codec === "vp9" || codec === "h264") {
-          const codecKey = codec;
-          for (const width of widths) {
-            const w = parseInt(width, 10);
-            const src = document.createElement("source");
-            const codecVariant = variant[codecKey];
-            if (typeof codecVariant === "string") {
-              src.src = codecVariant;
-            } else {
-              src.src = codecVariant[w];
-            }
-            src.type = get_media_type(codec, w);
-            src.media = w !== 3840 ? "(max-width: ".concat(MAX_WIDTHS[w], "px)") : "";
-            srcs.push(src);
-          }
-        }
-      }
-    }
-    return srcs.sort((a, b) => {
-      const [aCodec, aWidth] = srcToAttributes(a.src);
-      const [bCodec, bWidth] = srcToAttributes(b.src);
-      if (aWidth === bWidth) {
-        switch (aCodec) {
-          case "av1":
-            return -1;
-          case "vp9":
-            return bCodec === "av1" ? 1 : -1;
-          case "h264":
-            return 1;
-          // h264 should always be last if widths are equal
-          default:
-            throw new Error("Unknown codec: ".concat(aCodec));
-        }
-      } else {
-        return aWidth - bWidth;
-      }
-    });
-  }
-  // get the sizes attribute for the poster image
-  getSizes() {
-    const { heroVideo } = this;
-    const { poster } = heroVideo;
-    const { png } = poster;
-    const { widths } = png;
-    let sizes = "";
-    for (const width of Object.keys(widths)) {
-      const w = parseInt(width, 10);
-      if (width in MAX_WIDTHS) {
-        sizes += w !== 3840 ? "(max-width: ".concat(MAX_WIDTHS[width], "px) ").concat(width, "px, ") : "".concat(width, "px");
-      }
-    }
-    return sizes.trim().replace(/,$/, "");
-  }
-  // construct the picture element
-  constructPictureElement() {
-    const { picture, poster } = this;
-    let srcs = [];
-    for (const type of Object.keys(poster)) {
-      if (type === "webp" || type === "avif") {
-        const { srcset } = poster[type];
-        const source = document.createElement("source");
-        source.srcset = srcset;
-        source.type = "image/".concat(type);
-        srcs.push(source);
-      }
-    }
-    srcs = srcs.sort((a, b) => {
-      const aType = a.type.split("/")[1];
-      const bType = b.type.split("/")[1];
-      if (aType === bType) {
-        return 0;
-      } else {
-        if (aType === "avif") {
-          return -1;
-        }
-        return 1;
-      }
-    });
-    picture.append(...srcs);
-    const img = document.createElement("img");
-    img.src = poster.png.widths[1280];
-    img.srcset = poster.png.srcset;
-    img.alt = "";
-    img.sizes = this.getSizes();
-    picture.classList.add("hero__poster");
-    picture.append(img);
-    return picture;
-  }
-  getElements() {
-    return this.video;
-  }
-};
-
-// src/assets/javascripts/features/hero/video/videoManager.ts
-var customWindow4 = window;
-var { document$: document$3 } = customWindow4;
-var VideoManager = class _VideoManager {
-  constructor() {
-    this.store = HeroStore.getInstance();
-    this.container = document.querySelector(".hero__container") || document.createElement("div");
-    this.ctaContainer = document.querySelector(".cta__container") || document.createElement("div");
-    this.ctaText = gsapWithCSS.utils.toArray("h1, h2");
-    this.timeline = gsapWithCSS.timeline();
-    this.subscriptions = new Subscription();
-    this.has_played = false;
-    this.status = "not_initialized";
-    this.canPlay = false;
-    this.videoDuration = 0;
-    this.titleStart = 0;
-    this.message = "";
-    this.videoStore = getHeroVideos();
-    this.initVideo();
-    this.constructTimeline();
-    this.init_subscriptions();
-  }
-  /**
-   * @method init_subscriptions
-   * @private
-   * @description Initializes the subscriptions for the VideoManager
-   */
-  init_subscriptions() {
-    const { videoState$ } = this.store;
-    const video$ = videoState$.pipe(distinctUntilKeyChanged("canPlay"), map(({ canPlay }) => canPlay), tap((canPlay) => {
-      if (canPlay) {
-        this.handleCanPlay();
-      } else {
-        this.handleStopPlay();
-      }
-    }));
-    const motionSub$ = this.store.state$.pipe(distinctUntilKeyChanged("prefersReducedMotion"), filter(({ prefersReducedMotion }) => prefersReducedMotion));
-    const stallHandler$ = combineLatest([
-      videoState$.pipe(filter((state) => state.canPlay === true)),
-      merge(fromEvent(this.element, "stalled"), fromEvent(this.element, "waiting"))
-    ]).pipe(tap(() => {
-      this.pause();
-    }), switchMap(() => fromEvent(this.element, "canplay")), tap(() => {
-      this.resume();
-    }));
-    this.subscriptions.add(video$.subscribe());
-    this.subscriptions.add(motionSub$.subscribe(() => this.initiateFallback()));
-    this.subscriptions.add(stallHandler$.subscribe());
-  }
-  initVideo() {
-    this.backupPicture = document.querySelector(".hero__backup") || document.createElement("picture");
-    if (this.videoStore.length === 0) {
-      this.initiateFallback();
-      throw new Error("No videos found");
-    } else if (this.videoStore.length === 1) {
-      this.video = new VideoElement(this.videoStore[0]);
-    } else {
-      const randomized = gsapWithCSS.utils.shuffle(this.videoStore);
-      this.video = new VideoElement(randomized[0]);
-      this.element = this.video.video;
-      this.poster = this.video.picture;
-      this.message = this.video.message;
-    }
-  }
-  static getInstance() {
-    var _a2;
-    return (_a2 = this.instance) != null ? _a2 : this.instance = new _VideoManager();
-  }
-  handleCanPlay() {
-    this.canPlay = true;
-    switch (this.status) {
-      case "loading":
-      case "playing":
-        break;
-      case "paused":
-        this.timeline.resume();
-        break;
-      case "on_delay":
-        this.timeline.restart();
-        break;
-      case "loaded":
-        this.timeline.play();
-        break;
-      case "not_initialized":
-        this.status = "loading";
-        this.loadVideo();
-    }
-  }
-  handleStopPlay() {
-    this.canPlay = false;
-    this.pause();
-    if (this.has_played && this.videoStore.length > 1) {
-      this.reinit();
-      this.status = "loading";
-    }
-  }
-  // sets initial timeline properties
-  constructTimeline() {
-    this.timeline = gsapWithCSS.timeline({
-      defaults: { paused: true },
-      paused: true,
-      onStart: () => {
-        this.status = "playing";
-      },
-      onComplete: () => {
-        this.status = "on_delay";
-      },
-      onRepeat: () => {
-        this.has_played = true;
-      },
-      repeat: -1,
-      repeatDelay: 3,
-      callbackScope: this,
-      ease: "none"
-    });
-  }
-  setEmphasisAnimations() {
-    const { subtle, strong } = OBSERVER_CONFIG.emphasisTargets;
-    const subtleTargets = gsapWithCSS.utils.toArray(document.querySelectorAll(subtle));
-    const strongTargets = gsapWithCSS.utils.toArray(document.querySelectorAll(strong));
-    this.timeline.add(["subtleEmphasis", gsapWithCSS.emphasize(subtleTargets, SUBTLE_EMPHASIS_CONFIG)], ">");
-    this.timeline.add(["strongEmphasis", gsapWithCSS.emphasize(strongTargets, STRONG_EMPHASIS_CONFIG)], ">=0.5");
-    gsapWithCSS.to(strongTargets, STRONG_EMPHASIS_CONFIG);
-  }
-  loadVideo() {
-    if (!this.container.querySelector("picture")) {
-      this.loadPoster();
-    }
-    if (this.container.querySelector("video")) {
-      return;
-    }
-    document$3.subscribe(() => {
-      gsapWithCSS.set(this.element, { autoAlpha: 0 });
-      this.element.pause();
-      this.container.append(this.element);
-      this.element.load();
-      fromEvent(this.element, "loadedmetadata").subscribe(() => {
-        this.videoDuration = this.element.duration;
-        this.titleStart = this.videoDuration - 5;
-      });
-      fromEvent(this.element, "canplay").subscribe(() => {
-        this.status = "loaded";
-        gsapWithCSS.to(this.poster, { autoAlpha: 0, duration: 0.5 });
-        this.timeline.add(["fadeinVideo", gsapWithCSS.to(this.element, { autoAlpha: 1, duration: 0.5 })], 0);
-        this.timeline.add([
-          "startVideo",
-          () => {
-            this.element.play();
-          }
-        ], "<");
-        if (this.video.message) {
-          this.timeline.add(["fadeOutVideo", gsapWithCSS.to(this.element, { autoAlpha: 0, duration: 0.5 })], this.titleStart);
-          this.timeline.add(["message", gsapWithCSS.animateMessage(this.container, { message: this.message, repeat: 0 })], this.titleStart);
-          this.setEmphasisAnimations();
-          this.timeline.add([
-            "resetVideo",
-            () => {
-              this.stop();
-              this.play();
-            },
-            ">"
-          ]);
-        }
-      });
-    });
-  }
-  loadPoster() {
-    gsapWithCSS.set(this.poster, { autoAlpha: 0 });
-    this.container.append(this.poster);
-    const img = this.poster.querySelector("img");
-    const transition = () => gsapWithCSS.to(this.poster, { autoAlpha: 1, duration: 0.5 });
-    if (img && img instanceof HTMLImageElement) {
-      if (img.complete) {
-        transition();
-      } else {
-        fromEvent(img, "load").subscribe(transition);
-      }
-    } else {
-      this.loadBackup();
-    }
-  }
-  loadBackup() {
-    const backup = this.backupPicture || this.poster;
-    if (!Array.from(this.container.children).includes(backup)) {
-      requestAnimationFrame(() => {
-        this.container.append(backup);
-      });
-    }
-    gsapWithCSS.to(backup, { autoAlpha: 1, duration: 1 });
-  }
-  initiateFallback() {
-    if (this.container.querySelector("video")) {
-      gsapWithCSS.to(this.element, { autoAlpha: 0, duration: 0.5 });
-      this.container.removeChild(this.element);
-    }
-    this.status = "loaded";
-    if (!this.store.getStateValue("prefersReducedMotion")) {
-      this.loadBackup();
-    }
-    gsapWithCSS.set(this.ctaContainer, { autoAlpha: 1 });
-    gsapWithCSS.animateMessage(this.container, {
-      message: this.ctaText || this.message,
-      repeat: 0,
-      autoRemoveChildren: true
-    });
-    this.timeline.kill();
-    this.subscriptions.unsubscribe();
-  }
-  play() {
-    if (!this.timeline.isActive()) {
-      this.timeline.play();
-      this.element.play();
-    }
-  }
-  pause() {
-    if (this.timeline.isActive()) {
-      this.timeline.pause();
-      this.element.pause();
-    }
-  }
-  resume() {
-    if (this.timeline.paused()) {
-      this.timeline.resume();
-      this.element.play();
-    }
-  }
-  stop() {
-    if (this.timeline.isActive()) {
-      this.timeline.pause();
-      this.element.pause();
-      this.timeline.seek(0);
-      this.element.currentTime = 0;
-    } else {
-      this.timeline.seek(0);
-      this.element.currentTime = 0;
-    }
-  }
-  reinit() {
-    this.timeline.kill();
-    this.constructor();
-  }
-};
+_getGSAP() && gsap2.registerPlugin(Observer);
 
 // node_modules/gsap/ScrollTrigger.js
 var gsap3;
@@ -15849,10 +14065,10 @@ var ScrollTrigger2 = /* @__PURE__ */ function() {
         _div100vh.style.position = "absolute";
         _refresh100vh();
         _rafBugFix();
-        Observer2.register(gsap3);
-        ScrollTrigger4.isTouch = Observer2.isTouch;
-        _fixIOSBug = Observer2.isTouch && /(iPad|iPhone|iPod|Mac)/g.test(navigator.userAgent);
-        _ignoreMobileResize = Observer2.isTouch === 1;
+        Observer.register(gsap3);
+        ScrollTrigger4.isTouch = Observer.isTouch;
+        _fixIOSBug = Observer.isTouch && /(iPad|iPhone|iPod|Mac)/g.test(navigator.userAgent);
+        _ignoreMobileResize = Observer.isTouch === 1;
         _addListener3(_win4, "wheel", _onScroll3);
         _root2 = [_win4, _doc4, _docEl2, _body2];
         if (gsap3.matchMedia) {
@@ -16066,7 +14282,7 @@ var _allowNativePanning = function _allowNativePanning2(target, direction) {
   if (direction === true) {
     target.style.removeProperty("touch-action");
   } else {
-    target.style.touchAction = direction === true ? "auto" : direction ? "pan-" + direction + (Observer2.isTouch ? " pinch-zoom" : "") : "none";
+    target.style.touchAction = direction === true ? "auto" : direction ? "pan-" + direction + (Observer.isTouch ? " pinch-zoom" : "") : "none";
   }
   target === _docEl2 && _allowNativePanning2(_body2, direction);
 };
@@ -16090,7 +14306,7 @@ var _nestedScroll = function _nestedScroll2(_ref5) {
   }
 };
 var _inputObserver = function _inputObserver2(target, type, inputs, nested) {
-  return Observer2.create({
+  return Observer.create({
     target,
     capture: true,
     debounce: false,
@@ -16101,10 +14317,10 @@ var _inputObserver = function _inputObserver2(target, type, inputs, nested) {
     onDrag: nested,
     onScroll: nested,
     onEnable: function onEnable() {
-      return inputs && _addListener3(_doc4, Observer2.eventTypes[0], _captureInputs, false, true);
+      return inputs && _addListener3(_doc4, Observer.eventTypes[0], _captureInputs, false, true);
     },
     onDisable: function onDisable() {
-      return _removeListener3(_doc4, Observer2.eventTypes[0], _captureInputs, true);
+      return _removeListener3(_doc4, Observer.eventTypes[0], _captureInputs, true);
     }
   });
 };
@@ -16123,7 +14339,7 @@ var _getScrollNormalizer = function _getScrollNormalizer2(vars) {
   vars.type || (vars.type = "wheel,touch");
   vars.debounce = !!vars.debounce;
   vars.id = vars.id || "normalizer";
-  var _vars2 = vars, normalizeScrollX = _vars2.normalizeScrollX, momentum = _vars2.momentum, allowNestedScroll = _vars2.allowNestedScroll, onRelease = _vars2.onRelease, self, maxY, target = _getTarget(vars.target) || _docEl2, smoother = gsap3.core.globals().ScrollSmoother, smootherInstance = smoother && smoother.get(), content = _fixIOSBug && (vars.content && _getTarget(vars.content) || smootherInstance && vars.content !== false && !smootherInstance.smooth() && smootherInstance.content()), scrollFuncY = _getScrollFunc(target, _vertical), scrollFuncX = _getScrollFunc(target, _horizontal), scale = 1, initialScale = (Observer2.isTouch && _win4.visualViewport ? _win4.visualViewport.scale * _win4.visualViewport.width : _win4.outerWidth) / _win4.innerWidth, wheelRefresh = 0, resolveMomentumDuration = _isFunction3(momentum) ? function() {
+  var _vars2 = vars, normalizeScrollX = _vars2.normalizeScrollX, momentum = _vars2.momentum, allowNestedScroll = _vars2.allowNestedScroll, onRelease = _vars2.onRelease, self, maxY, target = _getTarget(vars.target) || _docEl2, smoother = gsap3.core.globals().ScrollSmoother, smootherInstance = smoother && smoother.get(), content = _fixIOSBug && (vars.content && _getTarget(vars.content) || smootherInstance && vars.content !== false && !smootherInstance.smooth() && smootherInstance.content()), scrollFuncY = _getScrollFunc(target, _vertical), scrollFuncX = _getScrollFunc(target, _horizontal), scale = 1, initialScale = (Observer.isTouch && _win4.visualViewport ? _win4.visualViewport.scale * _win4.visualViewport.width : _win4.outerWidth) / _win4.innerWidth, wheelRefresh = 0, resolveMomentumDuration = _isFunction3(momentum) ? function() {
     return momentum(self);
   } : function() {
     return momentum || 2.8;
@@ -16239,7 +14455,7 @@ var _getScrollNormalizer = function _getScrollNormalizer2(vars) {
     inputObserver.kill();
   };
   vars.lockAxis = vars.lockAxis !== false;
-  self = new Observer2(vars);
+  self = new Observer(vars);
   self.iOS = _fixIOSBug;
   _fixIOSBug && !scrollFuncY() && scrollFuncY(1);
   _fixIOSBug && gsap3.ticker.add(_passThrough3);
@@ -16273,7 +14489,7 @@ ScrollTrigger2.sort = function(func) {
   });
 };
 ScrollTrigger2.observe = function(vars) {
-  return new Observer2(vars);
+  return new Observer(vars);
 };
 ScrollTrigger2.normalizeScroll = function(vars) {
   if (typeof vars === "undefined") {
@@ -16287,7 +14503,7 @@ ScrollTrigger2.normalizeScroll = function(vars) {
     _normalizer2 = vars;
     return;
   }
-  var normalizer = vars instanceof Observer2 ? vars : _getScrollNormalizer(vars);
+  var normalizer = vars instanceof Observer ? vars : _getScrollNormalizer(vars);
   _normalizer2 && _normalizer2.target === normalizer.target && _normalizer2.kill();
   _isViewport3(normalizer.target) && (_normalizer2 = normalizer);
   return normalizer;
@@ -16524,6 +14740,1792 @@ ScrollToPlugin.config = function(vars) {
 };
 _getGSAP5() && gsap4.registerPlugin(ScrollToPlugin);
 
+// src/assets/javascripts/state/store.ts
+var customWindow2 = window;
+var weAreDev = isDev(new URL(customWindow2.location.href));
+var { viewport$: viewport$4 } = customWindow2;
+var initialUrl = new URL(customWindow2.location.href);
+var HeroStore = class _HeroStore {
+  /**
+   * @description Initializes the HeroStore singleton instance
+   */
+  constructor() {
+    // state$ is a BehaviorSubject that holds the current state of the hero section
+    this.state$ = new BehaviorSubject({
+      atHome: isHome(initialUrl),
+      landingVisible: isHome(initialUrl),
+      pageVisible: !document.hidden || document.visibilityState === "visible",
+      prefersReducedMotion: customWindow2.matchMedia("(prefers-reduced-motion: reduce)").matches,
+      viewport: {
+        offset: getViewportOffset(),
+        size: getViewportSize()
+      },
+      header: { height: 0, hidden: true },
+      parallaxHeight: getViewportOffset().y * 1.4,
+      location: initialUrl,
+      tearDown: false
+    });
+    this.videoState$ = new BehaviorSubject({ canPlay: false });
+    this.parallaxHeight$ = new BehaviorSubject(getViewportOffset().y * 1.4);
+    this.subscriptions = new Subscription();
+    this.initSubscriptions();
+  }
+  /**
+   * @returns {HeroStore} Singleton instance of the HeroStore
+   * @description Static singleton instance getter
+   */
+  static getInstance() {
+    var _a2;
+    return (_a2 = _HeroStore.instance) != null ? _a2 : _HeroStore.instance = new _HeroStore();
+  }
+  /**
+   * @param {Partial<HeroState>} update - Partial state object to update the hero state
+   * @param {AnimationComponent} component Optional component to update
+   * @description Updates the hero state with a partial state
+   */
+  updateState(update, component) {
+    if (weAreDev) {
+      this.debugStateChange(update);
+    }
+    if (update === null || update === void 0) {
+      return;
+    }
+    const changes = Object.entries(update).filter(([key, value]) => value !== null && key in this.state$.value && this.state$.value[key] !== value);
+    if (changes.length === 0) {
+      return;
+    }
+    this.state$.next({ ...this.state$.value, ...update });
+    if (component && component === "video" /* Video */) {
+      logger.info("updating video state; update:", update);
+      this.videoState$.next(update);
+      return;
+    }
+  }
+  /**
+   * @param {Partial<HeroState>} updates - Partial state object to update the hero state
+   * @param {AnimationComponent} component Optional component to update state
+   * @description Updates the hero state with a partial state
+   */
+  updateHeroState(updates, component) {
+    logger.info("external component updating state; updates:", updates);
+    this.updateState(updates, component);
+  }
+  /**
+   * @param {string} name - Name of the observable
+   * @param {(T) => Partial<HeroState>} updateFn - Function to update state based on observable value
+   * @returns {Observer<T>} - Observer for the observable
+   * @description Creates an observer for an observable
+   */
+  createObserver(name, updateFn, component) {
+    return {
+      next: (value) => {
+        logger.info("".concat(name, " received:"), value);
+        this.updateState(updateFn(value), component);
+      },
+      error: (error) => logger.error("Error in ".concat(name, ":"), error),
+      complete: () => logger.info("".concat(name, " completed"))
+    };
+  }
+  /**
+   * @description Initializes all observables and subscriptions
+   */
+  initSubscriptions() {
+    const atHome$ = navigationEvents$.pipe(map(isHome), distinctUntilChanged(), startWith(isHome(initialUrl)), shareReplay(1), tap(this.createObserver("atHome$", (atHome) => ({ atHome }))));
+    const landing$ = isPartiallyInViewport(document.getElementById("parallax-hero-image-layer")).pipe(filter((landing) => landing !== void 0 && landing !== null));
+    const landingVisible$ = atHome$.pipe(filter((atHome) => atHome), switchMap(() => landing$), filter((landingVisible) => landingVisible && landingVisible !== void 0 && landingVisible !== null), tap(this.createObserver("landingVisible$", (landingVisible) => ({ landingVisible }))));
+    const pageVisible$ = isPageVisible$.pipe(tap(this.createObserver("pageVisible$", (pageVisible) => ({ pageVisible }))));
+    const motion$ = prefersReducedMotion$.pipe(tap(this.createObserver("prefersReducedMotion$", (prefersReducedMotion) => ({
+      prefersReducedMotion
+    }))));
+    const view$ = viewport$4.pipe(distinctUntilChanged(), debounceTime(100), shareReplay(1), tap((viewport) => {
+      setCssVariable("--viewport-offset-height", "".concat(viewport.offset.y, "px"));
+      setCssVariable("--viewport-offset-width", "".concat(viewport.offset.x, "px"));
+    }), tap(this.createObserver("view$", (viewport) => ({ viewport }))));
+    const header$3 = watchHeader(getComponentElement("header"), { viewport$: viewport$4 }).pipe(tap((header) => {
+      setCssVariable("--header-height", header.hidden ? "0" : "".concat(header.height, "px"));
+    }), tap(this.createObserver("header$", (header) => ({ header }))));
+    const parallax$ = combineLatest([
+      viewport$4,
+      watchHeader(getComponentElement("header"), { viewport$: viewport$4 }),
+      watchMediaQuery("(orientation: portrait)")
+    ]).pipe(map(([viewport, header, portrait]) => {
+      return {
+        viewHeight: viewport.offset.y,
+        headerHeight: header.height,
+        portrait
+      };
+    }), map(({ viewHeight, headerHeight, portrait }) => {
+      const adjustedHeight = viewHeight - headerHeight;
+      return portrait ? adjustedHeight * 1.4 : adjustedHeight * 1.6;
+    }), distinctUntilChanged(), shareReplay(1), tap((parallaxHeight) => {
+      setCssVariable("--parallax-height", "".concat(parallaxHeight, "px"));
+    }), tap(this.createObserver("parallaxHeight$", (parallaxHeight) => ({ parallaxHeight }))));
+    const video$ = this.getVideoState$((v) => this.videoState$.next(v));
+    this.subscriptions.add(atHome$.subscribe());
+    this.subscriptions.add(landingVisible$.subscribe());
+    this.subscriptions.add(pageVisible$.subscribe());
+    this.subscriptions.add(motion$.subscribe());
+    this.subscriptions.add(view$.subscribe());
+    this.subscriptions.add(header$3.subscribe());
+    this.subscriptions.add(location$.subscribe());
+    this.subscriptions.add(parallax$.subscribe());
+    this.subscriptions.add(video$.subscribe());
+  }
+  /**
+   * @returns {HeroState} Current state of the hero section
+   * @description Gets the current state of the hero section
+   */
+  getState() {
+    return this.state$.getValue();
+  }
+  /**
+   * @param {string} subject - Name of the state subject
+   * @returns {any} - Current value of the state subject
+   * @description Gets the current value of a specific state subject
+   */
+  getStateValue(subject) {
+    return this.state$.value[subject];
+  }
+  /**
+   * @param {string} component - Name of the component
+   * @returns {ComponentState} - Current state of the component
+   * @description Gets the current state of a specific
+   * component or landing permissions
+   */
+  getComponentValue(component) {
+    switch (component) {
+      case "video" /* Video */:
+        return this.videoState$.value;
+      default:
+        return this.videoState$.value;
+    }
+  }
+  /** ============================================
+   *          Component Specific Observables
+   *=============================================**/
+  /**
+   * @param {string} name - Name of the observable
+   * @param {ComponentStateUpdateFunction} func - Function to update the component state
+   * @returns {Observer<T>} - Observer for the observable
+   * @description Creates a standard observer for a component observable
+   */
+  getComponentObserver(name, func) {
+    return {
+      next: (value) => {
+        logger.info("".concat(name, " received:"), value);
+        if (func) {
+          ;
+          (value2) => func(value2);
+        }
+      },
+      error: (error) => logger.error("Error in ".concat(name, ":"), error),
+      complete: () => logger.info("".concat(name, " completed"))
+    };
+  }
+  /**
+   * @param {ComponentStateUpdateFunction} observerFunc Function to update the component state
+   * @returns {Observable<VideoState>} Observable for carousel state indicating play and pause conditions
+   * @description Creates an observable for the carousel state indicating play and pause conditions
+   */
+  getVideoState$(observerFunc) {
+    return this.state$.pipe(map((state) => ({
+      canPlay: videoPredicate.canPlay(state)
+    })), distinctUntilKeyChanged("canPlay"), shareReplay(1), tap(this.getComponentObserver("videoState$", observerFunc)));
+  }
+  /**
+   * @param {Partial<HeroState>} updates - Partial state object to update the hero state
+   * @description Logs and updates state changes for debugging
+   */
+  debugStateChange(updates) {
+    if (weAreDev) {
+      const oldState = this.state$.value;
+      const changes = Object.entries(updates).filter(([key, value]) => oldState[key] !== value);
+      if (changes.length === 0) {
+        return;
+      }
+      logger.info("Changes:", stringify(changes));
+      logger.info("New State:", stringify({ ...oldState, ...updates }));
+      Object.entries(predicates).filter(([_, value]) => typeof value === "function").forEach(([name, predicate]) => {
+        logger.info("".concat(name, ":"), predicate({ ...oldState, ...updates }));
+      });
+    }
+  }
+  /**
+   * @method destroy
+   * @public
+   * @description Unsubscribes from all observables and resets the singleton instance
+   */
+  destroy() {
+    this.subscriptions.unsubscribe();
+    _HeroStore.instance = void 0;
+  }
+};
+var isFullyVisible = (state) => state.atHome && state.landingVisible && state.pageVisible;
+var noVideo = (state) => state.prefersReducedMotion;
+var videoPredicate = {
+  canPlay: (state) => isFullyVisible(state) && !noVideo(state)
+};
+var predicates = {
+  isFullyVisible,
+  noVideo,
+  videoPredicate
+};
+
+// src/assets/javascripts/features/hero/animations/utils.ts
+var store = HeroStore.getInstance();
+function getMatchMediaInstance(scope) {
+  return gsapWithCSS.matchMedia(scope || document.documentElement);
+}
+function getDistanceToViewport(target, edge = "bottom") {
+  const rect = target.getBoundingClientRect();
+  const { viewport } = store.state$.getValue();
+  const distanceMap = {
+    top: rect.top,
+    right: viewport.offset.x - rect.right,
+    bottom: viewport.offset.y - rect.bottom,
+    left: rect.left
+  };
+  return distanceMap[edge];
+}
+function getContentElements(element) {
+  const allElements = Array.from(element.querySelectorAll("*"));
+  return allElements.filter((el) => {
+    var _a2, _b, _c;
+    if (!isValidElement(el, element)) {
+      return false;
+    }
+    const excludedClasses = ["outer", "inner", "hero__bg"];
+    const hasExcludedClass = excludedClasses.some((cls) => el.classList.contains(cls));
+    const hasContent = ((_c = (_b = (_a2 = el.textContent) == null ? void 0 : _a2.trim()) == null ? void 0 : _b.length) != null ? _c : 0) > 0 || el.querySelector("img, svg, video") !== null;
+    return !hasExcludedClass && hasContent;
+  });
+}
+function modifyDurationForReducedMotion(duration) {
+  let newDuration = duration;
+  getMatchMediaInstance().add({ reducedMotion: "(prefers-reduced-motion: reduce)" }, (context4) => {
+    const { reducedMotion } = context4.conditions;
+    if (reducedMotion) {
+      switch (typeof duration) {
+        case "number":
+          newDuration = duration * 2;
+          break;
+        case "string":
+          newDuration = parseFloat(duration) * 2;
+          break;
+        default:
+          newDuration = duration;
+      }
+    } else {
+      newDuration = duration;
+    }
+  });
+  return newDuration;
+}
+function wordsToLetterDivs(el) {
+  const docFragment = document.createDocumentFragment();
+  let text = "";
+  if (typeof el === "string") {
+    text = el;
+  } else {
+    text = el.innerText;
+  }
+  const letters = text.trim().split("");
+  letters.forEach((letter, idx) => {
+    if (idx === 0 && (letter === " " || letter === "\n")) {
+      return;
+    }
+    const textNode = document.createTextNode(letter);
+    if (letter === " " || letter === "\n") {
+      const lastEl = docFragment.lastChild;
+      lastEl == null ? void 0 : lastEl.appendChild(textNode);
+    }
+    const newDiv = document.createElement("div");
+    newDiv.appendChild(textNode);
+    newDiv.classList.add("hero__letter");
+    docFragment.appendChild(newDiv);
+  });
+  if (el instanceof HTMLElement) {
+    gsapWithCSS.set(el, { innerText: "" });
+  }
+  gsapWithCSS.set(docFragment.querySelectorAll("div"), { display: "inline-block", autoAlpha: 0 });
+  return docFragment;
+}
+
+// src/assets/javascripts/features/hero/animations/effects.ts
+function getFadeVars(out = false, yPercent, direction) {
+  const defaultDirection = out ? -1 /* UP */ : 1 /* DOWN */;
+  const pathDirection = direction || defaultDirection;
+  return {
+    from: { autoAlpha: out ? 1 : 0, yPercent: out ? 0 : pathDirection * yPercent },
+    to: { autoAlpha: out ? 0 : 1, yPercent: out ? pathDirection * yPercent : 0 }
+  };
+}
+function getDFactor(direction) {
+  return direction === -1 /* UP */ ? -1 /* UP */ : 1 /* DOWN */;
+}
+gsapWithCSS.registerEffect({
+  name: "setSection",
+  extendTimeline: true,
+  defaults: { extendTimeline: true },
+  effect: (config6) => {
+    if (Object.entries(config6).length === 1) {
+      config6 = config6[0];
+    }
+    const { direction, section } = config6;
+    logger.info("setSection: direction: ".concat(direction, ", section: ").concat(stringify(section)));
+    const dFactor = getDFactor(direction);
+    const tl = gsapWithCSS.timeline();
+    tl.add(gsapWithCSS.set(section.element, { zIndex: 0 })).add(gsapWithCSS.to(section.bg, { yPercent: -15 * dFactor })).add(gsapWithCSS.set(section.element, { autoAlpha: 0 })).add(gsapWithCSS.set(section.content, { autoAlpha: 0 }));
+  }
+});
+gsapWithCSS.registerEffect({
+  name: "transitionSection",
+  extendTimeline: true,
+  defaults: { extendTimeline: true },
+  effect: (config6) => {
+    if (Object.entries(config6).length === 1) {
+      config6 = config6[0];
+    }
+    const { direction, section } = config6;
+    logger.info("transitionSection: direction: ".concat(direction, ", section: ").concat(stringify(section)));
+    logger.info("config object: ".concat(stringify(config6)));
+    const dFactor = getDFactor(direction);
+    const tl = gsapWithCSS.timeline();
+    tl.fromTo([section.outerWrapper, section.innerWrapper], {
+      yPercent: (i) => i ? i * -100 * dFactor : 100 * dFactor
+    }, {
+      yPercent: 0
+    }, 0).fromTo(section.bg, {
+      yPercent: 15 * dFactor
+    }, {
+      yPercent: 0
+    }, 0).set(section.element, { zIndex: 1, autoAlpha: 1 }).fromTo(section.content, {
+      autoAlpha: 0,
+      yPercent: 50 * dFactor
+    }, {
+      autoAlpha: 1,
+      yPercent: 0,
+      stagger: {
+        each: 0.1,
+        axis: "y",
+        from: direction === -1 /* UP */ ? "start" : "end"
+      }
+    }, 0.2);
+    if (section.animation) {
+      tl.add(section.animation, ">=wrapperTransition");
+    }
+    return tl;
+  }
+});
+var fade = (targets, config6 = { out: false, direction: 1, fromConfig: {}, toConfig: {} }) => {
+  logger.info("fade: targets: ".concat(targets, ", config: ").concat(stringify(config6)));
+  const media = getMatchMediaInstance();
+  const tl = gsapWithCSS.timeline();
+  media.add({ reducedMotion: "(prefers-reduced-motion: reduce)" }, (context4) => {
+    const { out, direction, fromConfig, toConfig } = config6;
+    if (fromConfig && toConfig) {
+      const fadeVars = getFadeVars(out, Number(fromConfig.yPercent) || Number(toConfig == null ? void 0 : toConfig.yPercent) || 50, direction || null);
+      const fromVars = { ...fadeVars.from, ...fromConfig };
+      const toVars = { ...fadeVars.to, ...toConfig };
+      const { reducedMotion } = context4.conditions;
+      if (reducedMotion) {
+        const modifiedVars = [fromVars, toVars].map((vars) => {
+          let modified = { ...vars };
+          if (modified.yPercent) {
+            delete modified.yPercent;
+          } else if (modified.duration) {
+            modified.duration = modifyDurationForReducedMotion(vars.duration || 0.5);
+          }
+          return modified;
+        });
+        tl.add(gsapWithCSS.fromTo(targets, modifiedVars[0], modifiedVars[1]));
+      } else {
+        tl.add(gsapWithCSS.fromTo(targets, {
+          ...fromVars
+        }, {
+          ...toVars
+        }));
+      }
+    }
+  });
+  return tl;
+};
+gsapWithCSS.registerEffect({
+  name: "fadeIn",
+  extendTimeline: true,
+  effect: (targets, config6) => {
+    logger.info("fadeIn: targets: ".concat(targets, ", config: ").concat(stringify(config6)));
+    const { direction, fromConfig, toConfig } = config6;
+    targets = targets instanceof Array ? targets : [targets];
+    return fade(targets, { out: false, direction, fromConfig, toConfig });
+  }
+});
+gsapWithCSS.registerEffect({
+  name: "fadeOut",
+  extendTimeline: true,
+  defaults: { extendTimeline: true },
+  effect: (targets, config6) => {
+    logger.info("fadeOut: targets: ".concat(targets, ", config: ").concat(stringify(config6)));
+    const { direction, fromConfig, toConfig } = config6;
+    return fade(targets, { out: true, direction, fromConfig, toConfig });
+  }
+});
+var blink = (targets, config6 = {}) => {
+  logger.info("blink: targets: ".concat(targets, ", config: ").concat(stringify(config6), " "));
+  const duration = modifyDurationForReducedMotion(config6.duration || 0.5);
+  return gsapWithCSS.to(targets, {
+    autoAlpha: 0,
+    ease: "power4.in",
+    startAt: { filter: "brightness(1.3)" },
+    ...config6,
+    duration
+  });
+};
+var jump = (targets, config6 = {}) => {
+  logger.info("jump: targets: ".concat(targets, ", config: ").concat(stringify(config6)));
+  config6.y ? config6["delete"]("y") : null;
+  const duration = modifyDurationForReducedMotion(config6.duration || 0.5);
+  return gsapWithCSS.to(targets, {
+    y: (_index, target, _targets) => {
+      const distance = Math.abs(getDistanceToViewport(target));
+      return -gsapWithCSS.utils.clamp(distance > 10 ? 10 : distance, distance, 25);
+    },
+    yoyoEase: "bounce",
+    ease: "elastic",
+    repeatDelay: 2,
+    ...config6,
+    duration
+  });
+};
+var scaleUp = (targets, config6 = {}) => {
+  logger.info("scaleUp: targets: ".concat(targets, ", config: ").concat(stringify(config6)));
+  const duration = modifyDurationForReducedMotion(config6.duration || 0.5);
+  return gsapWithCSS.to(targets, { scale: 1.5, ease: "elastic", ...config6, duration });
+};
+gsapWithCSS.registerEffect({
+  name: "emphasize",
+  extendTimeline: true,
+  defaults: { repeat: -1, yoyo: true, extendTimeline: true },
+  effect: (targets, config6) => {
+    logger.info("emphasize: targets: ".concat(targets, ", config: ").concat(stringify(config6)));
+    if (!targets) {
+      return null;
+    }
+    const { blinkConfig, jumpConfig, scaleUpConfig } = config6;
+    const emphasisTimeline = gsapWithCSS.timeline();
+    getMatchMediaInstance().add({ reducedMotion: "(prefers-reduced-motion: reduce)" }, (context4) => {
+      const { reducedMotion } = context4.conditions;
+      if (reducedMotion) {
+        emphasisTimeline.add(blink(targets, { ...blinkConfig, ease: "power1.inOut" }));
+        emphasisTimeline.add(scaleUp(targets, { ...scaleUpConfig }));
+      } else {
+        emphasisTimeline.add(blink(targets, blinkConfig));
+        emphasisTimeline.add(jump(targets, jumpConfig));
+        emphasisTimeline.add(scaleUp(targets, scaleUpConfig));
+      }
+    });
+    return emphasisTimeline;
+  }
+});
+gsapWithCSS.registerEffect({
+  name: "animateMessage",
+  extendTimeline: true,
+  defaults: { extendTimeline: true, repeat: 0 },
+  effect: (target, config6) => {
+    logger.info("animateMessage: target: ".concat(target, ", config: ").concat(stringify(config6)));
+    target = target instanceof Array ? target : gsapWithCSS.utils.toArray(target);
+    if (!target || !(target instanceof Array)) {
+      return gsapWithCSS.timeline();
+    }
+    target = gsapWithCSS.utils.toArray(target).filter((el) => el !== null && el instanceof HTMLElement);
+    let msgFrag = document.createDocumentFragment();
+    let animationElements = [];
+    if (config6.message) {
+      msgFrag = wordsToLetterDivs(config6.message);
+      target = target.slice(0, 1);
+      if (target instanceof Array && target.length > 0 && target[0] && target[0] instanceof HTMLElement) {
+        requestAnimationFrame(() => {
+          const element = target[0];
+          element.append(msgFrag);
+          animationElements = gsapWithCSS.utils.toArray(element.querySelectorAll("div")).filter((el) => el !== null && el instanceof HTMLElement && el.innerText !== "");
+        });
+      } else {
+        return gsapWithCSS.timeline();
+      }
+    } else {
+      gsapWithCSS.utils.toArray(target).forEach((el) => {
+        if (el instanceof HTMLElement) {
+          const text = wordsToLetterDivs(el);
+          requestAnimationFrame(() => {
+            el.append(text);
+          });
+          animationElements.push(el);
+        }
+      });
+    }
+    const messageTimeline = gsapWithCSS.timeline();
+    messageTimeline.add(["setState", gsapWithCSS.set(animationElements, { autoAlpha: 0 })], 0);
+    let fromVars = config6.entranceFromVars || {};
+    let toVars = config6.entranceToVars || {};
+    let exitVars = config6.exitVars || {};
+    gsapWithCSS.matchMedia().add({ reducedMotion: "(prefers-reduced-motion: reduce)" }, (context4) => {
+      const { reducedMotion } = context4.conditions;
+      if (reducedMotion) {
+        fromVars.yPercent = 50;
+        toVars.ease = "power1.inOut";
+        toVars.stagger = { each: 0.04, from: "start" };
+        toVars.duration = modifyDurationForReducedMotion(toVars.duration || 1);
+        exitVars.duration = modifyDurationForReducedMotion(exitVars.duration || 0.5);
+        exitVars.yPercent = -50;
+        exitVars.ease = "power1.inOut";
+        exitVars.stagger = { each: 0.04, from: "end" };
+      }
+    });
+    messageTimeline.add([
+      "randomEntrance",
+      gsapWithCSS.fromTo(animationElements, { autoAlpha: 0, yPercent: 150, ...fromVars }, {
+        autoAlpha: 1,
+        yPercent: 0,
+        stagger: { each: 0.03, from: "random" },
+        duration: 1.2,
+        ...toVars
+      })
+    ], 0.02);
+    messageTimeline.add([
+      "randomExit",
+      gsapWithCSS.to(animationElements, {
+        autoAlpha: 0,
+        duration: 0.5,
+        yPercent: gsapWithCSS.utils.random(-150, 150, 10),
+        stagger: { each: 0.03, from: "random" },
+        ...exitVars
+      })
+    ], 4.5);
+    return messageTimeline;
+  }
+});
+
+// src/assets/javascripts/features/hero/animations/observer.ts
+gsapWithCSS.registerPlugin(Observer);
+var HeroObservation = class _HeroObservation {
+  constructor() {
+    this.store = HeroStore.getInstance();
+    this.currentIndex = -1;
+    this.config = OBSERVER_CONFIG;
+    this.sections = [];
+    this.subscriptions = new Subscription();
+    this.animating = false;
+    this.sectionCount = 0;
+    this.sectionIndexLength = 0;
+    this.defaultTimelineVars = {};
+    this.initialized = false;
+    this.footer = document.querySelector(".md-footer");
+    this.header = document.querySelector("#header-target nav.md-tabs");
+    this.blockbusterManager = VideoManager.getInstance();
+    this.defaultTimelineVars = {
+      defaults: {
+        callbackScope: this
+      },
+      repeat: 0,
+      duration: this.config.slides.slideDuration,
+      ease: "power2.inOut",
+      onComplete: () => {
+        this.animating = false;
+      },
+      onStart: () => {
+        this.animating = true;
+      },
+      callbackScope: this
+    };
+    this.transitionTl = gsapWithCSS.timeline(this.defaultTimelineVars);
+    this.setupSubscriptions();
+    logger.info("HeroObservation initialized");
+  }
+  /**
+   * @description Get the singleton instance of the HeroObservation class.
+   * @returns {HeroObservation}
+   */
+  static getInstance() {
+    var _a2;
+    return (_a2 = _HeroObservation.instance) != null ? _a2 : _HeroObservation.instance = new _HeroObservation();
+  }
+  // Sets up RxJs subscriptions to monitor the atHome state
+  setupSubscriptions() {
+    const atHome$ = this.store.state$.pipe(map((state) => state.atHome), filter((atHome) => atHome), distinctUntilChanged());
+    this.subscriptions.add(atHome$.subscribe(() => {
+      this.onLoad();
+    }));
+  }
+  // A delayed initialization function that sets up the observers
+  // and the animations for the Hero feature -- when the user is at home
+  onLoad() {
+    this.transitionTl.pause();
+    gsapWithCSS.set(this.footer, { autoAlpha: 0 });
+    gsapWithCSS.set(this.header, { autoAlpha: 0 });
+    this.subscriptions.add(navigationEvents$.pipe(filter((url2) => !isHome(url2))).subscribe(() => {
+      gsapWithCSS.set(this.footer, { autoAlpha: 1 });
+      gsapWithCSS.set(this.header, { autoAlpha: 1 });
+    }));
+    const outerWrappers = gsapWithCSS.utils.toArray(".outer");
+    const innerWrappers = gsapWithCSS.utils.toArray(".inner");
+    requestAnimationFrame(() => {
+      document.body.style.overflow = "hidden";
+      gsapWithCSS.set(this.sections.map((section) => section.element), { autoAlpha: 0 });
+      gsapWithCSS.set(outerWrappers, { yPercent: 100 });
+      gsapWithCSS.set(innerWrappers, { yPercent: -100 });
+    });
+    const { hash } = window.location;
+    const target = document.getElementById(hash.substring(1));
+    if (!this.initialized) {
+      this.setupSections();
+      this.wrapper = gsapWithCSS.utils.wrap([...Array(this.sectionCount).keys()]);
+      this.setupObserver();
+      this.setupFirstSection(!target);
+    } else {
+      if (target) {
+        const sectionTarget = this.sections.find((section) => section.content.includes(target));
+        if (sectionTarget) {
+          const index = this.sections.indexOf(sectionTarget);
+          this.goToSection(index, index === this.sectionIndexLength ? -1 /* UP */ : 1 /* DOWN */);
+        }
+      }
+      this.initialized = true;
+    }
+  }
+  /**
+   * @description Set up the first load of the Hero feature.
+   * Filters out the emphasis targets and fades in the content.
+   * Emphasis animations are handled in videoManager.ts.
+   */
+  setupFirstSection(startImmediately = false) {
+    const firstSection = this.sections[0];
+    this.registerAnimation(this.blockbusterManager.timeline, firstSection.element);
+    if (startImmediately) {
+      this.currentIndex = 0;
+      this.goToSection(0, 1 /* DOWN */);
+    }
+  }
+  /**
+   * @param animation - The animation to register (gsap.core.Timeline)
+   * @param key - The section element to register the animation with
+   * @description Register an animation with a section element.
+   */
+  registerAnimation(animation, key) {
+    const section = this.sections.find((section2) => section2.element === key);
+    if (section) {
+      section.animation = section.animation ? section.animation.add(animation) : animation;
+    }
+  }
+  /**
+   * @description Set up the Section objects for the Hero feature.
+   */
+  setupSections() {
+    const sectionEls = gsapWithCSS.utils.toArray("section.hero");
+    this.sections = sectionEls.map((el, index) => {
+      const outerWrapper = el.querySelector(".outer");
+      const innerWrapper = el.querySelector(".inner");
+      const bg = el.querySelector(".hero__bg");
+      const initialContent = getContentElements(el).filter((element) => element !== outerWrapper && element !== innerWrapper && element !== bg);
+      const content = Array.from(new Set(initialContent));
+      logger.info("Setting up section ".concat(index), { outerWrapper, innerWrapper, bg, content });
+      return {
+        index,
+        element: el,
+        outerWrapper,
+        innerWrapper,
+        bg,
+        content,
+        animation: gsapWithCSS.timeline({
+          paused: index !== 0,
+          // Only play first section
+          callbackScope: this
+        }).addLabel("start")
+      };
+    });
+    logger.info("Sections set up:", {
+      count: this.sections.length,
+      sections: this.sections.map((section) => ({
+        index: section.index,
+        elementId: section.element.id,
+        contentCount: section.content.length,
+        contentElements: section.content.map((el) => ({
+          tagName: el.tagName,
+          className: el.className,
+          id: el.id
+        }))
+      }))
+    });
+    const ignores = gsapWithCSS.utils.toArray(this.config.fades.fadeInIgnore);
+    this.sections[0].content = this.sections[0].content.filter((content) => !ignores.includes(content) && this.isValidContentTarget(content));
+    this.sectionCount = this.sections.length;
+    this.sectionIndexLength = this.sectionCount - 1;
+  }
+  /**
+   * @description Transition to the next section based on the direction and whether the scenicRoute is enabled.
+   * @param direction
+   * @param scenicRoute
+   * @returns
+   */
+  async transition(direction, scenicRoute) {
+    let index = this.getNextIndex(direction);
+    if (direction === -1 /* UP */ && this.currentIndex === 0 || direction === 1 /* DOWN */ && this.currentIndex === this.sectionIndexLength) {
+      return;
+    }
+    if (!this.animating && !scenicRoute) {
+      this.goToSection(index, direction);
+    } else if (!this.animating && scenicRoute && direction === 1 /* DOWN */) {
+      this.goToSection(index, direction);
+      let remainingSections = this.sectionIndexLength - index;
+      while (remainingSections > 0) {
+        await new Promise((resolve3) => setTimeout(resolve3, 5e3));
+        if (this.currentIndex !== this.sectionIndexLength && this.currentIndex === index) {
+          this.goToSection(index + 1 /* DOWN */, direction);
+          index++;
+          remainingSections--;
+        } else {
+          break;
+        }
+      }
+    }
+    return;
+  }
+  // Get the next index based on the direction
+  getNextIndex(direction) {
+    const nextIndex = this.wrapper(this.currentIndex + direction);
+    if (nextIndex < 0) {
+      return 0;
+    }
+    if (nextIndex >= this.sectionCount) {
+      return this.sectionCount - 1;
+    }
+    return nextIndex;
+  }
+  // Construct the transition timeline based on the direction and index
+  // Uses registered effects from observerEffects.ts
+  constructTransitionTimeline(direction, index, tl) {
+    const section = this.sections[index];
+    logger.info("Timeline state: currentIndex=".concat(this.currentIndex, ", targetIndex=").concat(index, ", direction=").concat(direction, ", sectionsCount=").concat(this.sectionCount));
+    if (this.currentIndex >= 0) {
+      logger.info("Setting section ".concat(this.currentIndex, " to section ").concat(index));
+      tl.setSection({ direction, section });
+    }
+    logger.info("Animating section ".concat(index, " in direction ").concat(direction));
+    tl.transitionSection({ direction, section });
+    if (section.animation && section.animation.totalDuration() > 0) {
+      tl.add(section.animation, ">");
+    }
+    logger.info("Transition for section ".concat(index, " is set and will trigger now"));
+    return tl;
+  }
+  // Go to the next section based on the index and direction
+  goToSection(index, direction) {
+    if (this.animating || index === this.currentIndex) {
+      return;
+    }
+    if (index < 0 || index >= this.sectionCount) {
+      logger.warn("Invalid section index: ".concat(index));
+      return;
+    }
+    logger.info("Going to section ".concat(index, " in direction ").concat(direction));
+    this.currentIndex = index;
+    let tl = gsapWithCSS.timeline({
+      defaults: {
+        duration: this.config.slides.slideDuration,
+        ease: "power2.inOut",
+        onComplete: () => {
+          this.animating = false;
+          logger.info("Completed transition to section ".concat(this.currentIndex));
+        },
+        onStart: () => {
+          this.animating = true;
+        },
+        callbackScope: this
+      }
+    });
+    tl = this.constructTransitionTimeline(direction, index, tl);
+    this.transitionTl = tl;
+    if (!this.transitionTl.isActive()) {
+      this.transitionTl.play();
+    }
+  }
+  /**
+   * @description Checks if an element is a valid content target for animations.
+   * Ensures the element exists, is a valid element, has a parent, belongs to a section,
+   * and is not one of the excluded section elements (bg, wrappers, etc.).
+   * @param el - The element to check.
+   * @returns True if the element is a valid content target, false otherwise.
+   */
+  isValidContentTarget(el) {
+    if (!el || !(el instanceof Element) || !el.parentElement) {
+      return false;
+    }
+    const section = this.sections.find((section2) => section2.content.includes(el));
+    if (!section) {
+      return false;
+    }
+    return el !== section.bg && el !== section.outerWrapper && el !== section.innerWrapper && el !== section.element && isValidElement(el, section.element);
+  }
+  /**
+   * @description Set up the Observers for the Hero feature. The Observers are created only when the user is at home. There are two Observers:
+   * 1. The transitionObserver is the main Observer that handles all
+   * perceived up/down interactions to trigger transitions between sections.
+   * 2. The clickObserver handles the click-driven "guided tour" of the sections.
+   */
+  setupObserver() {
+    const clickTargets = gsapWithCSS.utils.toArray(document.querySelectorAll(this.config.clickTargets));
+    const ignoreTargets = gsapWithCSS.utils.toArray(document.querySelectorAll(this.config.ignoreTargets));
+    this.transitionObserver = Observer.create({
+      type: "wheel,touch,pointer,scroll",
+      wheelSpeed: -1,
+      onDown: () => {
+        this.transition(1 /* DOWN */, false);
+      },
+      onUp: () => {
+        this.transition(-1 /* UP */, false);
+      },
+      preventDefault: true,
+      tolerance: 15,
+      ignore: clickTargets
+    });
+    this.transitionObserver.enable();
+    this.clickObserver = Observer.create({
+      type: "click",
+      target: clickTargets,
+      ignore: ignoreTargets,
+      onClick: () => {
+        this.transition(1 /* DOWN */, true);
+      },
+      onRelease: () => {
+        this.transition(1 /* DOWN */, true);
+      },
+      preventDefault: true
+    });
+    this.clickObserver.enable();
+  }
+  // Destroy the Observers and subscriptions
+  destroy() {
+    if (this.transitionObserver) {
+      this.transitionObserver.disable();
+    }
+    if (this.clickObserver) {
+      this.clickObserver.disable();
+    }
+    this.subscriptions.unsubscribe();
+  }
+};
+
+// src/assets/javascripts/features/hero/video/data.ts
+var breakFreeAv11280 = new URL("assets/videos/hero/break_free/break_free_av1_1280.MHR3ZGJM.webm", window.location.origin);
+var breakFreeAv11920 = new URL("assets/videos/hero/break_free/break_free_av1_1920.ZBJ6I55Y.webm", window.location.origin);
+var breakFreeAv12560 = new URL("assets/videos/hero/break_free/break_free_av1_2560.HXMDT5GO.webm", window.location.origin);
+var breakFreeAv13840 = new URL("assets/videos/hero/break_free/break_free_av1_3840.5V2V4VJR.webm", window.location.origin);
+var breakFreeAv1426 = new URL("assets/videos/hero/break_free/break_free_av1_426.XMIUTUPS.webm", window.location.origin);
+var breakFreeAv1640 = new URL("assets/videos/hero/break_free/break_free_av1_640.W4QED7UF.webm", window.location.origin);
+var breakFreeAv1854 = new URL("assets/videos/hero/break_free/break_free_av1_854.HN3WTVPV.webm", window.location.origin);
+var breakFreeH2641280 = new URL("assets/videos/hero/break_free/break_free_h264_1280.P7H5AFXW.mp4", window.location.origin);
+var breakFreeH2641920 = new URL("assets/videos/hero/break_free/break_free_h264_1920.VD3OTIVQ.mp4", window.location.origin);
+var breakFreeH2642560 = new URL("assets/videos/hero/break_free/break_free_h264_2560.SBX24NRJ.mp4", window.location.origin);
+var breakFreeH2643840 = new URL("assets/videos/hero/break_free/break_free_h264_3840.L6D346UN.mp4", window.location.origin);
+var breakFreeH264426 = new URL("assets/videos/hero/break_free/break_free_h264_426.N7UKN7DL.mp4", window.location.origin);
+var breakFreeH264640 = new URL("assets/videos/hero/break_free/break_free_h264_640.VS54S5EL.mp4", window.location.origin);
+var breakFreeH264854 = new URL("assets/videos/hero/break_free/break_free_h264_854.AKGTMYW6.mp4", window.location.origin);
+var breakFreeVp91280 = new URL("assets/videos/hero/break_free/break_free_vp9_1280.BI7P3W4T.webm", window.location.origin);
+var breakFreeVp91920 = new URL("assets/videos/hero/break_free/break_free_vp9_1920.UQIEAJZ4.webm", window.location.origin);
+var breakFreeVp92560 = new URL("assets/videos/hero/break_free/break_free_vp9_2560.FOFH4KAS.webm", window.location.origin);
+var breakFreeVp93840 = new URL("assets/videos/hero/break_free/break_free_vp9_3840.VKNFLIWB.webm", window.location.origin);
+var breakFreeVp9426 = new URL("assets/videos/hero/break_free/break_free_vp9_426.CWEZUEQQ.webm", window.location.origin);
+var breakFreeVp9640 = new URL("assets/videos/hero/break_free/break_free_vp9_640.X5H75VBM.webm", window.location.origin);
+var breakFreeVp9854 = new URL("assets/videos/hero/break_free/break_free_vp9_854.L7KXRADV.webm", window.location.origin);
+var breakFreeAvif1280 = new URL("assets/videos/hero/break_free/posters/break_free_1280.WQ46YIY6.avif", window.location.origin);
+var breakFreePng1280 = new URL("assets/videos/hero/break_free/posters/break_free_1280.V35JZ763.png", window.location.origin);
+var breakFreeWebp1280 = new URL("assets/videos/hero/break_free/posters/break_free_1280.DWFB27YG.webp", window.location.origin);
+var breakFreeAvif1920 = new URL("assets/videos/hero/break_free/posters/break_free_1920.FZMHEY63.avif", window.location.origin);
+var breakFreePng1920 = new URL("assets/videos/hero/break_free/posters/break_free_1920.WBZ3NBFU.png", window.location.origin);
+var breakFreeWebp1920 = new URL("assets/videos/hero/break_free/posters/break_free_1920.3GCUVDAP.webp", window.location.origin);
+var breakFreeAvif2560 = new URL("assets/videos/hero/break_free/posters/break_free_2560.LPKYWG2I.avif", window.location.origin);
+var breakFreePng2560 = new URL("assets/videos/hero/break_free/posters/break_free_2560.3L44PPVD.png", window.location.origin);
+var breakFreeWebp2560 = new URL("assets/videos/hero/break_free/posters/break_free_2560.JM4UI52R.webp", window.location.origin);
+var breakFreeAvif3840 = new URL("assets/videos/hero/break_free/posters/break_free_3840.PEEQKWAO.avif", window.location.origin);
+var breakFreePng3840 = new URL("assets/videos/hero/break_free/posters/break_free_3840.IHJWGFLI.png", window.location.origin);
+var breakFreeWebp3840 = new URL("assets/videos/hero/break_free/posters/break_free_3840.VNNHBF4O.webp", window.location.origin);
+var breakFreeAvif426 = new URL("assets/videos/hero/break_free/posters/break_free_426.A3KD2OWB.avif", window.location.origin);
+var breakFreePng426 = new URL("assets/videos/hero/break_free/posters/break_free_426.GHKJUUS4.png", window.location.origin);
+var breakFreeWebp426 = new URL("assets/videos/hero/break_free/posters/break_free_426.SJ76L2AA.webp", window.location.origin);
+var breakFreeAvif640 = new URL("assets/videos/hero/break_free/posters/break_free_640.BZMJNMOS.avif", window.location.origin);
+var breakFreePng640 = new URL("assets/videos/hero/break_free/posters/break_free_640.7RM4H6NV.png", window.location.origin);
+var breakFreeWebp640 = new URL("assets/videos/hero/break_free/posters/break_free_640.6W5EO4MO.webp", window.location.origin);
+var breakFreeAvif854 = new URL("assets/videos/hero/break_free/posters/break_free_854.T7N3S3Q2.avif", window.location.origin);
+var breakFreePng854 = new URL("assets/videos/hero/break_free/posters/break_free_854.44NAZCIU.png", window.location.origin);
+var breakFreeWebp854 = new URL("assets/videos/hero/break_free/posters/break_free_854.SBEKVABD.webp", window.location.origin);
+var tokyoShuffleAvif1280 = new URL("assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_1280.ZLQHM4VG.avif", window.location.origin);
+var tokyoShufflePng1280 = new URL("assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_1280.OYFSUR65.png", window.location.origin);
+var tokyoShuffleWebp1280 = new URL("assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_1280.EEEVR5AA.webp", window.location.origin);
+var tokyoShuffleAvif1920 = new URL("assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_1920.AGNLWXP5.avif", window.location.origin);
+var tokyoShufflePng1920 = new URL("assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_1920.C5GVT334.png", window.location.origin);
+var tokyoShuffleWebp1920 = new URL("assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_1920.A6XB2PAB.webp", window.location.origin);
+var tokyoShuffleAvif2560 = new URL("assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_2560.BOHJXWWH.avif", window.location.origin);
+var tokyoShufflePng2560 = new URL("assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_2560.B7WTBGPV.png", window.location.origin);
+var tokyoShuffleWebp2560 = new URL("assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_2560.K223UIDG.webp", window.location.origin);
+var tokyoShuffleAvif3840 = new URL("assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_3840.6YTTSAWO.avif", window.location.origin);
+var tokyoShufflePng3840 = new URL("assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_3840.KWJHCM5F.png", window.location.origin);
+var tokyoShuffleWebp3840 = new URL("assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_3840.WPHZ3N2S.webp", window.location.origin);
+var tokyoShuffleAvif426 = new URL("assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_426.JEFZFOJK.avif", window.location.origin);
+var tokyoShufflePng426 = new URL("assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_426.36AKL4KN.png", window.location.origin);
+var tokyoShuffleWebp426 = new URL("assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_426.VQWFGCSR.webp", window.location.origin);
+var tokyoShuffleAvif640 = new URL("assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_640.KF7GISVX.avif", window.location.origin);
+var tokyoShufflePng640 = new URL("assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_640.Q7RF6Q5K.png", window.location.origin);
+var tokyoShuffleWebp640 = new URL("assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_640.3AQWY55B.webp", window.location.origin);
+var tokyoShuffleAvif854 = new URL("assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_854.R5Q7G7ZO.avif", window.location.origin);
+var tokyoShufflePng854 = new URL("assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_854.AHAG6T2U.png", window.location.origin);
+var tokyoShuffleWebp854 = new URL("assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_854.OH5ALQCN.webp", window.location.origin);
+var tokyoShuffleAv11280 = new URL("assets/videos/hero/tokyo_shuffle/tokyo_shuffle_av1_1280.LTL754GX.webm", window.location.origin);
+var tokyoShuffleAv11920 = new URL("assets/videos/hero/tokyo_shuffle/tokyo_shuffle_av1_1920.HCHG3L6F.webm", window.location.origin);
+var tokyoShuffleAv12560 = new URL("assets/videos/hero/tokyo_shuffle/tokyo_shuffle_av1_2560.VZLSLY3T.webm", window.location.origin);
+var tokyoShuffleAv13840 = new URL("assets/videos/hero/tokyo_shuffle/tokyo_shuffle_av1_3840.IRQNSZL3.webm", window.location.origin);
+var tokyoShuffleAv1426 = new URL("assets/videos/hero/tokyo_shuffle/tokyo_shuffle_av1_426.VLHMAUSF.webm", window.location.origin);
+var tokyoShuffleAv1640 = new URL("assets/videos/hero/tokyo_shuffle/tokyo_shuffle_av1_640.UJYTIEMI.webm", window.location.origin);
+var tokyoShuffleAv1854 = new URL("assets/videos/hero/tokyo_shuffle/tokyo_shuffle_av1_854.T4JUCEGM.webm", window.location.origin);
+var tokyoShuffleH2641280 = new URL("assets/videos/hero/tokyo_shuffle/tokyo_shuffle_h264_1280.T7YZV75R.mp4", window.location.origin);
+var tokyoShuffleH2641920 = new URL("assets/videos/hero/tokyo_shuffle/tokyo_shuffle_h264_1920.IYJ32LIS.mp4", window.location.origin);
+var tokyoShuffleH2642560 = new URL("assets/videos/hero/tokyo_shuffle/tokyo_shuffle_h264_2560.EWUECAZU.mp4", window.location.origin);
+var tokyoShuffleH2643840 = new URL("assets/videos/hero/tokyo_shuffle/tokyo_shuffle_h264_3840.7IMTXTLT.mp4", window.location.origin);
+var tokyoShuffleH264426 = new URL("assets/videos/hero/tokyo_shuffle/tokyo_shuffle_h264_426.L7AX42QP.mp4", window.location.origin);
+var tokyoShuffleH264640 = new URL("assets/videos/hero/tokyo_shuffle/tokyo_shuffle_h264_640.VLIHCIGJ.mp4", window.location.origin);
+var tokyoShuffleH264854 = new URL("assets/videos/hero/tokyo_shuffle/tokyo_shuffle_h264_854.4V5TCTNN.mp4", window.location.origin);
+var tokyoShuffleVp91280 = new URL("assets/videos/hero/tokyo_shuffle/tokyo_shuffle_vp9_1280.OZ63FAA6.webm", window.location.origin);
+var tokyoShuffleVp91920 = new URL("assets/videos/hero/tokyo_shuffle/tokyo_shuffle_vp9_1920.BL4HBHVE.webm", window.location.origin);
+var tokyoShuffleVp92560 = new URL("assets/videos/hero/tokyo_shuffle/tokyo_shuffle_vp9_2560.HQFL3XZA.webm", window.location.origin);
+var tokyoShuffleVp93840 = new URL("assets/videos/hero/tokyo_shuffle/tokyo_shuffle_vp9_3840.AMTWROJH.webm", window.location.origin);
+var tokyoShuffleVp9426 = new URL("assets/videos/hero/tokyo_shuffle/tokyo_shuffle_vp9_426.MROBMCDW.webm", window.location.origin);
+var tokyoShuffleVp9640 = new URL("assets/videos/hero/tokyo_shuffle/tokyo_shuffle_vp9_640.YMSOWHCY.webm", window.location.origin);
+var tokyoShuffleVp9854 = new URL("assets/videos/hero/tokyo_shuffle/tokyo_shuffle_vp9_854.MXKV5CQO.webm", window.location.origin);
+var rawHeroVideos = [
+  {
+    variants: {
+      av1: {
+        3840: tokyoShuffleAv13840,
+        2560: tokyoShuffleAv12560,
+        1920: tokyoShuffleAv11920,
+        1280: tokyoShuffleAv11280,
+        854: tokyoShuffleAv1854,
+        640: tokyoShuffleAv1640,
+        426: tokyoShuffleAv1426
+      },
+      vp9: {
+        3840: tokyoShuffleVp93840,
+        2560: tokyoShuffleVp92560,
+        1920: tokyoShuffleVp91920,
+        1280: tokyoShuffleVp91280,
+        854: tokyoShuffleVp9854,
+        640: tokyoShuffleVp9640,
+        426: tokyoShuffleVp9426
+      },
+      h264: {
+        3840: tokyoShuffleH2643840,
+        2560: tokyoShuffleH2642560,
+        1920: tokyoShuffleH2641920,
+        1280: tokyoShuffleH2641280,
+        854: tokyoShuffleH264854,
+        640: tokyoShuffleH264640,
+        426: tokyoShuffleH264426
+      }
+    },
+    poster: {
+      avif: {
+        widths: {
+          3840: tokyoShuffleAvif3840,
+          2560: tokyoShuffleAvif2560,
+          1920: tokyoShuffleAvif1920,
+          1280: tokyoShuffleAvif1280,
+          854: tokyoShuffleAvif854,
+          640: tokyoShuffleAvif640,
+          426: tokyoShuffleAvif426
+        },
+        srcset: "".concat(tokyoShuffleAvif3840, " 3840w, ").concat(tokyoShuffleAvif2560, " 2560w, ").concat(tokyoShuffleAvif1920, " 1920w, ").concat(tokyoShuffleAvif1280, " 1280w, ").concat(tokyoShuffleAvif854, " 854w, ").concat(tokyoShuffleAvif640, " 640w, ").concat(tokyoShuffleAvif426, " 426w")
+      },
+      webp: {
+        widths: {
+          3840: tokyoShuffleWebp3840,
+          2560: tokyoShuffleWebp2560,
+          1920: tokyoShuffleWebp1920,
+          1280: tokyoShuffleWebp1280,
+          854: tokyoShuffleWebp854,
+          640: tokyoShuffleWebp640,
+          426: tokyoShuffleWebp426
+        },
+        srcset: "".concat(tokyoShuffleWebp3840, " 3840w, ").concat(tokyoShuffleWebp2560, " 2560w, ").concat(tokyoShuffleWebp1920, " 1920w, ").concat(tokyoShuffleWebp1280, " 1280w, ").concat(tokyoShuffleWebp854, " 854w, ").concat(tokyoShuffleWebp640, " 640w, ").concat(tokyoShuffleWebp426, " 426w")
+      },
+      png: {
+        widths: {
+          3840: tokyoShufflePng3840,
+          2560: tokyoShufflePng2560,
+          1920: tokyoShufflePng1920,
+          1280: tokyoShufflePng1280,
+          854: tokyoShufflePng854,
+          640: tokyoShufflePng640,
+          426: tokyoShufflePng426
+        },
+        srcset: "".concat(tokyoShufflePng3840, " 3840w, ").concat(tokyoShufflePng2560, " 2560w, ").concat(tokyoShufflePng1920, " 1920w, ").concat(tokyoShufflePng1280, " 1280w, ").concat(tokyoShufflePng854, " 854w, ").concat(tokyoShufflePng640, " 640w, ").concat(tokyoShufflePng426, " 426w")
+      }
+    },
+    parentPath: "~assets/videos/hero/tokyo_shuffle",
+    baseName: "tokyo_shuffle" /* TokyoShuffle */
+  },
+  {
+    variants: {
+      av1: {
+        3840: breakFreeAv13840,
+        2560: breakFreeAv12560,
+        1920: breakFreeAv11920,
+        1280: breakFreeAv11280,
+        854: breakFreeAv1854,
+        640: breakFreeAv1640,
+        426: breakFreeAv1426
+      },
+      vp9: {
+        3840: breakFreeVp93840,
+        2560: breakFreeVp92560,
+        1920: breakFreeVp91920,
+        1280: breakFreeVp91280,
+        854: breakFreeVp9854,
+        640: breakFreeVp9640,
+        426: breakFreeVp9426
+      },
+      h264: {
+        3840: breakFreeH2643840,
+        2560: breakFreeH2642560,
+        1920: breakFreeH2641920,
+        1280: breakFreeH2641280,
+        854: breakFreeH264854,
+        640: breakFreeH264640,
+        426: breakFreeH264426
+      }
+    },
+    poster: {
+      avif: {
+        widths: {
+          3840: breakFreeAvif3840,
+          2560: breakFreeAvif2560,
+          1920: breakFreeAvif1920,
+          1280: breakFreeAvif1280,
+          854: breakFreeAvif854,
+          640: breakFreeAvif640,
+          426: breakFreeAvif426
+        },
+        srcset: "".concat(breakFreeAvif3840, " 3840w, ").concat(breakFreeAvif2560, " 2560w, ").concat(breakFreeAvif1920, " 1920w, ").concat(breakFreeAvif1280, " 1280w, ").concat(breakFreeAvif854, " 854w, ").concat(breakFreeAvif640, " 640w, ").concat(breakFreeAvif426, " 426w")
+      },
+      webp: {
+        widths: {
+          3840: breakFreeWebp3840,
+          2560: breakFreeWebp2560,
+          1920: breakFreeWebp1920,
+          1280: breakFreeWebp1280,
+          854: breakFreeWebp854,
+          640: breakFreeWebp640,
+          426: breakFreeWebp426
+        },
+        srcset: "".concat(breakFreeWebp3840, " 3840w, ").concat(breakFreeWebp2560, " 2560w, ").concat(breakFreeWebp1920, " 1920w, ").concat(breakFreeWebp1280, " 1280w, ").concat(breakFreeWebp854, " 854w, ").concat(breakFreeWebp640, " 640w, ").concat(breakFreeWebp426, " 426w")
+      },
+      png: {
+        widths: {
+          3840: breakFreePng3840,
+          2560: breakFreePng2560,
+          1920: breakFreePng1920,
+          1280: breakFreePng1280,
+          854: breakFreePng854,
+          640: breakFreePng640,
+          426: breakFreePng426
+        },
+        srcset: "".concat(breakFreePng3840, " 3840w, ").concat(breakFreePng2560, " 2560w, ").concat(breakFreePng1920, " 1920w, ").concat(breakFreePng1280, " 1280w, ").concat(breakFreePng854, " 854w, ").concat(breakFreePng640, " 640w, ").concat(breakFreePng426, " 426w")
+      }
+    },
+    parentPath: "assets/videos/hero/break_free",
+    baseName: "break_free" /* BreakFree */
+  }
+];
+
+// src/assets/javascripts/features/hero/video/utils.ts
+function getHeroVideos() {
+  return rawHeroVideos;
+}
+var getAv1MediaType = (width) => {
+  const seqlevelMap = {
+    426: "16",
+    640: "16",
+    854: "16",
+    1280: "16",
+    1920: "16",
+    2560: "16",
+    3840: "16"
+  };
+  const seqlevel = seqlevelMap[width];
+  return "video/webm;codecs=av01.0.".concat(seqlevel, "M.10.0.110.01.01.01.0");
+};
+var getH264MediaType = (width) => {
+  const baseString = "avc1.6E00";
+  const levelMap = {
+    426: "16",
+    640: "1F",
+    854: "28",
+    1280: "32",
+    1920: "33",
+    2560: "3C",
+    3840: "3C"
+  };
+  const level = levelMap[width];
+  return "video/mp4;codecs=".concat(baseString).concat(level);
+};
+var getVp9MediaType = (width) => {
+  const levelMap = {
+    486: 20,
+    640: 21,
+    854: 30,
+    1280: 31,
+    1920: 40,
+    2560: 50,
+    3840: 51
+  };
+  const level = levelMap[width];
+  return "video/webm;codecs=vp09.02.".concat(level, ".10.00.01.01.01.01");
+};
+function get_media_type(type, width) {
+  switch (type) {
+    case "av1":
+      return getAv1MediaType(width);
+    case "vp9":
+      return getVp9MediaType(width);
+    case "h264":
+      return getH264MediaType(width);
+  }
+}
+function srcToAttributes(src) {
+  const splitName = (s) => s.split("_");
+  const { name } = parsePath(src);
+  const width = parseInt(splitName(name).slice(-1)[0].split(".")[0], 10);
+  const codec = splitName(name).slice(-2)[0];
+  return [codec, width];
+}
+
+// src/assets/javascripts/features/hero/video/videoElement.ts
+var VideoElement = class {
+  constructor(heroVideo, properties) {
+    this.video = document.createElement("video");
+    this.disablePictureInPicture = "true";
+    this.playsinline = "true";
+    this.preload = "metadata";
+    this.muted = "true";
+    this.loop = "true";
+    this.autoplay = "true";
+    this.picture = document.createElement("picture");
+    this.properties = {};
+    this.message = "";
+    this.video.classList.add("hero__video");
+    this.heroVideo = heroVideo;
+    this.poster = heroVideo.poster;
+    this.message = heroVideo.message || "";
+    let props = properties ? Object.fromEntries(Object.entries(properties).map(([key, value]) => [
+      key,
+      value === "true" || value === "false" ? value : this[key] || "true"
+    ])) : {};
+    this.assignProperties(props);
+    this.video = this.constructVideoElement();
+    this.sources = this.constructSources();
+    this.video.append(...this.sources);
+    this.picture = this.constructPictureElement();
+  }
+  // assign properties to the video element
+  assignProperties(properties) {
+    const { disablePictureInPicture, playsinline, preload, muted, loop, autoplay } = this;
+    return {
+      disablePictureInPicture,
+      playsinline,
+      preload,
+      muted,
+      loop,
+      autoplay,
+      ...properties
+    };
+  }
+  // construct the video element
+  constructVideoElement() {
+    const { video } = this;
+    for (const prop of Object.keys(this.properties)) {
+      const key = typeof prop === "string" ? prop : "".concat(prop);
+      try {
+        video.setAttribute(prop, this.properties[key]);
+      } catch (e) {
+        logger.error("Error setting property ".concat(key, " on video element: ").concat(e));
+      }
+    }
+    return video;
+  }
+  // make the source elements for the video element
+  constructSources() {
+    const { heroVideo } = this;
+    let srcs = [];
+    const widths = Object.keys(MAX_WIDTHS);
+    for (const [_, variant] of Object.entries(heroVideo.variants)) {
+      for (const codec of Object.keys(variant)) {
+        if (codec === "av1" || codec === "vp9" || codec === "h264") {
+          const codecKey = codec;
+          for (const width of widths) {
+            const w = parseInt(width, 10);
+            const src = document.createElement("source");
+            const codecVariant = variant[codecKey];
+            if (typeof codecVariant === "string") {
+              src.src = codecVariant;
+            } else {
+              src.src = codecVariant[w];
+            }
+            src.type = get_media_type(codec, w);
+            src.media = w !== 3840 ? "(max-width: ".concat(MAX_WIDTHS[w], "px)") : "";
+            srcs.push(src);
+          }
+        }
+      }
+    }
+    return srcs.sort((a, b) => {
+      const [aCodec, aWidth] = srcToAttributes(a.src);
+      const [bCodec, bWidth] = srcToAttributes(b.src);
+      if (aWidth === bWidth) {
+        switch (aCodec) {
+          case "av1":
+            return -1;
+          case "vp9":
+            return bCodec === "av1" ? 1 : -1;
+          case "h264":
+            return 1;
+          // h264 should always be last if widths are equal
+          default:
+            throw new Error("Unknown codec: ".concat(aCodec));
+        }
+      } else {
+        return aWidth - bWidth;
+      }
+    });
+  }
+  // get the sizes attribute for the poster image
+  getSizes() {
+    const { heroVideo } = this;
+    const { poster } = heroVideo;
+    const { png } = poster;
+    const { widths } = png;
+    let sizes = "";
+    for (const width of Object.keys(widths)) {
+      const w = parseInt(width, 10);
+      if (width in MAX_WIDTHS) {
+        sizes += w !== 3840 ? "(max-width: ".concat(MAX_WIDTHS[width], "px) ").concat(width, "px, ") : "".concat(width, "px");
+      }
+    }
+    return sizes.trim().replace(/,$/, "");
+  }
+  // construct the picture element
+  constructPictureElement() {
+    const { picture, poster } = this;
+    let srcs = [];
+    for (const type of Object.keys(poster)) {
+      if (type === "webp" || type === "avif") {
+        const { srcset } = poster[type];
+        const source = document.createElement("source");
+        source.srcset = srcset;
+        source.type = "image/".concat(type);
+        srcs.push(source);
+      }
+    }
+    srcs = srcs.sort((a, b) => {
+      const aType = a.type.split("/")[1];
+      const bType = b.type.split("/")[1];
+      if (aType === bType) {
+        return 0;
+      } else {
+        if (aType === "avif") {
+          return -1;
+        }
+        return 1;
+      }
+    });
+    picture.append(...srcs);
+    const img = document.createElement("img");
+    img.src = poster.png.widths[1280];
+    img.srcset = poster.png.srcset;
+    img.alt = "";
+    img.sizes = this.getSizes();
+    picture.classList.add("hero__poster");
+    picture.append(img);
+    return picture;
+  }
+  getElements() {
+    return this.video;
+  }
+};
+
+// src/assets/javascripts/features/hero/video/videoManager.ts
+var customWindow3 = window;
+var { document$: document$2 } = customWindow3;
+var VideoManager = class _VideoManager {
+  constructor() {
+    this.store = HeroStore.getInstance();
+    this.container = document.querySelector(".hero__container") || document.createElement("div");
+    this.ctaContainer = document.querySelector(".cta__container") || document.createElement("div");
+    this.ctaText = gsapWithCSS.utils.toArray("h1, h2");
+    this.timeline = gsapWithCSS.timeline();
+    this.subscriptions = new Subscription();
+    this.has_played = false;
+    this.status = "not_initialized";
+    this.canPlay = false;
+    this.videoDuration = 0;
+    this.titleStart = 0;
+    this.message = "";
+    this.store = HeroStore.getInstance();
+    this.videoStore = getHeroVideos();
+    this.initVideo();
+    this.constructTimeline();
+    this.init_subscriptions();
+  }
+  /**
+   * @method init_subscriptions
+   * @private
+   * @description Initializes the subscriptions for the VideoManager
+   */
+  init_subscriptions() {
+    const { videoState$ } = this.store;
+    const video$ = videoState$.pipe(distinctUntilKeyChanged("canPlay"), map(({ canPlay }) => canPlay), tap((canPlay) => {
+      if (canPlay) {
+        this.handleCanPlay();
+      } else {
+        this.handleStopPlay();
+      }
+    }));
+    const motionSub$ = this.store.state$.pipe(distinctUntilKeyChanged("prefersReducedMotion"), filter(({ prefersReducedMotion }) => prefersReducedMotion));
+    const stallHandler$ = combineLatest([
+      videoState$.pipe(filter((state) => state.canPlay === true)),
+      merge(fromEvent(this.element, "stalled"), fromEvent(this.element, "waiting"))
+    ]).pipe(tap(() => {
+      this.pause();
+    }), switchMap(() => fromEvent(this.element, "canplay")), tap(() => {
+      this.resume();
+    }));
+    this.subscriptions.add(video$.subscribe());
+    this.subscriptions.add(motionSub$.subscribe(() => this.initiateFallback()));
+    this.subscriptions.add(stallHandler$.subscribe());
+  }
+  initVideo() {
+    this.backupPicture = document.querySelector(".hero__backup") || document.createElement("picture");
+    if (this.videoStore.length === 0) {
+      this.initiateFallback();
+      throw new Error("No videos found");
+    } else if (this.videoStore.length === 1) {
+      this.video = new VideoElement(this.videoStore[0]);
+    } else {
+      const randomized = gsapWithCSS.utils.shuffle(this.videoStore);
+      this.video = new VideoElement(randomized[0]);
+      this.element = this.video.video;
+      this.poster = this.video.picture;
+      this.message = this.video.message;
+    }
+  }
+  static getInstance() {
+    var _a2;
+    return (_a2 = this.instance) != null ? _a2 : this.instance = new _VideoManager();
+  }
+  handleCanPlay() {
+    this.canPlay = true;
+    switch (this.status) {
+      case "loading":
+      case "playing":
+        break;
+      case "paused":
+        this.timeline.resume();
+        break;
+      case "on_delay":
+        this.timeline.restart();
+        break;
+      case "loaded":
+        this.timeline.play();
+        break;
+      case "not_initialized":
+        this.status = "loading";
+        this.loadVideo();
+    }
+  }
+  handleStopPlay() {
+    this.canPlay = false;
+    this.pause();
+    if (this.has_played && this.videoStore.length > 1) {
+      this.reinit();
+      this.status = "loading";
+    }
+  }
+  // sets initial timeline properties
+  constructTimeline() {
+    this.timeline = gsapWithCSS.timeline({
+      defaults: { paused: true, callbackScope: this },
+      paused: true,
+      onStart: () => {
+        this.status = "playing";
+      },
+      onComplete: () => {
+        this.status = "on_delay";
+      },
+      onRepeat: () => {
+        this.has_played = true;
+      },
+      repeat: -1,
+      repeatDelay: 3,
+      callbackScope: this,
+      ease: "none"
+    });
+  }
+  setEmphasisAnimations() {
+    const { subtle, strong } = OBSERVER_CONFIG.emphasisTargets;
+    const subtleTargets = gsapWithCSS.utils.toArray(document.querySelectorAll(subtle));
+    const strongTargets = gsapWithCSS.utils.toArray(document.querySelectorAll(strong));
+    this.timeline.add(["subtleEmphasis", gsapWithCSS.timeline.emphasize(subtleTargets, SUBTLE_EMPHASIS_CONFIG), ">"], ">").add(["strongEmphasis", gsapWithCSS.timeline.emphasize(strongTargets, STRONG_EMPHASIS_CONFIG), ">"], ">=0.5");
+  }
+  loadVideo() {
+    if (!this.container.querySelector("picture")) {
+      this.loadPoster();
+    }
+    if (this.container.querySelector("video")) {
+      return;
+    }
+    document$2.subscribe(() => {
+      gsapWithCSS.set(this.element, { autoAlpha: 0 });
+      this.element.pause();
+      this.container.append(this.element);
+      this.element.load();
+      fromEvent(this.element, "loadedmetadata").subscribe(() => {
+        this.videoDuration = this.element.duration;
+        this.titleStart = this.videoDuration - 5;
+      });
+      fromEvent(this.element, "canplay").subscribe(() => {
+        this.status = "loaded";
+        gsapWithCSS.to(this.poster, { autoAlpha: 0, duration: 0.5 });
+        this.timeline.add(["fadeinVideo", gsapWithCSS.to(this.element, { autoAlpha: 1, duration: 0.5 })], 0);
+        this.timeline.add([
+          "startVideo",
+          () => {
+            this.element.play();
+          }
+        ], "<");
+        if (this.video.message) {
+          this.timeline.add(["fadeOutVideo", gsapWithCSS.to(this.element, { autoAlpha: 0, duration: 0.5 })], this.titleStart);
+          this.timeline.add([
+            "message",
+            gsapWithCSS.timeline.animateMessage(this.container, { message: this.message, repeat: 0 })
+          ], this.titleStart);
+          this.setEmphasisAnimations();
+          this.timeline.add([
+            "resetVideo",
+            () => {
+              this.stop();
+              this.play();
+            },
+            ">"
+          ]);
+        }
+      });
+    });
+  }
+  loadPoster() {
+    gsapWithCSS.set(this.poster, { autoAlpha: 0 });
+    this.container.append(this.poster);
+    const img = this.poster.querySelector("img");
+    const transition = () => gsapWithCSS.to(this.poster, { autoAlpha: 1, duration: 0.5 });
+    if (img && img instanceof HTMLImageElement) {
+      if (img.complete) {
+        transition();
+      } else {
+        fromEvent(img, "load").subscribe(transition);
+      }
+    } else {
+      this.loadBackup();
+    }
+  }
+  loadBackup() {
+    const backup = this.backupPicture || this.poster;
+    if (!Array.from(this.container.children).includes(backup)) {
+      requestAnimationFrame(() => {
+        this.container.append(backup);
+      });
+    }
+    gsapWithCSS.to(backup, { autoAlpha: 1, duration: 1 });
+  }
+  initiateFallback() {
+    if (this.container.querySelector("video")) {
+      gsapWithCSS.to(this.element, { autoAlpha: 0, duration: 0.5 });
+      this.container.removeChild(this.element);
+    }
+    this.status = "loaded";
+    if (!this.store.getStateValue("prefersReducedMotion")) {
+      this.loadBackup();
+    }
+    gsapWithCSS.set(this.ctaContainer, { autoAlpha: 1 });
+    gsapWithCSS.animateMessage(this.container, {
+      message: this.ctaText || this.message,
+      repeat: 0,
+      autoRemoveChildren: true
+    });
+    this.timeline.kill();
+    this.subscriptions.unsubscribe();
+  }
+  play() {
+    if (!this.timeline.isActive()) {
+      this.timeline.play();
+      this.element.play();
+    }
+  }
+  pause() {
+    if (this.timeline.isActive()) {
+      this.timeline.pause();
+      this.element.pause();
+    }
+  }
+  resume() {
+    if (this.timeline.paused()) {
+      this.timeline.resume();
+      this.element.play();
+    }
+  }
+  stop() {
+    if (this.timeline.isActive()) {
+      this.timeline.pause();
+      this.element.pause();
+      this.timeline.seek(0);
+      this.element.currentTime = 0;
+    } else {
+      this.timeline.seek(0);
+      this.element.currentTime = 0;
+    }
+  }
+  reinit() {
+    this.timeline.kill();
+    this.constructor();
+  }
+};
+
+// src/assets/javascripts/features/feedback/feedback.ts
+var feedback = () => {
+  var _a2;
+  const feedbackForm = (_a2 = document.forms) == null ? void 0 : _a2.namedItem("feedback");
+  if (feedbackForm && feedbackForm instanceof HTMLFormElement) {
+    return fromEvent(feedbackForm, "submit").pipe(filter(isValidEvent), map((ev) => {
+      return ev;
+    }), tap(() => preventDefault), throttleTime(3e3), tap((ev) => {
+      var _a3;
+      const page = document.location.pathname;
+      const data = (_a3 = ev.submitter) == null ? void 0 : _a3.getAttribute("data-md-value");
+      logger.info(page, data);
+      if (feedbackForm.firstElementChild && feedbackForm.firstElementChild instanceof HTMLButtonElement) {
+        feedbackForm.firstElementChild.disabled = true;
+      }
+      const note = feedbackForm.querySelector(".md-feedback__note [data-md-value='".concat(data, "']"));
+      if (note && note instanceof HTMLElement) {
+        note.hidden = false;
+      }
+    }));
+  } else {
+    return of(null);
+  }
+};
+
+// src/assets/javascripts/features/licenses/tabManager.ts
+var TabManager = class {
+  /**
+   * @description Initializes tab elements and sets up interactions
+   */
+  constructor() {
+    this.selectors = {
+      inputs: '.tabbed-set input[type="radio"]',
+      iconPrefix: "#icon-"
+    };
+    this.disclaimerTabSelectors = {
+      inputs: "#not-advice-warning-checkbox, #not-official-warning-checkbox",
+      labelAnchors: "#not-advice-warning-label, #not-official-warning-label"
+    };
+    this.subscription = new Subscription();
+    this.tabs = this.initializeTabs();
+    this.childTabs = this.initializeChildTabs();
+    this.init();
+  }
+  /**
+   * @returns {TabElement[]} Collection of initialized tab elements
+   * @description Initializes tab elements by querying the DOM for input, label, and icon elements
+   */
+  initializeTabs() {
+    const inputs = Array.from(document.querySelectorAll(this.selectors.inputs));
+    return inputs.map((input) => {
+      var _a2;
+      const { id } = input;
+      const label = document.querySelector('label[for="'.concat(id, '"]'));
+      const elements = {
+        input,
+        label,
+        labelAnchor: label.querySelector("a"),
+        iconAnchor: document.querySelector("".concat(this.selectors.iconPrefix).concat(id)),
+        iconSVG: (_a2 = document.querySelector("".concat(this.selectors.iconPrefix).concat(id))) == null ? void 0 : _a2.querySelector("svg"),
+        contentElement: document.querySelector("#".concat(id)),
+        tablistElement: document.querySelector(".tabbed-set")
+      };
+      return Object.values(elements).every((el) => el) ? elements : null;
+    }).filter((tab) => tab !== null);
+  }
+  initializeChildTabs() {
+    const inputs = Array.from(document.querySelectorAll(this.disclaimerTabSelectors.inputs));
+    const labels = Array.from(document.querySelectorAll(this.disclaimerTabSelectors.labelAnchors));
+    return inputs.map((input) => {
+      const { id } = input;
+      const idPrefix = id.split("-")[1];
+      const label = labels.find((label2) => label2.id.includes(idPrefix));
+      const elements = {
+        labelAnchor: label,
+        input
+      };
+      return Object.values(elements).every((el) => el) ? elements : null;
+    }).filter((tab) => tab !== null);
+  }
+  setAria() {
+    this.tabs.forEach((tab) => {
+      const { contentElement, input, labelAnchor, label, iconAnchor, iconSVG, tablistElement } = tab;
+      tablistElement.setAttribute("role", "tablist");
+      contentElement.setAttribute("role", "tabpanel");
+      contentElement.setAttribute("aria-labelledby", "".concat(label.id || labelAnchor.id, " ").concat(iconAnchor.id));
+      input.setAttribute("aria-hidden", "true");
+      labelAnchor.setAttribute("role", "tab");
+      labelAnchor.setAttribute("aria-selected", input.checked ? "true" : "false");
+      labelAnchor.setAttribute("aria-controls", contentElement.id);
+      labelAnchor.setAttribute("tabindex", labelAnchor.href === "#reader" ? "0" : "-1");
+      iconSVG.setAttribute("role", "button");
+      iconAnchor.setAttribute("role", "tab");
+      iconAnchor.setAttribute("aria-selected", input.checked ? "true" : "false");
+      iconAnchor.setAttribute("aria-controls", contentElement.id);
+    });
+  }
+  toggleAriaSelected(tabEls) {
+    const checkedState = tabEls.map((tab) => tab.input.checked);
+    const anchors = tabEls.map((tab) => {
+      if ("iconAnchor" in tab) {
+        return [tab.labelAnchor, tab.iconAnchor];
+      }
+      return [tab.labelAnchor];
+    });
+    checkedState.forEach((checked, index) => {
+      anchors[index].forEach((anchor) => {
+        anchor.setAttribute("aria-selected", checked ? "true" : "false");
+      });
+    });
+  }
+  /**
+   * @param {TabElement} tab - Tab element to style
+   * @param {TabState} state - Tab state object
+   * @description Styles tab elements based on state
+   */
+  styleTab(tab, { isSelected, state }) {
+    const { label, iconAnchor, iconSVG } = tab;
+    const fillColor = state === "normal" ? "" : "var(--hover-color)";
+    const selectedColor = "var(--selected-color)";
+    iconAnchor.classList.toggle("selected", isSelected);
+    iconSVG.style.fill = isSelected ? selectedColor : fillColor;
+    label.style.color = isSelected ? selectedColor : fillColor;
+  }
+  /**
+   * @returns {Observable<void>} Observable for tab interactions
+   * @description Sets up interaction streams for tab elements
+   */
+  setupInteractions() {
+    const createEventStream = (elements, eventName) => {
+      const streams = elements.flatMap(({ label, iconAnchor }) => [
+        fromEvent(label, eventName).pipe(map(() => ({ id: label.getAttribute("for"), event: eventName }))),
+        fromEvent(iconAnchor, eventName).pipe(map(() => ({ id: iconAnchor.id.replace("icon-", ""), event: eventName })))
+      ]);
+      return merge(...streams).pipe(share());
+    };
+    const eventStateMap = {
+      mouseenter: "hover",
+      mouseleave: "normal",
+      focus: "focus",
+      "focus-visible": "focus-visible",
+      blur: "normal"
+    };
+    const events = ["mouseenter", "mouseleave", "focus", "focus-visible", "blur"];
+    const interactionStreams = events.map((event) => createEventStream(this.tabs, event));
+    const iconClicks = this.tabs.map(({ iconAnchor, input, labelAnchor }) => merge(fromEvent(labelAnchor, "click"), fromEvent(iconAnchor, "click")).pipe(tap(() => {
+      preventDefault;
+      if (!input.checked) {
+        input.checked = true;
+        this.toggleAriaSelected(this.tabs);
+        input.dispatchEvent(new Event("change"));
+      }
+    }), map(() => ({ id: input.id, event: "click" }))));
+    const childClicks = this.childTabs.map(({ input, labelAnchor }) => fromEvent(labelAnchor, "click").pipe(tap(() => {
+      preventDefault;
+      if (!input.checked) {
+        input.checked = true;
+        this.toggleAriaSelected(this.childTabs);
+        input.dispatchEvent(new Event("change"));
+      }
+    }), map(() => ({ id: input.id, event: "click" }))));
+    const selections = this.tabs.map(({ input }) => fromEvent(input, "change").pipe(map(() => input.id), filter((id) => !!id)));
+    return merge(...interactionStreams, ...iconClicks, ...childClicks, ...selections).pipe(filter((event) => typeof event === "object" && "id" in event && "event" in event), debounceTime(30), tap((event) => {
+      const { id, event: eventName } = event;
+      const tab = this.tabs.find((t) => t.input.id === id);
+      if (tab) {
+        this.styleTab(tab, {
+          isSelected: tab.input.checked,
+          state: eventStateMap[eventName] || "normal"
+        });
+      }
+    }), map(() => void 0));
+  }
+  /**
+   * @description Initializes tab styles and sets up interaction streams
+   */
+  init() {
+    logger.info("Initializing license tabs");
+    this.setAria();
+    this.tabs.forEach((tab) => {
+      this.styleTab(tab, { isSelected: tab.input.checked, state: "normal" });
+    });
+    this.subscription = this.setupInteractions().subscribe({
+      error: (err) => logger.error("Error setting up license tabs:", err)
+    });
+    const allAnchors = [];
+    this.tabs.forEach((tab) => {
+      allAnchors.push(tab.labelAnchor, tab.iconAnchor);
+    });
+    this.childTabs.forEach((tab) => {
+      allAnchors.push(tab.labelAnchor);
+    });
+    allAnchors.forEach((anchor) => {
+      anchor.addEventListener("click", preventDefault);
+    });
+  }
+  /**
+   * @description Unsubscribes from event streams and performs cleanup
+   */
+  cleanup() {
+    logger.info("Cleaning up license tabs");
+    if (this.subscription) {
+      this.subscription.unsubscribe();
+    }
+  }
+};
+
+// src/assets/javascripts/features/licenses/index.ts
+var customWindow4 = window;
+var { document$: document$3 } = customWindow4;
+function initLicenseFeature() {
+  let tabManager = null;
+  return document$3.pipe(tap(() => {
+    var _a2;
+    (_a2 = tabManager == null ? void 0 : tabManager.cleanup) == null ? void 0 : _a2.call(tabManager);
+    tabManager = new TabManager();
+    logger.info("License feature initialized");
+  }), map(() => {
+    return tabManager == null ? void 0 : tabManager.subscription;
+  }));
+}
+
 // src/assets/javascripts/index.ts
 gsapWithCSS.registerPlugin(ScrollTrigger2, ScrollToPlugin);
 document.documentElement.classList.remove("no-js");
@@ -16656,48 +16658,6 @@ pageSubscription$.subscribe();
  * @copyright No rights reserved.
  */
 /**
- * @module feedback
- * @description Handles feedback form submission
- * @license Plain Unlicense(Public Domain)
- * @copyright No rights reserved. Created by and for Plain License www.plainlicense.org
- */
-/**
- * @module TabManager
- *
- * @description Coordinates tab interactions with corresponding link icons and labels
- *
- * @license Plain-Unlicense (Public Domain)
- * @author Adam Poulemanos adam<at>plainlicense<dot>org
- * @copyright No rights reserved
- */
-/**
- * @module types (licenses)
- * @description Types for the licenses feature.
- *
- * @license Plain-Unlicense (Public Domain)
- * @author Adam Poulemanos adam<at>plainlicense<dot>org
- * @copyright No rights reserved.
- */
-/**
- * @module features/licenses
- *
- * @description License feature initialization.
- *
- * @license Plain-Unlicense (Public Domain)
- * @author Adam Poulemanos adam<at>plainlicense<dot>org
- * @copyright No rights reserved.
- */
-/**
- * @module predicates
- * @description A collection of state predicates for HeroState and its sub-states. This
- * probably looks sad; it's a remnant of a much more complicated state system. Here
- * until the next refactor.
- *
- * @license Plain-Unlicense
- * @author Adam Poulemanos adam<at>plainlicense<dot>org
- * @copyright No rights reserved
- */
-/**
  * @module store
  * @description Centralized state management for hero section with reactive state updates
  *
@@ -16754,6 +16714,38 @@ pageSubscription$.subscribe();
  * @license Plain-Unlicense (Public Domain)
  * @author Adam Poulemanos adam<at>plainlicense<dot>org
  * @copyright No rights reserved
+ */
+/**
+ * @module feedback
+ * @description Handles feedback form submission
+ * @license Plain Unlicense(Public Domain)
+ * @copyright No rights reserved. Created by and for Plain License www.plainlicense.org
+ */
+/**
+ * @module TabManager
+ *
+ * @description Coordinates tab interactions with corresponding link icons and labels
+ *
+ * @license Plain-Unlicense (Public Domain)
+ * @author Adam Poulemanos adam<at>plainlicense<dot>org
+ * @copyright No rights reserved
+ */
+/**
+ * @module types (licenses)
+ * @description Types for the licenses feature.
+ *
+ * @license Plain-Unlicense (Public Domain)
+ * @author Adam Poulemanos adam<at>plainlicense<dot>org
+ * @copyright No rights reserved.
+ */
+/**
+ * @module features/licenses
+ *
+ * @description License feature initialization.
+ *
+ * @license Plain-Unlicense (Public Domain)
+ * @author Adam Poulemanos adam<at>plainlicense<dot>org
+ * @copyright No rights reserved.
  */
 /**
  * ========================================================================
@@ -16844,4 +16836,4 @@ gsap/ScrollToPlugin.js:
    * @author: Jack Doyle, jack@greensock.com
   *)
 */
-//# sourceMappingURL=index.G76RNORK.js.map
+//# sourceMappingURL=index.DRRI3LKH.js.map
