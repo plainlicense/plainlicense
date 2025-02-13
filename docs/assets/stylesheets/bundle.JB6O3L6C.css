@@ -7181,27 +7181,75 @@ section.hero h2 {
 section.hero a {
   text-decoration: none;
 }
+section.hero .hero__poster {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  opacity: 1;
+  transition: opacity 300ms ease-out;
+}
 section.hero .hero__bg {
   position: absolute;
   top: 0;
+  left: 0;
   z-index: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   width: 100%;
   height: 100%;
   background-position: center;
   background-size: cover;
+  opacity: 1;
+  transition: opacity 300ms ease-out;
 }
 section.hero .hero__backup {
   display: none;
   opacity: 0;
 }
+section.hero :is(--active) {
+  visibility: visible;
+  opacity: 1;
+}
+section.hero :is(--inactive) {
+  visibility: hidden;
+  opacity: 0;
+}
+section.hero .hero--image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+section.hero .hero__video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 300ms ease-in;
+}
 @media (prefers-reduced-motion: reduce) {
+  section.hero .hero__video {
+    display: none;
+  }
   section.hero .hero__backup {
     display: block;
     opacity: 1;
     transition: opacity 1000ms ease-in-out;
+  }
+  section.hero .hero__poster {
+    display: none;
+    opacity: 0;
+    transition: opacity 300ms ease-out;
+  }
+  section.hero .hero__poster--image {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    opacity: 1;
+    transition: opacity 300ms ease-in;
   }
 }
 section.hero .hero__container {
@@ -7482,4 +7530,4 @@ section.hero .md-typeset.hero-grid .middle {
 }
 
 /* src/assets/stylesheets/bundle.css */
-/*# sourceMappingURL=bundle.TDST6L6U.css.map */
+/*# sourceMappingURL=bundle.JB6O3L6C.css.map */

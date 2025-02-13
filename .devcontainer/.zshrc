@@ -37,7 +37,6 @@ export LANG=en_US.UTF-8
    export EDITOR='code'
  fi
 
-
 export bash_completion="$HOME/.local/share/bash-completion/completions"
 export BUN_INSTALL="/home/vscode/.bun"
 export RUSTUP_TERM_COLOR=always
@@ -51,6 +50,7 @@ alias lld='ls -alFhd'
 alias lldr='ls -alFhdR'
 alias locate='lolcate'
 alias updatedb="lolcate --update > /dev/null 2>&1 &"
+alias node='node %u || bunx --bun %u'
 export PATH="$BUN_INSTALL/bin:$HOME/.cargo/bin:$HOME/bin:$HOME/sbin:$PATH:/opt/bin:/opt/sbin:/opt/local/bin:/opt/local/sbin"
 export UV_PYTHON_DOWNLOADS="automatic"
 export UV_CACHE_DIR="/workspaces/PlainLicense/.cache/uv"
@@ -83,8 +83,13 @@ fi
 FNM_PATH="/home/vscode/.local/share/fnm"
 if [ -d "$FNM_PATH" ]; then
   export PATH="$FNM_PATH:$PATH"
-  eval "`fnm env`"
+  eval "$(fnm env)"
 fi
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source "$HOME/.p10k.zsh"
+
+node_bin=$(command -v node)
+if [ ! -f "/usr/bin/node" ] && [ ! -L "/usr/bin/node" ] && [ -f "$node_bin" ]; then
+  sudo ln -s "$node_bin" /usr/bin/node
+fi

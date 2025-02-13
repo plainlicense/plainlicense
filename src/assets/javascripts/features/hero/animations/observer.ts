@@ -50,6 +50,8 @@ export class HeroObservation {
 
   private transitionTl: gsap.core.Timeline
 
+  private hasTransitioned: boolean = false
+
   // @ts-ignore - initialized in onLoad
   private wrapper
 
@@ -63,7 +65,9 @@ export class HeroObservation {
 
   private footer: Element | null = document.querySelector(".md-footer")
 
-  private header: Element | null = document.querySelector("#header-target nav.md-tabs")
+  private header: Element[] | null = gsap.utils.toArray(
+    document.querySelectorAll("#header-target nav.md-tabs"),
+  )
 
   private blockbusterManager: VideoManager = VideoManager.getInstance()
 
@@ -132,19 +136,21 @@ export class HeroObservation {
         this.sections.map((section) => section.element),
         { autoAlpha: 0 },
       )
-      gsap.set(outerWrappers, { yPercent: 100 })
-      gsap.set(innerWrappers, { yPercent: -100 })
+      gsap.set(outerWrappers, { yPercent: 100, autoAlpha: 1 })
+      gsap.set(innerWrappers, { yPercent: -100, autoAlpha: 1 })
     })
     const { hash } = window.location
     const target = document.getElementById(hash.substring(1))
     if (!this.initialized) {
       this.setupSections()
       this.wrapper = gsap.utils.wrap([...Array(this.sectionCount).keys()])
+      logger.info("wrapper setup", { wrapper: this.wrapper })
       this.setupObserver()
       this.setupFirstSection(!target)
     } else {
       // if there's a hash we need to transition to the correct section
       if (target) {
+        this.hasTransitioned = true
         const sectionTarget = this.sections.find((section) => section.content.includes(target))
         if (sectionTarget) {
           const index = this.sections.indexOf(sectionTarget)
@@ -161,10 +167,7 @@ export class HeroObservation {
    * Emphasis animations are handled in videoManager.ts.
    */
   private setupFirstSection(startImmediately: boolean = false) {
-    const firstSection = this.sections[0]
-    this.registerAnimation(this.blockbusterManager.timeline, firstSection.element)
     if (startImmediately) {
-      this.currentIndex = 0
       this.goToSection(0, Direction.DOWN)
     }
   }
@@ -201,6 +204,26 @@ export class HeroObservation {
 
       logger.info(`Setting up section ${index}`, { outerWrapper, innerWrapper, bg, content })
 
+      const animation = gsap
+        .timeline({
+          ...this.defaultTimelineVars,
+          defaults: {
+            paused: !(index === 0), // only play the first section immediately
+            callbackScope: this,
+          },
+          onComplete:
+            index === 0 ?
+              () => {
+                this.animating = false
+                logger.info("First section animation complete; playing video")
+                this.blockbusterManager.play()
+              }
+            : () => {
+                this.animating = false
+              },
+        })
+        .addLabel("start")
+
       return {
         index,
         element: el,
@@ -208,14 +231,9 @@ export class HeroObservation {
         innerWrapper,
         bg,
         content,
-        animation: gsap
-          .timeline({
-            paused: index !== 0, // Only play first section
-            callbackScope: this,
-          })
-          .addLabel("start"),
-      }
-    }) as Section[]
+        animation,
+      } as Section
+    })
 
     // Debug log the sections
     logger.info("Sections set up:", {
@@ -249,12 +267,7 @@ export class HeroObservation {
    */
   public async transition(direction: Direction, scenicRoute?: boolean) {
     let index = this.getNextIndex(direction)
-    if (
-      (direction === Direction.UP && this.currentIndex === 0) ||
-      (direction === Direction.DOWN && this.currentIndex === this.sectionIndexLength)
-    ) {
-      return
-    }
+    this.hasTransitioned = !!(index > 0)
     if (!this.animating && !scenicRoute) {
       this.goToSection(index, direction)
     } else if (!this.animating && scenicRoute && direction === Direction.DOWN) {
@@ -278,17 +291,16 @@ export class HeroObservation {
 
   // Get the next index based on the direction
   private getNextIndex(direction: Direction): number {
-    const nextIndex = this.wrapper(this.currentIndex + direction)
-
-    // Add bounds checking
+    if (this.hasTransitioned) {
+      return this.wrapper(this.currentIndex + direction) as number
+    }
+    const nextIndex = this.currentIndex + direction
     if (nextIndex < 0) {
       return 0
+    } else {
+      this.hasTransitioned = true
+      return nextIndex
     }
-    if (nextIndex >= this.sectionCount) {
-      return this.sectionCount - 1
-    }
-
-    return nextIndex
   }
 
   // Construct the transition timeline based on the direction and index
@@ -299,19 +311,18 @@ export class HeroObservation {
       `Timeline state: currentIndex=${this.currentIndex}, targetIndex=${index}, direction=${direction}, sectionsCount=${this.sectionCount}`,
     )
 
-    if (this.currentIndex >= 0) {
-      // the first time this runs, currentIndex will be -1
-      logger.info(`Setting section ${this.currentIndex} to section ${index}`)
-      tl.setSection({ direction, section })
+    if (this.currentIndex < 0) {
+      this.currentIndex = index
     }
+    // the first time this runs, currentIndex will be -1
+    logger.info(`Setting section ${this.currentIndex} to section ${index}`)
+    tl.setSection(section.element, { direction, section })
     logger.info(`Animating section ${index} in direction ${direction}`)
-    tl.transitionSection({ direction, section })
+    tl.transitionSection(section.element, { direction, section })
     if (section.animation && section.animation.totalDuration() > 0) {
       tl.add(section.animation, ">")
     }
-
     logger.info(`Transition for section ${index} is set and will trigger now`)
-
     return tl
   }
 
@@ -321,10 +332,10 @@ export class HeroObservation {
       return
     }
 
-    // Add bounds validation
     if (index < 0 || index >= this.sectionCount) {
-      logger.warn(`Invalid section index: ${index}`)
-      return
+      return index < 0 ?
+          this.goToSection(0, direction)
+        : this.goToSection(this.sectionIndexLength, direction)
     }
 
     logger.info(`Going to section ${index} in direction ${direction}`)
@@ -350,9 +361,7 @@ export class HeroObservation {
     tl = this.constructTransitionTimeline(direction, index, tl)
     this.transitionTl = tl
 
-    if (!this.transitionTl.isActive()) {
-      this.transitionTl.play()
-    }
+    this.transitionTl.play()
   }
 
   /**

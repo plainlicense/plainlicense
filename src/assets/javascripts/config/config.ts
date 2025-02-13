@@ -41,7 +41,7 @@ const FADE_IN_CONFIG: FadeInConfig = {
     autoAlpha: 0,
     ease: "power1.inOut",
     repeat: 0,
-    paused: true,
+    paused: false,
   },
 } as const
 
@@ -65,7 +65,7 @@ export const OBSERVER_CONFIG: ObserverConfig = {
   clickTargets: ".cta__container--target-selector",
   ignoreTargets: "a, button, header, navigation, .md-tabs",
   emphasisTargets: {
-    subtle: ".cta__container--target-selector>button",
+    subtle: "button.md-button",
     strong: ".cta__container--down-indicator",
   },
 } as const
@@ -108,7 +108,7 @@ export const SUBTLE_EMPHASIS_CONFIG: EmphasisConfig = {
 } as const
 
 export const STRONG_EMPHASIS_CONFIG: EmphasisConfig = {
-  blinkConfig: { yoyoEase: "power1.in", repeat: -1, repeatDelay: 0.5, autoAlpha: 0.4},
+  blinkConfig: { yoyoEase: "power1.in", repeat: -1, repeatDelay: 0.5, autoAlpha: 0.4 },
   jumpConfig: {},
-  scaleUpConfig: { duration: 1 },
+  scaleUpConfig: { duration: 1, scale: 1.1 },
 } as const

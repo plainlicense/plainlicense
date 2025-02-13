@@ -67,7 +67,7 @@ const insertAnalytics = () => {
       "https://app.tinyanalytics.io/pixel/ei74pg7dZSNOtFvI",
       false, // async must be false
       true, // defer can be true
-      true, // ignore Do Not Track
+      false, // ignore Do Not Track
     )
   } catch (e) {
     console.warn("Analytics failed to load:", e)
@@ -85,7 +85,7 @@ const feedback$ = onDom$(of(feedback()))
 const buttonScript$ = onDom$(of(insertButtonScript()))
 const color$ = of(document.body.setAttribute("data-md-color-scheme", "slate"))
 const observer$ = of(HeroObservation.getInstance())
-const videoManager$ = of(VideoManager.getInstance())
+//const videoManager$ = of(VideoManager.getInstance())
 const licenseHashHandler$ = onDom$(watchLicenseHash())
 const license$ = navigationEvents$.pipe(
   filter(isLicense),
@@ -99,7 +99,7 @@ const pageConfigs: PageConfig[] = [
   {
     matcher: isHome,
     location: "home",
-    observables: [color$, observer$, videoManager$],
+    observables: [color$, observer$],
   },
   {
     matcher: isLicense,

@@ -29,7 +29,7 @@ import * as esbuild from "esbuild"
 import * as fs from "fs/promises"
 import * as path from "path"
 import { Observable, from } from "rxjs"
-import { PROJECTS, basePosterObj, baseProject, webConfig } from "./config/"
+import { PROJECTS, backupImage, basePosterObj, baseProject, webConfig } from "./config/"
 import { FileHashes, ImageIndex, Manifest, Project, buildJson, esbuildOutputs } from "./types"
 import * as utils from "./utils"
 
@@ -130,6 +130,19 @@ const metaOutput = async (result: esbuild.BuildResult): Promise<esbuildOutputs> 
 }
 
 /**
+ * @function buildNoScriptImage
+ * @descripts Constructs the noscript image element.
+ * @param {ImageIndex} noScriptImage - The base image index object.
+ * @returns {Promise<string>} A promise resolving to the generated `<picture>` element string.
+ */
+const buildNoScriptImage = async (noScriptImage: ImageIndex): Promise<string> => {
+  const noScriptFiles = await utils.getImageHeroes(backupImage)
+  const noScriptIndex = await utils.constructImageIndex(noScriptFiles)
+  const newIndex = { ...noScriptImage, ...noScriptIndex }
+  return Promise.resolve(utils.generatePictureElement(newIndex))
+}
+
+/**
  * @param {esbuildOutputs} output - the esbuild outputs
  * @returns {Promise<buildJson>} the mapping object
  * @description Maps the metafile outputs
@@ -143,7 +156,7 @@ const metaOutputMap = async (output: esbuildOutputs): Promise<buildJson> => {
   const logoKey =
     keys.find((key) => key.includes("logo_named")) ||
     Object.values(newFileLocs).find((value) => value.includes("logo_named"))
-  const noScriptImageContent = utils.generatePictureElement(noScriptImage)
+  const noScriptImageContent = await buildNoScriptImage(noScriptImage)
 
   const mapping = {
     noScriptImage: noScriptImageContent,

@@ -67,7 +67,7 @@ gsap.registerEffect({
   name: "setSection",
   extendTimeline: true,
   defaults: { extendTimeline: true },
-  effect: (config: TransitionConfig) => {
+  effect: (targets: gsap.TweenTarget, config: TransitionConfig) => {
     if (Object.entries(config).length === 1) {
       config = config[0]
     }
@@ -75,9 +75,9 @@ gsap.registerEffect({
     logger.info(`setSection: direction: ${direction}, section: ${stringify(section)}`)
     const dFactor = getDFactor(direction)
     const tl = gsap.timeline()
-    tl.add(gsap.set(section.element, { zIndex: 0 }))
+    tl.add(gsap.set(targets, { zIndex: 0 }))
       .add(gsap.to(section.bg, { yPercent: -15 * dFactor }))
-      .add(gsap.set(section.element, { autoAlpha: 0 }))
+      .add(gsap.set(targets, { autoAlpha: 0 }))
       .add(gsap.set(section.content, { autoAlpha: 0 }))
   },
 })
@@ -88,8 +88,8 @@ gsap.registerEffect({
 gsap.registerEffect({
   name: "transitionSection",
   extendTimeline: true,
-  defaults: { extendTimeline: true },
-  effect: (config: TransitionConfig) => {
+  defaults: { extendTimeline: true, paused: false },
+  effect: (targets: gsap.TweenTarget, config: TransitionConfig) => {
     if (Object.entries(config).length === 1) {
       config = config[0]
     }
@@ -98,13 +98,16 @@ gsap.registerEffect({
     logger.info(`config object: ${stringify(config)}`)
     const dFactor = getDFactor(direction)
     const tl = gsap.timeline()
+    tl.set(targets, { zIndex: 1, autoAlpha: 1 })
     tl.fromTo(
       [section.outerWrapper, section.innerWrapper],
       {
         yPercent: (i: number) => (i ? i * -100 * dFactor : 100 * dFactor),
+        autoAlpha: 1,
       },
       {
         yPercent: 0,
+        autoAlpha: 0,
       },
       0,
     )
@@ -115,10 +118,11 @@ gsap.registerEffect({
         },
         {
           yPercent: 0,
+          autoAlpha: 1,
         },
         0,
       )
-      .set(section.element, { zIndex: 1, autoAlpha: 1 })
+      .set(targets, { zIndex: 1, autoAlpha: 1 })
       .fromTo(
         section.content,
         {
@@ -136,7 +140,7 @@ gsap.registerEffect({
         },
         0.2,
       )
-    if (section.animation) {
+    if (section.animation && section.animation.totalDuration() > 0) {
       tl.add(section.animation, ">=wrapperTransition")
     }
     return tl
@@ -322,27 +326,27 @@ gsap.registerEffect({
   name: "animateMessage",
   extendTimeline: true,
   defaults: { extendTimeline: true, repeat: 0 },
-  effect: (target: gsap.TweenTarget, config: AnimateMessageConfig) => {
-    logger.info(`animateMessage: target: ${target}, config: ${stringify(config)}`)
-    target = target instanceof Array ? target : gsap.utils.toArray(target)
-    if (!target || !(target instanceof Array)) {
+  effect: (targets: gsap.TweenTarget, config: AnimateMessageConfig) => {
+    logger.info(`animateMessage: targets: ${targets}, config: ${stringify(config)}`)
+    targets = targets instanceof Array ? targets : gsap.utils.toArray(targets)
+    if (!targets || !(targets instanceof Array)) {
       return gsap.timeline()
     }
-    target = gsap.utils.toArray(target).filter((el) => el !== null && el instanceof HTMLElement)
+    targets = gsap.utils.toArray(targets).filter((el) => el !== null && el instanceof HTMLElement)
     let msgFrag = document.createDocumentFragment()
     let animationElements: HTMLElement[] = []
     if (config.message) {
       msgFrag = wordsToLetterDivs(config.message)
-      target = (target as []).slice(0, 1)
+      targets = (targets as []).slice(0, 1)
       if (
-        target instanceof Array &&
-        target.length > 0 &&
-        target[0] &&
-        target[0] instanceof HTMLElement
+        targets instanceof Array &&
+        targets.length > 0 &&
+        targets[0] &&
+        targets[0] instanceof HTMLElement
       ) {
         requestAnimationFrame(() => {
           // @ts-ignore - seriously... can't TS see the type guard RIGHT THERE? ^^
-          const element = target[0] as HTMLElement
+          const element = targets[0] as HTMLElement
           element.append(msgFrag)
           animationElements = gsap.utils
             .toArray(element.querySelectorAll("div"))
@@ -354,7 +358,7 @@ gsap.registerEffect({
         return gsap.timeline()
       }
     } else {
-      gsap.utils.toArray(target).forEach((el) => {
+      gsap.utils.toArray(targets).forEach((el) => {
         if (el instanceof HTMLElement) {
           const text = wordsToLetterDivs(el)
           requestAnimationFrame(() => {

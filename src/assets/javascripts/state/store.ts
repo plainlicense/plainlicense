@@ -243,7 +243,7 @@ export class HeroStore {
         }
       }),
       map(({ viewHeight, headerHeight, portrait }) => {
-        const adjustedHeight = viewHeight - headerHeight
+        const adjustedHeight = Math.abs(viewHeight - headerHeight)
         return portrait ? adjustedHeight * 1.4 : adjustedHeight * 1.6
       }),
       distinctUntilChanged(),

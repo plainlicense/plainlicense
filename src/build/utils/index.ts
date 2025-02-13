@@ -1,6 +1,8 @@
 import * as crypto from "crypto"
-import globby from "globby"
 import * as fs from "fs/promises"
+import globby from "globby"
+import path, { ParsedPath } from "path"
+import { optimize } from "svgo"
 import {
   basePath,
   cssLocs,
@@ -8,6 +10,7 @@ import {
   hashPattern,
   imageTypes,
   mediaExtensionPattern,
+  resKeys,
   resPattern,
   videoCodecs,
   videoExtensions,
@@ -17,13 +20,11 @@ import type {
   HeroFiles,
   HeroPaths,
   ImageIndex,
+  ImageType,
   MediaFileExtension,
   PlaceholderMap,
   VideoWidth,
 } from "../types"
-import { optimize } from "svgo"
-import path, { ParsedPath } from "path"
-
 
 export async function calculateIntegrity(content: Buffer): Promise<string> {
   const hash = crypto.createHash("sha384")
@@ -121,16 +122,6 @@ const validatePathInput = (filename: string, ext: string): boolean => {
     throw new Error("Invalid input")
   }
   return isValid
-}
-
-/**
- * @param filePath - the path to the file
- * @returns {string} new hash for the file
- * @description Generates an MD5 hash for a file
- */
-export async function getmd5Hash(filePath: string): Promise<string> {
-  const content = await fs.readFile(filePath, "utf8")
-  return crypto.createHash("md5").update(content).digest("hex").slice(0, 8)
 }
 
 /**
@@ -263,15 +254,6 @@ export function minsvg(data: string): string {
 }
 
 /**
- * @param {string} str - the string to convert
- * @returns {string} the title-cased string
- */
-
-function toTitleCase(str: string): string {
-  return str.charAt(0).toUpperCase() + str.slice(1)
-}
-
-/**
  * @param {string} dir - the string to convert
  * @returns {string} the title-cased string
  */
@@ -324,7 +306,7 @@ export const generatePictureElement = (
       }
     })
     .join(", ")
-  const img = `<img src="${png.widths[1280]}" class="${className}--image" draggable="false", fetchpriority="high", loading="eager", sizes="${sizes}", srcset="${png.srcset}">`
+  const img = `<img src="${png.widths[1280]}" class="${className}--image" draggable="false" fetchpriority="high" loading="eager" sizes="${sizes}" srcset="${png.srcset}">`
 
   return `<picture class="nojs ${className}" role="presentation">${sources}\n${img}</picture>`
 }
@@ -402,6 +384,7 @@ async function replacePlaceholders(newContent: PlaceholderMap): Promise<void> {
   }
 }
 
+// verifies that the CSS bundle was created
 export async function verifyBundleCreated(): Promise<void> {
   if (!(await fileExists(cssSrc))) {
     throw new Error("CSS bundle was not created")
@@ -417,4 +400,84 @@ export async function generatePlaceholderMap(): Promise<void> {
   //const fontHashMap = await resolveFontFiles()
   const newContent = cssHashMap
   await replacePlaceholders(newContent)
+}
+
+/**
+ * @function getImageHeroes
+ * @summary Retrieves hero image files based on a given base name.
+ * @param {string} baseName - The base name of the hero images to retrieve.
+ * @returns {Promise<HeroFile[]>} A promise that resolves to an array of HeroFile objects representing the retrieved image files.
+ */
+export async function getImageHeroes(baseName: string): Promise<HeroFile[]> {
+  const files = await Promise.resolve(
+    resolveGlob(`${basePath.replace("src", "docs")}/${baseName}/posters/${baseName}*`),
+  )
+  return (await Promise.all(files.map((file) => deconstructPath(file)))).filter(Boolean)
+}
+
+/**
+ * @function getHeroPaths
+ * @summary Constructs a record of HeroPaths categorized by image type.
+ * @param {HeroFile[]} images - An array of HeroFile objects representing the images.
+ * @returns {Promise<Record<ImageType, HeroPaths>>} A promise that resolves to a record mapping image types to their corresponding paths and widths.
+ */
+async function getHeroPaths(images: HeroFile[]): Promise<Record<ImageType, HeroPaths>> {
+  // Initialize objects for each image type
+  const pathObjs: Record<ImageType, typeof resKeys> = {
+    avif: resKeys,
+    webp: resKeys,
+    png: resKeys,
+  }
+
+  // Process each image type separately
+  const imageTypes = Object.keys(pathObjs) as ImageType[]
+  const pathsByType = await Promise.all(
+    imageTypes.map(async (type) => {
+      const typeImages = images.filter((img) => img.extension === type)
+      const paths = typeImages.reduce((acc, image) => {
+        const { width, srcPath } = image
+        const src = srcPath.replace("src/", "").replace("docs/", "")
+        const resolution = parseInt(width.toString(), 10)
+
+        if (resolution in pathObjs[type]) {
+          acc[resolution] = src
+        }
+        return acc
+      }, {} as HeroPaths)
+
+      return { [type]: paths }
+    }),
+  )
+
+  // Combine results into final object
+  return Object.assign({}, ...pathsByType) as Record<ImageType, HeroPaths>
+}
+
+/**
+ * @function constructImageIndex
+ * @description Constructs an image index object from an array of HeroFile objects.
+ * @param {HeroFile[]} images - An array of HeroFile objects representing the images.
+ * @returns {Promise<ImageIndex>} A promise that resolves to an ImageIndex object containing image information categorized by type.
+ */
+export async function constructImageIndex(images: HeroFile[]): Promise<ImageIndex> {
+  const pathRecords = await getHeroPaths(images)
+  const { avif, webp, png } = pathRecords
+  const parent = images[0].parentPath
+  return {
+    avif: {
+      widths: avif,
+      srcset: await generateSrcset(avif),
+      parent,
+    },
+    webp: {
+      widths: webp,
+      srcset: await generateSrcset(webp),
+      parent,
+    },
+    png: {
+      widths: png,
+      srcset: await generateSrcset(png),
+      parent,
+    },
+  } as ImageIndex
 }

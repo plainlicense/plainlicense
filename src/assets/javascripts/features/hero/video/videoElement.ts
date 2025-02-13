@@ -9,7 +9,7 @@
 import { logger } from "~/utils"
 import { CodecVariants, ImageIndex, HeroVideo, VideoWidth } from "./types"
 import { MAX_WIDTHS } from "~/config"
-import { get_media_type, srcToAttributes } from "./utils"
+import { getMediaType, srcToAttributes } from "./utils"
 
 /**
  * @class VideoElement
@@ -22,18 +22,6 @@ export class VideoElement {
   private sources: HTMLSourceElement[]
 
   private heroVideo: HeroVideo
-
-  private disablePictureInPicture: "true" | "false" = "true"
-
-  private playsinline: "true" | "false" = "true"
-
-  private preload: string = "metadata"
-
-  private muted: "true" | "false" = "true"
-
-  private loop: "true" | "false" = "true"
-
-  private autoplay: "true" | "false" = "true"
 
   private poster: ImageIndex
 
@@ -48,32 +36,35 @@ export class VideoElement {
     this.heroVideo = heroVideo
     this.poster = heroVideo.poster
     this.message = heroVideo.message || ""
-    let props =
-      properties ?
-        Object.fromEntries(
-          Object.entries(properties).map(([key, value]) => [
-            key,
-            value === "true" || value === "false" ? value : this[key as keyof this] || "true",
-          ]),
-        )
-      : {}
-    this.assignProperties(props as { [key: string]: string })
+    this.properties = this.getProperties(properties || {})
+    logger.info("Video Properties: ", this.properties)
+    for (const prop of Object.keys(this.properties)) {
+      const key = typeof prop === "string" ? prop : `${prop}`
+      try {
+        this.video.setAttribute(prop, this.properties[key])
+      } catch (e) {
+        logger.error(`Error setting property ${key} on video element: ${e}`)
+      }
+    }
     this.video = this.constructVideoElement()
     this.sources = this.constructSources()
     this.video.append(...this.sources)
+    logger.info("video element: ", this.video)
+    logger.info("sources: ", this.sources)
     this.picture = this.constructPictureElement()
+    this.setupVideoLoadHandlers()
   }
 
   // assign properties to the video element
-  private assignProperties(properties: { [key: string]: string }) {
-    const { disablePictureInPicture, playsinline, preload, muted, loop, autoplay } = this
+  private getProperties(properties: { [key: string]: string }) {
     return {
-      disablePictureInPicture,
-      playsinline,
-      preload,
-      muted,
-      loop,
-      autoplay,
+      disablePictureInPicture: "true",
+      playsInline: "true",
+      preload: "metadata",
+      muted: "true",
+      loop: "true",
+      autoplay: "true",
+      dataNoSnippet: "true",
       ...properties,
     }
   }
@@ -97,24 +88,19 @@ export class VideoElement {
     const { heroVideo } = this
     let srcs = []
     const widths = Object.keys(MAX_WIDTHS)
-    for (const [_, variant] of Object.entries(heroVideo.variants)) {
-      for (const codec of Object.keys(variant)) {
-        if (codec === "av1" || codec === "vp9" || codec === "h264") {
-          const codecKey = codec as unknown as CodecVariants
-          for (const width of widths) {
-            const w = parseInt(width, 10) as VideoWidth
-            const src = document.createElement("source")
-            // @ts-ignore
-            const codecVariant = variant[codecKey as keyof typeof variant]
-            if (typeof codecVariant === "string") {
-              src.src = codecVariant
-            } else {
-              src.src = codecVariant[w]
-            }
-            src.type = get_media_type(codec, w)
-            src.media = w !== 3840 ? `(max-width: ${MAX_WIDTHS[w]}px)` : ""
-            srcs.push(src)
+    for (const [codec, variant] of Object.entries(heroVideo.variants)) {
+      if (codec === "av1" || codec === "vp9" || codec === "h264") {
+        for (const width of widths) {
+          const w = parseInt(width, 10) as VideoWidth
+          const src = document.createElement("source")
+          // @ts-ignore
+          const codecVariant = variant[width]
+          if (typeof codecVariant === "string" || codecVariant instanceof URL) {
+            src.src = codecVariant instanceof URL ? codecVariant.href : codecVariant
           }
+          src.type = getMediaType(codec, w)
+          src.media = w !== 3840 ? `(max-width: ${MAX_WIDTHS[w]}px)` : ""
+          srcs.push(src)
         }
       }
     }
@@ -160,7 +146,9 @@ export class VideoElement {
 
   // construct the picture element
   private constructPictureElement() {
-    const { picture, poster } = this
+    const picture = document.createElement("picture")
+    picture.classList.add("hero__poster", "hero__poster--active")
+    const { poster } = this
     let srcs = []
     for (const type of Object.keys(poster)) {
       // type guard
@@ -190,9 +178,32 @@ export class VideoElement {
     img.srcset = poster.png.srcset
     img.alt = ""
     img.sizes = this.getSizes()
+    img.draggable = false
+    img.fetchPriority = "high"
+    img.classList.add("hero__poster--image")
     picture.classList.add("hero__poster")
+    picture.role = "presentation"
     picture.append(img)
     return picture
+  }
+
+  // setup event handlers for the video element
+  private setupVideoLoadHandlers() {
+    this.video.addEventListener("canplaythrough", () => {
+      this.picture.classList.remove("hero__poster--active")
+      this.picture.classList.add("hero__poster--inactive")
+    })
+
+    // Fallback if video fails to load
+    this.video.addEventListener("error", () => {
+      this.picture.classList.add("hero__poster--active")
+      this.picture.classList.remove("hero__poster--inactive")
+    })
+
+    this.video.addEventListener("playing", () => {
+      this.picture.classList.remove("hero__poster--inactive")
+      this.picture.classList.add("hero__poster--active")
+    })
   }
 
   public getElements() {

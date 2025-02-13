@@ -1,11 +1,16 @@
 import {
+  EMPTY,
   Subscription,
   combineLatest,
   distinctUntilKeyChanged,
+  exhaustMap,
   filter,
+  from,
   fromEvent,
   map,
   merge,
+  mergeAll,
+  of,
   switchMap,
   tap,
 } from "rxjs"
@@ -15,6 +20,7 @@ import { OBSERVER_CONFIG, STRONG_EMPHASIS_CONFIG, SUBTLE_EMPHASIS_CONFIG } from 
 import { HeroStore } from "~/state"
 import { HeroVideo, VideoStatus } from "./types"
 import { getHeroVideos } from "./utils"
+import { logger, parsePath } from "~/utils"
 
 let customWindow: CustomWindow = window as unknown as CustomWindow
 
@@ -106,15 +112,36 @@ export class VideoManager {
       tap(() => {
         this.pause()
       }),
-      switchMap(() => fromEvent(this.element, "canplay")),
+      switchMap(() => fromEvent(this.element, "canplaythrough")),
       tap(() => {
         this.resume()
+      }),
+    )
+
+    const elementChildren = Array.from(this.element.children)
+    const errorHandler$ = merge([
+      fromEvent(this.element, "error"),
+      fromEvent(elementChildren, "error"),
+    ]).pipe(
+      mergeAll(),
+      filter((ev: Event) => {
+        return (
+          ev.target instanceof HTMLMediaElement && (ev.target as HTMLMediaElement).error !== null
+        )
+      }),
+      exhaustMap((ev: Event) => {
+        const { error } = ev.target as HTMLMediaElement
+        if (error) {
+          return from(of(this.handleMediaError(error)))
+        }
+        return EMPTY
       }),
     )
 
     this.subscriptions.add(video$.subscribe())
     this.subscriptions.add(motionSub$.subscribe(() => this.initiateFallback()))
     this.subscriptions.add(stallHandler$.subscribe())
+    this.subscriptions.add(errorHandler$.subscribe())
   }
 
   private constructor() {
@@ -192,6 +219,17 @@ export class VideoManager {
       onRepeat: () => {
         this.has_played = true
       },
+      onUpdate: () => {
+        if (!this.element.played.length) {
+          this.timeline.pause()
+          try {
+            this.tryNewSource()
+          } catch (e) {
+            logger.error("Failed to switch codec", e)
+            this.initiateFallback()
+          }
+        }
+      },
       repeat: -1,
       repeatDelay: 3,
       callbackScope: this,
@@ -230,7 +268,7 @@ export class VideoManager {
         this.videoDuration = this.element.duration
         this.titleStart = this.videoDuration - 5
       })
-      fromEvent(this.element, "canplay").subscribe(() => {
+      fromEvent(this.element, "canplaythrough").subscribe(() => {
         this.status = "loaded"
         gsap.to(this.poster, { autoAlpha: 0, duration: 0.5 })
         this.timeline.add(
@@ -297,36 +335,73 @@ export class VideoManager {
     if (!Array.from(this.container.children).includes(backup)) {
       requestAnimationFrame(() => {
         this.container.append(backup)
+        backup.classList.add("hero__poster--active")
+        backup.querySelector("img")?.classList.add("hero__poster--image")
       })
     }
     gsap.to(backup, { autoAlpha: 1, duration: 1 })
   }
 
-  private initiateFallback(): void {
-    if (this.container.querySelector("video")) {
-      gsap.to(this.element, { autoAlpha: 0, duration: 0.5 })
-      this.container.removeChild(this.element)
+  private addPlayOnInteraction(): void {
+    const playOnInteraction = () => {
+      this.element.play().catch((e) => {
+        logger.error("Failed to play on interaction", e)
+        document.removeEventListener("click", playOnInteraction)
+        document.removeEventListener("touchstart", playOnInteraction)
+        this.initiateFallback()
+      })
     }
-    this.status = "loaded"
-    // prefersReducedMotion's fallback is handled by CSS
-    if (!this.store.getStateValue("prefersReducedMotion")) {
-      this.loadBackup()
-    }
-    gsap.set(this.ctaContainer, { autoAlpha: 1 })
-
-    gsap.animateMessage(this.container, {
-      message: this.ctaText || this.message,
-      repeat: 0,
-      autoRemoveChildren: true,
-    })
-    this.timeline.kill()
-    this.subscriptions.unsubscribe()
+    this.poster.classList.add("hero__poster--active")
+    this.poster.classList.remove("hero__poster--inactive")
+    document.addEventListener("click", playOnInteraction)
+    document.addEventListener("touchstart", playOnInteraction)
   }
 
+  private initiateFallback(): void {
+    if (this.status === "on_fallback") {
+      return
+    }
+    const fallback =
+      this.poster.classList.contains("hero__poster--active") ? this.poster : this.backupPicture
+    if (fallback !== this.poster) {
+      this.loadBackup()
+    }
+    const newTl = gsap.timeline({ paused: false, defaults: { repeat: 0 } })
+    newTl
+      .add(["fallback", gsap.set(this.element, { autoAlpha: 0, duration: 0.5 })], 0)
+      .call(() => {
+        this.element.classList.add("hero__video--inactive")
+        this.status = "on_fallback"
+        if (this.container.querySelector("video")) {
+          this.container.removeChild(this.element)
+        }
+        if (!this.container.querySelector("picture")) {
+          this.container.append(fallback)
+        }
+        if (!fallback.classList.contains("hero__poster--active")) {
+          gsap.set(fallback, { autoAlpha: 1, duration: 0.5 })
+          fallback.classList.add("hero__poster--active")
+        }
+      })
+      .set(this.ctaContainer, { autoAlpha: 1 })
+      .animateMessage(this.container, {
+        message: this.ctaText || this.message,
+        repeat: 0,
+        duration: 0.5,
+        autoRemoveChildren: true,
+      })
+    this.setEmphasisAnimations()
+    this.timeline.kill()
+    this.timeline = newTl
+    this.timeline.play()
+    this.subscriptions.unsubscribe()
+  }
   public play(): void {
-    if (!this.timeline.isActive()) {
+    if (!this.timeline.isActive() && this.status !== "on_fallback") {
       this.timeline.play()
-      this.element.play()
+      this.element.play().catch(() => {
+        this.addPlayOnInteraction()
+      })
     }
   }
 
@@ -340,7 +415,9 @@ export class VideoManager {
   public resume(): void {
     if (this.timeline.paused()) {
       this.timeline.resume()
-      this.element.play()
+      this.element.play().catch(() => {
+        this.addPlayOnInteraction()
+      })
     }
   }
 
@@ -359,5 +436,57 @@ export class VideoManager {
   private reinit(): void {
     this.timeline.kill()
     this.constructor()
+  }
+
+  private handleMediaError(error: MediaError): void {
+    switch (error.code) {
+      case 1:
+        logger.error("Video element encountered an error. User aborted the video.")
+        break
+      case 2:
+        logger.error("Video element encountered an error. Network error.")
+        try {
+          this.element.load()
+        } catch (err) {
+          logger.error("Failed to reload video element.", err)
+        }
+        this.tryNewSource()
+        break
+      case 3:
+      case 4:
+        const name = error.code === 3 ? "decoder error" : "source error"
+        logger.error(`Video element encountered an error. ${name}.`)
+        this.tryNewSource()
+        break
+      default:
+        logger.error("Video element encountered an error.", error)
+        break
+    }
+  }
+
+  private tryNewSource(): void {
+    logger.info("Switching codec...")
+    // Replace this.element.src with a URL pointing to a video that uses a supported codec
+    const { currentSrc } = this.element
+    const parsedSrc = parsePath(currentSrc)
+    const { name } = parsedSrc
+    if (name.includes("av1")) {
+      logger.info("Switching to vp9 codec")
+      this.element.src = currentSrc.replace("av1", "vp9")
+    } else if (name.includes("vp9")) {
+      logger.info("Switching to h264 codec")
+      this.element.src = currentSrc.replace("vp9", "h264")
+    } else {
+      logger.error("No more codecs to switch to. Initiating fallback.")
+      this.initiateFallback()
+    }
+    if (this.element.currentSrc !== currentSrc) {
+      this.element.load()
+      fromEvent(this.element, "canplaythrough").subscribe(() => {
+        this.element.play().catch(() => {
+          this.addPlayOnInteraction()
+        })
+      })
+    }
   }
 }

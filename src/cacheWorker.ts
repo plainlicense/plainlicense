@@ -431,7 +431,10 @@ class CacheStrategies {
     const strat = CacheStrategies
     const ext = url.pathname.split(".").pop()
     if (!strat.cacheExts.some((ext) => url.pathname.endsWith(ext)) || !ext) {
-      return fetch(request)
+      return fetch(request).catch((error) => {
+        logger.error("Failed to fetch:", error as Error)
+        throw new NetworkError("Failed to fetch request", 500)
+      })
     }
     if (strat.staleWhileRevalidateExts.includes(ext)) {
       return strat.staleWhileRevalidate(request)

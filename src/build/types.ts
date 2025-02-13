@@ -21,7 +21,6 @@
  */
 
 import path from "path"
-import { BuildResult } from "esbuild"
 
 // regex separator ("|") or minimatch separator (",")
 export type Separator = "|" | ","

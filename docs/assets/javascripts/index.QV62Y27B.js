@@ -5391,7 +5391,7 @@ var FADE_IN_CONFIG = {
     autoAlpha: 0,
     ease: "power1.inOut",
     repeat: 0,
-    paused: true
+    paused: false
   }
 };
 var OBSERVER_CONFIG = {
@@ -5410,7 +5410,7 @@ var OBSERVER_CONFIG = {
   clickTargets: ".cta__container--target-selector",
   ignoreTargets: "a, button, header, navigation, .md-tabs",
   emphasisTargets: {
-    subtle: ".cta__container--target-selector>button",
+    subtle: "button.md-button",
     strong: ".cta__container--down-indicator"
   }
 };
@@ -5447,7 +5447,7 @@ var SUBTLE_EMPHASIS_CONFIG = {
 var STRONG_EMPHASIS_CONFIG = {
   blinkConfig: { yoyoEase: "power1.in", repeat: -1, repeatDelay: 0.5, autoAlpha: 0.4 },
   jumpConfig: {},
-  scaleUpConfig: { duration: 1 }
+  scaleUpConfig: { duration: 1, scale: 1.1 }
 };
 
 // src/assets/javascripts/utils/conditionChecks.ts
@@ -8318,6 +8318,36 @@ function endWith() {
   return function(source) {
     return concat(source, of.apply(void 0, __spreadArray([], __read(values))));
   };
+}
+
+// node_modules/rxjs/dist/esm5/internal/operators/exhaustMap.js
+function exhaustMap(project, resultSelector) {
+  if (resultSelector) {
+    return function(source) {
+      return source.pipe(exhaustMap(function(a, i) {
+        return innerFrom(project(a, i)).pipe(map(function(b, ii) {
+          return resultSelector(a, b, i, ii);
+        }));
+      }));
+    };
+  }
+  return operate(function(source, subscriber) {
+    var index = 0;
+    var innerSub = null;
+    var isComplete = false;
+    source.subscribe(createOperatorSubscriber(subscriber, function(outerValue) {
+      if (!innerSub) {
+        innerSub = createOperatorSubscriber(subscriber, void 0, function() {
+          innerSub = null;
+          isComplete && subscriber.complete();
+        });
+        innerFrom(project(outerValue, index++)).subscribe(innerSub);
+      }
+    }, function() {
+      isComplete = true;
+      !innerSub && subscriber.complete();
+    }));
+  });
 }
 
 // node_modules/rxjs/dist/esm5/internal/operators/finalize.js
@@ -12141,7 +12171,7 @@ function watchLicenseHash() {
 }
 
 // src/assets/javascripts/utils/fetchWorker.ts
-var cacheWorkerUrl = "cacheWorker.JQPLJI3F.js";
+var cacheWorkerUrl = "cacheWorker.UYGCTNMV.js";
 if ("serviceWorker" in navigator && window.isSecureContext) {
   logger.info("Registering service worker");
   const register2 = async () => {
@@ -14855,7 +14885,7 @@ var HeroStore = class _HeroStore {
         portrait
       };
     }), map(({ viewHeight, headerHeight, portrait }) => {
-      const adjustedHeight = viewHeight - headerHeight;
+      const adjustedHeight = Math.abs(viewHeight - headerHeight);
       return portrait ? adjustedHeight * 1.4 : adjustedHeight * 1.6;
     }), distinctUntilChanged(), shareReplay(1), tap((parallaxHeight) => {
       setCssVariable("--parallax-height", "".concat(parallaxHeight, "px"));
@@ -15067,7 +15097,7 @@ gsapWithCSS.registerEffect({
   name: "setSection",
   extendTimeline: true,
   defaults: { extendTimeline: true },
-  effect: (config6) => {
+  effect: (targets, config6) => {
     if (Object.entries(config6).length === 1) {
       config6 = config6[0];
     }
@@ -15075,14 +15105,14 @@ gsapWithCSS.registerEffect({
     logger.info("setSection: direction: ".concat(direction, ", section: ").concat(stringify(section)));
     const dFactor = getDFactor(direction);
     const tl = gsapWithCSS.timeline();
-    tl.add(gsapWithCSS.set(section.element, { zIndex: 0 })).add(gsapWithCSS.to(section.bg, { yPercent: -15 * dFactor })).add(gsapWithCSS.set(section.element, { autoAlpha: 0 })).add(gsapWithCSS.set(section.content, { autoAlpha: 0 }));
+    tl.add(gsapWithCSS.set(targets, { zIndex: 0 })).add(gsapWithCSS.to(section.bg, { yPercent: -15 * dFactor })).add(gsapWithCSS.set(targets, { autoAlpha: 0 })).add(gsapWithCSS.set(section.content, { autoAlpha: 0 }));
   }
 });
 gsapWithCSS.registerEffect({
   name: "transitionSection",
   extendTimeline: true,
-  defaults: { extendTimeline: true },
-  effect: (config6) => {
+  defaults: { extendTimeline: true, paused: false },
+  effect: (targets, config6) => {
     if (Object.entries(config6).length === 1) {
       config6 = config6[0];
     }
@@ -15091,15 +15121,19 @@ gsapWithCSS.registerEffect({
     logger.info("config object: ".concat(stringify(config6)));
     const dFactor = getDFactor(direction);
     const tl = gsapWithCSS.timeline();
+    tl.set(targets, { zIndex: 1, autoAlpha: 1 });
     tl.fromTo([section.outerWrapper, section.innerWrapper], {
-      yPercent: (i) => i ? i * -100 * dFactor : 100 * dFactor
+      yPercent: (i) => i ? i * -100 * dFactor : 100 * dFactor,
+      autoAlpha: 1
     }, {
-      yPercent: 0
+      yPercent: 0,
+      autoAlpha: 0
     }, 0).fromTo(section.bg, {
       yPercent: 15 * dFactor
     }, {
-      yPercent: 0
-    }, 0).set(section.element, { zIndex: 1, autoAlpha: 1 }).fromTo(section.content, {
+      yPercent: 0,
+      autoAlpha: 1
+    }, 0).set(targets, { zIndex: 1, autoAlpha: 1 }).fromTo(section.content, {
       autoAlpha: 0,
       yPercent: 50 * dFactor
     }, {
@@ -15111,7 +15145,7 @@ gsapWithCSS.registerEffect({
         from: direction === -1 /* UP */ ? "start" : "end"
       }
     }, 0.2);
-    if (section.animation) {
+    if (section.animation && section.animation.totalDuration() > 0) {
       tl.add(section.animation, ">=wrapperTransition");
     }
     return tl;
@@ -15231,21 +15265,21 @@ gsapWithCSS.registerEffect({
   name: "animateMessage",
   extendTimeline: true,
   defaults: { extendTimeline: true, repeat: 0 },
-  effect: (target, config6) => {
-    logger.info("animateMessage: target: ".concat(target, ", config: ").concat(stringify(config6)));
-    target = target instanceof Array ? target : gsapWithCSS.utils.toArray(target);
-    if (!target || !(target instanceof Array)) {
+  effect: (targets, config6) => {
+    logger.info("animateMessage: targets: ".concat(targets, ", config: ").concat(stringify(config6)));
+    targets = targets instanceof Array ? targets : gsapWithCSS.utils.toArray(targets);
+    if (!targets || !(targets instanceof Array)) {
       return gsapWithCSS.timeline();
     }
-    target = gsapWithCSS.utils.toArray(target).filter((el) => el !== null && el instanceof HTMLElement);
+    targets = gsapWithCSS.utils.toArray(targets).filter((el) => el !== null && el instanceof HTMLElement);
     let msgFrag = document.createDocumentFragment();
     let animationElements = [];
     if (config6.message) {
       msgFrag = wordsToLetterDivs(config6.message);
-      target = target.slice(0, 1);
-      if (target instanceof Array && target.length > 0 && target[0] && target[0] instanceof HTMLElement) {
+      targets = targets.slice(0, 1);
+      if (targets instanceof Array && targets.length > 0 && targets[0] && targets[0] instanceof HTMLElement) {
         requestAnimationFrame(() => {
-          const element = target[0];
+          const element = targets[0];
           element.append(msgFrag);
           animationElements = gsapWithCSS.utils.toArray(element.querySelectorAll("div")).filter((el) => el !== null && el instanceof HTMLElement && el.innerText !== "");
         });
@@ -15253,7 +15287,7 @@ gsapWithCSS.registerEffect({
         return gsapWithCSS.timeline();
       }
     } else {
-      gsapWithCSS.utils.toArray(target).forEach((el) => {
+      gsapWithCSS.utils.toArray(targets).forEach((el) => {
         if (el instanceof HTMLElement) {
           const text = wordsToLetterDivs(el);
           requestAnimationFrame(() => {
@@ -15315,12 +15349,13 @@ var HeroObservation = class _HeroObservation {
     this.sections = [];
     this.subscriptions = new Subscription();
     this.animating = false;
+    this.hasTransitioned = false;
     this.sectionCount = 0;
     this.sectionIndexLength = 0;
     this.defaultTimelineVars = {};
     this.initialized = false;
     this.footer = document.querySelector(".md-footer");
-    this.header = document.querySelector("#header-target nav.md-tabs");
+    this.header = gsapWithCSS.utils.toArray(document.querySelectorAll("#header-target nav.md-tabs"));
     this.blockbusterManager = VideoManager.getInstance();
     this.defaultTimelineVars = {
       defaults: {
@@ -15371,18 +15406,20 @@ var HeroObservation = class _HeroObservation {
     requestAnimationFrame(() => {
       document.body.style.overflow = "hidden";
       gsapWithCSS.set(this.sections.map((section) => section.element), { autoAlpha: 0 });
-      gsapWithCSS.set(outerWrappers, { yPercent: 100 });
-      gsapWithCSS.set(innerWrappers, { yPercent: -100 });
+      gsapWithCSS.set(outerWrappers, { yPercent: 100, autoAlpha: 1 });
+      gsapWithCSS.set(innerWrappers, { yPercent: -100, autoAlpha: 1 });
     });
     const { hash } = window.location;
     const target = document.getElementById(hash.substring(1));
     if (!this.initialized) {
       this.setupSections();
       this.wrapper = gsapWithCSS.utils.wrap([...Array(this.sectionCount).keys()]);
+      logger.info("wrapper setup", { wrapper: this.wrapper });
       this.setupObserver();
       this.setupFirstSection(!target);
     } else {
       if (target) {
+        this.hasTransitioned = true;
         const sectionTarget = this.sections.find((section) => section.content.includes(target));
         if (sectionTarget) {
           const index = this.sections.indexOf(sectionTarget);
@@ -15398,10 +15435,7 @@ var HeroObservation = class _HeroObservation {
    * Emphasis animations are handled in videoManager.ts.
    */
   setupFirstSection(startImmediately = false) {
-    const firstSection = this.sections[0];
-    this.registerAnimation(this.blockbusterManager.timeline, firstSection.element);
     if (startImmediately) {
-      this.currentIndex = 0;
       this.goToSection(0, 1 /* DOWN */);
     }
   }
@@ -15428,6 +15462,21 @@ var HeroObservation = class _HeroObservation {
       const initialContent = getContentElements(el).filter((element) => element !== outerWrapper && element !== innerWrapper && element !== bg);
       const content = Array.from(new Set(initialContent));
       logger.info("Setting up section ".concat(index), { outerWrapper, innerWrapper, bg, content });
+      const animation = gsapWithCSS.timeline({
+        ...this.defaultTimelineVars,
+        defaults: {
+          paused: !(index === 0),
+          // only play the first section immediately
+          callbackScope: this
+        },
+        onComplete: index === 0 ? () => {
+          this.animating = false;
+          logger.info("First section animation complete; playing video");
+          this.blockbusterManager.play();
+        } : () => {
+          this.animating = false;
+        }
+      }).addLabel("start");
       return {
         index,
         element: el,
@@ -15435,11 +15484,7 @@ var HeroObservation = class _HeroObservation {
         innerWrapper,
         bg,
         content,
-        animation: gsapWithCSS.timeline({
-          paused: index !== 0,
-          // Only play first section
-          callbackScope: this
-        }).addLabel("start")
+        animation
       };
     });
     logger.info("Sections set up:", {
@@ -15468,9 +15513,7 @@ var HeroObservation = class _HeroObservation {
    */
   async transition(direction, scenicRoute) {
     let index = this.getNextIndex(direction);
-    if (direction === -1 /* UP */ && this.currentIndex === 0 || direction === 1 /* DOWN */ && this.currentIndex === this.sectionIndexLength) {
-      return;
-    }
+    this.hasTransitioned = !!(index > 0);
     if (!this.animating && !scenicRoute) {
       this.goToSection(index, direction);
     } else if (!this.animating && scenicRoute && direction === 1 /* DOWN */) {
@@ -15491,26 +15534,29 @@ var HeroObservation = class _HeroObservation {
   }
   // Get the next index based on the direction
   getNextIndex(direction) {
-    const nextIndex = this.wrapper(this.currentIndex + direction);
+    if (this.hasTransitioned) {
+      return this.wrapper(this.currentIndex + direction);
+    }
+    const nextIndex = this.currentIndex + direction;
     if (nextIndex < 0) {
       return 0;
+    } else {
+      this.hasTransitioned = true;
+      return nextIndex;
     }
-    if (nextIndex >= this.sectionCount) {
-      return this.sectionCount - 1;
-    }
-    return nextIndex;
   }
   // Construct the transition timeline based on the direction and index
   // Uses registered effects from observerEffects.ts
   constructTransitionTimeline(direction, index, tl) {
     const section = this.sections[index];
     logger.info("Timeline state: currentIndex=".concat(this.currentIndex, ", targetIndex=").concat(index, ", direction=").concat(direction, ", sectionsCount=").concat(this.sectionCount));
-    if (this.currentIndex >= 0) {
-      logger.info("Setting section ".concat(this.currentIndex, " to section ").concat(index));
-      tl.setSection({ direction, section });
+    if (this.currentIndex < 0) {
+      this.currentIndex = index;
     }
+    logger.info("Setting section ".concat(this.currentIndex, " to section ").concat(index));
+    tl.setSection(section.element, { direction, section });
     logger.info("Animating section ".concat(index, " in direction ").concat(direction));
-    tl.transitionSection({ direction, section });
+    tl.transitionSection(section.element, { direction, section });
     if (section.animation && section.animation.totalDuration() > 0) {
       tl.add(section.animation, ">");
     }
@@ -15523,8 +15569,7 @@ var HeroObservation = class _HeroObservation {
       return;
     }
     if (index < 0 || index >= this.sectionCount) {
-      logger.warn("Invalid section index: ".concat(index));
-      return;
+      return index < 0 ? this.goToSection(0, direction) : this.goToSection(this.sectionIndexLength, direction);
     }
     logger.info("Going to section ".concat(index, " in direction ").concat(direction));
     this.currentIndex = index;
@@ -15544,9 +15589,7 @@ var HeroObservation = class _HeroObservation {
     });
     tl = this.constructTransitionTimeline(direction, index, tl);
     this.transitionTl = tl;
-    if (!this.transitionTl.isActive()) {
-      this.transitionTl.play();
-    }
+    this.transitionTl.play();
   }
   /**
    * @description Checks if an element is a valid content target for animations.
@@ -15861,20 +15904,7 @@ var getAv1MediaType = (width) => {
   const seqlevel = seqlevelMap[width];
   return "video/webm;codecs=av01.0.".concat(seqlevel, "M.10.0.110.01.01.01.0");
 };
-var getH264MediaType = (width) => {
-  const baseString = "avc1.6E00";
-  const levelMap = {
-    426: "16",
-    640: "1F",
-    854: "28",
-    1280: "32",
-    1920: "33",
-    2560: "3C",
-    3840: "3C"
-  };
-  const level = levelMap[width];
-  return "video/mp4;codecs=".concat(baseString).concat(level);
-};
+var getH264MediaType = () => "video/mp4;codecs=avc1";
 var getVp9MediaType = (width) => {
   const levelMap = {
     486: 20,
@@ -15888,7 +15918,7 @@ var getVp9MediaType = (width) => {
   const level = levelMap[width];
   return "video/webm;codecs=vp09.02.".concat(level, ".10.00.01.01.01.01");
 };
-function get_media_type(type, width) {
+function getMediaType(type, width) {
   switch (type) {
     case "av1":
       return getAv1MediaType(width);
@@ -15910,12 +15940,6 @@ function srcToAttributes(src) {
 var VideoElement = class {
   constructor(heroVideo, properties) {
     this.video = document.createElement("video");
-    this.disablePictureInPicture = "true";
-    this.playsinline = "true";
-    this.preload = "metadata";
-    this.muted = "true";
-    this.loop = "true";
-    this.autoplay = "true";
     this.picture = document.createElement("picture");
     this.properties = {};
     this.message = "";
@@ -15923,26 +15947,34 @@ var VideoElement = class {
     this.heroVideo = heroVideo;
     this.poster = heroVideo.poster;
     this.message = heroVideo.message || "";
-    let props = properties ? Object.fromEntries(Object.entries(properties).map(([key, value]) => [
-      key,
-      value === "true" || value === "false" ? value : this[key] || "true"
-    ])) : {};
-    this.assignProperties(props);
+    this.properties = this.getProperties(properties || {});
+    logger.info("Video Properties: ", this.properties);
+    for (const prop of Object.keys(this.properties)) {
+      const key = typeof prop === "string" ? prop : "".concat(prop);
+      try {
+        this.video.setAttribute(prop, this.properties[key]);
+      } catch (e) {
+        logger.error("Error setting property ".concat(key, " on video element: ").concat(e));
+      }
+    }
     this.video = this.constructVideoElement();
     this.sources = this.constructSources();
     this.video.append(...this.sources);
+    logger.info("video element: ", this.video);
+    logger.info("sources: ", this.sources);
     this.picture = this.constructPictureElement();
+    this.setupVideoLoadHandlers();
   }
   // assign properties to the video element
-  assignProperties(properties) {
-    const { disablePictureInPicture, playsinline, preload, muted, loop, autoplay } = this;
+  getProperties(properties) {
     return {
-      disablePictureInPicture,
-      playsinline,
-      preload,
-      muted,
-      loop,
-      autoplay,
+      disablePictureInPicture: "true",
+      playsInline: "true",
+      preload: "metadata",
+      muted: "true",
+      loop: "true",
+      autoplay: "true",
+      dataNoSnippet: "true",
       ...properties
     };
   }
@@ -15964,23 +15996,18 @@ var VideoElement = class {
     const { heroVideo } = this;
     let srcs = [];
     const widths = Object.keys(MAX_WIDTHS);
-    for (const [_, variant] of Object.entries(heroVideo.variants)) {
-      for (const codec of Object.keys(variant)) {
-        if (codec === "av1" || codec === "vp9" || codec === "h264") {
-          const codecKey = codec;
-          for (const width of widths) {
-            const w = parseInt(width, 10);
-            const src = document.createElement("source");
-            const codecVariant = variant[codecKey];
-            if (typeof codecVariant === "string") {
-              src.src = codecVariant;
-            } else {
-              src.src = codecVariant[w];
-            }
-            src.type = get_media_type(codec, w);
-            src.media = w !== 3840 ? "(max-width: ".concat(MAX_WIDTHS[w], "px)") : "";
-            srcs.push(src);
+    for (const [codec, variant] of Object.entries(heroVideo.variants)) {
+      if (codec === "av1" || codec === "vp9" || codec === "h264") {
+        for (const width of widths) {
+          const w = parseInt(width, 10);
+          const src = document.createElement("source");
+          const codecVariant = variant[width];
+          if (typeof codecVariant === "string" || codecVariant instanceof URL) {
+            src.src = codecVariant instanceof URL ? codecVariant.href : codecVariant;
           }
+          src.type = getMediaType(codec, w);
+          src.media = w !== 3840 ? "(max-width: ".concat(MAX_WIDTHS[w], "px)") : "";
+          srcs.push(src);
         }
       }
     }
@@ -16021,7 +16048,9 @@ var VideoElement = class {
   }
   // construct the picture element
   constructPictureElement() {
-    const { picture, poster } = this;
+    const picture = document.createElement("picture");
+    picture.classList.add("hero__poster", "hero__poster--active");
+    const { poster } = this;
     let srcs = [];
     for (const type of Object.keys(poster)) {
       if (type === "webp" || type === "avif") {
@@ -16050,9 +16079,28 @@ var VideoElement = class {
     img.srcset = poster.png.srcset;
     img.alt = "";
     img.sizes = this.getSizes();
+    img.draggable = false;
+    img.fetchPriority = "high";
+    img.classList.add("hero__poster--image");
     picture.classList.add("hero__poster");
+    picture.role = "presentation";
     picture.append(img);
     return picture;
+  }
+  // setup event handlers for the video element
+  setupVideoLoadHandlers() {
+    this.video.addEventListener("canplaythrough", () => {
+      this.picture.classList.remove("hero__poster--active");
+      this.picture.classList.add("hero__poster--inactive");
+    });
+    this.video.addEventListener("error", () => {
+      this.picture.classList.add("hero__poster--active");
+      this.picture.classList.remove("hero__poster--inactive");
+    });
+    this.video.addEventListener("playing", () => {
+      this.picture.classList.remove("hero__poster--inactive");
+      this.picture.classList.add("hero__poster--active");
+    });
   }
   getElements() {
     return this.video;
@@ -16102,12 +16150,26 @@ var VideoManager = class _VideoManager {
       merge(fromEvent(this.element, "stalled"), fromEvent(this.element, "waiting"))
     ]).pipe(tap(() => {
       this.pause();
-    }), switchMap(() => fromEvent(this.element, "canplay")), tap(() => {
+    }), switchMap(() => fromEvent(this.element, "canplaythrough")), tap(() => {
       this.resume();
+    }));
+    const elementChildren = Array.from(this.element.children);
+    const errorHandler$ = merge([
+      fromEvent(this.element, "error"),
+      fromEvent(elementChildren, "error")
+    ]).pipe(mergeAll(), filter((ev) => {
+      return ev.target instanceof HTMLMediaElement && ev.target.error !== null;
+    }), exhaustMap((ev) => {
+      const { error } = ev.target;
+      if (error) {
+        return from(of(this.handleMediaError(error)));
+      }
+      return EMPTY;
     }));
     this.subscriptions.add(video$.subscribe());
     this.subscriptions.add(motionSub$.subscribe(() => this.initiateFallback()));
     this.subscriptions.add(stallHandler$.subscribe());
+    this.subscriptions.add(errorHandler$.subscribe());
   }
   initVideo() {
     this.backupPicture = document.querySelector(".hero__backup") || document.createElement("picture");
@@ -16170,6 +16232,17 @@ var VideoManager = class _VideoManager {
       onRepeat: () => {
         this.has_played = true;
       },
+      onUpdate: () => {
+        if (!this.element.played.length) {
+          this.timeline.pause();
+          try {
+            this.tryNewSource();
+          } catch (e) {
+            logger.error("Failed to switch codec", e);
+            this.initiateFallback();
+          }
+        }
+      },
       repeat: -1,
       repeatDelay: 3,
       callbackScope: this,
@@ -16198,7 +16271,7 @@ var VideoManager = class _VideoManager {
         this.videoDuration = this.element.duration;
         this.titleStart = this.videoDuration - 5;
       });
-      fromEvent(this.element, "canplay").subscribe(() => {
+      fromEvent(this.element, "canplaythrough").subscribe(() => {
         this.status = "loaded";
         gsapWithCSS.to(this.poster, { autoAlpha: 0, duration: 0.5 });
         this.timeline.add(["fadeinVideo", gsapWithCSS.to(this.element, { autoAlpha: 1, duration: 0.5 })], 0);
@@ -16246,33 +16319,68 @@ var VideoManager = class _VideoManager {
     const backup = this.backupPicture || this.poster;
     if (!Array.from(this.container.children).includes(backup)) {
       requestAnimationFrame(() => {
+        var _a2;
         this.container.append(backup);
+        backup.classList.add("hero__poster--active");
+        (_a2 = backup.querySelector("img")) == null ? void 0 : _a2.classList.add("hero__poster--image");
       });
     }
     gsapWithCSS.to(backup, { autoAlpha: 1, duration: 1 });
   }
+  addPlayOnInteraction() {
+    const playOnInteraction = () => {
+      this.element.play().catch((e) => {
+        logger.error("Failed to play on interaction", e);
+        document.removeEventListener("click", playOnInteraction);
+        document.removeEventListener("touchstart", playOnInteraction);
+        this.initiateFallback();
+      });
+    };
+    this.poster.classList.add("hero__poster--active");
+    this.poster.classList.remove("hero__poster--inactive");
+    document.addEventListener("click", playOnInteraction);
+    document.addEventListener("touchstart", playOnInteraction);
+  }
   initiateFallback() {
-    if (this.container.querySelector("video")) {
-      gsapWithCSS.to(this.element, { autoAlpha: 0, duration: 0.5 });
-      this.container.removeChild(this.element);
+    if (this.status === "on_fallback") {
+      return;
     }
-    this.status = "loaded";
-    if (!this.store.getStateValue("prefersReducedMotion")) {
+    const fallback = this.poster.classList.contains("hero__poster--active") ? this.poster : this.backupPicture;
+    if (fallback !== this.poster) {
       this.loadBackup();
     }
-    gsapWithCSS.set(this.ctaContainer, { autoAlpha: 1 });
-    gsapWithCSS.animateMessage(this.container, {
+    const newTl = gsapWithCSS.timeline({ paused: false, defaults: { repeat: 0 } });
+    newTl.add(["fallback", gsapWithCSS.set(this.element, { autoAlpha: 0, duration: 0.5 })], 0).call(() => {
+      this.element.classList.add("hero__video--inactive");
+      this.status = "on_fallback";
+      if (this.container.querySelector("video")) {
+        this.container.removeChild(this.element);
+      }
+      if (!this.container.querySelector("picture")) {
+        this.container.append(fallback);
+      }
+      if (!fallback.classList.contains("hero__poster--active")) {
+        gsapWithCSS.set(fallback, { autoAlpha: 1, duration: 0.5 });
+        fallback.classList.add("hero__poster--active");
+      }
+    }).set(this.ctaContainer, { autoAlpha: 1 }).animateMessage(this.container, {
       message: this.ctaText || this.message,
       repeat: 0,
+      duration: 0.5,
       autoRemoveChildren: true
     });
+    this.setEmphasisAnimations();
     this.timeline.kill();
+    this.timeline = newTl;
+    this.timeline.play();
     this.subscriptions.unsubscribe();
   }
   play() {
-    if (!this.timeline.isActive()) {
+    if (!this.timeline.isActive() && this.status !== "on_fallback") {
       this.timeline.play();
-      this.element.play();
+      this.element.play().catch(() => {
+        this.addPlayOnInteraction();
+      });
     }
   }
   pause() {
@@ -16284,7 +16392,9 @@ var VideoManager = class _VideoManager {
   resume() {
     if (this.timeline.paused()) {
       this.timeline.resume();
-      this.element.play();
+      this.element.play().catch(() => {
+        this.addPlayOnInteraction();
+      });
     }
   }
   stop() {
@@ -16301,6 +16411,55 @@ var VideoManager = class _VideoManager {
   reinit() {
     this.timeline.kill();
     this.constructor();
+  }
+  handleMediaError(error) {
+    switch (error.code) {
+      case 1:
+        logger.error("Video element encountered an error. User aborted the video.");
+        break;
+      case 2:
+        logger.error("Video element encountered an error. Network error.");
+        try {
+          this.element.load();
+        } catch (err) {
+          logger.error("Failed to reload video element.", err);
+        }
+        this.tryNewSource();
+        break;
+      case 3:
+      case 4:
+        const name = error.code === 3 ? "decoder error" : "source error";
+        logger.error("Video element encountered an error. ".concat(name, "."));
+        this.tryNewSource();
+        break;
+      default:
+        logger.error("Video element encountered an error.", error);
+        break;
+    }
+  }
+  tryNewSource() {
+    logger.info("Switching codec...");
+    const { currentSrc } = this.element;
+    const parsedSrc = parsePath(currentSrc);
+    const { name } = parsedSrc;
+    if (name.includes("av1")) {
+      logger.info("Switching to vp9 codec");
+      this.element.src = currentSrc.replace("av1", "vp9");
+    } else if (name.includes("vp9")) {
+      logger.info("Switching to h264 codec");
+      this.element.src = currentSrc.replace("vp9", "h264");
+    } else {
+      logger.error("No more codecs to switch to. Initiating fallback.");
+      this.initiateFallback();
+    }
+    if (this.element.currentSrc !== currentSrc) {
+      this.element.load();
+      fromEvent(this.element, "canplaythrough").subscribe(() => {
+        this.element.play().catch(() => {
+          this.addPlayOnInteraction();
+        });
+      });
+    }
   }
 };
 
@@ -16541,7 +16700,7 @@ var insertAnalytics = () => {
       // async must be false
       true,
       // defer can be true
-      true
+      false
     );
   } catch (e) {
     console.warn("Analytics failed to load:", e);
@@ -16556,7 +16715,6 @@ var feedback$ = onDom$(of(feedback()));
 var buttonScript$ = onDom$(of(insertButtonScript()));
 var color$ = of(document.body.setAttribute("data-md-color-scheme", "slate"));
 var observer$4 = of(HeroObservation.getInstance());
-var videoManager$ = of(VideoManager.getInstance());
 var licenseHashHandler$ = onDom$(watchLicenseHash());
 var license$ = navigationEvents$.pipe(filter(isLicense), switchMap(() => initLicenseFeature()));
 var fixSvg$ = onDom$(of(() => fixSvgDimensions()));
@@ -16565,7 +16723,7 @@ var pageConfigs = [
   {
     matcher: isHome,
     location: "home",
-    observables: [color$, observer$4, videoManager$]
+    observables: [color$, observer$4]
   },
   {
     matcher: isLicense,
@@ -16836,4 +16994,4 @@ gsap/ScrollToPlugin.js:
    * @author: Jack Doyle, jack@greensock.com
   *)
 */
-//# sourceMappingURL=index.DRRI3LKH.js.map
+//# sourceMappingURL=index.QV62Y27B.js.map
