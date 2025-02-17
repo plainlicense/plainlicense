@@ -23,26 +23,6 @@
         min-width: 100vw;
     }
 
-    /* Some hero-only settings on classes used on other pages */
-    @media screen and (orientation: portrait) and (min-width: 416px) {
-        div.md-main__inner.md-grid div.md-sidebar.md-sidebar--primary {
-            z-index: 1100;
-            margin-top: 2rem;
-            object-fit: cover;
-            background-color: rgba(var(--zaffre-adj), 0.6);
-        }
-    }
-
-    header.md-header,
-    header.md-header--shadow {
-        z-index: 998 !important;
-        display: block;
-        pointer-events: visible;
-        object-fit: cover;
-        background: var(--zaffre);
-        transition: opacity 750ms;
-    }
-
     .md-source-file {
         display: none;
     }
@@ -53,21 +33,15 @@
         object-fit: cover;
         background-color: rgba(var(--zaffre-adj), 0.6);
     }
-
-    .md-container {
-        flex-direction: column;
-        align-items: flex-start;
-        align-content: space-between
-    }
-    nav.md-tabs {
-        position: fixed;
-        top: 4.5rem;
-    }
     nav.md-tabs, #header-target, .md-footer {
-        visibility: hidden;
         opacity: 0;
     }
 
+    main.md-main {
+        display: none;
+        visibility: hidden;
+        opacity: 0;
+    }
 </style>
 {% endblock %}
 {% block content %}

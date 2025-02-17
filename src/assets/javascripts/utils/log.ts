@@ -14,19 +14,29 @@ const url = new URL(window.location.href)
 isDevelopment = isDev(url)
 
 export const logger = {
+  debug: (message: string, ...args: unknown[]) => {
+    if (isDevelopment) {
+      console.debug(`%c[DEBUG] ${message}`, "color: aqua", ...args)
+    }
+  },
   error: (message: string, ...args: unknown[]) => {
     if (isDevelopment) {
-      console.error(message, ...args)
+      console.error(`%c[ERROR] ${message}`, "color: magenta", ...args)
     }
   },
   warn: (message: string, ...args: unknown[]) => {
     if (isDevelopment) {
-      console.warn(message, ...args)
+      console.warn(`%c[WARNING] ${message}`, "color: orange", ...args)
     }
   },
   info: (message: string, ...args: unknown[]) => {
     if (isDevelopment) {
-      console.info(message, ...args)
+      console.info(`%c[INFO] ${message}`, "color: white", ...args)
+    }
+  },
+  table: (data: unknown) => {
+    if (isDevelopment) {
+      console.table(data)
     }
   },
 }

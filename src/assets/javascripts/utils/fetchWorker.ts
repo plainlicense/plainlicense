@@ -4,17 +4,17 @@ const cacheWorkerUrl = "cacheWorker.ts"
 
 // registers the service worker
 if ("serviceWorker" in navigator && window.isSecureContext) {
-  logger.info("Registering service worker")
+  logger.debug("Registering service worker")
   const register = async () => {
     navigator.serviceWorker
       .register(cacheWorkerUrl, { scope: "/" })
       .then((registration) => {
         if (registration.installing) {
-          logger.info("Service worker installing")
+          logger.debug("Service worker installing")
         } else if (registration.waiting) {
-          logger.info("Service worker installed")
+          logger.debug("Service worker installed")
         } else if (registration.active) {
-          logger.info("Service worker active")
+          logger.debug("Service worker active")
         }
       })
       .catch((error) => {

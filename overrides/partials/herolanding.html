@@ -1,4 +1,3 @@
-</div>
 <section contenteditable="false" data-md-color-scheme="slate" data-md-color-media="dark"
   class="hero first" id="parallax-hero-image-layer">
   <div class="outer">
@@ -37,6 +36,30 @@
                 position: relative;
                 z-index: 1;
                 padding-bottom: 1rem;
+                content-visibility: visible;
+              }
+
+              .section.hero .hero__backup {
+                display: block;
+                opacity: 1;
+                visibility: visible;
+              }
+
+              .section.hero .outer,
+              .section.hero .inner {
+                display: none;
+                opacity: 0;
+                visibility: hidden;
+                transition: opacity 300ms ease-in-out, visibility 300ms ease-in-out;
+                z-index: -1000;
+              }
+
+              .section.hero .hero__bg {
+                display: none;
+                opacity: 0;
+                visibility: hidden;
+                transition: opacity 300ms ease-in-out, visibility 300ms ease-in-out;
+                z-index: -1000;
               }
 
               .section.hero .cta__container h1,
@@ -51,6 +74,7 @@
               .section.hero .hero__container {
                 opacity: 1;
                 visibility: visible;
+                content-visibility: visible;
               }
 
               .section.hero .md-typeset {
@@ -99,7 +123,7 @@
         <div class="md-typeset hero-grid middle">
           <h1 class="impact-text" id="pt2-hero-content-section-header">
             <span>licenses</span><br />
-            <span>people </span><span>can</span><br />understand</span>
+            <span>people </span><span>can</span><br /><span>understand</span>
           </h1>
         </div>
       </div>

@@ -308,7 +308,7 @@ export const generatePictureElement = (
     .join(", ")
   const img = `<img src="${png.widths[1280]}" class="${className}--image" draggable="false" fetchpriority="high" loading="eager" sizes="${sizes}" srcset="${png.srcset}">`
 
-  return `<picture class="nojs ${className}" role="presentation">${sources}\n${img}</picture>`
+  return `<picture class="nojs .hero__backup ${className}--active" role="presentation">${sources}\n${img}</picture>`
 }
 
 /**

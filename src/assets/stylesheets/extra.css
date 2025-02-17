@@ -21,7 +21,7 @@ html {
   }
 
   nav.md-nav {
-    display: none;
+    visibility: hidden;
   }
 }
 
@@ -199,7 +199,7 @@ a.md-nav__link--active {
 
 @media screen and (max-width: 1220px) {
   .md-tabs {
-    display: none;
+    visibility: hidden;
   }
 }
 

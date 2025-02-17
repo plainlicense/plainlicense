@@ -5,6 +5,7 @@
 	"image": "mcr.microsoft.com/devcontainers/base:ubuntu",
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	"forwardPorts": [
+		6000,
 		6499,
 		8000,
 		9222
@@ -13,22 +14,25 @@
 		"6499": {
 			"label": "Bun debug"
 		},
+		"6000": {
+			"label": "Firefox debug server",
+			"protocol": "http",
+			"icon": "firefox",
+			"onAutoForward": "notify",
+			"elevateIfNeeded": true
+		},
 		"8000": {
 			"label": "MKDocs dev server",
 			"protocol": "http",
 			"icon": "globe",
 			"openMode": "openBrowser",
-			"onAutoForward": "notify",
-			"requireLocalPort": true,
+			"onAutoForward": "openBrowserOnce",
 			"elevateIfNeeded": true
 		},
 		"9222": {
-			"label": "Chrome Debugger",
+			"label": "Chrome debug server",
 			"protocol": "http",
 			"icon": "chrome",
-			"openMode": "openBrowser",
-			"onAutoForward": "notify",
-			"requireLocalPort": true,
 			"elevateIfNeeded": true
 		}
 	},
@@ -40,8 +44,7 @@
 		"--dns",
 		"103.247.36.36",
 		"--dns",
-		"103.247.37.37",
-		"--add-host=host.docker.internal:host-gateway"
+		"103.247.37.37"
 	],
 	"containerEnv": {
 		"UV_LINK_MODE": "copy",

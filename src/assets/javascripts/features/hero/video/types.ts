@@ -14,7 +14,7 @@ export type Animations = Map<symbol, gsap.core.Timeline>
 
 export type VideoWidth = 426 | 640 | 854 | 1280 | 1920 | 2560 | 3840
 
-export type HeroPaths = Record<VideoWidth, string>
+export type HeroPaths = Record<VideoWidth, URL>
 
 export type VideoCodec = "av1" | "vp9" | "h264"
 

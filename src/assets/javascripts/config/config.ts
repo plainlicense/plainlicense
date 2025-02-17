@@ -12,6 +12,7 @@ import type { FadeInConfig, ObserverConfig } from "./types"
 
 // tags to exclude from animation
 export const EXCLUDED_TAGS = ["STYLE", "SCRIPT", "NOSCRIPT"] as const
+export const BACKUP_PICTURE = "break_free" as const
 
 const FADE_IN_CONFIG: FadeInConfig = {
   prefersReducedMotion: {
@@ -29,12 +30,12 @@ const FADE_IN_CONFIG: FadeInConfig = {
   normal: {
     from: {
       autoAlpha: 0,
-      y: 75,
+      yPercent: 75,
     },
     to: {
       autoAlpha: 1,
       duration: 0.5,
-      y: 0,
+      yPercent: 0,
     },
   },
   defaults: {
@@ -69,6 +70,13 @@ export const OBSERVER_CONFIG: ObserverConfig = {
     strong: ".cta__container--down-indicator",
   },
 } as const
+
+/**
+ * @type {string} VIDEO_MANAGER_ELEMENTS
+ * @description Elements for observer to ignore when VideoManager is active
+ */
+export const VIDEO_MANAGER_ELEMENTS: string =
+  ".hero__video, .hero__poster, .hero__poster--image, .hero__backup, noscript, style, script" as const
 
 /**
  * Minimum widths for video source media queries

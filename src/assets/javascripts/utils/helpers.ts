@@ -7,7 +7,8 @@
  * @copyright No rights reserved.
  */
 
-import { ParsedURLPath } from "./types"
+import { logger } from "./log"
+import { ParsedURLPath, UrlAsObject } from "./types"
 
 /**
  * Create a script tag with the given src, async and defer attributes
@@ -15,6 +16,7 @@ import { ParsedURLPath } from "./types"
  * @param src the source of the script
  * @param async async attribute
  * @param defer defer attribute
+ * @param ignoreDnt ignore do not track attribute
  */
 export const createScript = (src: string, async = true, defer = true, ignoreDnt = false) => {
   const alreadyLoaded = document.querySelector(`script[src="${src}"]`)
@@ -61,48 +63,44 @@ export function parsePath(path: string): ParsedURLPath {
   const parts = path.split("/")
   const base = parts.pop() || ""
   const dir = parts.join("/") || "/"
-  const name = base?.split(".").slice(0, -1).join(".") || ""
-  const ext = base?.split(".").pop() || ""
+  const nameParts = base.split(".")
+  const ext = nameParts.length > 1 ? nameParts.pop()! : ""
+  const name = nameParts.join(".")
   const root = parts[0] === "" ? "/" : ""
-  const pathObj = { base, dir, ext, name, root }
-  const url = URL.parse(path)
-  if (url instanceof URL) {
-    const {
-      hash,
-      host,
-      hostname,
-      href,
-      origin,
-      password,
-      pathname,
-      port,
-      protocol,
-      search,
-      searchParams,
-      username,
-    } = url
-    return {
-      base,
-      dir,
-      ext,
-      hash,
-      host,
-      hostname,
-      href,
-      name,
-      origin,
-      password,
-      pathname,
-      port,
-      protocol,
-      root,
-      search,
-      searchParams,
-      username,
+
+  const basePath = { base, dir, ext, name, root }
+
+  let urlObj: UrlAsObject | {} = {}
+  try {
+    const url = new URL(path, window.location.origin)
+    urlObj = {
+      hash: url.hash,
+      host: url.host,
+      hostname: url.hostname,
+      href: url.href,
+      origin: url.origin,
+      password: url.password,
+      pathname: url.pathname,
+      port: url.port,
+      protocol: url.protocol,
+      search:
+        url.search.length ?
+          Object.fromEntries(new URLSearchParams(url.search).entries()) || ""
+        : url.search || "",
+      username: url.username,
     }
-  } else {
-    return pathObj
+  } catch (error) {
+    // Leave as null if URL construction fails
   }
+
+  if (Object.keys(urlObj).length) {
+    return {
+      ...basePath,
+      ...urlObj,
+    }
+  }
+
+  return basePath
 }
 
 /**
@@ -155,4 +153,29 @@ export function fixSvgDimensions(): void {
       svg.setAttribute("height", item.value)
     })
   })
+}
+
+// A simple range function
+// from https://stackoverflow.com/a/10050831 by Fuji
+export function range(size: number, startAt: number = 0): ReadonlyArray<number> {
+  return [...Array(size).keys()].map((i) => i + startAt)
+}
+
+export function logObject(obj: any, label: string = "") {
+  if (!obj) {
+    logger.error(`No object to log for ${label}`)
+    return
+  }
+  if (Array.isArray(obj)) {
+    obj.forEach((item, i) => {
+      logger.debug(`${label}[${i}]: `, item)
+    })
+    return
+  } else if (typeof obj === "object") {
+    Object.keys(obj).forEach((key) => {
+      logger.debug(`${label}.${key}: `, obj[key])
+    })
+  } else {
+    logger.debug(`${label}: `, obj)
+  }
 }

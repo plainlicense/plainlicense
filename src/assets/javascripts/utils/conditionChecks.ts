@@ -6,7 +6,9 @@
  * @copyright No rights reserved.
  */
 
+import gsap from "gsap"
 import { EXCLUDED_TAGS } from "~/config"
+import { NotVisibleReport } from "./types"
 
 const LICENSE_HASHES = ["#reader", "#html", "#markdown", "#plaintext", "#changelog", "#official"]
 
@@ -103,7 +105,7 @@ export const isValidEvent = (value: Event | null) => {
  *
  * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/checkVisibility|MDN checkVisibility}
  */
-export const elementIsVisible = (el: HTMLElement | null): boolean => {
+export const elementIsVisible = (el: HTMLElement | null, checkParent: boolean = false): boolean => {
   if (!el || !(el instanceof HTMLElement)) {
     return false
   }
@@ -125,7 +127,11 @@ export const elementIsVisible = (el: HTMLElement | null): boolean => {
     el.parentElement?.style.contentVisibility !== "hidden" &&
     el.parentElement?.style.visibility !== "hidden"
 
-  return isNotHidden && parentNotHidden
+  if (checkParent && el.parentElement) {
+    return isNotHidden && parentNotHidden
+  }
+
+  return isNotHidden
 }
 
 /**
@@ -134,7 +140,7 @@ export const elementIsVisible = (el: HTMLElement | null): boolean => {
  * @param parent - The parent element.
  * @returns Whether the element is valid for animation.
  */
-export function isValidElement(el: unknown, parent: Element): boolean {
+export function isValidElement(el: unknown, parent: Element): el is Element {
   if (el === parent) {
     return false
   }
@@ -156,4 +162,51 @@ export function isValidElement(el: unknown, parent: Element): boolean {
     return false
   }
   return el.innerHTML.trim() !== ""
+}
+
+/**
+ * Checks if an element exists within the DOM or a specific container.
+ * @param el - The element to check.
+ * @param container - Optional container element. If provided, checks if the element is within this container. Otherwise, checks if the element is within the document body.
+ * @returns `true` if the element is in the DOM (or container), `false` otherwise.
+ */
+export function elementInDom(el: Element, container?: Element): boolean {
+  return container ? container.contains(el) : document.body.contains(el)
+}
+
+/**
+ * Retrieves elements that are not visible within a specified parent element.
+ * Primarily for debugging purposes.
+ * @param parent - The parent element to check for visibility.
+ * @returns An array of elements that are not visible.
+ */
+export function elementsNotVisible(parent: Element = document.body): Element[] {
+  const children = gsap.utils.toArray("*", parent)
+  return children
+    .filter((el) => isValidElement(el, parent) && !elementIsVisible(el as HTMLElement))
+    .filter(Boolean) as Element[]
+}
+
+export function generateNonVisibleElementReport(
+  parent: Element = document.body,
+): NotVisibleReport[] {
+  const elements = elementsNotVisible(parent)
+  if (elements.length === 0) {
+    return []
+  }
+  return elements.map((el) => {
+    const computedStyle = getComputedStyle(el)
+    const parentComputedStyle = getComputedStyle(el.parentElement as Element)
+    return {
+      element: el as HTMLElement,
+      noBox: computedStyle.display === "none" || computedStyle.display === "contents",
+      parentHidden:
+        (parentComputedStyle.display === "none" || parentComputedStyle.visibility === "hidden") &&
+        computedStyle.visibility === "inherit",
+      contentVisibilityAuto: el.checkVisibility({ contentVisibilityAuto: true }),
+      contentVisibilityHidden: computedStyle.contentVisibility === "hidden",
+      opacityZero: computedStyle.opacity === "0",
+      visibilityHidden: computedStyle.visibility === "hidden",
+    }
+  })
 }

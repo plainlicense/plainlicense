@@ -10,16 +10,30 @@
 
 import { gsap } from "gsap"
 import { Observer } from "gsap/Observer"
-import { Subscription } from "rxjs"
-import { distinctUntilChanged, filter, map } from "rxjs/operators"
+import {
+  BehaviorSubject,
+  Subscription,
+  debounceTime,
+  distinctUntilChanged,
+  distinctUntilKeyChanged,
+  filter,
+  map,
+  skipUntil,
+} from "rxjs"
 import { OBSERVER_CONFIG, ObserverConfig } from "~/config"
-import { HeroStore, HeroState } from "~/state"
-import { Direction, Section } from "./types"
+import { HeroState, HeroStore } from "~/state"
+import { Direction, Section, SectionIndex } from "./types"
 import { getContentElements } from "./utils"
 // Make sure we have the effects registered
-import { isHome, logger, isValidElement, navigationEvents$, stringify } from "~/utils"
+import {
+  generateNonVisibleElementReport,
+  isHome,
+  isValidElement,
+  logger,
+  navigationEvents$,
+  range,
+} from "~/utils"
 import "./effects"
-import { VideoManager } from "~/features"
 
 gsap.registerPlugin(Observer)
 
@@ -31,9 +45,11 @@ gsap.registerPlugin(Observer)
 export class HeroObservation {
   private store = HeroStore.getInstance()
 
-  private currentIndex: number = -1
+  private currentIndex: SectionIndex = SectionIndex.NotInitialized
 
   private config: ObserverConfig = OBSERVER_CONFIG
+
+  private hasTransitioned: boolean = false
 
   public sections: Section[] = []
 
@@ -46,14 +62,13 @@ export class HeroObservation {
 
   private clickObserver: Observer | undefined
 
+  private headerObserver: Observer | undefined
+
+  private footerObserver: Observer | undefined
+
   public animating: boolean = false
 
   private transitionTl: gsap.core.Timeline
-
-  private hasTransitioned: boolean = false
-
-  // @ts-ignore - initialized in onLoad
-  private wrapper
 
   private sectionCount: number = 0
 
@@ -63,13 +78,13 @@ export class HeroObservation {
 
   private initialized: boolean = false
 
+  private indexSubject = new BehaviorSubject<SectionIndex>(SectionIndex.NotInitialized)
+
   private footer: Element | null = document.querySelector(".md-footer")
 
-  private header: Element[] | null = gsap.utils.toArray(
-    document.querySelectorAll("#header-target nav.md-tabs"),
-  )
+  private header: Element[] | null = gsap.utils.toArray("#header-target, nav.md-tabs")
 
-  private blockbusterManager: VideoManager = VideoManager.getInstance()
+  private wrapper = gsap.utils.wrap(range(this.sectionCount) as number[])
 
   private constructor() {
     this.defaultTimelineVars = {
@@ -79,12 +94,6 @@ export class HeroObservation {
       repeat: 0,
       duration: this.config.slides.slideDuration,
       ease: "power2.inOut",
-      onComplete: () => {
-        this.animating = false
-      },
-      onStart: () => {
-        this.animating = true
-      },
       callbackScope: this,
     }
     this.transitionTl = gsap.timeline(this.defaultTimelineVars)
@@ -99,21 +108,41 @@ export class HeroObservation {
   public static getInstance(): HeroObservation {
     return (HeroObservation.instance ??= new HeroObservation())
   }
-
   // Sets up RxJs subscriptions to monitor the atHome state
   private setupSubscriptions() {
     // We're only interested in the atHome state
     const atHome$ = this.store.state$.pipe(
-      map((state: HeroState) => state.atHome),
+      filter((state: HeroState) => state.atHome),
+      distinctUntilKeyChanged("atHome"),
+      map((state) => {
+        return state.atHome
+      }),
       filter((atHome: boolean) => atHome),
+    )
+
+    const index$ = this.indexSubject
+      .asObservable()
+      .pipe(distinctUntilChanged(), skipUntil(atHome$), distinctUntilChanged())
+
+    const tearDown$ = this.store.state$.pipe(
+      map((state: HeroState) => state.atHome),
       distinctUntilChanged(),
+      filter((atHome: boolean) => !atHome),
+      debounceTime(5000),
     )
 
     this.subscriptions.add(
       atHome$.subscribe(() => {
         this.onLoad()
+        this.subscriptions.add(tearDown$.subscribe(() => this.destroy()))
       }),
     )
+    this.subscriptions.add(index$.subscribe((index) => this.store.section$.next(index)))
+  }
+
+  private updateIndex(index: SectionIndex) {
+    this.currentIndex = index
+    this.indexSubject.next(index)
   }
 
   // A delayed initialization function that sets up the observers
@@ -132,32 +161,29 @@ export class HeroObservation {
     const innerWrappers = gsap.utils.toArray(".inner")
     requestAnimationFrame(() => {
       document.body.style.overflow = "hidden"
-      gsap.set(
-        this.sections.map((section) => section.element),
-        { autoAlpha: 0 },
-      )
-      gsap.set(outerWrappers, { yPercent: 100, autoAlpha: 1 })
-      gsap.set(innerWrappers, { yPercent: -100, autoAlpha: 1 })
+      this.sections.forEach((section) => {
+        gsap.set(section.element, { autoAlpha: 0 })
+      })
+      gsap.set(outerWrappers, { yPercent: 100 })
+      gsap.set(innerWrappers, { yPercent: -100 })
     })
     const { hash } = window.location
-    const target = document.getElementById(hash.substring(1))
+    const target = hash.length > 0 ? document.getElementById(hash.substring(1)) : null
     if (!this.initialized) {
       this.setupSections()
-      this.wrapper = gsap.utils.wrap([...Array(this.sectionCount).keys()])
-      logger.info("wrapper setup", { wrapper: this.wrapper })
+      this.wrapper = gsap.utils.wrap(range(this.sectionCount) as number[])
       this.setupObserver()
       this.setupFirstSection(!target)
-    } else {
-      // if there's a hash we need to transition to the correct section
-      if (target) {
-        this.hasTransitioned = true
-        const sectionTarget = this.sections.find((section) => section.content.includes(target))
-        if (sectionTarget) {
-          const index = this.sections.indexOf(sectionTarget)
-          this.goToSection(index, index === this.sectionIndexLength ? Direction.UP : Direction.DOWN)
-        }
-      }
       this.initialized = true
+    } else if (target) {
+      this.hasTransitioned = true
+      const sectionTarget = this.sections.find((section) => section.content.includes(target))
+      if (sectionTarget) {
+        const index = this.sections.indexOf(sectionTarget)
+        this.goToSection(index, index === this.sectionIndexLength ? Direction.Up : Direction.Down)
+      } else {
+        logger.warn(`Target section ${target.id} not found in sections`)
+      }
     }
   }
 
@@ -168,7 +194,7 @@ export class HeroObservation {
    */
   private setupFirstSection(startImmediately: boolean = false) {
     if (startImmediately) {
-      this.goToSection(0, Direction.DOWN)
+      this.goToSection(0, Direction.Down)
     }
   }
 
@@ -197,30 +223,36 @@ export class HeroObservation {
       const bg = el.querySelector(".hero__bg")
 
       // Get content elements, excluding structural wrappers
-      const initialContent = getContentElements(el).filter(
-        (element) => element !== outerWrapper && element !== innerWrapper && element !== bg,
-      )
+      const initialContent = getContentElements(el)
+        .filter((element) => element !== outerWrapper && element !== innerWrapper && element !== bg)
+        .filter((e) =>
+          isValidElement(
+            e,
+            e.parentElement || this.sections[index].bg || this.sections[index].element,
+          ),
+        )
       const content = Array.from(new Set(initialContent))
 
-      logger.info(`Setting up section ${index}`, { outerWrapper, innerWrapper, bg, content })
+      logger.debug(`Setting up section ${index}`, { outerWrapper, innerWrapper, bg, content })
 
       const animation = gsap
         .timeline({
           ...this.defaultTimelineVars,
           defaults: {
-            paused: !(index === 0), // only play the first section immediately
+            paused: true,
             callbackScope: this,
+            ease: "power2.inOut",
           },
-          onComplete:
-            index === 0 ?
-              () => {
-                this.animating = false
-                logger.info("First section animation complete; playing video")
-                this.blockbusterManager.play()
-              }
-            : () => {
-                this.animating = false
-              },
+          duration:
+            index === SectionIndex.Landing ?
+              () =>
+                this.hasTransitioned ?
+                  this.config.slides.slideDuration
+                : this.config.slides.slideDuration / 3
+            : this.config.slides.slideDuration,
+          callbackScope: this,
+          onStart: this.onStartFunction(index),
+          onComplete: this.onCompleteFunction(index),
         })
         .addLabel("start")
 
@@ -235,21 +267,6 @@ export class HeroObservation {
       } as Section
     })
 
-    // Debug log the sections
-    logger.info("Sections set up:", {
-      count: this.sections.length,
-      sections: this.sections.map((section) => ({
-        index: section.index,
-        elementId: section.element.id,
-        contentCount: section.content.length,
-        contentElements: section.content.map((el) => ({
-          tagName: el.tagName,
-          className: el.className,
-          id: el.id,
-        })),
-      })),
-    })
-
     // Filter out ignored elements from first section
     const ignores = gsap.utils.toArray(this.config.fades.fadeInIgnore)
     this.sections[0].content = this.sections[0].content.filter(
@@ -260,26 +277,27 @@ export class HeroObservation {
     this.sectionIndexLength = this.sectionCount - 1
   }
   /**
-   * @description Transition to the next section based on the direction and whether the scenicRoute is enabled.
+   * @description Transition to the next section based on the direction and whether the scenicRoute is enablgetNexted.
    * @param direction
    * @param scenicRoute
    * @returns
    */
   public async transition(direction: Direction, scenicRoute?: boolean) {
-    let index = this.getNextIndex(direction)
-    this.hasTransitioned = !!(index > 0)
-    if (!this.animating && !scenicRoute) {
-      this.goToSection(index, direction)
-    } else if (!this.animating && scenicRoute && direction === Direction.DOWN) {
-      this.goToSection(index, direction)
-      let remainingSections = this.sectionIndexLength - index
+    if (this.animating) {
+      return
+    }
+    let nextIndex = this.getNextIndex(direction)
+    if (!scenicRoute) {
+      this.goToSection(nextIndex, direction)
+    } else if (scenicRoute && direction === Direction.Down) {
+      this.goToSection(nextIndex, direction)
+      let remainingSections = this.sectionIndexLength - nextIndex
 
       while (remainingSections > 0) {
         await new Promise((resolve) => setTimeout(resolve, 5000))
-
-        if (this.currentIndex !== this.sectionIndexLength && this.currentIndex === index) {
-          this.goToSection(index + Direction.DOWN, direction)
-          index++
+        if (this.currentIndex !== this.sectionIndexLength && this.currentIndex === nextIndex) {
+          this.goToSection(nextIndex + Direction.Down, direction)
+          nextIndex++
           remainingSections--
         } else {
           break // Exit loop if condition fails
@@ -295,11 +313,11 @@ export class HeroObservation {
       return this.wrapper(this.currentIndex + direction) as number
     }
     const nextIndex = this.currentIndex + direction
-    if (nextIndex < 0) {
+    if (nextIndex <= 0) {
       return 0
     } else {
       this.hasTransitioned = true
-      return nextIndex
+      return this.wrapper(nextIndex) as number
     }
   }
 
@@ -307,13 +325,9 @@ export class HeroObservation {
   // Uses registered effects from observerEffects.ts
   private constructTransitionTimeline(direction: Direction, index: number, tl: gsap.core.Timeline) {
     const section = this.sections[index]
-    logger.info(
+    logger.debug(
       `Timeline state: currentIndex=${this.currentIndex}, targetIndex=${index}, direction=${direction}, sectionsCount=${this.sectionCount}`,
     )
-
-    if (this.currentIndex < 0) {
-      this.currentIndex = index
-    }
     // the first time this runs, currentIndex will be -1
     logger.info(`Setting section ${this.currentIndex} to section ${index}`)
     tl.setSection(section.element, { direction, section })
@@ -327,40 +341,30 @@ export class HeroObservation {
   }
 
   // Go to the next section based on the index and direction
-  private goToSection(index: number, direction: Direction) {
-    if (this.animating || index === this.currentIndex) {
+  private goToSection(index: number, direction: Direction): void {
+    logger.info("Entering go to section with index and direction:", index, direction)
+    // an insurance policy for edge cases: ensure the index is within bounds
+    const clampedIndex = gsap.utils.clamp(0, this.sections.length - 1, index)
+    if (this.animating || clampedIndex === this.currentIndex) {
+      logger.info("Exiting goToSection: already animating or index is the same.")
+      logger.debug("Clamped index:", clampedIndex)
       return
     }
-
-    if (index < 0 || index >= this.sectionCount) {
-      return index < 0 ?
-          this.goToSection(0, direction)
-        : this.goToSection(this.sectionIndexLength, direction)
-    }
-
-    logger.info(`Going to section ${index} in direction ${direction}`)
+    this.updateIndex(clampedIndex)
 
     // Update currentIndex before creating timeline
-    this.currentIndex = index
+    if (!this.sections[clampedIndex].animation) {
+      throw new Error(
+        `No animation found for section ${clampedIndex} -- failed to setup transition`,
+      )
+    }
+    logger.debug(`Transitioning to section ${clampedIndex} in direction ${direction}`)
 
-    let tl = gsap.timeline({
-      defaults: {
-        duration: this.config.slides.slideDuration,
-        ease: "power2.inOut",
-        onComplete: () => {
-          this.animating = false
-          logger.info(`Completed transition to section ${this.currentIndex}`)
-        },
-        onStart: () => {
-          this.animating = true
-        },
-        callbackScope: this,
-      },
-    })
-
-    tl = this.constructTransitionTimeline(direction, index, tl)
-    this.transitionTl = tl
-
+    this.transitionTl = this.constructTransitionTimeline(
+      direction,
+      clampedIndex,
+      this.sections[clampedIndex].animation,
+    )
     this.transitionTl.play()
   }
 
@@ -388,6 +392,53 @@ export class HeroObservation {
     )
   }
 
+  private onStartFunction(index: SectionIndex) {
+    return () => {
+      this.store.updateHeroState({ isTransitioning: true })
+      this.animating = true
+      this.updateIndex(index)
+      logger.info(`Transitioning to section ${index}`)
+    }
+  }
+
+  private onCompleteFunction(index: SectionIndex) {
+    return () => {
+      this.store.updateHeroState({ isTransitioning: false })
+      this.animating = false
+      logger.info(`Transition to section ${index} complete`)
+      this.updateIndex(index)
+      logger.debug("Hidden elements in section:")
+      logger.table(generateNonVisibleElementReport(this.sections[index].element))
+    }
+  }
+
+  private onActionFunction(direction: Direction, scenicRoute: boolean = false) {
+    return () => {
+      if (!this.animating) {
+        this.transition(direction, scenicRoute)
+      } else {
+        logger.warn("Transition is already in progress")
+      }
+    }
+  }
+
+  private onHoverFunction(element: Element | Element[]) {
+    return () => !this.animating && gsap.to(element, { autoAlpha: 1, duration: 0.3 })
+  }
+
+  private onHoverEndFunction(element: Element | Element[]) {
+    return () => !this.animating && gsap.to(element, { autoAlpha: 0, duration: 0.3 })
+  }
+
+  private createHoverObserver(element: Element | Element[]): Observer {
+    return Observer.create({
+      type: "hover",
+      target: element,
+      onHover: this.onHoverFunction(element),
+      onHoverEnd: this.onHoverEndFunction(element),
+    })
+  }
+
   /**
    * @description Set up the Observers for the Hero feature. The Observers are created only when the user is at home. There are two Observers:
    * 1. The transitionObserver is the main Observer that handles all
@@ -395,19 +446,15 @@ export class HeroObservation {
    * 2. The clickObserver handles the click-driven "guided tour" of the sections.
    */
   private setupObserver() {
-    const clickTargets = gsap.utils.toArray(document.querySelectorAll(this.config.clickTargets))
-    const ignoreTargets = gsap.utils.toArray(document.querySelectorAll(this.config.ignoreTargets))
+    const clickTargets = gsap.utils.toArray(this.config.clickTargets)
+    const ignoreTargets = gsap.utils.toArray(this.config.ignoreTargets)
     this.transitionObserver = Observer.create({
-      type: "wheel,touch,pointer,scroll",
+      type: "wheel,touch,pointer",
       wheelSpeed: -1,
-      onDown: () => {
-        this.transition(Direction.DOWN, false)
-      },
-      onUp: () => {
-        this.transition(Direction.UP, false)
-      },
+      onDown: this.onActionFunction(Direction.Down),
+      onUp: this.onActionFunction(Direction.Up),
       preventDefault: true,
-      tolerance: 15,
+      tolerance: 25,
       ignore: clickTargets as Element[],
     })
     this.transitionObserver.enable()
@@ -415,25 +462,41 @@ export class HeroObservation {
       type: "click",
       target: clickTargets as Element[],
       ignore: ignoreTargets as Element[],
-      onClick: () => {
-        this.transition(Direction.DOWN, true)
-      },
-      onRelease: () => {
-        this.transition(Direction.DOWN, true)
-      },
+      onClick: this.onActionFunction(Direction.Down, true),
+      onRelease: this.onActionFunction(Direction.Down, true),
       preventDefault: true,
     })
     this.clickObserver.enable()
+    const headerHeight = this.store.getStateValue("header")?.height
+    if (headerHeight && this.header) {
+      this.headerObserver = this.createHoverObserver(this.header)
+      this.headerObserver.enable()
+    }
+    if (this.footer) {
+      this.footerObserver = this.createHoverObserver(this.footer)
+      this.footerObserver.enable()
+    }
   }
 
   // Destroy the Observers and subscriptions
   public destroy() {
-    if (this.transitionObserver) {
-      this.transitionObserver.disable()
-    }
-    if (this.clickObserver) {
-      this.clickObserver.disable()
-    }
+    logger.debug("Destroying observers and subscriptions")
+    const observers = [
+      this.transitionObserver,
+      this.clickObserver,
+      this.headerObserver,
+      this.footerObserver,
+    ]
+
+    observers.forEach((observer) => {
+      if (observer) {
+        observer.disable()
+        observer.kill()
+      }
+    })
+
     this.subscriptions.unsubscribe()
+    this.initialized = false
+    this.currentIndex = SectionIndex.NotInitialized
   }
 }

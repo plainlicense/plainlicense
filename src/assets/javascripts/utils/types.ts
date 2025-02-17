@@ -1,4 +1,35 @@
-export interface ParsedURLPath {
+import { Observable } from "rxjs"
+import { Url } from "url"
+
+export interface WatchOptions {
+  viewport$: Observable<Viewport> /* Viewport observable */
+}
+
+export interface NotVisibleReport {
+  element: HTMLElement
+  noBox: boolean
+  parentHidden: boolean
+  contentVisibilityAuto: boolean
+  contentVisibilityHidden: boolean
+  opacityZero: boolean
+  visibilityHidden: boolean
+}
+
+export interface UrlAsObject {
+  hash: string
+  host: string
+  hostname: string
+  href: string
+  origin: string
+  password: string
+  pathname: string
+  port: string
+  protocol: string
+  search: string
+  username: string
+}
+
+export interface UrlAsParsed {
   base: string
   dir: string
   ext?: string
@@ -7,13 +38,6 @@ export interface ParsedURLPath {
   hostname?: string
   href?: string
   name: string
-  origin?: string
-  password?: string
-  pathname?: string
-  port?: string
-  protocol?: string
-  root: string
-  search?: string
-  searchParams?: URLSearchParams
-  username?: string
 }
+
+export type ParsedURLPath = UrlAsParsed & Partial<UrlAsObject>

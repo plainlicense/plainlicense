@@ -6,9 +6,9 @@
  * @copyright No rights reserved
  */
 
-import { logger } from "~/utils"
-import { CodecVariants, ImageIndex, HeroVideo, VideoWidth } from "./types"
 import { MAX_WIDTHS } from "~/config"
+import { logger } from "~/utils"
+import { HeroVideo, ImageIndex, VideoWidth } from "./types"
 import { getMediaType, srcToAttributes } from "./utils"
 
 /**
@@ -21,7 +21,7 @@ export class VideoElement {
 
   private sources: HTMLSourceElement[]
 
-  private heroVideo: HeroVideo
+  public heroVideo: HeroVideo
 
   private poster: ImageIndex
 
@@ -32,12 +32,13 @@ export class VideoElement {
   public message: string = ""
 
   constructor(heroVideo: HeroVideo, properties?: { [key: string]: string }) {
-    this.video.classList.add("hero__video")
+    this.video.classList.add("hero__video", "hero__video--active")
     this.heroVideo = heroVideo
     this.poster = heroVideo.poster
     this.message = heroVideo.message || ""
     this.properties = this.getProperties(properties || {})
-    logger.info("Video Properties: ", this.properties)
+    logger.debug("Video Properties: ")
+    logger.table(this.properties)
     for (const prop of Object.keys(this.properties)) {
       const key = typeof prop === "string" ? prop : `${prop}`
       try {
@@ -49,22 +50,24 @@ export class VideoElement {
     this.video = this.constructVideoElement()
     this.sources = this.constructSources()
     this.video.append(...this.sources)
-    logger.info("video element: ", this.video)
-    logger.info("sources: ", this.sources)
+    logger.debug("video element: ")
+    logger.table(this.video)
+    logger.debug("sources: ")
+    logger.table(this.sources)
     this.picture = this.constructPictureElement()
-    this.setupVideoLoadHandlers()
   }
 
   // assign properties to the video element
   private getProperties(properties: { [key: string]: string }) {
     return {
-      disablePictureInPicture: "true",
-      playsInline: "true",
+      disablePictureInPicture: String(true),
+      playsinline: String(true),
       preload: "metadata",
-      muted: "true",
-      loop: "true",
-      autoplay: "true",
-      dataNoSnippet: "true",
+      muted: String(true),
+      loop: String(true),
+      autoplay: "",
+      dataNoSnippet: String(true),
+      volume: "0.0",
       ...properties,
     }
   }
@@ -87,18 +90,17 @@ export class VideoElement {
   private constructSources() {
     const { heroVideo } = this
     let srcs = []
-    const widths = Object.keys(MAX_WIDTHS)
     for (const [codec, variant] of Object.entries(heroVideo.variants)) {
       if (codec === "av1" || codec === "vp9" || codec === "h264") {
-        for (const width of widths) {
-          const w = parseInt(width, 10) as VideoWidth
+        for (const [width, url] of Object.entries(variant)) {
+          const w =
+            typeof width === "string" ? (parseInt(width, 10) as VideoWidth) : (width as VideoWidth)
           const src = document.createElement("source")
-          // @ts-ignore
-          const codecVariant = variant[width]
-          if (typeof codecVariant === "string" || codecVariant instanceof URL) {
-            src.src = codecVariant instanceof URL ? codecVariant.href : codecVariant
-          }
+          const codecVariant = url
+          src.src = codecVariant.href
           src.type = getMediaType(codec, w)
+
+          logger.debug(`Adding source: ${src.src} with type: ${src.type}`)
           src.media = w !== 3840 ? `(max-width: ${MAX_WIDTHS[w]}px)` : ""
           srcs.push(src)
         }
@@ -174,7 +176,7 @@ export class VideoElement {
     })
     picture.append(...srcs)
     const img = document.createElement("img")
-    img.src = poster.png.widths[1280]
+    img.src = poster.png.widths[1280].href
     img.srcset = poster.png.srcset
     img.alt = ""
     img.sizes = this.getSizes()
@@ -185,25 +187,6 @@ export class VideoElement {
     picture.role = "presentation"
     picture.append(img)
     return picture
-  }
-
-  // setup event handlers for the video element
-  private setupVideoLoadHandlers() {
-    this.video.addEventListener("canplaythrough", () => {
-      this.picture.classList.remove("hero__poster--active")
-      this.picture.classList.add("hero__poster--inactive")
-    })
-
-    // Fallback if video fails to load
-    this.video.addEventListener("error", () => {
-      this.picture.classList.add("hero__poster--active")
-      this.picture.classList.remove("hero__poster--inactive")
-    })
-
-    this.video.addEventListener("playing", () => {
-      this.picture.classList.remove("hero__poster--inactive")
-      this.picture.classList.add("hero__poster--active")
-    })
   }
 
   public getElements() {

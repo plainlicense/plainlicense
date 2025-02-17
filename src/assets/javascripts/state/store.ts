@@ -29,32 +29,63 @@ import {
   switchMap,
   tap,
 } from "rxjs"
+import { getViewportOffset, getViewportSize } from "~/browser"
+import { Header, getComponentElement } from "~/components"
+import { SectionIndex } from "~/features"
+import {
+  isDev,
+  isHome,
+  isPageVisible$,
+  isPartiallyInViewport,
+  logger,
+  navigationEvents$,
+  prefersReducedMotion$,
+  setCssVariable,
+  stringify,
+  watchHeader,
+  watchMediaQuery,
+} from "~/utils"
 import {
   AnimationComponent,
   ComponentStateUpdateFunction,
   HeroState,
   StatePredicate,
+  StateValue,
+  TransitionState,
   VideoState,
 } from "./types"
-import {
-  isDev,
-  isHome,
-  logger,
-  stringify,
-  setCssVariable,
-  isPageVisible$,
-  isPartiallyInViewport,
-  navigationEvents$,
-  prefersReducedMotion$,
-  watchMediaQuery,
-} from "~/utils"
-import { getViewportOffset, getViewportSize } from "~/browser"
-import { Header, getComponentElement, watchHeader } from "~/components"
 
 let customWindow: CustomWindow = window as unknown as CustomWindow
 const weAreDev = isDev(new URL(customWindow.location.href))
 const { viewport$ } = customWindow
 const initialUrl = new URL(customWindow.location.href)
+
+/** ======================
+ **   COMPONENT PREDICATES
+ *========================**/
+// there used to be a lot more, but, we simplified it by moving to the video.
+
+export const isFullyVisible = (state: HeroState): boolean =>
+  state.atHome && state.landingVisible && state.pageVisible
+
+const isTransitioning = (state: HeroState): boolean => state.isTransitioning
+
+export const noVideo = (state: HeroState): boolean => state.prefersReducedMotion
+
+/**
+ * @param {HeroState} state - Hero state
+ * @returns {VideoState} video state predicate
+ * @description Predicates for the video component
+ */
+export const videoPredicate = (state: HeroState): VideoState => ({
+  canPlay: isFullyVisible(state) && !noVideo(state) && !isTransitioning(state),
+})
+
+const predicates = {
+  isFullyVisible,
+  noVideo,
+  videoPredicate,
+}
 
 /**
  * @class HeroStore
@@ -80,7 +111,8 @@ export class HeroStore {
   // state$ is a BehaviorSubject that holds the current state of the hero section
   public state$ = new BehaviorSubject<HeroState>({
     atHome: isHome(initialUrl),
-    landingVisible: isHome(initialUrl),
+    canPlay: false,
+    landingVisible: isHome(initialUrl) && (initialUrl.hash === "" || initialUrl.hash === "#"),
     pageVisible: !document.hidden || document.visibilityState === "visible",
     prefersReducedMotion: customWindow.matchMedia("(prefers-reduced-motion: reduce)").matches,
     viewport: {
@@ -90,12 +122,19 @@ export class HeroStore {
     header: { height: 0, hidden: true },
     parallaxHeight: getViewportOffset().y * 1.4,
     location: initialUrl,
+    isTransitioning: false,
     tearDown: false,
+    currentSection: SectionIndex.NotInitialized,
   })
 
   public videoState$ = new BehaviorSubject<VideoState>({ canPlay: false })
 
   public parallaxHeight$ = new BehaviorSubject<number>(getViewportOffset().y * 1.4)
+
+  // defaulting to true keeps the video from playing on page load
+  public transitionState$ = new BehaviorSubject<TransitionState>({ isTransitioning: true })
+
+  public section$ = new BehaviorSubject<SectionIndex>(SectionIndex.NotInitialized)
 
   private subscriptions = new Subscription()
 
@@ -136,10 +175,14 @@ export class HeroStore {
       return
     }
     this.state$.next({ ...this.state$.value, ...update })
-    if (component && component === AnimationComponent.Video) {
-      logger.info("updating video state; update:", update)
-      this.videoState$.next(update as VideoState)
-      return
+    if (component) {
+      switch (component) {
+        case AnimationComponent.Video:
+          this.videoState$.next({ ...this.videoState$.value, ...update })
+          break
+        default:
+          break
+      }
     }
   }
 
@@ -149,7 +192,8 @@ export class HeroStore {
    * @description Updates the hero state with a partial state
    */
   public updateHeroState(updates: Partial<HeroState>, component?: AnimationComponent): void {
-    logger.info("external component updating state; updates:", updates)
+    logger.debug("external component updating state; updates:")
+    logger.table(updates)
     this.updateState(updates, component)
   }
 
@@ -166,7 +210,8 @@ export class HeroStore {
   ): Observer<T> {
     return {
       next: (value: T) => {
-        logger.info(`${name} received:`, value)
+        logger.debug(`Observer ${name} received:`)
+        logger.table(value)
         this.updateState(updateFn(value), component)
       },
       error: (error: Error) => logger.error(`Error in ${name}:`, error),
@@ -186,17 +231,21 @@ export class HeroStore {
       tap(this.createObserver("atHome$", (atHome) => ({ atHome }))),
     )
 
-    const landing$ = isPartiallyInViewport(
-      document.getElementById("parallax-hero-image-layer") as HTMLElement,
-    ).pipe(filter((landing) => landing !== undefined && landing !== null))
+    const landing$ = combineLatest([
+      isPartiallyInViewport(document.getElementById("parallax-hero-image-layer") as HTMLElement),
+      this.section$.pipe(filter((section) => section < SectionIndex.Impact)),
+    ]).pipe(
+      map(([landingVisible, _currentSection]) => {
+        return landingVisible
+      }),
+      distinctUntilChanged(),
+      shareReplay(1),
+    )
 
     const landingVisible$ = atHome$.pipe(
       filter((atHome) => atHome),
       switchMap(() => landing$),
-      filter(
-        (landingVisible) =>
-          landingVisible && landingVisible !== undefined && landingVisible !== null,
-      ),
+      filter((landingVisible) => !!landingVisible),
       tap(this.createObserver("landingVisible$", (landingVisible) => ({ landingVisible }))),
     )
 
@@ -254,7 +303,31 @@ export class HeroStore {
       tap(this.createObserver("parallaxHeight$", (parallaxHeight) => ({ parallaxHeight }))),
     )
 
-    const video$ = this.getVideoState$((v) => this.videoState$.next(v as VideoState))
+    const video$ = this.getVideoState$((canPlay) => {
+      this.videoState$.next({ canPlay } as unknown as VideoState)
+    })
+
+    const transition$ = this.getTransitionState$((t) => {
+      this.transitionState$.next(t as TransitionState)
+    })
+
+    const loc$ = navigationEvents$.pipe(
+      tap(
+        this.createObserver("location$", (location) => ({
+          location,
+        })),
+      ),
+    )
+
+    const section$ = this.section$.pipe(
+      tap(
+        this.createObserver("section$", (currentSection) => ({
+          currentSection,
+        })),
+      ),
+      distinctUntilChanged(),
+      shareReplay(1),
+    )
 
     this.subscriptions.add(atHome$.subscribe())
     this.subscriptions.add(landingVisible$.subscribe())
@@ -262,9 +335,11 @@ export class HeroStore {
     this.subscriptions.add(motion$.subscribe())
     this.subscriptions.add(view$.subscribe())
     this.subscriptions.add(header$.subscribe())
-    this.subscriptions.add(location$.subscribe())
+    this.subscriptions.add(loc$.subscribe())
     this.subscriptions.add(parallax$.subscribe())
     this.subscriptions.add(video$.subscribe())
+    this.subscriptions.add(transition$.subscribe())
+    this.subscriptions.add(section$.subscribe())
   }
 
   /**
@@ -290,13 +365,8 @@ export class HeroStore {
    * @description Gets the current state of a specific
    * component or landing permissions
    */
-  public getComponentValue(component: string): VideoState {
-    switch (component) {
-      case AnimationComponent.Video:
-        return this.videoState$.value
-      default:
-        return this.videoState$.value
-    }
+  public getComponentValue(): VideoState {
+    return this.videoState$.value
   }
 
   /** ============================================
@@ -312,9 +382,10 @@ export class HeroStore {
   private getComponentObserver<T>(name: string, func?: ComponentStateUpdateFunction): Observer<T> {
     return {
       next: (value: T) => {
-        logger.info(`${name} received:`, value)
+        logger.debug(`Observer ${name} received:`)
+        logger.table(value)
         if (func) {
-          ;(value: T) => func(value as VideoState)
+          func(value as StateValue)
         }
       },
       error: (error: Error) => logger.error(`Error in ${name}:`, error),
@@ -327,15 +398,37 @@ export class HeroStore {
    * @returns {Observable<VideoState>} Observable for carousel state indicating play and pause conditions
    * @description Creates an observable for the carousel state indicating play and pause conditions
    */
-  private getVideoState$(observerFunc: ComponentStateUpdateFunction): Observable<VideoState> {
+  private getStateObservable(
+    observerFunc: ComponentStateUpdateFunction,
+    key: keyof HeroState,
+    observableName: string,
+    predicate?: (state: HeroState) => any,
+  ): Observable<T> {
     return this.state$.pipe(
-      map((state) => ({
-        canPlay: videoPredicate.canPlay(state),
-      })),
-      distinctUntilKeyChanged("canPlay"),
+      map(
+        (state) =>
+          ({
+            [key]: predicate ? predicate(state) : state[key],
+          }) as unknown as T,
+      ),
+      distinctUntilKeyChanged(key as keyof StateValue),
+      shareReplay(1),
+      tap(this.getComponentObserver(observableName, observerFunc)),
+    )
+  }
+  private getVideoState$(observerFunc: ComponentStateUpdateFunction): Observable<boolean> {
+    return this.state$.pipe(
+      map((state) => predicates.videoPredicate(state).canPlay), // Return boolean directly
+      distinctUntilChanged(),
       shareReplay(1),
       tap(this.getComponentObserver("videoState$", observerFunc)),
     )
+  }
+
+  private getTransitionState$(
+    observerFunc: ComponentStateUpdateFunction,
+  ): Observable<TransitionState> {
+    return this.getStateObservable(observerFunc, "isTransitioning", "transitionState$")
   }
 
   /**
@@ -351,12 +444,13 @@ export class HeroStore {
       if (changes.length === 0) {
         return
       }
-      logger.info("Changes:", stringify(changes))
-      logger.info("New State:", stringify({ ...oldState, ...updates }))
+      logger.debug("State received changes:")
+      logger.table(changes)
+      logger.debug("New state:", stringify({ ...oldState, ...updates }))
       Object.entries(predicates)
         .filter(([_, value]) => typeof value === "function")
         .forEach(([name, predicate]) => {
-          logger.info(`${name}:`, (predicate as StatePredicate)({ ...oldState, ...updates }))
+          logger.debug(`${name}:`, (predicate as StatePredicate)({ ...oldState, ...updates }))
         })
     }
   }
@@ -370,34 +464,4 @@ export class HeroStore {
     this.subscriptions.unsubscribe()
     HeroStore.instance = undefined
   }
-}
-
-/**
- * @param {HeroState} state - Hero state
- * @returns {boolean} Whether the hero is fully visible
- * @description Checks if the hero is fully visible
- */
-export const isFullyVisible = (state: HeroState): boolean =>
-  state.atHome && state.landingVisible && state.pageVisible
-
-export const noVideo = (state: HeroState): boolean => state.prefersReducedMotion
-
-/** ======================
- **   COMPONENT PREDICATES
- *========================**/
-// there used to be a lot more, but, we simplified it by moving to the video.
-
-/**
- * @param {HeroState} state - Hero state
- * @returns {VideoState} video state predicate
- * @description Predicates for the video component
- */
-export const videoPredicate = {
-  canPlay: (state: HeroState): boolean => isFullyVisible(state) && !noVideo(state),
-}
-
-const predicates = {
-  isFullyVisible,
-  noVideo,
-  videoPredicate,
 }

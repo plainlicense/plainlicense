@@ -3,7 +3,6 @@ import esbuild from "esbuild"
 import manifestPlugin from "esbuild-plugin-manifest"
 import { promises as fs } from "fs"
 import { EsbuildOutput, ReplacerConfig } from "../types"
-import { get } from "http"
 
 let buildOutput: EsbuildOutput = {}
 
@@ -144,7 +143,7 @@ const replacerConfigs: ReplacerConfig[] = [
     replacer: (match: RegExpExecArray) => {
       if (match && match.groups) {
         // @ts-ignore - TS doesn't know we're compiling to esm in esbuild
-        return `var ${match.groups.variable} = new URL(${match.groups.path.replace("..", "assets")}, window.location.origin);`
+        return `var ${match.groups.variable} = ${match.groups.path.replace("..", "assets")};`
       }
       return match[0]
     },
