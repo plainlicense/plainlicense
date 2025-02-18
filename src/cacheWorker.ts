@@ -164,6 +164,24 @@ const normalizeRequest = (url: RequestLike): Request => {
   return url instanceof Request ? url : new Request(url)
 }
 
+const hasCryptoHash = (url: URL | string): boolean => {
+  const u = url instanceof URL ? url.pathname : url
+  const name = u.split("/").pop()
+  return name?.split(".").length === 3
+}
+
+const getCryptoHashlessBaseName = (url: URL | string) => {
+  const u = url instanceof URL ? url.pathname : url
+  if (!hasCryptoHash(u)) {
+    return u.split("/").pop()
+  }
+  const parts = u.split("/").pop()?.split(".")
+  const hashlessName = [parts?.slice(0), parts?.slice(-1)].filter(Boolean)
+  if (hashlessName && hashlessName.length === 2) {
+    return hashlessName.join(".")
+  }
+}
+
 /**
  * Cache manager for managing cache operations
  *
@@ -376,10 +394,12 @@ class CacheManager {
       logger.error("Failed to fetch:", new Error(errorMessage))
       logger.error("Attempting fallback fetch")
       const url = new URL(request.toString())
-      if (MANIFEST && Object.keys(MANIFEST).includes(url.pathname)) {
-        const inConfig = MANIFEST.hasOwnProperty(url.pathname)
-        if (inConfig) {
-          const newLocation = MANIFEST[url.pathname].file
+      const name = getCryptoHashlessBaseName(url)
+
+      if (MANIFEST && name) {
+        const key = Object.keys(MANIFEST).find((key) => key.includes(name))
+        if (key) {
+          const newLocation = MANIFEST[key].file
           return this.tryFetch(newLocation, init)
         }
       }
@@ -424,7 +444,12 @@ class CacheStrategies {
       return fetch(request)
     }
     const url = new URL(request.url)
-    if (url.origin !== self.location.origin) {
+    if (
+      url.origin !== self.location.origin ||
+      (url.origin === self.location.origin &&
+        !url.href.includes("assets") &&
+        (url.href.endsWith(".png") || url.href.endsWith(".ico") || url.href.endsWith(".jpg")))
+    ) {
       return fetch(request)
     }
     // spellchecker:off

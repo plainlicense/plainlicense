@@ -52,6 +52,8 @@ sqlite3 \
 unzip \
 xclip \
 xterm \
+xdg-utils \
+flatpak-xdg-utils \
 zlib1g \
 zlib1g-dev \
 zsh \

@@ -91,5 +91,7 @@ fi
 
 node_bin=$(command -v node)
 if [ ! -f "/usr/bin/node" ] && [ ! -L "/usr/bin/node" ] && [ -f "$node_bin" ]; then
-  sudo ln -s "$node_bin" /usr/bin/node
+  sudo ln -s "$node_bin" /usr/bin/node > /dev/null 2>&1
 fi
+
+source /workspaces/PlainLicense/.venv/bin/activate

@@ -21,10 +21,11 @@
 // @ts-ignore: yes, I know it's not in the project json...
 import * as bundle from "@/bundle"
 
+import gsap from "gsap"
 import {
-  Observable,
   combineLatest,
   debounceTime,
+  defer,
   distinctUntilChanged,
   filter,
   from,
@@ -33,6 +34,7 @@ import {
   map,
   merge,
   mergeMap,
+  Observable,
   of,
   share,
   shareReplay,
@@ -46,13 +48,14 @@ import {
   toArray,
 } from "rxjs"
 import Tablesort from "tablesort"
-
+import { feature } from "~/_"
+import { getLocation, watchElementSize, watchViewportAt } from "~/browser"
+import { getComponentElement, Header, watchHeader } from "~/components"
 import { isLicenseHash, isValidEvent, logger } from "./"
-import { getLocation, watchViewportAt } from "~/browser"
-import { getComponentElement, watchHeader } from "~/components"
+import { WatchOptions } from "./types"
 
 export const NAV_EXIT_DELAY = 60000
-export const PAGE_CLEANUP_DELAY = 20000
+export const PAGE_CLEANUp_DELAY = 20000
 
 let customWindow: CustomWindow = window as unknown as CustomWindow
 
@@ -230,7 +233,7 @@ export function watchPathnameChange(predicate: (_url: URL) => boolean) {
  * @returns an observable that emits when a table is found or null if no tables are found
  */
 export const watchTables = () => {
-  const tables = document.querySelectorAll("article table:not([class])")
+  const tables = gsap.utils.toArray("article table:not([class])") as HTMLTableElement[]
   const observables = () =>
     tables.length > 0 ?
       from(tables).pipe(
@@ -351,5 +354,51 @@ export function postUrlsForWorker(urls: string[]) {
     return
   }
   customWindow.postMessage({ type: "CACHE_URLS", payload: urls })
-  logger.info(`Cached URLs: ${urls.join(", ")}`)
+  logger.debug(`Cached URLs: ${urls.join(", ")}`)
+}
+
+/**
+ * Checks if the header element is hidden.
+ * It returns an observable that emits a boolean value indicating whether the header is hidden.
+ *
+ * @param options An object containing viewport information.
+ * @returns An observable emitting a boolean indicating if the header is hidden.
+ */
+function isHidden({ viewport$ }: WatchOptions): Observable<boolean> {
+  if (!feature("header.autohide")) {
+    return of(false)
+  }
+  const header = getComponentElement("header")
+  if (!header || !viewport$) {
+    return of(false)
+  }
+  if (
+    header.checkVisibility({
+      contentVisibilityAuto: true,
+      opacityProperty: true,
+      visibilityProperty: true,
+    })
+  ) {
+    return of(true)
+  }
+  return of(false)
+}
+
+/**
+ * Creates an observable that monitors the header element's size and visibility.
+ * Emits an object containing the header's height and a boolean indicating if it's hidden.
+ *
+ * @param el The header element to observe.
+ * @param options Viewport and feature flag options.
+ * @returns An observable emitting the header's dimensions and visibility status.
+ */
+export function watchHeader(el: HTMLElement, options: WatchOptions): Observable<Header> {
+  return defer(() => combineLatest([watchElementSize(el), isHidden(options)])).pipe(
+    map(([{ height }, hidden]) => ({
+      height,
+      hidden,
+    })),
+    distinctUntilChanged((a, b) => a.height === b.height && a.hidden === b.hidden),
+    shareReplay(1),
+  )
 }

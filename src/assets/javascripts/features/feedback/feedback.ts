@@ -5,8 +5,8 @@
  * @copyright No rights reserved. Created by and for Plain License www.plainlicense.org
  */
 import { Observable, filter, fromEvent, map, of, tap, throttleTime } from "rxjs"
-import { logger } from "~/utils/log"
 import { isValidEvent, preventDefault } from "~/utils"
+import { logger } from "~/utils/log"
 
 /**
  * @exports feedback
@@ -28,7 +28,7 @@ export const feedback = (): Observable<Event | null> => {
       tap((ev: SubmitEvent) => {
         const page = document.location.pathname
         const data = ev.submitter?.getAttribute("data-md-value")
-        logger.info(page, data)
+        logger.debug(page, data)
         if (
           feedbackForm.firstElementChild &&
           feedbackForm.firstElementChild instanceof HTMLButtonElement

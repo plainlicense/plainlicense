@@ -85,6 +85,7 @@ const feedback$ = onDom$(of(feedback()))
 const buttonScript$ = onDom$(of(insertButtonScript()))
 const color$ = of(document.body.setAttribute("data-md-color-scheme", "slate"))
 const observer$ = of(HeroObservation.getInstance())
+const videoManager$ = of(VideoManager.getInstance())
 //const videoManager$ = of(VideoManager.getInstance())
 const licenseHashHandler$ = onDom$(watchLicenseHash())
 const license$ = navigationEvents$.pipe(
@@ -99,7 +100,7 @@ const pageConfigs: PageConfig[] = [
   {
     matcher: isHome,
     location: "home",
-    observables: [color$, observer$],
+    observables: [color$, observer$, videoManager$],
   },
   {
     matcher: isLicense,

@@ -19,9 +19,16 @@ export interface ReducedMotionCondition extends gsap.Conditions {
  * @description Direction enum for the Hero Observers.
  */
 export enum Direction {
-  UP = -1, // toward the top of the page
+  Up = -1, // toward the top of the page
 
-  DOWN = 1, // toward the bottom of the page
+  Down = 1, // toward the bottom of the page
+}
+
+export enum SectionIndex {
+  NotInitialized = -1,
+  Landing = 0,
+  Impact = 1,
+  LaunchPad = 2,
 }
 
 /**
@@ -29,7 +36,7 @@ export enum Direction {
  * @description Section element and content for Observer animation.
  */
 export interface Section {
-  readonly index: number
+  index: number | SectionIndex
   readonly element: Element
   readonly outerWrapper: Element | null
   readonly innerWrapper: Element | null

@@ -12,8 +12,6 @@ import { HeroStore } from "~/state"
 import { isValidElement } from "~/utils"
 import { ReducedMotionCondition } from "./types"
 
-const store = HeroStore.getInstance()
-
 /**
  * Randomly selects and removes an item from an array, reshuffling if depleted.
  *
@@ -27,7 +25,7 @@ const store = HeroStore.getInstance()
  * @see {@link https://greensock.com/docs/v3/GSAP/Utilities/mapRange} GSAP Normalization Utility
  */
 export function normalizeResolution(): number {
-  const viewport = store.getStateValue("viewport")
+  const viewport = HeroStore.getInstance().getStateValue("viewport")
   const resolution = Math.max(viewport.offset.y, viewport.offset.x)
   const clampedResolution = gsap.utils.clamp(320, 3840, resolution)
   return gsap.utils.mapRange(320, 3840, 0, 1, clampedResolution)
@@ -58,7 +56,7 @@ export function getDistanceToViewport(
   edge: "top" | "right" | "bottom" | "left" = "bottom",
 ) {
   const rect = target.getBoundingClientRect()
-  const { viewport } = store.state$.getValue()
+  const { viewport } = HeroStore.getInstance().state$.getValue()
   const distanceMap = {
     top: rect.top,
     right: viewport.offset.x - rect.right,
@@ -88,25 +86,23 @@ export function hasLabel(tl: gsap.core.Timeline, label: string): boolean {
  * @returns The content-containing elements of the element.
  */
 export function getContentElements(element: Element): Element[] {
+  // Exclude wrapper elements and utility classes
+  const excludedClasses = ["outer", "inner", "hero__bg"]
+  const hasExcludedClass = (el: Element) =>
+    excludedClasses.some((cls) => el.classList.contains(cls))
+  const hasContent = (el: Element) =>
+    (el.textContent?.trim()?.length ?? 0) > 0 ||
+    el.querySelector("img, svg, video, picture") !== null
+
   // First get all child elements
-  const allElements = Array.from(element.querySelectorAll("*"))
-
-  // Filter out elements that should be excluded
-  return allElements.filter((el: Element): boolean => {
-    // Check if element is valid and visible
-    if (!isValidElement(el, element)) {
-      return false
-    }
-    // Exclude wrapper elements and utility classes
-    const excludedClasses = ["outer", "inner", "hero__bg"]
-    const hasExcludedClass = excludedClasses.some((cls) => el.classList.contains(cls))
-
-    // Get only elements that contain actual content
-    const hasContent =
-      (el.textContent?.trim()?.length ?? 0) > 0 || el.querySelector("img, svg, video") !== null
-    return !hasExcludedClass && hasContent
-  })
+  return gsap.utils
+    .toArray("*", element)
+    .filter(
+      (el): el is Element => el instanceof Element && el !== element && isValidElement(el, element),
+    )
+    .filter((el) => !hasExcludedClass(el) && hasContent(el))
 }
+
 /**
  * Attempts to retrieve an object's values as elements.
  * @param obj - The object to retrieve values from.
@@ -186,10 +182,20 @@ export function modifyDurationForReducedMotion(
  * @param el - The element or text to split into divs.
  * @returns A document fragment containing the divs.
  */
-export function wordsToLetterDivs(el: HTMLElement | string): DocumentFragment {
+export function wordsToLetterDivs(
+  el: HTMLElement | string | HTMLElement[] | string[],
+): DocumentFragment {
   const docFragment = document.createDocumentFragment()
   let text = ""
-  if (typeof el === "string") {
+  if (Array.isArray(el)) {
+    if (el.every((item) => typeof item === "string")) {
+      text = el.join(" ")
+    } else {
+      el.forEach((item) => {
+        docFragment.appendChild(wordsToLetterDivs(item))
+      })
+    }
+  } else if (typeof el === "string") {
     text = el
   } else {
     text = el.innerText
@@ -198,12 +204,10 @@ export function wordsToLetterDivs(el: HTMLElement | string): DocumentFragment {
   letters.forEach((letter, idx) => {
     if (idx === 0 && (letter === " " || letter === "\n")) {
       return
+    } else if (idx === letters.length - 1 && letter === " ") {
+      return
     }
     const textNode = document.createTextNode(letter)
-    if (letter === " " || letter === "\n") {
-      const lastEl = docFragment.lastChild
-      lastEl?.appendChild(textNode)
-    }
     const newDiv = document.createElement("div")
     newDiv.appendChild(textNode)
     newDiv.classList.add("hero__letter")
@@ -212,6 +216,7 @@ export function wordsToLetterDivs(el: HTMLElement | string): DocumentFragment {
   if (el instanceof HTMLElement) {
     gsap.set(el, { innerText: "" })
   }
-  gsap.set(docFragment.querySelectorAll("div"), { display: "inline-block", autoAlpha: 0 })
+  const fragmentDivs = gsap.utils.toArray("div", docFragment)
+  gsap.set(fragmentDivs, { display: "inline-block", autoAlpha: 0 })
   return docFragment
 }

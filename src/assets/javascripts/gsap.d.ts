@@ -1,7 +1,9 @@
 import { gsap } from "gsap"
+import { extend } from "tablesort"
 
 declare module "gsap" {
-  export interface GSAP extends gsap {
+  export interface GSAP extends gsap {}
+  interface GSAPTimeline extends gsap.core.Timeline {
     animateMessage(targets: gsap.TweenTarget, config: AnimateMessageConfig): gsap.core.Timeline
     fadeIn(targets: gsap.TweenTarget, config: FadeEffectConfig): gsap.core.Timeline
     fadeOut(targets: gsap.TweenTarget, config: FadeEffectConfig): gsap.core.Timeline
@@ -11,4 +13,5 @@ declare module "gsap" {
   }
 
   const gsap: GSAP
+  const timeline: GSAPTimeline
 }

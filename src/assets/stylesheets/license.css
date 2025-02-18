@@ -495,7 +495,7 @@ p.md-nav__description.license {
 
 .md-nav--secondary> details.question> summary::marker,
 .md-nav--secondary> details.question> summary::-webkit-details-marker {
-  display: none;
+  visibility: hidden;
 }
 
 .md-nav--secondary> details.question> summary::after {

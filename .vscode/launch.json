@@ -2,16 +2,36 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Launch Chrome",
+      "name": "Attach Firefox Debug",
+      "type": "firefox",
+      "clearConsoleOnReload": true,
       "request": "attach",
+      "url": "http://localhost:8000",
+      "webRoot": "${workspaceFolder}/src",
+      "reloadOnAttach": true,
+      "port": 6000,
+      "preLaunchTask": "mkdocs serve live",
+      "skipFiles": [
+        "${workspaceFolder}/node_modules/**/*",
+        "${workspaceFolder}/external/**/*"
+      ],
+      "pathMappings": [
+        {
+          "url": "/",
+          "path": "${workspaceFolder}/docs"
+        }
+      ]
+    },
+    {
+      "name": "Launch Chrome",
+      "request": "launch",
       "type": "chrome",
-      "address": "host.docker.internal",
-      "port": 9222,
       "preLaunchTask": "prepare-chrome",
       "pathMapping": {
         "/": "${workspaceFolder}/docs"
       },
-      "url": "http://host.docker.internal:8000",
+      "runtimeExecutable": "/usr/bin/flatpak run --branch=stable --arch=x86_64 --command=/app/bin/chromium --enable-features=UseOzonePlatform --ozone-platform=wayland --gtk-version=4 --gpu-testing-vendor-id=0x10de --gpu-testing-device-id=0x25ac",
+      "url": "http://localhost:8000",
       "webRoot": "${workspaceFolder}/src",
       "outFiles": [
         "${workspaceFolder}/docs/**",
@@ -22,7 +42,6 @@
         "**/node_modules/**",
         "${workspaceFolder}/external/**"
       ]
-
     },
     {
       "name": "bun debug",

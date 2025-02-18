@@ -19,6 +19,7 @@ import {
   share,
   tap,
 } from "rxjs"
+import gsap from "gsap"
 import { ChildTabs, TabElement, TabState, TabStateType } from "./types"
 import { logger, preventDefault } from "~/utils"
 
@@ -68,7 +69,7 @@ export class TabManager {
    * @description Initializes tab elements by querying the DOM for input, label, and icon elements
    */
   private initializeTabs(): TabElement[] {
-    const inputs = Array.from(document.querySelectorAll(this.selectors.inputs))
+    const inputs = gsap.utils.toArray(this.selectors.inputs) as HTMLInputElement[]
 
     return inputs
       .map((input) => {
@@ -95,8 +96,10 @@ export class TabManager {
   }
 
   private initializeChildTabs(): ChildTabs[] {
-    const inputs = Array.from(document.querySelectorAll(this.disclaimerTabSelectors.inputs))
-    const labels = Array.from(document.querySelectorAll(this.disclaimerTabSelectors.labelAnchors))
+    const inputs = gsap.utils.toArray(this.disclaimerTabSelectors.inputs) as HTMLInputElement[]
+    const labels = gsap.utils.toArray(
+      this.disclaimerTabSelectors.labelAnchors,
+    ) as HTMLAnchorElement[]
 
     return inputs
       .map((input) => {
