@@ -6,8 +6,8 @@ declare module "gsap" {
     fadeIn(targets: gsap.TweenTarget, config: FadeEffectConfig): gsap.core.Timeline
     fadeOut(targets: gsap.TweenTarget, config: FadeEffectConfig): gsap.core.Timeline
     emphasize(targets: gsap.TweenTarget, config: EmphasisConfig): gsap.core.Timeline
-    setSection(config: TransitionConfig): gsap.core.Timeline
-    transitionSection(config: TransitionConfig): gsap.core.Timeline
+    setSection(targets: gsap.TweenTarget, config: TransitionConfig): gsap.core.Timeline
+    transitionSection(targets: gsap.TweenTarget, config: TransitionConfig): gsap.core.Timeline
   }
 
   const gsap: GSAP

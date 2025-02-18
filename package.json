@@ -271,6 +271,7 @@
     "gsap": "^3.12.7",
     "lunr": "^2.3.9",
     "lunr-languages": "^1.14.0",
+    "plain-license": ".",
     "plain-license-elastic-2.0": "workspace:plain-license-elastic-2.0",
     "plain-license-mit": "workspace:plain-license-mit",
     "plain-license-mpl-2.0": "workspace:plain-license-mpl-2.0",

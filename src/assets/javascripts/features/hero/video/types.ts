@@ -52,3 +52,4 @@ export type VideoStatus =
   | "playing"
   | "paused"
   | "on_delay"
+  | "on_fallback"

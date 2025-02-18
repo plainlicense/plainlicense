@@ -47,10 +47,9 @@ import {
 } from "rxjs"
 import Tablesort from "tablesort"
 
-import { isLicenseHash, isValidEvent } from "./conditionChecks"
+import { isLicenseHash, isValidEvent, logger } from "./"
 import { getLocation, watchViewportAt } from "~/browser"
 import { getComponentElement, watchHeader } from "~/components"
-import { logger } from "~/utils"
 
 export const NAV_EXIT_DELAY = 60000
 export const PAGE_CLEANUP_DELAY = 20000

@@ -5,11 +5,13 @@
       "name": "Launch Chrome",
       "request": "attach",
       "type": "chrome",
+      "address": "host.docker.internal",
+      "port": 9222,
       "preLaunchTask": "prepare-chrome",
       "pathMapping": {
         "/": "${workspaceFolder}/docs"
       },
-      "url": "http://localhost:8000",
+      "url": "http://host.docker.internal:8000",
       "webRoot": "${workspaceFolder}/src",
       "outFiles": [
         "${workspaceFolder}/docs/**",

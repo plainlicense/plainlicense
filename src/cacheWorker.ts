@@ -127,7 +127,9 @@ class NetworkError extends Error {
 }
 
 // Load the manifest file
-async function loadManifest(url: URL): Promise<string | undefined> {
+async function loadManifest(
+  url: URL,
+): Promise<Record<string, { file: string; integrity: string }> | undefined> {
   try {
     const response = await fetch(url)
     if (!response.ok) {
@@ -146,7 +148,8 @@ const MANIFEST: Manifest = {}
   if (!data) {
     throw new CacheError("Failed to load manifest file")
   }
-  Object.assign(MANIFEST, data)
+  const editedKeys = Object.keys(data).map((key) => key.replace("docs/", ""))
+  Object.assign(MANIFEST, Object.fromEntries(editedKeys.map((key) => [key, data[`docs/${key}`]])))
 })()
 
 const normalizeUrl = (url: RequestLike): URL => {
@@ -421,9 +424,6 @@ class CacheStrategies {
       return fetch(request)
     }
     const url = new URL(request.url)
-    if (url.pathname.includes("livereload")) {
-      return new Response("Blocked", { status: 200, statusText: "OK" })
-    }
     if (url.origin !== self.location.origin) {
       return fetch(request)
     }
@@ -431,7 +431,10 @@ class CacheStrategies {
     const strat = CacheStrategies
     const ext = url.pathname.split(".").pop()
     if (!strat.cacheExts.some((ext) => url.pathname.endsWith(ext)) || !ext) {
-      return fetch(request)
+      return fetch(request).catch((error) => {
+        logger.error("Failed to fetch:", error as Error)
+        throw new NetworkError("Failed to fetch request", 500)
+      })
     }
     if (strat.staleWhileRevalidateExts.includes(ext)) {
       return strat.staleWhileRevalidate(request)

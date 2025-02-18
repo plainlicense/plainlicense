@@ -98,7 +98,7 @@ export function getContentElements(element: Element): Element[] {
       return false
     }
     // Exclude wrapper elements and utility classes
-    const excludedClasses = ["outer", "inner", "bg"]
+    const excludedClasses = ["outer", "inner", "hero__bg"]
     const hasExcludedClass = excludedClasses.some((cls) => el.classList.contains(cls))
 
     // Get only elements that contain actual content

@@ -21,7 +21,6 @@
  */
 
 import path from "path"
-import { BuildResult } from "esbuild"
 
 // regex separator ("|") or minimatch separator (",")
 export type Separator = "|" | ","
@@ -162,4 +161,11 @@ export interface ReplacerConfig {
   getOutputFile?: () => Promise<string | undefined>
   pathFilter?: (path: string) => boolean
   custom?: string[] // name of a custom property function
+}
+
+export interface Manifest {
+  [filePath: string]: {
+    file: string
+    integrity: string
+  }
 }

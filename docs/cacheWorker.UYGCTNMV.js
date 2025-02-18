@@ -7,7 +7,7 @@
  */
 
 
-// src/cacheWorker.F7JTYP6Y.js
+// src/cacheWorker.UYGCTNMV.js
 var woff2Inter = new URL("assets/fonts/inter-v.5HMTI5F7.woff2", self.location.origin);
 var woff2Bangers = new URL("assets/fonts/bangers-regular.BIV5PPSH.woff2", self.location.origin);
 var woff2SourceCodePro = new URL("assets/fonts/sourcecodepro-regular.CK7SPIOU.woff2", self.location.origin);
@@ -90,7 +90,8 @@ var MANIFEST = {};
   if (!data) {
     throw new CacheError("Failed to load manifest file");
   }
-  Object.assign(MANIFEST, data);
+  const editedKeys = Object.keys(data).map((key) => key.replace("docs/", ""));
+  Object.assign(MANIFEST, Object.fromEntries(editedKeys.map((key) => [key, data["docs/".concat(key)]])));
 })();
 var normalizeUrl = (url) => {
   return url instanceof URL ? url : url instanceof Request ? new URL(url.url) : new URL(url);
@@ -312,16 +313,16 @@ var _CacheStrategies = class _CacheStrategies {
       return fetch(request);
     }
     const url = new URL(request.url);
-    if (url.pathname.includes("livereload")) {
-      return new Response("Blocked", { status: 200, statusText: "OK" });
-    }
     if (url.origin !== self.location.origin) {
       return fetch(request);
     }
     const strat = _CacheStrategies;
     const ext = url.pathname.split(".").pop();
     if (!strat.cacheExts.some((ext2) => url.pathname.endsWith(ext2)) || !ext) {
-      return fetch(request);
+      return fetch(request).catch((error) => {
+        logger.error("Failed to fetch:", error);
+        throw new NetworkError("Failed to fetch request", 500);
+      });
     }
     if (strat.staleWhileRevalidateExts.includes(ext)) {
       return strat.staleWhileRevalidate(request);
@@ -463,4 +464,4 @@ self.addEventListener("message", (event) => {
  * @author Adam Poulemanos <adam<at>plainlicense<dot>org>
  * @copyright No rights reserved.
  */
-//# sourceMappingURL=cacheWorker.F7JTYP6Y.js.map
+//# sourceMappingURL=cacheWorker.UYGCTNMV.js.map

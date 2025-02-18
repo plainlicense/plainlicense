@@ -1,16 +1,18 @@
 #!/bin/bash
 
+
 # Update and install packages
 echo "adding nameservers to resolve.conf"
-echo "nameserver 1.1.1.2" | sudo tee /etc/resolv.conf > /dev/null
-echo "nameserver 1.0.0.2" | sudo tee -a /etc/resolv.conf > /dev/null
-echo "nameserver 103.247.36.36" | sudo tee -a /etc/resolv.conf > /dev/null
-echo "nameserver 103.247.37.37 | sudo tee -a /etc/resolv.conf > /dev/null"
-echo "options attempts:3" | sudo tee -a /etc/resolv.conf > /dev/null
-echo "options timeout:5" | sudo tee -a /etc/resolv.conf > /dev/null
+echo "nameserver 1.1.1.2" | sudo tee /etc/resolv.conf > /dev/null &&
+echo "nameserver 1.0.0.2" | sudo tee -a /etc/resolv.conf > /dev/null &
+echo "nameserver 103.247.36.36" | sudo tee -a /etc/resolv.conf > /dev/null &
+echo "nameserver 103.247.37.37" | sudo tee -a /etc/resolv.conf > /dev/null &
+echo "options attempts:3" | sudo tee -a /etc/resolv.conf > /dev/null &&
+echo "options timeout:5" | sudo tee -a /etc/resolv.conf > /dev/null &&
 echo "nameservers added resolv.conf:"
 cat /etc/resolv.conf
 cd /workspaces/PlainLicense || return
+sudo sh -c DEBIAN_FRONTEND=noninteractive &&
 sudo apt update &&
 sudo apt upgrade -y &&
 sudo apt install -y --no-install-recommends \
@@ -57,6 +59,7 @@ zsh-autosuggestions \
 zsh-syntax-highlighting &&
 
 function initial_installs() {
+    export DEBIAN_FRONTEND=noninteractive
     echo "installing uv"
     export BUN_INSTALL="/home/vscode/.bun"
     export UV_PYTHON_DOWNLOADS="automatic"
@@ -81,35 +84,33 @@ function initial_installs() {
 function setup_node() {
     local fnmloc=/home/vscode/.fnm/fnm
     echo "setting up node environment"
-    $fnmloc install --lts || $fnmloc install 23
+    $fnmloc install 23 &
 }
 
 function set_configs() {
     export bash_completion="$HOME/.local/share/bash-completion/completions"
-
     ZSHRC="/workspaces/PlainLicense/.devcontainer/.zshrc"
     BASHRC="/workspaces/PlainLicense/.devcontainer/.bashrc"
     P10K="/workspaces/PlainLicense/.devcontainer/.p10k.zsh"
     LOLCATE_CONFIG="/workspaces/PlainLicense/.devcontainer/lolcate_config.toml"
     LOLCATE_IGNORES="/workspaces/PlainLicense/.devcontainer/lolcate_ignores"
     echo "setting configurations for zsh, powerlevel10k, bash, and completions"
-    cat "$ZSHRC" > "$HOME/.zshrc"
-    cat "$BASHRC" > "$HOME/.bashrc"
-    cat "$P10K" > "$HOME/.p10k.zsh"
-    mkdir -p "$HOME/.config/lolcate/default"
-    cat "$LOLCATE_CONFIG" > "$HOME/.config/lolcate/default/config.toml"
-    cat "$LOLCATE_IGNORES" > "$HOME/.config/lolcate/default/ignores"
-    mkdir -p "$bash_completion"
-    unalias ll
-    mkdir -p "$HOME/.zfunc"
-
-    mkdir -p "$HOME/logs" &&
+    cat "$ZSHRC" > "$HOME/.zshrc" &
+    cat "$BASHRC" > "$HOME/.bashrc" &
+    cat "$P10K" > "$HOME/.p10k.zsh" &
+    mkdir -p "$HOME/.config/lolcate/default" &&
+    cat "$LOLCATE_CONFIG" > "$HOME/.config/lolcate/default/config.toml" &
+    cat "$LOLCATE_IGNORES" > "$HOME/.config/lolcate/default/ignores" &
+    mkdir -p "$bash_completion" &&
+    unalias ll &
+    mkdir -p "$HOME/.zfunc" &&
+    mkdir -p "$HOME/logs" &
     mkdir -p /workspaces/PlainLicense/.workbench &&
-    ln -s /home/vscode/logs /workspaces/PlainLicense/.workbench/ &&
-    echo "lolcate --update > /dev/null 2>&1 &" | sudo tee /etc/cron.daily/lolcate &&
-    sudo chmod +x /etc/cron.daily/lolcate &&
-    chmod +x "$HOME/.oh-my-zsh/oh-my-zsh.sh"
-    touch "$HOME/.source_zshrc"
+    ln -s /home/vscode/logs /workspaces/PlainLicense/.workbench/ &
+    echo "lolcate --update > /dev/null 2>&1 &" | sudo tee /etc/cron.daily/lolcate &
+    sudo chmod +x /etc/cron.daily/lolcate &
+    chmod +x "$HOME/.oh-my-zsh/oh-my-zsh.sh" &&
+    touch "$HOME/.source_zshrc" &&
     gpgconfig="$(cat << 'EOF'
     enable-ssh-support
     default-cache-ttl 1200
@@ -117,9 +118,10 @@ function set_configs() {
     pinentry-program /usr/bin/pinentry-curses
 EOF
     )" &&
-    echo "$gpgconfig" > "$HOME/.gnupg/gpg-agent.conf"
+    echo "$gpgconfig" > "$HOME/.gnupg/gpg-agent.conf" &&
     gpgconf --kill gpg-agent &
     sudo killall gpg-agent &
+    echo "Configurations have been set."
 }
 
 
@@ -127,9 +129,11 @@ function setup_rust_helpers() {
     echo "installing ripgrep"
     cargo install --all-features ripgrep &&
     echo "installing typos-cli"
-    cargo install typos-cli &&
+    cargo install typos-cli &
     echo "installing lolcate"
-    cargo install --git https://github.com/ngirard/lolcate-rs
+    cargo install --git https://github.com/ngirard/lolcate-rs &
+    echo "installing cargo-update"
+    cargo install cargo-update &
 }
 
 function uv_install() {
@@ -142,8 +146,8 @@ function uv_install() {
     $uvloc tool install ruff -q &&
     $uvloc tool install pre-commit -q &&
     source /workspaces/PlainLicense/.venv/bin/activate &&
-    $uvloc sync --all-extras
-    $uvloc generate-shell-completion zsh > ~/.zfunc/_uv
+    $uvloc sync --all-extras &&
+    $uvloc generate-shell-completion zsh > ~/.zfunc/_uv &
     $uvloc generate-shell-completion bash > "$bash_completion"/uv
 }
 
@@ -157,12 +161,12 @@ function bun_install() {
 
 function set_completions() {
     echo "adding rustup, cargo, and rg completions"
-    "$HOME"/.cargo/bin/rustup completions zsh > "$HOME/.zfunc/_rustup"
-    "$HOME"/.cargo/bin/rustup completions bash > "$bash_completion/rustup"
-    "$HOME"/.cargo/bin/rustup completions zsh cargo > "$HOME/.zfunc/_cargo"
-    "$HOME"/.cargo/bin/rustup completions bash cargo > "$bash_completion/cargo"
-    "$HOME"/.cargo/bin/rg --generate=complete-zsh > "$HOME/.zfunc/_rg"
-    "$HOME"/.cargo/bin/rg --generate=complete-bash > "$bash_completion/rg"
+    "$HOME"/.cargo/bin/rustup completions zsh > "$HOME/.zfunc/_rustup" &
+    "$HOME"/.cargo/bin/rustup completions bash > "$bash_completion/rustup" &
+    "$HOME"/.cargo/bin/rustup completions zsh cargo > "$HOME/.zfunc/_cargo" &
+    "$HOME"/.cargo/bin/rustup completions bash cargo > "$bash_completion/cargo" &
+    "$HOME"/.cargo/bin/rg --generate=complete-zsh > "$HOME/.zfunc/_rg" &
+    "$HOME"/.cargo/bin/rg --generate=complete-bash > "$bash_completion/rg" &
 }
 
 initial_installs &&

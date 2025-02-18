@@ -31,20 +31,7 @@ const getAv1MediaType = (width: VideoWidth) => {
   return `video/webm;codecs=av01.0.${seqlevel}M.10.0.110.01.01.01.0`
 }
 
-const getH264MediaType = (width: VideoWidth) => {
-  const baseString = "avc1.6E00"
-  const levelMap = {
-    426: "16",
-    640: "1F",
-    854: "28",
-    1280: "32",
-    1920: "33",
-    2560: "3C",
-    3840: "3C",
-  }
-  const level = levelMap[width]
-  return `video/mp4;codecs=${baseString}${level}`
-}
+const getH264MediaType = () => `video/mp4;codecs=avc1`
 
 const getVp9MediaType = (width: VideoWidth) => {
   const levelMap = {
@@ -69,7 +56,7 @@ const getVp9MediaType = (width: VideoWidth) => {
  * @param width
  * @returns The media type parameter
  */
-export function get_media_type(type: VideoCodec, width: VideoWidth): string {
+export function getMediaType(type: VideoCodec, width: VideoWidth): string {
   switch (type) {
     case "av1":
       return getAv1MediaType(width)
