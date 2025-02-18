@@ -2,6 +2,22 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "name": "Attach to Chrome",
+      "port": 9222,
+      "request": "attach",
+      "type": "chrome",
+      "webRoot": "${workspaceFolder}/src",
+      "url": "http://localhost:8000",
+      "pathMapping": {
+        "/": "${workspaceFolder}/docs"
+      },
+      "skipFiles": [
+        "${workspaceFolder}/node_modules/**/*",
+        "${workspaceFolder}/external/**/*"
+      ],
+      "preLaunchTask": "mkdocs serve live"
+    },
+    {
       "name": "Attach Firefox Debug",
       "type": "firefox",
       "clearConsoleOnReload": true,

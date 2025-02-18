@@ -197,7 +197,7 @@ export function generateNonVisibleElementReport(
   return elements.map((el) => {
     const computedStyle = getComputedStyle(el)
     const parentComputedStyle = getComputedStyle(el.parentElement as Element)
-    return {
+    const report: NotVisibleReport = {
       element: el as HTMLElement,
       noBox: computedStyle.display === "none" || computedStyle.display === "contents",
       parentHidden:
@@ -208,5 +208,16 @@ export function generateNonVisibleElementReport(
       opacityZero: computedStyle.opacity === "0",
       visibilityHidden: computedStyle.visibility === "hidden",
     }
+    if (Object.entries(report).some(([_, value]) => value)) {
+      report.reason = Object.entries(report)
+        .map(([key, value]) => {
+          if (value === true || value === "true") {
+            return key
+          }
+          return undefined
+        })
+        .filter(Boolean) as Array<keyof NotVisibleReport>
+    }
+    return report
   })
 }

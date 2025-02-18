@@ -66,21 +66,21 @@ const logger = {
   error: (message: string, error?: Error) => {
     if (isDev()) {
       if (error instanceof CacheError) {
-        console.error(`[ServiceWorker] Cache Error: ${message}`)
+        console.error(`%c[ServiceWorker] Cache Error: ${message}`, "color: aquamarine")
         console.error(error.toString())
       } else if (error instanceof NetworkError) {
-        console.error(`[ServiceWorker] Network Error: ${message}`)
+        console.error(`%c[ServiceWorker] Network Error: ${message}`, "color: aquamarine")
         console.error(`Status: ${error.status || "unknown"}`)
         console.error(error.message)
       } else if (error) {
-        console.error(`[ServiceWorker] ${message}`)
+        console.error(`%c[ServiceWorker] ${message}`, "color: aquamarine")
         console.error(error)
       }
     }
   },
   info: (message: string) => {
     if (isDev()) {
-      console.info(`[ServiceWorker] ${message}`)
+      console.info(`%c[ServiceWorker] ${message}`, "color: cyan")
     }
   },
 }
@@ -371,7 +371,7 @@ class CacheManager {
       this.cacheKeys.push(request.toString())
       return response
     } catch (error) {
-      logger.error("Failed to fetch:", error as Error)
+      logger.error(`Failed to fetch request for ${request.toString()}`, error as Error)
       throw new NetworkError(`Failed to fetch request for ${request.toString()}`, 500)
     } finally {
       await this.checkForStaleKey(request)

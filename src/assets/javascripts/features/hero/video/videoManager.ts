@@ -277,7 +277,7 @@ export class VideoManager {
       this.backupPicture.classList.add("hero__backup", "hero__poster,", "hero__backup--inactive")
       this.container.append(this.backupPicture)
 
-      this.backupPicture.style.display = "none";
+      this.backupPicture.style.display = "none"
     }
   }
 
@@ -569,7 +569,7 @@ export class VideoManager {
       })
       .set(this.container, { autoAlpha: 1 })
       .set(this.ctaContainer, { autoAlpha: 1 })
-      .animateMessage(this.container, {
+      ["animateMessage"](this.container, {
         message: this.message || this.ctaText,
         repeat: 0,
         duration: 5,
@@ -579,6 +579,9 @@ export class VideoManager {
           this.play()
         },
         ...overrideVars,
+      })
+      .call(() => {
+        logger.info("Text animation completed")
       })
   }
 

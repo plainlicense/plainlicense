@@ -48,6 +48,7 @@ import {
   windowEvents,
 } from "~/utils"
 import type { PageConfig } from "./types"
+import { AnimationDebugger } from "./features/hero/animations/animationDebugger"
 
 gsap.registerPlugin(ScrollTrigger, ScrollToPlugin)
 
@@ -88,6 +89,7 @@ const observer$ = of(HeroObservation.getInstance())
 const videoManager$ = of(VideoManager.getInstance())
 //const videoManager$ = of(VideoManager.getInstance())
 const licenseHashHandler$ = onDom$(watchLicenseHash())
+const animationDebugger$ = onDom$(of(new AnimationDebugger()))
 const license$ = navigationEvents$.pipe(
   filter(isLicense),
   switchMap(() => initLicenseFeature()),
@@ -100,7 +102,7 @@ const pageConfigs: PageConfig[] = [
   {
     matcher: isHome,
     location: "home",
-    observables: [color$, observer$, videoManager$],
+    observables: [color$, observer$, videoManager$, animationDebugger$],
   },
   {
     matcher: isLicense,

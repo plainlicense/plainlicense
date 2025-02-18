@@ -13,6 +13,7 @@ export interface NotVisibleReport {
   contentVisibilityHidden: boolean
   opacityZero: boolean
   visibilityHidden: boolean
+  reason?: Array<keyof NotVisibleReport>
 }
 
 export interface UrlAsObject {

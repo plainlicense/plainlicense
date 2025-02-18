@@ -243,6 +243,7 @@ export class HeroObservation {
             callbackScope: this,
             ease: "power2.inOut",
           },
+          paused: true,
           duration:
             index === SectionIndex.Landing ?
               () =>
@@ -330,9 +331,9 @@ export class HeroObservation {
     )
     // the first time this runs, currentIndex will be -1
     logger.info(`Setting section ${this.currentIndex} to section ${index}`)
-    tl.setSection(section.element, { direction, section })
+    tl["setSection"](section.element, { direction, section })
     logger.info(`Animating section ${index} in direction ${direction}`)
-    tl.transitionSection(section.element, { direction, section })
+    tl["transitionSection"](section.element, { direction, section })
     if (section.animation && section.animation.totalDuration() > 0) {
       tl.add(section.animation, ">")
     }

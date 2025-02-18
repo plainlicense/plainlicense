@@ -50,10 +50,8 @@ export class VideoElement {
     this.video = this.constructVideoElement()
     this.sources = this.constructSources()
     this.video.append(...this.sources)
-    logger.debug("video element: ")
-    logger.table(this.video)
-    logger.debug("sources: ")
-    logger.table(this.sources)
+    logger.debug("video element: %o", this.video)
+    logger.debug("sources: %o", this.sources)
     this.picture = this.constructPictureElement()
   }
 
