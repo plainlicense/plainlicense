@@ -20,8 +20,8 @@
  */
 
 import gsap from "gsap"
-import { OBSERVER_CONFIG } from "~/config"
-import { isValidElement, logger, logObject } from "~/utils"
+import { OBSERVER_CONFIG, VIDEO_MANAGER_ELEMENTS } from "~/config"
+import { headerShouldDisplay, isValidElement, logger, logObject } from "~/utils"
 import {
   AnimateMessageConfig,
   Direction,
@@ -78,8 +78,6 @@ gsap.registerEffect({
     return gsap
       .timeline({ extendTimeline: true, paused: false })
       .add(gsap.set(targets, { zIndex: 0, autoAlpha: 0 }))
-      .add(gsap.set(section.outerWrapper, { yPercent: 100, zIndex: 1 }))
-      .add(gsap.set(section.innerWrapper, { yPercent: -100, zIndex: 1 }))
       .add(gsap.to(section.bg, { yPercent: -15 * dFactor, zIndex: 0 }))
       .add(gsap.set(section.content, { autoAlpha: 0, zIndex: 1 }))
   },
@@ -155,33 +153,58 @@ gsap.registerEffect({
   extendTimeline: true,
   defaults: { extendTimeline: true, duration: OBSERVER_CONFIG.slides.slideDuration },
   effect: (targets: gsap.TweenTarget, config: TransitionConfig) => {
+    // *note: `targets` is the section element
     if (Object.entries(config).length === 1) {
       config = config[0]
     }
-    const { direction, section } = config
+    const { index, direction, section } = config
     logger.debug(`transitionSection: direction: ${direction}, section: ${console.dir(section)}`)
     const dFactor = getDFactor(direction)
+    const fadeInTargets = section.content.filter(
+      (el) =>
+        el instanceof Element &&
+        isValidElement(el, el.parentElement || section.element) &&
+        !Array.from(el.classList).some((cls) => VIDEO_MANAGER_ELEMENTS.includes(cls)),
+    )
+    logger.debug(`fadeInTargets: ${logObject(fadeInTargets, "fadeInTargets")}`)
+    const header = gsap.utils.toArray(OBSERVER_CONFIG.header)
+    let revealHeader = gsap.timeline()
+    if (headerShouldDisplay() && header.length > 0 && index === 0) {
+      revealHeader.add(
+        gsap.fromTo(
+          header,
+          { autoAlpha: 0, zIndex: 1, yPercent: 100, backgroundColor: "transparent" },
+          {
+            autoAlpha: 1,
+            zIndex: 300,
+            duration: 0.5,
+            yPercent: 0,
+            backgroundColor: "transparent",
+          },
+        ),
+      )
+    }
     return gsap
-      .timeline({ extendTimeline: true, paused: false })
+      .timeline({ extendTimeline: true })
       .set(targets, { zIndex: 1, autoAlpha: 1 })
       .fromTo(
         [section.outerWrapper, section.innerWrapper],
         {
           yPercent: (i: number) => (i ? i * -100 * dFactor : 100 * dFactor),
-          autoAlpha: 1,
         },
         {
           yPercent: 0,
-          autoAlpha: 0,
           zIndex: -100,
         },
         0,
       )
       .fromTo(section.bg, { yPercent: 15 * dFactor }, { yPercent: 0, zIndex: -99 }, 0)
       .add(
-        ["fadeIn", fade(section.content, { ...OBSERVER_CONFIG.fades, out: false, direction })],
+        ["fadeIn", fade(fadeInTargets, { ...OBSERVER_CONFIG.fades, out: false, direction })],
         ">",
       )
+      .add(gsap.to(section.content, { autoAlpha: 1, zIndex: 1 }), "fadeIn+=0.3")
+      .add(revealHeader, ">")
   },
 })
 

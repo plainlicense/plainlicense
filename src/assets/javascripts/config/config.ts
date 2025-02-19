@@ -7,7 +7,7 @@
  * @author Adam Poulemanos adam<at>plainlicense<dot>org
  */
 import gsap from "gsap"
-import { EmphasisConfig } from "~/features"
+import { EmphasisConfig } from "~/hero"
 import type { FadeInConfig, ObserverConfig } from "./types"
 
 // tags to exclude from animation
@@ -51,6 +51,8 @@ const FADE_IN_CONFIG: FadeInConfig = {
  * @description Configuration for the observer
  */
 export const OBSERVER_CONFIG: ObserverConfig = {
+  header: "#header-target, .md-tabs",
+  footer: ".md-footer",
   fades: {
     fadeInSections: gsap.utils.toArray("section"),
     fadeInDuration: 0.5,

@@ -62,8 +62,6 @@ export class HeroObservation {
 
   private clickObserver: Observer | undefined
 
-  private headerObserver: Observer | undefined
-
   private footerObserver: Observer | undefined
 
   public animating: boolean = false
@@ -80,9 +78,9 @@ export class HeroObservation {
 
   private indexSubject = new BehaviorSubject<SectionIndex>(SectionIndex.NotInitialized)
 
-  private footer: Element | null = document.querySelector(".md-footer")
+  private footer: Element | null = document.querySelector(this.config.footer)
 
-  private header: Element[] | null = gsap.utils.toArray("#header-target, nav.md-tabs")
+  private header: Element[] | null = gsap.utils.toArray(this.config.header)
 
   private wrapper = gsap.utils.wrap(range(this.sectionCount) as number[])
 
@@ -287,6 +285,7 @@ export class HeroObservation {
     if (this.animating) {
       return
     }
+    this.animating = true
     let nextIndex = this.getNextIndex(direction)
     if (!scenicRoute) {
       this.goToSection(nextIndex, direction)
@@ -451,7 +450,7 @@ export class HeroObservation {
     const ignoreTargets = gsap.utils.toArray(this.config.ignoreTargets)
     this.transitionObserver = Observer.create({
       type: "wheel,touch,pointer",
-      wheelSpeed: -1,
+      wheelSpeed: 1,
       onDown: this.onActionFunction(Direction.Down),
       onUp: this.onActionFunction(Direction.Up),
       preventDefault: true,
@@ -468,26 +467,16 @@ export class HeroObservation {
       preventDefault: true,
     })
     this.clickObserver.enable()
-    const headerHeight = this.store.getStateValue("header")?.height
-    if (headerHeight && this.header) {
-      this.headerObserver = this.createHoverObserver(this.header)
-      this.headerObserver.enable()
-    }
     if (this.footer) {
       this.footerObserver = this.createHoverObserver(this.footer)
-      this.footerObserver.enable()
+      this.footerObserver.disable() // Disable by default; we enable when at the last section
     }
   }
 
   // Destroy the Observers and subscriptions
   public destroy() {
     logger.debug("Destroying observers and subscriptions")
-    const observers = [
-      this.transitionObserver,
-      this.clickObserver,
-      this.headerObserver,
-      this.footerObserver,
-    ]
+    const observers = [this.transitionObserver, this.clickObserver, this.footerObserver]
 
     observers.forEach((observer) => {
       if (observer) {

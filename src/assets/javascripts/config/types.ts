@@ -55,6 +55,8 @@ export interface SlideConfig {
  * @property {string} ignoreTargets - selectors for ignored targets
  */
 export interface ObserverConfig {
+  header: string
+  footer: string
   fades: FadeConfig
   slides: SlideConfig
   clickTargets: string

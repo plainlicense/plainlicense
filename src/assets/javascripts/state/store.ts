@@ -31,7 +31,7 @@ import {
 } from "rxjs"
 import { getViewportOffset, getViewportSize } from "~/browser"
 import { Header, getComponentElement } from "~/components"
-import { SectionIndex } from "~/features"
+import { SectionIndex } from "~/hero"
 import {
   isDev,
   isHome,

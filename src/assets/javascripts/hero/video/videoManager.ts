@@ -601,7 +601,8 @@ export class VideoManager {
 
   private reinit(): void {
     this.timeline.kill()
-    this.constructor()
+    VideoManager.instance = undefined
+    VideoManager.getInstance()
   }
 
   private handleMediaError(error: MediaError): void {

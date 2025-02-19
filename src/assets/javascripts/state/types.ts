@@ -5,7 +5,7 @@
 
 import gsap from "gsap"
 import { Header } from "~/components"
-import { Section, SectionIndex } from "~/features"
+import { SectionIndex } from "~/hero"
 
 /**
  * @exports @enum {AnimationState}

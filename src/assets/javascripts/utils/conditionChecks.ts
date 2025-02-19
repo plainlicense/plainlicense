@@ -7,7 +7,7 @@
  */
 
 import gsap from "gsap"
-import { EXCLUDED_TAGS } from "~/config"
+import { EXCLUDED_TAGS, OBSERVER_CONFIG } from "~/config"
 import { NotVisibleReport } from "./types"
 
 const LICENSE_HASHES = ["#reader", "#html", "#markdown", "#plaintext", "#changelog", "#official"]
@@ -187,6 +187,11 @@ export function elementsNotVisible(parent: Element = document.body): Element[] {
     .filter(Boolean) as Element[]
 }
 
+/**
+ * Generates a report of elements that are not visible within a specified parent element.
+ * @param parent - The parent element to check for visibility.
+ * @returns An array of NotVisibleReport objects for elements that are not visible.
+ */
 export function generateNonVisibleElementReport(
   parent: Element = document.body,
 ): NotVisibleReport[] {
@@ -220,4 +225,11 @@ export function generateNonVisibleElementReport(
     }
     return report
   })
+}
+
+export function headerShouldDisplay() {
+  return gsap.utils
+    .toArray(OBSERVER_CONFIG.header)
+    .filter((el) => el instanceof HTMLElement)
+    .some((el) => Array.from(el.classList).includes("active"))
 }

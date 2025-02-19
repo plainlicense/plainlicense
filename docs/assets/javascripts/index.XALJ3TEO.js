@@ -5396,6 +5396,8 @@ var FADE_IN_CONFIG = {
   }
 };
 var OBSERVER_CONFIG = {
+  header: "#header-target, .md-tabs",
+  footer: ".md-footer",
   fades: {
     fadeInSections: gsapWithCSS.utils.toArray("section"),
     fadeInDuration: 0.5,
@@ -5415,6 +5417,7 @@ var OBSERVER_CONFIG = {
     strong: ".cta__container--down-indicator"
   }
 };
+var VIDEO_MANAGER_ELEMENTS = ".hero__video, .hero__poster, .hero__poster--image, .hero__backup, noscript, style, script";
 var MAX_WIDTHS = {
   426: "426",
   640: "640",
@@ -5560,6 +5563,9 @@ function generateNonVisibleElementReport(parent = document.body) {
     }
     return report;
   });
+}
+function headerShouldDisplay() {
+  return gsapWithCSS.utils.toArray(OBSERVER_CONFIG.header).filter((el) => el instanceof HTMLElement).some((el) => Array.from(el.classList).includes("active"));
 }
 
 // src/assets/javascripts/utils/log.ts
@@ -14881,7 +14887,7 @@ ScrollToPlugin.config = function(vars) {
 };
 _getGSAP5() && gsap4.registerPlugin(ScrollToPlugin);
 
-// src/assets/javascripts/features/hero/animations/utils.ts
+// src/assets/javascripts/hero/animations/utils.ts
 function getMatchMediaInstance(scope) {
   return gsapWithCSS.matchMedia(scope || document.documentElement);
 }
@@ -14963,7 +14969,7 @@ function wordsToLetterDivs(el) {
   return docFragment;
 }
 
-// src/assets/javascripts/features/hero/animations/effects.ts
+// src/assets/javascripts/hero/animations/effects.ts
 function getFadeVars(out = false, yPercent, direction) {
   const defaultDirection = out ? -1 /* Up */ : 1 /* Down */;
   const pathDirection = direction || defaultDirection;
@@ -14986,7 +14992,7 @@ gsapWithCSS.registerEffect({
     const { direction, section } = config6;
     logger.info("setting up section for transition");
     const dFactor = getDFactor(direction);
-    return gsapWithCSS.timeline({ extendTimeline: true, paused: false }).add(gsapWithCSS.set(targets, { zIndex: 0, autoAlpha: 0 })).add(gsapWithCSS.set(section.outerWrapper, { yPercent: 100, zIndex: 1 })).add(gsapWithCSS.set(section.innerWrapper, { yPercent: -100, zIndex: 1 })).add(gsapWithCSS.to(section.bg, { yPercent: -15 * dFactor, zIndex: 0 })).add(gsapWithCSS.set(section.content, { autoAlpha: 0, zIndex: 1 }));
+    return gsapWithCSS.timeline({ extendTimeline: true, paused: false }).add(gsapWithCSS.set(targets, { zIndex: 0, autoAlpha: 0 })).add(gsapWithCSS.to(section.bg, { yPercent: -15 * dFactor, zIndex: 0 })).add(gsapWithCSS.set(section.content, { autoAlpha: 0, zIndex: 1 }));
   }
 });
 var fade = (targets, config6 = { out: false, direction: 1, fromConfig: {}, toConfig: {} }) => {
@@ -15034,17 +15040,28 @@ gsapWithCSS.registerEffect({
     if (Object.entries(config6).length === 1) {
       config6 = config6[0];
     }
-    const { direction, section } = config6;
+    const { index, direction, section } = config6;
     logger.debug("transitionSection: direction: ".concat(direction, ", section: ").concat(console.dir(section)));
     const dFactor = getDFactor(direction);
-    return gsapWithCSS.timeline({ extendTimeline: true, paused: false }).set(targets, { zIndex: 1, autoAlpha: 1 }).fromTo([section.outerWrapper, section.innerWrapper], {
-      yPercent: (i) => i ? i * -100 * dFactor : 100 * dFactor,
-      autoAlpha: 1
+    const fadeInTargets = section.content.filter((el) => el instanceof Element && isValidElement(el, el.parentElement || section.element) && !Array.from(el.classList).some((cls) => VIDEO_MANAGER_ELEMENTS.includes(cls)));
+    logger.debug("fadeInTargets: ".concat(logObject(fadeInTargets, "fadeInTargets")));
+    const header = gsapWithCSS.utils.toArray(OBSERVER_CONFIG.header);
+    let revealHeader = gsapWithCSS.timeline();
+    if (headerShouldDisplay() && header.length > 0 && index === 0) {
+      revealHeader.add(gsapWithCSS.fromTo(header, { autoAlpha: 0, zIndex: 1, yPercent: 100, backgroundColor: "transparent" }, {
+        autoAlpha: 1,
+        zIndex: 300,
+        duration: 0.5,
+        yPercent: 0,
+        backgroundColor: "transparent"
+      }));
+    }
+    return gsapWithCSS.timeline({ extendTimeline: true }).set(targets, { zIndex: 1, autoAlpha: 1 }).fromTo([section.outerWrapper, section.innerWrapper], {
+      yPercent: (i) => i ? i * -100 * dFactor : 100 * dFactor
     }, {
       yPercent: 0,
-      autoAlpha: 0,
       zIndex: -100
-    }, 0).fromTo(section.bg, { yPercent: 15 * dFactor }, { yPercent: 0, zIndex: -99 }, 0).add(["fadeIn", fade(section.content, { ...OBSERVER_CONFIG.fades, out: false, direction })], ">");
+    }, 0).fromTo(section.bg, { yPercent: 15 * dFactor }, { yPercent: 0, zIndex: -99 }, 0).add(["fadeIn", fade(fadeInTargets, { ...OBSERVER_CONFIG.fades, out: false, direction })], ">").add(gsapWithCSS.to(section.content, { autoAlpha: 1, zIndex: 1 }), "fadeIn+=0.3").add(revealHeader, ">");
   }
 });
 gsapWithCSS.registerEffect({
@@ -15196,7 +15213,7 @@ gsapWithCSS.registerEffect({
   }
 });
 
-// src/assets/javascripts/features/hero/animations/observer.ts
+// src/assets/javascripts/hero/animations/observer.ts
 gsapWithCSS.registerPlugin(Observer);
 var HeroObservation = class _HeroObservation {
   constructor() {
@@ -15212,8 +15229,8 @@ var HeroObservation = class _HeroObservation {
     this.defaultTimelineVars = {};
     this.initialized = false;
     this.indexSubject = new BehaviorSubject(-1 /* NotInitialized */);
-    this.footer = document.querySelector(".md-footer");
-    this.header = gsapWithCSS.utils.toArray("#header-target, nav.md-tabs");
+    this.footer = document.querySelector(this.config.footer);
+    this.header = gsapWithCSS.utils.toArray(this.config.header);
     this.wrapper = gsapWithCSS.utils.wrap(range(this.sectionCount));
     this.defaultTimelineVars = {
       defaults: {
@@ -15363,6 +15380,7 @@ var HeroObservation = class _HeroObservation {
     if (this.animating) {
       return;
     }
+    this.animating = true;
     let nextIndex = this.getNextIndex(direction);
     if (!scenicRoute) {
       this.goToSection(nextIndex, direction);
@@ -15492,12 +15510,11 @@ var HeroObservation = class _HeroObservation {
    * 2. The clickObserver handles the click-driven "guided tour" of the sections.
    */
   setupObserver() {
-    var _a2;
     const clickTargets = gsapWithCSS.utils.toArray(this.config.clickTargets);
     const ignoreTargets = gsapWithCSS.utils.toArray(this.config.ignoreTargets);
     this.transitionObserver = Observer.create({
       type: "wheel,touch,pointer",
-      wheelSpeed: -1,
+      wheelSpeed: 1,
       onDown: this.onActionFunction(1 /* Down */),
       onUp: this.onActionFunction(-1 /* Up */),
       preventDefault: true,
@@ -15514,25 +15531,15 @@ var HeroObservation = class _HeroObservation {
       preventDefault: true
     });
     this.clickObserver.enable();
-    const headerHeight = (_a2 = this.store.getStateValue("header")) == null ? void 0 : _a2.height;
-    if (headerHeight && this.header) {
-      this.headerObserver = this.createHoverObserver(this.header);
-      this.headerObserver.enable();
-    }
     if (this.footer) {
       this.footerObserver = this.createHoverObserver(this.footer);
-      this.footerObserver.enable();
+      this.footerObserver.disable();
     }
   }
   // Destroy the Observers and subscriptions
   destroy() {
     logger.debug("Destroying observers and subscriptions");
-    const observers = [
-      this.transitionObserver,
-      this.clickObserver,
-      this.headerObserver,
-      this.footerObserver
-    ];
+    const observers = [this.transitionObserver, this.clickObserver, this.footerObserver];
     observers.forEach((observer) => {
       if (observer) {
         observer.disable();
@@ -15545,7 +15552,7 @@ var HeroObservation = class _HeroObservation {
   }
 };
 
-// src/assets/javascripts/features/hero/video/data.ts
+// src/assets/javascripts/hero/video/data.ts
 var breakFreeAv11280 = "assets/videos/hero/break_free/break_free_av1_1280.MHR3ZGJM.webm";
 var breakFreeAv11920 = "assets/videos/hero/break_free/break_free_av1_1920.ZBJ6I55Y.webm";
 var breakFreeAv12560 = "assets/videos/hero/break_free/break_free_av1_2560.HXMDT5GO.webm";
@@ -15782,7 +15789,7 @@ var rawHeroVideos = [
   }
 ];
 
-// src/assets/javascripts/features/hero/video/utils.ts
+// src/assets/javascripts/hero/video/utils.ts
 function getHeroVideos() {
   return rawHeroVideos;
 }
@@ -15848,7 +15855,7 @@ function toggleActiveClass(el, classBase, makeActive) {
   el.classList.add(makeActive ? active : inactive);
 }
 
-// src/assets/javascripts/features/hero/video/videoElement.ts
+// src/assets/javascripts/hero/video/videoElement.ts
 var VideoElement = class {
   constructor(heroVideo, properties) {
     this.video = document.createElement("video");
@@ -16003,7 +16010,7 @@ var VideoElement = class {
   }
 };
 
-// src/assets/javascripts/features/hero/video/videoManager.ts
+// src/assets/javascripts/hero/video/videoManager.ts
 var customWindow2 = window;
 var { document$: document$2 } = customWindow2;
 var VideoManager = class _VideoManager {
@@ -16426,7 +16433,8 @@ var VideoManager = class _VideoManager {
   }
   reinit() {
     this.timeline.kill();
-    this.constructor();
+    _VideoManager.instance = void 0;
+    _VideoManager.getInstance();
   }
   handleMediaError(error) {
     switch (error.code) {
@@ -16481,233 +16489,11 @@ var VideoManager = class _VideoManager {
   }
 };
 
-// src/assets/javascripts/features/feedback/feedback.ts
-var feedback = () => {
-  var _a2;
-  const feedbackForm = (_a2 = document.forms) == null ? void 0 : _a2.namedItem("feedback");
-  if (feedbackForm && feedbackForm instanceof HTMLFormElement) {
-    return fromEvent(feedbackForm, "submit").pipe(filter(isValidEvent), map((ev) => {
-      return ev;
-    }), tap(() => preventDefault), throttleTime(3e3), tap((ev) => {
-      var _a3;
-      const page = document.location.pathname;
-      const data = (_a3 = ev.submitter) == null ? void 0 : _a3.getAttribute("data-md-value");
-      logger.debug(page, data);
-      if (feedbackForm.firstElementChild && feedbackForm.firstElementChild instanceof HTMLButtonElement) {
-        feedbackForm.firstElementChild.disabled = true;
-      }
-      const note = feedbackForm.querySelector(".md-feedback__note [data-md-value='".concat(data, "']"));
-      if (note && note instanceof HTMLElement) {
-        note.hidden = false;
-      }
-    }));
-  } else {
-    return of(null);
-  }
-};
-
-// src/assets/javascripts/features/licenses/tabManager.ts
-var TabManager = class {
-  /**
-   * @description Initializes tab elements and sets up interactions
-   */
-  constructor() {
-    this.selectors = {
-      inputs: '.tabbed-set input[type="radio"]',
-      iconPrefix: "#icon-"
-    };
-    this.disclaimerTabSelectors = {
-      inputs: "#not-advice-warning-checkbox, #not-official-warning-checkbox",
-      labelAnchors: "#not-advice-warning-label, #not-official-warning-label"
-    };
-    this.subscription = new Subscription();
-    this.tabs = this.initializeTabs();
-    this.childTabs = this.initializeChildTabs();
-    this.init();
-  }
-  /**
-   * @returns {TabElement[]} Collection of initialized tab elements
-   * @description Initializes tab elements by querying the DOM for input, label, and icon elements
-   */
-  initializeTabs() {
-    const inputs = gsapWithCSS.utils.toArray(this.selectors.inputs);
-    return inputs.map((input) => {
-      var _a2;
-      const { id } = input;
-      const label = document.querySelector('label[for="'.concat(id, '"]'));
-      const elements = {
-        input,
-        label,
-        labelAnchor: label.querySelector("a"),
-        iconAnchor: document.querySelector("".concat(this.selectors.iconPrefix).concat(id)),
-        iconSVG: (_a2 = document.querySelector("".concat(this.selectors.iconPrefix).concat(id))) == null ? void 0 : _a2.querySelector("svg"),
-        contentElement: document.querySelector("#".concat(id)),
-        tablistElement: document.querySelector(".tabbed-set")
-      };
-      return Object.values(elements).every((el) => el) ? elements : null;
-    }).filter((tab) => tab !== null);
-  }
-  initializeChildTabs() {
-    const inputs = gsapWithCSS.utils.toArray(this.disclaimerTabSelectors.inputs);
-    const labels = gsapWithCSS.utils.toArray(this.disclaimerTabSelectors.labelAnchors);
-    return inputs.map((input) => {
-      const { id } = input;
-      const idPrefix = id.split("-")[1];
-      const label = labels.find((label2) => label2.id.includes(idPrefix));
-      const elements = {
-        labelAnchor: label,
-        input
-      };
-      return Object.values(elements).every((el) => el) ? elements : null;
-    }).filter((tab) => tab !== null);
-  }
-  setAria() {
-    this.tabs.forEach((tab) => {
-      const { contentElement, input, labelAnchor, label, iconAnchor, iconSVG, tablistElement } = tab;
-      tablistElement.setAttribute("role", "tablist");
-      contentElement.setAttribute("role", "tabpanel");
-      contentElement.setAttribute("aria-labelledby", "".concat(label.id || labelAnchor.id, " ").concat(iconAnchor.id));
-      input.setAttribute("aria-hidden", "true");
-      labelAnchor.setAttribute("role", "tab");
-      labelAnchor.setAttribute("aria-selected", input.checked ? "true" : "false");
-      labelAnchor.setAttribute("aria-controls", contentElement.id);
-      labelAnchor.setAttribute("tabindex", labelAnchor.href === "#reader" ? "0" : "-1");
-      iconSVG.setAttribute("role", "button");
-      iconAnchor.setAttribute("role", "tab");
-      iconAnchor.setAttribute("aria-selected", input.checked ? "true" : "false");
-      iconAnchor.setAttribute("aria-controls", contentElement.id);
-    });
-  }
-  toggleAriaSelected(tabEls) {
-    const checkedState = tabEls.map((tab) => tab.input.checked);
-    const anchors = tabEls.map((tab) => {
-      if ("iconAnchor" in tab) {
-        return [tab.labelAnchor, tab.iconAnchor];
-      }
-      return [tab.labelAnchor];
-    });
-    checkedState.forEach((checked, index) => {
-      anchors[index].forEach((anchor) => {
-        anchor.setAttribute("aria-selected", checked ? "true" : "false");
-      });
-    });
-  }
-  /**
-   * @param {TabElement} tab - Tab element to style
-   * @param {TabState} state - Tab state object
-   * @description Styles tab elements based on state
-   */
-  styleTab(tab, { isSelected, state }) {
-    const { label, iconAnchor, iconSVG } = tab;
-    const fillColor = state === "normal" ? "" : "var(--hover-color)";
-    const selectedColor = "var(--selected-color)";
-    iconAnchor.classList.toggle("selected", isSelected);
-    iconSVG.style.fill = isSelected ? selectedColor : fillColor;
-    label.style.color = isSelected ? selectedColor : fillColor;
-  }
-  /**
-   * @returns {Observable<void>} Observable for tab interactions
-   * @description Sets up interaction streams for tab elements
-   */
-  setupInteractions() {
-    const createEventStream = (elements, eventName) => {
-      const streams = elements.flatMap(({ label, iconAnchor }) => [
-        fromEvent(label, eventName).pipe(map(() => ({ id: label.getAttribute("for"), event: eventName }))),
-        fromEvent(iconAnchor, eventName).pipe(map(() => ({ id: iconAnchor.id.replace("icon-", ""), event: eventName })))
-      ]);
-      return merge(...streams).pipe(share());
-    };
-    const eventStateMap = {
-      mouseenter: "hover",
-      mouseleave: "normal",
-      focus: "focus",
-      "focus-visible": "focus-visible",
-      blur: "normal"
-    };
-    const events = ["mouseenter", "mouseleave", "focus", "focus-visible", "blur"];
-    const interactionStreams = events.map((event) => createEventStream(this.tabs, event));
-    const iconClicks = this.tabs.map(({ iconAnchor, input, labelAnchor }) => merge(fromEvent(labelAnchor, "click"), fromEvent(iconAnchor, "click")).pipe(tap(() => {
-      preventDefault;
-      if (!input.checked) {
-        input.checked = true;
-        this.toggleAriaSelected(this.tabs);
-        input.dispatchEvent(new Event("change"));
-      }
-    }), map(() => ({ id: input.id, event: "click" }))));
-    const childClicks = this.childTabs.map(({ input, labelAnchor }) => fromEvent(labelAnchor, "click").pipe(tap(() => {
-      preventDefault;
-      if (!input.checked) {
-        input.checked = true;
-        this.toggleAriaSelected(this.childTabs);
-        input.dispatchEvent(new Event("change"));
-      }
-    }), map(() => ({ id: input.id, event: "click" }))));
-    const selections = this.tabs.map(({ input }) => fromEvent(input, "change").pipe(map(() => input.id), filter((id) => !!id)));
-    return merge(...interactionStreams, ...iconClicks, ...childClicks, ...selections).pipe(filter((event) => typeof event === "object" && "id" in event && "event" in event), debounceTime(30), tap((event) => {
-      const { id, event: eventName } = event;
-      const tab = this.tabs.find((t) => t.input.id === id);
-      if (tab) {
-        this.styleTab(tab, {
-          isSelected: tab.input.checked,
-          state: eventStateMap[eventName] || "normal"
-        });
-      }
-    }), map(() => void 0));
-  }
-  /**
-   * @description Initializes tab styles and sets up interaction streams
-   */
-  init() {
-    logger.info("Initializing license tabs");
-    this.setAria();
-    this.tabs.forEach((tab) => {
-      this.styleTab(tab, { isSelected: tab.input.checked, state: "normal" });
-    });
-    this.subscription = this.setupInteractions().subscribe({
-      error: (err) => logger.error("Error setting up license tabs:", err)
-    });
-    const allAnchors = [];
-    this.tabs.forEach((tab) => {
-      allAnchors.push(tab.labelAnchor, tab.iconAnchor);
-    });
-    this.childTabs.forEach((tab) => {
-      allAnchors.push(tab.labelAnchor);
-    });
-    allAnchors.forEach((anchor) => {
-      anchor.addEventListener("click", preventDefault);
-    });
-  }
-  /**
-   * @description Unsubscribes from event streams and performs cleanup
-   */
-  cleanup() {
-    logger.info("Cleaning up license tabs");
-    if (this.subscription) {
-      this.subscription.unsubscribe();
-    }
-  }
-};
-
-// src/assets/javascripts/features/licenses/index.ts
-var customWindow3 = window;
-var { document$: document$3 } = customWindow3;
-function initLicenseFeature() {
-  let tabManager = null;
-  return document$3.pipe(tap(() => {
-    var _a2;
-    (_a2 = tabManager == null ? void 0 : tabManager.cleanup) == null ? void 0 : _a2.call(tabManager);
-    tabManager = new TabManager();
-    logger.info("License feature initialized");
-  }), map(() => {
-    return tabManager == null ? void 0 : tabManager.subscription;
-  }));
-}
-
 // src/assets/javascripts/state/store.ts
-var customWindow4 = window;
-var weAreDev = isDev(new URL(customWindow4.location.href));
-var { viewport$: viewport$4 } = customWindow4;
-var initialUrl = new URL(customWindow4.location.href);
+var customWindow3 = window;
+var weAreDev = isDev(new URL(customWindow3.location.href));
+var { viewport$: viewport$4 } = customWindow3;
+var initialUrl = new URL(customWindow3.location.href);
 var isFullyVisible = (state) => state.atHome && state.landingVisible && state.pageVisible;
 var isTransitioning = (state) => state.isTransitioning;
 var noVideo = (state) => state.prefersReducedMotion;
@@ -16730,7 +16516,7 @@ var HeroStore = class _HeroStore {
       canPlay: false,
       landingVisible: isHome(initialUrl) && (initialUrl.hash === "" || initialUrl.hash === "#"),
       pageVisible: !document.hidden || document.visibilityState === "visible",
-      prefersReducedMotion: customWindow4.matchMedia("(prefers-reduced-motion: reduce)").matches,
+      prefersReducedMotion: customWindow3.matchMedia("(prefers-reduced-motion: reduce)").matches,
       viewport: {
         offset: getViewportOffset(),
         size: getViewportSize()
@@ -16973,176 +16759,227 @@ var HeroStore = class _HeroStore {
   }
 };
 
-// src/assets/javascripts/features/hero/animations/animationDebugger.ts
-var _AnimationDebugger = class _AnimationDebugger {
-  constructor() {
-    this.store = HeroStore.getInstance();
-    this.animationState$ = new BehaviorSubject({
-      landingVisible: false,
-      canPlay: false,
-      isTransitioning: false
-    });
-    this.subscriptions = new Subscription();
-    if (_AnimationDebugger.isDebugging) {
-      logger.info("AnimationDebugger is enabled");
-      this.initSubscriptions();
-    } else {
-      logger.info("AnimationDebugger is disabled");
-    }
-  }
-  checkForNonVisibleElements(section) {
-    if (typeof section === "number" && section > -1) {
-      return generateNonVisibleElementReport(Array.from(document.querySelectorAll("section"))[section]);
-    } else {
-      return;
-    }
-  }
-  parseNonVisibleElementReport(reports) {
-    reports.forEach((report) => {
-      const { element } = report;
-      const { id, classList } = element;
-      const identifier = id || classList[0];
-      const { reason } = report;
-      if (reason && reason.length) {
-        reason == null ? void 0 : reason.forEach((r) => {
-          this.handleReason(r, identifier, element);
-        });
+// src/assets/javascripts/feedback/feedback.ts
+var feedback = () => {
+  var _a2;
+  const feedbackForm = (_a2 = document.forms) == null ? void 0 : _a2.namedItem("feedback");
+  if (feedbackForm && feedbackForm instanceof HTMLFormElement) {
+    return fromEvent(feedbackForm, "submit").pipe(filter(isValidEvent), map((ev) => {
+      return ev;
+    }), tap(() => preventDefault), throttleTime(3e3), tap((ev) => {
+      var _a3;
+      const page = document.location.pathname;
+      const data = (_a3 = ev.submitter) == null ? void 0 : _a3.getAttribute("data-md-value");
+      logger.debug(page, data);
+      if (feedbackForm.firstElementChild && feedbackForm.firstElementChild instanceof HTMLButtonElement) {
+        feedbackForm.firstElementChild.disabled = true;
       }
-    });
-  }
-  checkFixWithUser(element, fix) {
-    const response = window.prompt("Tried fixing element ".concat(element, " by setting ").concat(fix, ". Can you see it now? (yes/no)"));
-    if (response === "yes") {
-      return true;
-    } else {
-      return false;
-    }
-  }
-  testFixesForVisibility(element, reason) {
-    logger.info("Attempting to fix visibility for element: ".concat(element));
-    let userResponse;
-    switch (reason) {
-      case "noBox":
-        element.style.display = "block";
-        userResponse = this.checkFixWithUser(element, "display to block");
-        if (userResponse) {
-          logger.info("Element ".concat(element, " is now visible after applying display: block"));
-        } else {
-          logger.warn("Element ".concat(element, " is still not visible after applying display: block"));
-        }
-        break;
-      case "parentHidden":
-        if (element.parentElement) {
-          element.parentElement.style.display = "block";
-          userResponse = this.checkFixWithUser(element, "parent display to block");
-          if (userResponse) {
-            logger.info("Element ".concat(element, " is now visible after applying parent display: block"));
-          } else {
-            logger.warn("Element ".concat(element, " is still not visible after applying parent display: block"));
-            logger.info("Attempting to set parent to visible");
-            element.parentElement.style.visibility = "visible";
-            userResponse = this.checkFixWithUser(element, "parent visibility to visible");
-            if (userResponse) {
-              logger.info("Element ".concat(element, " is now visible after applying parent visibility: visible"));
-            } else {
-              logger.warn("Element ".concat(element, " is still not visible after applying parent visibility: visible"));
-            }
-          }
-        } else {
-          logger.warn("Element ".concat(element, " has no parent"));
-        }
-        break;
-      case "contentVisibilityAuto":
-      case "contentVisibilityHidden":
-        element.style.contentVisibility = "visible";
-        userResponse = this.checkFixWithUser(element, "contentVisibility to visible");
-        if (userResponse) {
-          logger.info("Element ".concat(element, " is now visible after applying contentVisibility: visible"));
-        } else {
-          logger.warn("Element ".concat(element, " is still not visible after applying contentVisibility: visible"));
-        }
-        break;
-      case "opacityZero":
-        element.style.opacity = "1";
-        userResponse = this.checkFixWithUser(element, "opacity to 1");
-        if (userResponse) {
-          logger.info("Element ".concat(element, " is now visible after applying opacity: 1"));
-        } else {
-          logger.warn("Element ".concat(element, " is still not visible after applying opacity: 1"));
-        }
-        break;
-      case "visibilityHidden":
-        element.style.visibility = "visible";
-        userResponse = this.checkFixWithUser(element, "visibility to visible");
-        if (userResponse) {
-          logger.info("Element ".concat(element, " is now visible after applying visibility: visible"));
-        } else {
-          logger.warn("Element ".concat(element, " is still not visible after applying visibility: visible"));
-        }
-        break;
-      default:
-        logger.warn("Element ".concat(element, " is not visible for an unknown reason"));
-        break;
-    }
-  }
-  checkWithUserToProceed(reason, identifier, element) {
-    const response = window.prompt("Element ".concat(identifier, " is not visible. Reason: ").concat(reason, ". Do you\n      want to try to make it visible? (yes/no)\n\n      full element info: ").concat(element.toString()));
-    if (response === "yes") {
-      return true;
-    } else {
-      return false;
-    }
-  }
-  handleReason(reason, identifier, element) {
-    const response = this.checkWithUserToProceed(reason, identifier, element);
-    if (response) {
-      this.testFixesForVisibility(element, reason);
-    } else {
-      logger.info("User chose not to attempt to fix visibility for element ".concat(element));
-      return;
-    }
-  }
-  initSubscriptions() {
-    const state$ = this.store.state$.pipe(map((state) => {
-      const { landingVisible, canPlay, isTransitioning: isTransitioning2, currentSection } = state;
-      return { landingVisible, canPlay, isTransitioning: isTransitioning2, currentSection };
-    }), shareReplay(1));
-    distinctUntilChanged((prev, curr) => {
-      return prev.landingVisible === curr.landingVisible && prev.canPlay === curr.canPlay && prev.isTransitioning === curr.isTransitioning && prev.currentSection === curr.currentSection;
-    });
-    this.subscriptions.add(state$.subscribe({
-      next: (state) => {
-        this.animationState$.next(state);
-      },
-      error: (error) => {
-        logger.error("Error in AnimationDebugger observable: ", error);
-      },
-      complete: () => {
-        logger.info("AnimationDebugger observable complete");
+      const note = feedbackForm.querySelector(".md-feedback__note [data-md-value='".concat(data, "']"));
+      if (note && note instanceof HTMLElement) {
+        note.hidden = false;
       }
     }));
-    const sectionWatch$ = this.animationState$.pipe(filter((state) => state.currentSection !== void 0 && state.currentSection > -1 && state.isTransitioning === false), map((state) => state.currentSection), distinctUntilChanged());
-    this.subscriptions.add(sectionWatch$.subscribe({
-      next: (currentSection) => {
-        const report = this.checkForNonVisibleElements(currentSection);
-        logger.info("Received new section: ", currentSection);
-        if (report) {
-          this.parseNonVisibleElementReport(report);
-        } else {
-          logger.info("No non-visible elements found in section: ", currentSection);
-        }
-      },
-      error: (error) => {
-        logger.error("Error processing section updates: ", error);
-      },
-      complete: () => {
-        logger.info("Section watch observable completed");
-      }
-    }));
+  } else {
+    return of(null);
   }
 };
-_AnimationDebugger.isDebugging = isDev(new URL(window.location.href));
-var AnimationDebugger = _AnimationDebugger;
+
+// src/assets/javascripts/licenses/tabManager.ts
+var TabManager = class {
+  /**
+   * @description Initializes tab elements and sets up interactions
+   */
+  constructor() {
+    this.selectors = {
+      inputs: '.tabbed-set input[type="radio"]',
+      iconPrefix: "#icon-"
+    };
+    this.disclaimerTabSelectors = {
+      inputs: "#not-advice-warning-checkbox, #not-official-warning-checkbox",
+      labelAnchors: "#not-advice-warning-label, #not-official-warning-label"
+    };
+    this.subscription = new Subscription();
+    this.tabs = this.initializeTabs();
+    this.childTabs = this.initializeChildTabs();
+    this.init();
+  }
+  /**
+   * @returns {TabElement[]} Collection of initialized tab elements
+   * @description Initializes tab elements by querying the DOM for input, label, and icon elements
+   */
+  initializeTabs() {
+    const inputs = gsapWithCSS.utils.toArray(this.selectors.inputs);
+    return inputs.map((input) => {
+      var _a2;
+      const { id } = input;
+      const label = document.querySelector('label[for="'.concat(id, '"]'));
+      const elements = {
+        input,
+        label,
+        labelAnchor: label.querySelector("a"),
+        iconAnchor: document.querySelector("".concat(this.selectors.iconPrefix).concat(id)),
+        iconSVG: (_a2 = document.querySelector("".concat(this.selectors.iconPrefix).concat(id))) == null ? void 0 : _a2.querySelector("svg"),
+        contentElement: document.querySelector("#".concat(id)),
+        tablistElement: document.querySelector(".tabbed-set")
+      };
+      return Object.values(elements).every((el) => el) ? elements : null;
+    }).filter((tab) => tab !== null);
+  }
+  initializeChildTabs() {
+    const inputs = gsapWithCSS.utils.toArray(this.disclaimerTabSelectors.inputs);
+    const labels = gsapWithCSS.utils.toArray(this.disclaimerTabSelectors.labelAnchors);
+    return inputs.map((input) => {
+      const { id } = input;
+      const idPrefix = id.split("-")[1];
+      const label = labels.find((label2) => label2.id.includes(idPrefix));
+      const elements = {
+        labelAnchor: label,
+        input
+      };
+      return Object.values(elements).every((el) => el) ? elements : null;
+    }).filter((tab) => tab !== null);
+  }
+  setAria() {
+    this.tabs.forEach((tab) => {
+      const { contentElement, input, labelAnchor, label, iconAnchor, iconSVG, tablistElement } = tab;
+      tablistElement.setAttribute("role", "tablist");
+      contentElement.setAttribute("role", "tabpanel");
+      contentElement.setAttribute("aria-labelledby", "".concat(label.id || labelAnchor.id, " ").concat(iconAnchor.id));
+      input.setAttribute("aria-hidden", "true");
+      labelAnchor.setAttribute("role", "tab");
+      labelAnchor.setAttribute("aria-selected", input.checked ? "true" : "false");
+      labelAnchor.setAttribute("aria-controls", contentElement.id);
+      labelAnchor.setAttribute("tabindex", labelAnchor.href === "#reader" ? "0" : "-1");
+      iconSVG.setAttribute("role", "button");
+      iconAnchor.setAttribute("role", "tab");
+      iconAnchor.setAttribute("aria-selected", input.checked ? "true" : "false");
+      iconAnchor.setAttribute("aria-controls", contentElement.id);
+    });
+  }
+  toggleAriaSelected(tabEls) {
+    const checkedState = tabEls.map((tab) => tab.input.checked);
+    const anchors = tabEls.map((tab) => {
+      if ("iconAnchor" in tab) {
+        return [tab.labelAnchor, tab.iconAnchor];
+      }
+      return [tab.labelAnchor];
+    });
+    checkedState.forEach((checked, index) => {
+      anchors[index].forEach((anchor) => {
+        anchor.setAttribute("aria-selected", checked ? "true" : "false");
+      });
+    });
+  }
+  /**
+   * @param {TabElement} tab - Tab element to style
+   * @param {TabState} state - Tab state object
+   * @description Styles tab elements based on state
+   */
+  styleTab(tab, { isSelected, state }) {
+    const { label, iconAnchor, iconSVG } = tab;
+    const fillColor = state === "normal" ? "" : "var(--hover-color)";
+    const selectedColor = "var(--selected-color)";
+    iconAnchor.classList.toggle("selected", isSelected);
+    iconSVG.style.fill = isSelected ? selectedColor : fillColor;
+    label.style.color = isSelected ? selectedColor : fillColor;
+  }
+  /**
+   * @returns {Observable<void>} Observable for tab interactions
+   * @description Sets up interaction streams for tab elements
+   */
+  setupInteractions() {
+    const createEventStream = (elements, eventName) => {
+      const streams = elements.flatMap(({ label, iconAnchor }) => [
+        fromEvent(label, eventName).pipe(map(() => ({ id: label.getAttribute("for"), event: eventName }))),
+        fromEvent(iconAnchor, eventName).pipe(map(() => ({ id: iconAnchor.id.replace("icon-", ""), event: eventName })))
+      ]);
+      return merge(...streams).pipe(share());
+    };
+    const eventStateMap = {
+      mouseenter: "hover",
+      mouseleave: "normal",
+      focus: "focus",
+      "focus-visible": "focus-visible",
+      blur: "normal"
+    };
+    const events = ["mouseenter", "mouseleave", "focus", "focus-visible", "blur"];
+    const interactionStreams = events.map((event) => createEventStream(this.tabs, event));
+    const iconClicks = this.tabs.map(({ iconAnchor, input, labelAnchor }) => merge(fromEvent(labelAnchor, "click"), fromEvent(iconAnchor, "click")).pipe(tap(() => {
+      preventDefault;
+      if (!input.checked) {
+        input.checked = true;
+        this.toggleAriaSelected(this.tabs);
+        input.dispatchEvent(new Event("change"));
+      }
+    }), map(() => ({ id: input.id, event: "click" }))));
+    const childClicks = this.childTabs.map(({ input, labelAnchor }) => fromEvent(labelAnchor, "click").pipe(tap(() => {
+      preventDefault;
+      if (!input.checked) {
+        input.checked = true;
+        this.toggleAriaSelected(this.childTabs);
+        input.dispatchEvent(new Event("change"));
+      }
+    }), map(() => ({ id: input.id, event: "click" }))));
+    const selections = this.tabs.map(({ input }) => fromEvent(input, "change").pipe(map(() => input.id), filter((id) => !!id)));
+    return merge(...interactionStreams, ...iconClicks, ...childClicks, ...selections).pipe(filter((event) => typeof event === "object" && "id" in event && "event" in event), debounceTime(30), tap((event) => {
+      const { id, event: eventName } = event;
+      const tab = this.tabs.find((t) => t.input.id === id);
+      if (tab) {
+        this.styleTab(tab, {
+          isSelected: tab.input.checked,
+          state: eventStateMap[eventName] || "normal"
+        });
+      }
+    }), map(() => void 0));
+  }
+  /**
+   * @description Initializes tab styles and sets up interaction streams
+   */
+  init() {
+    logger.info("Initializing license tabs");
+    this.setAria();
+    this.tabs.forEach((tab) => {
+      this.styleTab(tab, { isSelected: tab.input.checked, state: "normal" });
+    });
+    this.subscription = this.setupInteractions().subscribe({
+      error: (err) => logger.error("Error setting up license tabs:", err)
+    });
+    const allAnchors = [];
+    this.tabs.forEach((tab) => {
+      allAnchors.push(tab.labelAnchor, tab.iconAnchor);
+    });
+    this.childTabs.forEach((tab) => {
+      allAnchors.push(tab.labelAnchor);
+    });
+    allAnchors.forEach((anchor) => {
+      anchor.addEventListener("click", preventDefault);
+    });
+  }
+  /**
+   * @description Unsubscribes from event streams and performs cleanup
+   */
+  cleanup() {
+    logger.info("Cleaning up license tabs");
+    if (this.subscription) {
+      this.subscription.unsubscribe();
+    }
+  }
+};
+
+// src/assets/javascripts/licenses/index.ts
+var customWindow4 = window;
+var { document$: document$3 } = customWindow4;
+function initLicenseFeature() {
+  let tabManager = null;
+  return document$3.pipe(tap(() => {
+    var _a2;
+    (_a2 = tabManager == null ? void 0 : tabManager.cleanup) == null ? void 0 : _a2.call(tabManager);
+    tabManager = new TabManager();
+    logger.info("License feature initialized");
+  }), map(() => {
+    return tabManager == null ? void 0 : tabManager.subscription;
+  }));
+}
 
 // src/assets/javascripts/index.ts
 gsapWithCSS.registerPlugin(ScrollTrigger2, ScrollToPlugin);
@@ -17176,7 +17013,6 @@ var color$ = of(document.body.setAttribute("data-md-color-scheme", "slate"));
 var observer$4 = of(HeroObservation.getInstance());
 var videoManager$ = of(VideoManager.getInstance());
 var licenseHashHandler$ = onDom$(watchLicenseHash());
-var animationDebugger$ = onDom$(of(new AnimationDebugger()));
 var license$ = navigationEvents$.pipe(filter(isLicense), switchMap(() => initLicenseFeature()));
 var fixSvg$ = onDom$(of(() => fixSvgDimensions()));
 var windowEvents$ = from(windowEvents());
@@ -17184,7 +17020,7 @@ var pageConfigs = [
   {
     matcher: isHome,
     location: "home",
-    observables: [color$, observer$4, videoManager$, animationDebugger$]
+    observables: [color$, observer$4, videoManager$]
   },
   {
     matcher: isLicense,
@@ -17321,6 +17157,20 @@ pageSubscription$.subscribe();
  * @copyright No rights reserved
  */
 /**
+ * @module store
+ * @description Centralized state management for hero section with reactive state updates
+ *
+ * Implements a singleton reactive store for managing complex UI state using RxJS,
+ * with advanced state tracking, predicate-based logic, and performance optimizations.
+ *
+ * Frankly, it's overkill, but it was designed for a complex UI with many moving parts... and then I changed the design to be simpler... so now it's overkill.
+ * But it works, so I'm leaving it in place.
+ *
+ * @license Plain-Unlicense (Public Domain)
+ * @author Adam Poulemanos adam<at>plainlicense<dot>org
+ * @copyright No rights reserved
+ */
+/**
  * @module feedback
  * @description Handles feedback form submission
  * @license Plain Unlicense(Public Domain)
@@ -17344,27 +17194,13 @@ pageSubscription$.subscribe();
  * @copyright No rights reserved.
  */
 /**
- * @module features/licenses
+ * @module licenses
  *
  * @description License feature initialization.
  *
  * @license Plain-Unlicense (Public Domain)
  * @author Adam Poulemanos adam<at>plainlicense<dot>org
  * @copyright No rights reserved.
- */
-/**
- * @module store
- * @description Centralized state management for hero section with reactive state updates
- *
- * Implements a singleton reactive store for managing complex UI state using RxJS,
- * with advanced state tracking, predicate-based logic, and performance optimizations.
- *
- * Frankly, it's overkill, but it was designed for a complex UI with many moving parts... and then I changed the design to be simpler... so now it's overkill.
- * But it works, so I'm leaving it in place.
- *
- * @license Plain-Unlicense (Public Domain)
- * @author Adam Poulemanos adam<at>plainlicense<dot>org
- * @copyright No rights reserved
  */
 /**
  * ========================================================================
@@ -17455,4 +17291,4 @@ gsap/ScrollToPlugin.js:
    * @author: Jack Doyle, jack@greensock.com
   *)
 */
-//# sourceMappingURL=index.4UIYIT4H.js.map
+//# sourceMappingURL=index.XALJ3TEO.js.map

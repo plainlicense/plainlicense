@@ -1,5 +1,5 @@
 /**
- * @module features/licenses
+ * @module licenses
  *
  * @description License feature initialization.
  *
