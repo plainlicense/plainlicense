@@ -15,7 +15,8 @@ import woff2Inter from "./assets/fonts/inter-v.woff2"
 import woff2Bangers from "./assets/fonts/bangers-regular.woff2"
 import woff2SourceCodePro from "./assets/fonts/sourcecodepro-regular.woff2"
 import woff2Raleway from "./assets/fonts/raleway.woff2"
-import svgLogo from "./assets/images/logo_named.svg"
+import svgNamedLogo from "./assets/images/logo_named.svg"
+import svgLogo from "./assets/images/logo_only_color_transp.svg"
 
 // Configuration types
 interface CacheConfig {
@@ -41,7 +42,7 @@ interface Payload {
 
 let CONFIG: CacheConfig = {
   cacheName: "plain-license-v1",
-  preCacheUrls: [woff2Inter, woff2Bangers, woff2SourceCodePro, woff2Raleway, svgLogo],
+  preCacheUrls: [woff2Inter, woff2Bangers, woff2SourceCodePro, woff2Raleway, svgNamedLogo, svgLogo],
   version: Date.now(),
 }
 
@@ -180,6 +181,7 @@ const getCryptoHashlessBaseName = (url: URL | string) => {
   if (hashlessName && hashlessName.length === 2) {
     return hashlessName.join(".")
   }
+  return ""
 }
 
 /**

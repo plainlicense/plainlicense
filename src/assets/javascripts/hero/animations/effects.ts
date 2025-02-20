@@ -350,16 +350,14 @@ gsap.registerEffect({
     if (config.message) {
       logger.debug(`Animating message: ${config.message}`)
       const msgFrag = wordsToLetterDivs(config.message)
-      const fragDivs = Array.from(msgFrag.children)
+      const innerContainer = msgFrag.querySelector(".hero__letter--container--inner")
+      if (!innerContainer) {
+        logger.error("No inner container found in message fragment.")
+        return gsap.timeline()
+      }
+      const fragDivs = Array.from(innerContainer.children)
       containerTarget.append(msgFrag)
       const messageTimeline = gsap.timeline()
-      const textElements = gsap.utils
-        .toArray("div", containerTarget)
-        .filter((el) => isValidElement(el, containerTarget) && fragDivs.includes(el))
-      logger.debug(
-        `Animating message for ${textElements.length} elements. Added to container %o`,
-        containerTarget,
-      )
       gsap.set(containerTarget, { autoAlpha: 1 })
       let fromVars = config.entranceFromVars || {}
       let toVars = config.entranceToVars || {}
@@ -385,7 +383,7 @@ gsap.registerEffect({
           [
             "randomEntrance",
             gsap.fromTo(
-              textElements,
+              fragDivs,
               { autoAlpha: 0, yPercent: gsap.utils.random(-150, 150, 10), ...fromVars },
               {
                 autoAlpha: 1,
@@ -402,7 +400,7 @@ gsap.registerEffect({
         .add(
           [
             "randomExit",
-            gsap.to(textElements, {
+            gsap.to(fragDivs, {
               autoAlpha: 0,
               duration: 0.5,
               contentVisibility: "hidden",

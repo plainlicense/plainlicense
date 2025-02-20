@@ -1,4 +1,5 @@
 import { HeroName, HeroVideo } from "./types"
+import svgLogo from "~assets/images/logo_only_color_transp.svg"
 import breakFreeAv11280 from "~assets/videos/hero/break_free/break_free_av1_1280.webm"
 import breakFreeAv11920 from "~assets/videos/hero/break_free/break_free_av1_1920.webm"
 import breakFreeAv12560 from "~assets/videos/hero/break_free/break_free_av1_2560.webm"
@@ -90,6 +91,8 @@ const toUrl = (pathname: string) => {
   pathname = pathname.replace("~", "").replace("..", "assets")
   return new URL(pathname, origin)
 }
+
+export const plainLogo = toUrl(svgLogo)
 
 export const rawHeroVideos = [
   {

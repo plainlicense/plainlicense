@@ -186,13 +186,19 @@ export function wordsToLetterDivs(
   el: HTMLElement | string | HTMLElement[] | string[],
 ): DocumentFragment {
   const docFragment = document.createDocumentFragment()
+  const outerContainer = document.createElement("div")
+  outerContainer.classList.add("hero__letter--container--outer")
+  const innerContainer = document.createElement("div")
+  innerContainer.classList.add("hero__letter--container--inner")
+  outerContainer.appendChild(innerContainer)
+  docFragment.appendChild(outerContainer)
   let text = ""
   if (Array.isArray(el)) {
     if (el.every((item) => typeof item === "string")) {
       text = el.join(" ")
     } else {
       el.forEach((item) => {
-        docFragment.appendChild(wordsToLetterDivs(item))
+        innerContainer.appendChild(wordsToLetterDivs(item))
       })
     }
   } else if (typeof el === "string") {
@@ -211,12 +217,12 @@ export function wordsToLetterDivs(
     const newDiv = document.createElement("div")
     newDiv.appendChild(textNode)
     newDiv.classList.add("hero__letter")
-    docFragment.appendChild(newDiv)
+    innerContainer.appendChild(newDiv)
   })
   if (el instanceof HTMLElement) {
     gsap.set(el, { innerText: "" })
   }
-  const fragmentDivs = gsap.utils.toArray("div", docFragment)
-  gsap.set(fragmentDivs, { display: "inline-block", autoAlpha: 0 })
+  const fragmentDivs = gsap.utils.toArray("div", innerContainer)
+  gsap.set(fragmentDivs, { display: "block", autoAlpha: 0 })
   return docFragment
 }

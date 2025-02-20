@@ -29,6 +29,8 @@ import { elementInDom, logger, parsePath } from "~/utils"
 import { HeroVideo, VideoStatus } from "./types"
 import { getHeroVideos, toggleActiveClass } from "./utils"
 import { VideoElement } from "./videoElement"
+import { plainLogo } from "./data"
+import { ReducedMotionCondition } from "../animations"
 
 let customWindow: CustomWindow = window as unknown as CustomWindow
 
@@ -74,9 +76,24 @@ export class VideoManager {
   private ctaContainer: HTMLDivElement =
     (document.querySelector(".cta__container") as HTMLDivElement) || document.createElement("div")
 
-  private ctaText: HTMLElement[] = gsap.utils.toArray("h1, h2")
+  private logo: HTMLDivElement = (() => {
+    const div = document.createElement("div") as HTMLDivElement
+    div.classList.add("hero__logo")
+    const img = document.createElement("img")
+    const viewportWidth = window.innerWidth
+    img.src = plainLogo.href
+    img.alt = "Plain License Logo"
+    img.width = gsap.utils.clamp(64, 400, viewportWidth * 0.1)
+    img.height = img.width
+    div.appendChild(img)
+    gsap.set(div, { autoAlpha: 0, scale: 0, yPercent: 5 })
+    this.ctaContainer.append(div)
+    return div
+  })()
 
   public timeline: GSAPTimeline = gsap.timeline()
+
+  private textAnimationTimeline: GSAPTimeline = gsap.timeline()
 
   private subscriptions: Subscription = new Subscription()
 
@@ -197,6 +214,27 @@ export class VideoManager {
       }),
     )
 
+    const textAnimator$ = fromEvent(this.element, "timeupdate").pipe(
+      filter((ev) => {
+        return (
+          ev.target instanceof HTMLMediaElement &&
+          ev.target.duration > 0 &&
+          ev.target.currentTime >= this.titleStart
+        )
+      }),
+      map(() => {
+        return true
+      }),
+      distinctUntilChanged(),
+      switchMap(() => {
+        if (!this.textAnimationTimeline.isActive()) {
+          return of(this.textAnimationTimeline.play())
+        } else {
+          return EMPTY
+        }
+      }),
+    )
+
     const waiting$ = fromEvent(this.element, "waiting").pipe(
       filter((ev) => {
         return ev.target instanceof HTMLMediaElement
@@ -215,6 +253,7 @@ export class VideoManager {
       playing$,
       waiting$,
       metadata$,
+      textAnimator$,
     ]
 
     const videoObserver = {
@@ -252,6 +291,7 @@ export class VideoManager {
     this.videoStore = getHeroVideos()
     this.initVideo()
     this.constructTimeline()
+    this.constructTextTimeline()
     this.init_subscriptions()
   }
 
@@ -335,58 +375,116 @@ export class VideoManager {
     logger.info("Video stopped. Reinitiating.")
   }
 
+  private constructTextTimeline(): void {
+    const ctaHeaders = gsap.utils.toArray(this.ctaContainer.querySelectorAll("h1, h2"))
+    this.textAnimationTimeline = gsap
+      .timeline({
+        defaults: { paused: true, callbackScope: this },
+        paused: true,
+        callbackScope: this,
+        repeat: 0,
+        onStart: () => {
+          if (!this.hasPlayed) {
+            this.setEmphasisAnimations()
+          }
+          gsap.to(this.element, { autoAlpha: 0, duration: 0.5 })
+          this.status = "on_delay"
+          this.timeline.restart().pause()
+          this.hasPlayed = true
+        },
+        onComplete: () => {
+          gsap.to(this.element, { autoAlpha: 1, duration: 0.5 })
+          gsap.to(ctaHeaders, { autoAlpha: 1, duration: 0.5 })
+          this.status = "paused"
+          this.timeline.play()
+          this.textAnimationTimeline.restart().pause()
+        },
+      })
+      .add(
+        gsap.to(ctaHeaders, {
+          autoAlpha: 0,
+          duration: 0.5,
+        }),
+      )
+      .add(this.animateText())
+    gsap
+      .matchMedia()
+      .add({ reducedMotion: "(prefers-reduced-motion: reduce)" }, (context: gsap.Context) => {
+        const { reducedMotion } = context.conditions as ReducedMotionCondition
+        const logoTl = gsap.timeline()
+        if (!reducedMotion) {
+          logoTl.to(this.logo, {
+            scale: 1,
+            duration: 2.5,
+            yoyo: true,
+            repeat: 1,
+            ease: "power3.inOut",
+            autoAlpha: 1,
+            xPercent: 0,
+            startAt: { scale: 0, autoAlpha: 0, xPercent: -100 },
+          })
+        } else {
+          logoTl.to(this.logo, {
+            autoAlpha: 1,
+            duration: 5,
+            scale: 1,
+            xPercent: 0,
+            startAt: { scale: 0, autoAlpha: 0 },
+          })
+        }
+        this.textAnimationTimeline.add(logoTl, "<=+2")
+      })
+  }
+
   // sets initial timeline properties
   private constructTimeline(): void {
-    this.timeline = gsap.timeline({
-      defaults: { paused: true, callbackScope: this },
-      paused: true,
-      callbackScope: this,
-      onStart: () => {
-        this.transitionToVideo()
-        this.element.play()
-        this.timeline.play()
-        this.status = "playing"
-        if (!this.videoDuration && this.element.duration) {
-          this.videoDuration = this.element.duration
-          this.titleStart = this.videoDuration - 5
-        }
-      },
-      onUpdate: () => {
-        if (
-          this.status !== "on_delay" &&
-          this.element.played.length > 0 &&
-          this.videoDuration > 0 &&
-          this.element.currentTime > this.titleStart
-        ) {
-          this.element.pause()
-          this.status = "on_delay"
-          gsap.to(this.element, { autoAlpha: 0, duration: 0.5 })
-          this.animateText().play()
-        }
-        if (!this.element.played.length && this.element.error) {
-          this.timeline.pause()
-          this.status = "loading"
-          try {
-            this.tryNewSource()
-          } catch (e) {
-            logger.error("Failed to switch codec", e)
-            this.initiateFallback()
+    this.timeline = gsap
+      .timeline({
+        defaults: { paused: true, callbackScope: this },
+        paused: true,
+        callbackScope: this,
+        onStart: () => {
+          this.transitionToVideo()
+          this.element.play()
+          this.status = "playing"
+          if (!this.videoDuration && this.element.duration) {
+            this.videoDuration = this.element.duration
+            this.titleStart = this.videoDuration - 5
           }
-        }
-      },
-      onComplete: () => {
-        this.stop()
-        this.timeline.restart()
-        this.hasPlayed = true
-        this.status = "on_delay"
-      },
-      onRepeat: () => {
-        this.hasPlayed = true
-      },
-      repeat: -1,
-      repeatDelay: 3,
-      ease: "none",
-    })
+        },
+        onUpdate: () => {
+          if (!this.element.played.length && this.element.error) {
+            this.timeline.pause()
+            this.status = "loading"
+            try {
+              this.tryNewSource()
+            } catch (e) {
+              logger.error("Failed to switch codec", e)
+              this.initiateFallback()
+            }
+          }
+        },
+        onComplete: () => {
+          if (!this.textAnimationTimeline.isActive()) {
+            this.textAnimationTimeline.play()
+          }
+        },
+        repeat: 0, // we handle this manually to control the video
+        ease: "none",
+      })
+      .add(
+        [
+          "startVideo",
+          () => {
+            this.element.play().catch((e) => {
+              logger.error("Failed to play video", e)
+              this.addPlayOnInteraction()
+            })
+          },
+        ],
+        "<",
+      )
+      .add(gsap.set(this.container, { autoAlpha: 1 }))
   }
 
   private setEmphasisAnimations(): GSAPTimeline {
@@ -396,11 +494,19 @@ export class VideoManager {
     return gsap
       .timeline()
       .add(
-        ["subtleEmphasis", gsap.timeline().emphasize(subtleTargets, SUBTLE_EMPHASIS_CONFIG), ">"],
+        [
+          "subtleEmphasis",
+          gsap.timeline()["emphasize"](subtleTargets, SUBTLE_EMPHASIS_CONFIG),
+          ">",
+        ],
         ">",
       )
       .add(
-        ["strongEmphasis", gsap.timeline().emphasize(strongTargets, STRONG_EMPHASIS_CONFIG), ">"],
+        [
+          "strongEmphasis",
+          gsap.timeline()["emphasize"](strongTargets, STRONG_EMPHASIS_CONFIG),
+          ">",
+        ],
         ">=0.5",
       )
   }
@@ -416,35 +522,6 @@ export class VideoManager {
       gsap.set(this.element, { autoAlpha: 0 })
       this.container.append(this.element)
       this.element.load()
-      this.timeline
-        .add(
-          [
-            "startVideo",
-            () => {
-              this.element.play().catch((e) => {
-                logger.error("Failed to play video", e)
-                this.addPlayOnInteraction()
-              })
-            },
-          ],
-          "<",
-        )
-        .call(() => {
-          toggleActiveClass(this.poster, "hero__poster", false)
-          toggleActiveClass(this.element, "hero__video", true)
-          gsap.set(this.container, { autoAlpha: 1, duration: 1 })
-        })
-      if (this.video.message) {
-        this.timeline
-          .add(
-            ["fadeOutVideo", gsap.to(this.element, { autoAlpha: 0, duration: 0.5 })],
-            this.titleStart,
-          )
-          .add(this.animateText())
-          .add(this.setEmphasisAnimations())
-      } else {
-        logger.info("No message to display for the video")
-      }
     })
   }
 
@@ -497,6 +574,7 @@ export class VideoManager {
     toggleActiveClass(this.poster, "hero__poster", revert)
     if (revert) {
       this.timeline.pause()
+      this.textAnimationTimeline.pause()
       this.element.pause()
     } else {
       this.element.play().catch(() => {
@@ -555,29 +633,22 @@ export class VideoManager {
     this.subscriptions.unsubscribe()
     logger.info("Initiated fallback")
   }
-  public play(): void {
-    if (!this.timeline.isActive() && this.status !== "on_fallback") {
-      this.transitionToVideo()
-    }
-  }
 
   private animateText(overrideVars: gsap.TweenVars = {}): GSAPTimeline {
     return gsap
       .timeline()
       .call(() => {
-        toggleActiveClass(this.element, "hero__video", false)
+        if (this.element.classList.contains("hero__video--active")) {
+          toggleActiveClass(this.element, "hero__video", false)
+        }
       })
       .set(this.container, { autoAlpha: 1 })
-      .set(this.ctaContainer, { autoAlpha: 1 })
+      .to(this.ctaContainer, { autoAlpha: 1, duration: 0.5 })
       ["animateMessage"](this.container, {
-        message: this.message || this.ctaText,
+        message: this.message,
         repeat: 0,
         duration: 5,
         callbackScope: this,
-        onComplete: () => {
-          this.stop()
-          this.play()
-        },
         ...overrideVars,
       })
       .call(() => {
@@ -585,18 +656,45 @@ export class VideoManager {
       })
   }
 
+  public play(): void {
+    if (!this.timeline.isActive() && this.status !== "on_fallback" && this.status !== "on_delay") {
+      this.transitionToVideo()
+    } else if (this.status === "on_delay" && !this.textAnimationTimeline.isActive()) {
+      this.textAnimationTimeline.restart().play()
+    }
+  }
+
   public pause(): void {
-    this.transitionToVideo(true)
+    if (this.status === "on_fallback") {
+      return
+    }
+    this.textAnimationTimeline.pause()
+    this.timeline.pause()
+    this.element.pause()
+    this.status = "paused"
   }
 
   public resume(): void {
+    if (this.status === "on_fallback") {
+      return
+    }
+    if (this.status === "on_delay" && !this.textAnimationTimeline.isActive()) {
+      this.stop()
+    }
     this.play()
   }
 
   public stop(): void {
     this.element.pause()
     this.element.currentTime = 0
-    this.timeline.restart()
+    this.timeline.restart().pause()
+    this.textAnimationTimeline.restart().pause()
+    // check if video is loaded
+    if (this.element.readyState === 4) {
+      this.status = "loaded"
+    } else {
+      this.status = "loading"
+    }
   }
 
   private reinit(): void {
@@ -608,7 +706,7 @@ export class VideoManager {
   private handleMediaError(error: MediaError): void {
     switch (error.code) {
       case 1:
-        logger.error("Video element encountered an error. User aborted the video.")
+        this.play()
         break
       case 2:
         logger.error("Video element encountered an error. Network error.")

@@ -267,9 +267,8 @@ export class HeroObservation {
     })
 
     // Filter out ignored elements from first section
-    const ignores = gsap.utils.toArray(this.config.fades.fadeInIgnore)
-    this.sections[0].content = this.sections[0].content.filter(
-      (content) => !ignores.includes(content) && this.isValidContentTarget(content),
+    this.sections[0].content = this.sections[0].content.filter((content) =>
+      this.isValidContentTarget(content),
     )
 
     this.sectionCount = this.sections.length

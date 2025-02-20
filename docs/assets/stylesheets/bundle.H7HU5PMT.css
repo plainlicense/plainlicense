@@ -7185,9 +7185,9 @@ section.hero a {
 section.hero .hero__poster {
   position: absolute;
   top: 0;
-  left: 50%;
+  left: 0;
   z-index: 1;
-  width: 50%;
+  width: 100%;
   height: auto;
   opacity: 1;
 }
@@ -7205,9 +7205,9 @@ section.hero .hero__bg {
 section.hero .hero__backup {
   position: absolute;
   top: 0;
-  left: 50%;
+  left: 0;
   visibility: hidden;
-  width: 50%;
+  width: 100%;
   object-fit: cover;
   opacity: 0;
   transition: opacity 500ms ease-in-out;
@@ -7230,7 +7230,7 @@ section.hero .hero__backup--inactive {
 }
 section.hero .hero__poster--image {
   top: 0;
-  left: 50%;
+  left: 0;
   z-index: 0;
   display: block;
   object-fit: cover;
@@ -7239,8 +7239,8 @@ section.hero .hero__poster--image {
 section.hero .hero__video {
   position: absolute;
   top: 0;
-  left: 50%;
-  width: 50%;
+  left: 0;
+  width: 100%;
   height: auto;
 }
 @media (prefers-reduced-motion: reduce) {
@@ -7602,4 +7602,4 @@ section.hero.third .hero__bg {
 }
 
 /* src/assets/stylesheets/bundle.css */
-/*# sourceMappingURL=bundle.ITWFRTFJ.css.map */
+/*# sourceMappingURL=bundle.H7HU5PMT.css.map */

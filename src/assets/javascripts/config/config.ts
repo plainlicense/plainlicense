@@ -57,7 +57,6 @@ export const OBSERVER_CONFIG: ObserverConfig = {
     fadeInSections: gsap.utils.toArray("section"),
     fadeInDuration: 0.5,
     fadeInConfig: FADE_IN_CONFIG,
-    fadeInIgnore: ".cta__container--header, .cta__container--subtitle",
   },
   slides: {
     sections: gsap.utils.toArray("section"),

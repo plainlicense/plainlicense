@@ -31,7 +31,6 @@ export interface FadeConfig {
   fadeInSections: HTMLElement[]
   fadeInDuration: number
   fadeInConfig: FadeInConfig
-  fadeInIgnore: string // selectorAll query
 }
 
 /**

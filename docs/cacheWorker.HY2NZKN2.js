@@ -7,15 +7,16 @@
  */
 
 
-// src/cacheWorker.X7HXEUSF.js
+// src/cacheWorker.HY2NZKN2.js
 var woff2Inter = new URL("assets/fonts/inter-v.5HMTI5F7.woff2", self.location.origin);
 var woff2Bangers = new URL("assets/fonts/bangers-regular.BIV5PPSH.woff2", self.location.origin);
 var woff2SourceCodePro = new URL("assets/fonts/sourcecodepro-regular.CK7SPIOU.woff2", self.location.origin);
 var woff2Raleway = new URL("assets/fonts/raleway.FJCY4DUZ.woff2", self.location.origin);
-var svgLogo = new URL("assets/images/logo_named.YIWHC445.svg", self.location.origin);
+var svgNamedLogo = new URL("assets/images/logo_named.YIWHC445.svg", self.location.origin);
+var svgLogo = new URL("assets/images/logo_only_color_transp.WJCCEJU7.svg", self.location.origin);
 var CONFIG = {
   cacheName: "plain-license-v1",
-  preCacheUrls: [woff2Inter, woff2Bangers, woff2SourceCodePro, woff2Raleway, svgLogo],
+  preCacheUrls: [woff2Inter, woff2Bangers, woff2SourceCodePro, woff2Raleway, svgNamedLogo, svgLogo],
   version: Date.now()
 };
 var preCacheExts = ["js", "css", "html", "json", "svg", "woff", "woff2"];
@@ -115,6 +116,7 @@ var getCryptoHashlessBaseName = (url) => {
   if (hashlessName && hashlessName.length === 2) {
     return hashlessName.join(".");
   }
+  return "";
 };
 var CacheManager = class {
   constructor() {
@@ -482,4 +484,4 @@ self.addEventListener("message", (event) => {
  * @author Adam Poulemanos <adam<at>plainlicense<dot>org>
  * @copyright No rights reserved.
  */
-//# sourceMappingURL=cacheWorker.X7HXEUSF.js.map
+//# sourceMappingURL=cacheWorker.HY2NZKN2.js.map
