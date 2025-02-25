@@ -27,6 +27,7 @@ import {
   debounceTime,
   defer,
   distinctUntilChanged,
+  EMPTY,
   filter,
   from,
   fromEvent,
@@ -50,9 +51,10 @@ import {
 import Tablesort from "tablesort"
 import { feature } from "~/_"
 import { getLocation, watchElementSize, watchViewportAt } from "~/browser"
-import { getComponentElement, Header, watchHeader } from "~/components"
-import { isLicenseHash, isValidEvent, logger } from "./"
+import { getComponentElement, Header } from "~/components"
+import { isHome, isLicenseHash, isValidEvent, logger, setCssVariable } from "./"
 import { WatchOptions } from "./types"
+import { off } from "process"
 
 export const NAV_EXIT_DELAY = 60000
 export const PAGE_CLEANUp_DELAY = 20000
@@ -400,5 +402,90 @@ export function watchHeader(el: HTMLElement, options: WatchOptions): Observable<
     })),
     distinctUntilChanged((a, b) => a.height === b.height && a.hidden === b.hidden),
     shareReplay(1),
+  )
+}
+
+const header = getComponentElement("header")
+const nav = getComponentElement("tabs")
+const footer = document.querySelector("#hero-footer") as HTMLElement
+
+export function handleHomeHeader() {
+  return navigationEvents$.pipe(
+    filter((url) => isHome(url)),
+    distinctUntilChanged(),
+    tap(() => {
+      if (header) {
+        header.hidden = true
+      }
+      if (nav) {
+        nav.hidden = true
+      }
+      if (footer) {
+        footer.hidden = true
+      }
+    }),
+  )
+}
+
+async function resizeText(header: HTMLElement, offsetX: number) {
+  const headerWidth = () => header.getBoundingClientRect().width
+  const currentSize = () => parseInt(window.getComputedStyle(header).fontSize, 10)
+  const maxWidth = offsetX - offsetX * 0.1
+  const computeWidthChange = () => {
+    const computedWidth = headerWidth()
+    if (maxWidth - computedWidth < 10 && maxWidth - computedWidth >= 0) {
+      return 0
+    }
+    if (computedWidth > maxWidth) {
+      return -5
+    }
+    return 5
+  }
+
+  while (headerWidth() > maxWidth || headerWidth() < maxWidth - 10) {
+    const newSize = currentSize() + computeWidthChange()
+    requestAnimationFrame(() => {
+      setCssVariable("--hero-h1-size", `${newSize}px`)
+    })
+  }
+}
+
+export async function heroTextSizeWatch() {
+  const headers = gsap.utils.toArray("section.hero h1").filter((header) => {
+    return header instanceof HTMLElement && header.innerText.length > 0
+  }) as HTMLElement[]
+  const lineBreak = /<br\s?\/>/
+  const headerTexts: string[][] = []
+  headers.forEach((header: HTMLElement) => {
+    const text = header.innerHTML
+    if (lineBreak.test(text)) {
+      const lines = text.split(lineBreak).map((line: string) => line.replace(/<[^>]*>/g, "").trim())
+      headerTexts.push(lines)
+    } else {
+      const line = header.innerText.trim()
+      headerTexts.push([line])
+    }
+  })
+  const longestLine = headerTexts.reduce((acc, lines) => {
+    const longest = lines.reduce((longest, line) => {
+      return line.length > longest.length ? line : longest || ""
+    }, "")
+    return longest.length > acc.length ? longest : acc
+  }, "")
+  if (!longestLine) {
+    return EMPTY
+  }
+  const header = headers.find((header) => {
+    return header.innerText.includes(longestLine)
+  })
+  if (!header) {
+    return EMPTY
+  }
+  return viewport$.pipe(
+    map(({ offset: { x } }) => x),
+    distinctUntilChanged(),
+    tap((x) => {
+      from(resizeText(header, x)).subscribe()
+    }),
   )
 }

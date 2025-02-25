@@ -29,24 +29,28 @@
 {% endif %}
 
 <!-- Header -->
-<header class="{{ class }}" id="header-target" data-md-component="header">
-  Permissions-Policy: autoplay=(self)
+<header class="{{ class }}" id="hero-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="{{ lang.t('header') }}">
     <!-- Link to home -->
     <a href="{{ config.extra.homepage | d(nav.homepage.url, true) | url }}"
-        title="{{ config.site_name | e }}" class="md-header__button md-logo"
-        aria-label="{{ config.site_name }}" data-md-component="logo">
-        {% include "partials/logo.html" %}
+      title="{{ config.site_name | e }}" class="md-header__button md-logo"
+      aria-label="{{ config.site_name }}" data-md-component="logo">
+      {% include "partials/logo.html" %}
     </a>
 
     <!-- Button to open drawer -->
     <label class="md-header__button md-icon" for="__drawer">
-        {% set icon = config.theme.icon.menu or "material/menu" %}
-        {% include ".icons/" ~ icon ~ ".svg" %}
+      {% set icon = config.theme.icon.menu or "material/menu" %}
+      {% include ".icons/" ~ icon ~ ".svg" %}
     </label>
     <!-- Header title -->
     <div class="md-header__title" data-md-component="header-title">
       <div class="md-header__ellipsis">
+        <a href="{{ config.extra.homepage | d(nav.homepage.url, true) | url }}"
+          title="{{ config.site_name | e }}" class="md-header__button md-logo"
+          aria-label="{{ config.site_name }}">
+          <img src="{{ simple_logo | url }}" alt="logo" class="simple_logo" hidden />
+        </a>
         <div class="md-header__topic">
           <span class="md-ellipsis">
           </span>
@@ -54,23 +58,24 @@
       </div>
     </div>
 
-    <form class="md-header__option" data-md-component="palette"
-        style="opacity:0;visibility:hidden;" aria-hidden="true">
-    {% for option in config.theme.palette %}
-    {% set scheme = "slate" %}
-    {% set primary = "custom" %}
-    {% set accent = "custom" %}
+    <form class="md-header__option" data-md-component="palette" style="opacity:0;visibility:hidden;"
+      aria-hidden="true">
+      {% for option in config.theme.palette %}
+      {% set scheme = "slate" %}
+      {% set primary = "custom" %}
+      {% set accent = "custom" %}
       <input class="md-option" data-md-color-media="dark"
-            data-md-color-scheme="{{ scheme | replace(' ', '-') }}"
-            data-md-color-primary="{{ primary | replace(' ', '-') }}"
-            data-md-color-accent="{{ accent | replace(' ', '-') }}" aria-hidden="true"
-            type="radio" name="__palette" id="__palette_{{ loop.index0 }}" />
-        {% if option.toggle %}
-      <label class="md-header__button md-icon" title="{{ option.toggle.name }}" for="__palette_{{ loop.index % loop.length }}" hidden>
-      {% include ".icons/" ~ option.toggle.icon ~ ".svg" %}
+        data-md-color-scheme="{{ scheme | replace(' ', '-') }}"
+        data-md-color-primary="{{ primary | replace(' ', '-') }}"
+        data-md-color-accent="{{ accent | replace(' ', '-') }}" aria-hidden="true" type="radio"
+        name="__palette" id="__palette_{{ loop.index0 }}" />
+      {% if option.toggle %}
+      <label class="md-header__button md-icon" title="{{ option.toggle.name }}"
+        for="__palette_{{ loop.index % loop.length }}" hidden>
+        {% include ".icons/" ~ option.toggle.icon ~ ".svg" %}
       </label>
-        {% endif %}
-        {% endfor %}
+      {% endif %}
+      {% endfor %}
     </form>
 
     <!-- Site language selector -->
@@ -81,8 +86,8 @@
     <!-- Button to open search modal -->
     {% if "material/search" in config.plugins %}
     <label class="md-header__button md-icon" for="__search">
-        {% set icon = config.theme.icon.search or "material/magnify" %}
-        {% include ".icons/" ~ icon ~ ".svg" %}
+      {% set icon = config.theme.icon.search or "material/magnify" %}
+      {% include ".icons/" ~ icon ~ ".svg" %}
     </label>
 
     <!-- Search interface -->
@@ -92,7 +97,7 @@
     <!-- Repository information -->
     {% if config.repo_url | trim | url %}
     <div class="md-header__source">
-        {% include "partials/source.html" %}
+      {% include "partials/source.html" %}
     </div>
     {% endif %}
   </nav>
@@ -102,5 +107,4 @@
   {% include "partials/hero_tabs.html" %}
   {% endif %}
   {% endif %}
-
 </header>

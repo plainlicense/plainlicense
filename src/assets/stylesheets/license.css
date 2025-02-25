@@ -39,7 +39,7 @@ article[data-embedded-license] .md-typeset details.license {
 article[data-embedded-license] .md-typeset .license> .admonition-title,
 article[data-embedded-license] .md-typeset .license> details.question> summary {
   color: var(--zaffre);
-  background-color: rgba(var(--dark-emerald-adj), 0.1);
+  background-color: rgba(var(--dark-emerald-rgb), 0.1);
 }
 
 [data-md-color-scheme="slate"] article[data-embedded-license] .md-typeset .license> .admonition-title,
@@ -263,7 +263,7 @@ p.md-nav__description.license {
   min-height: 3rem;
   padding-top: 1.5rem;
   margin-top: 1rem;
-  font-size-adjust: calc(1rem + 1vw);
+  font-size-rgbust: calc(1rem + 1vw);
   font-weight: 700;
   vertical-align: bottom;
   color: var(--md-default-fg-color--light);
@@ -476,7 +476,7 @@ p.md-nav__description.license {
   font-size: clamp(0.9rem, 1rem, 1.2rem);
   font-weight: 700;
   cursor: pointer;
-  background-color: rgba(var(--aquamarine-adj), 0.1);
+  background-color: rgba(var(--aquamarine-rgb), 0.1);
   border: none;
   border-inline-start-width: 0.25rem;
   border-start-start-radius: 0.125rem;

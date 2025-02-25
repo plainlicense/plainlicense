@@ -184,6 +184,11 @@ const getCryptoHashlessBaseName = (url: URL | string) => {
   return ""
 }
 
+const isHTML = (url: RequestLike): boolean => {
+  const u = normalizeUrl(url)
+  return u.pathname.endsWith(".html")
+}
+
 /**
  * Cache manager for managing cache operations
  *
@@ -366,9 +371,17 @@ class CacheManager {
    */
   private async tryFetch(request: Request | string | URL, init?: RequestInit): Promise<Response> {
     try {
+      const normalized = normalizeUrl(request)
+      const isHTMLRequest = isHTML(normalized)
       const response = await fetch(request, init)
       if (!response.ok) {
         throw new NetworkError("Network response was not ok", response.status)
+      }
+      if (isHTMLRequest) {
+        const name = normalized.pathname.split("/").pop()
+        if (name === "index.html" || name === "/") {
+          response.headers.set("Permissions-Policy", "autoplay=(self)")
+        }
       }
       this.cacheKeys.push(request.toString())
       return response
@@ -450,7 +463,10 @@ class CacheStrategies {
       url.origin !== self.location.origin ||
       (url.origin === self.location.origin &&
         !url.href.includes("assets") &&
-        (url.href.endsWith(".png") || url.href.endsWith(".ico") || url.href.endsWith(".jpg")))
+        (url.href.endsWith(".png") ||
+          url.href.endsWith(".ico") ||
+          url.href.endsWith(".jpg") ||
+          url.href === self.location.href))
     ) {
       return fetch(request)
     }

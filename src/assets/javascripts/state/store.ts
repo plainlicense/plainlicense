@@ -30,7 +30,7 @@ import {
   tap,
 } from "rxjs"
 import { getViewportOffset, getViewportSize } from "~/browser"
-import { Header, getComponentElement } from "~/components"
+import { Header, getComponentElement, watchTabs } from "~/components"
 import { SectionIndex } from "~/hero"
 import {
   isDev,
@@ -272,10 +272,23 @@ export class HeroStore {
       tap(this.createObserver("view$", (viewport) => ({ viewport }))),
     )
 
-    const header$ = watchHeader(getComponentElement("header"), { viewport$ }).pipe(
-      tap((header: Header) => {
-        setCssVariable("--header-height", header.hidden ? "0" : `${header.height}px`)
+    const header$ = watchHeader(getComponentElement("header"), { viewport$ })
+
+    const tab$ = watchTabs(getComponentElement("tabs"), { viewport$, header$ })
+
+    const headerWatch$ = combineLatest([header$, tab$]).pipe(
+      tap(([header, tabs]) => {
+        if (tabs.hidden) {
+          setCssVariable("--header-height", header.hidden ? "0" : `${header.height}px`)
+        } else {
+          const tabHeight = getComponentElement("tabs").offsetHeight
+          setCssVariable(
+            "--header-height",
+            header.hidden ? `${tabHeight}px` : `${header.height + tabHeight}px`,
+          )
+        }
       }),
+      map(([header, _tabs]) => header),
       tap(this.createObserver("header$", (header) => ({ header }))),
     )
 
@@ -334,7 +347,7 @@ export class HeroStore {
     this.subscriptions.add(pageVisible$.subscribe())
     this.subscriptions.add(motion$.subscribe())
     this.subscriptions.add(view$.subscribe())
-    this.subscriptions.add(header$.subscribe())
+    this.subscriptions.add(headerWatch$.subscribe())
     this.subscriptions.add(loc$.subscribe())
     this.subscriptions.add(parallax$.subscribe())
     this.subscriptions.add(video$.subscribe())

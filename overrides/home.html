@@ -31,10 +31,11 @@
         z-index: 1100;
         margin-top: 2rem;
         object-fit: cover;
-        background-color: rgba(var(--zaffre-adj), 0.6);
+        background-color: rgba(var(--zaffre-rgb), 0.6);
     }
-    nav.md-tabs, #header-target, .md-footer {
-        opacity: 0;
+
+    #hero-tabs {
+        background: transparent;
     }
 
     main.md-main {
@@ -46,6 +47,12 @@
 {% endblock %}
 {% block content %}
 {% endblock %}
+
+<!-- Footer -->
+{% block footer %}
+{% include "partials/herofooter.html" %}
+{% endblock %}
+
 {% block scripts %}
 <script async fetch-priority="high" type="module" src="{{ js_bundle | url }}"></script>
 {% endblock %}

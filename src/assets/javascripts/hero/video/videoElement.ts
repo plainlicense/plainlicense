@@ -42,6 +42,7 @@ export class VideoElement {
     for (const prop of Object.keys(this.properties)) {
       const key = typeof prop === "string" ? prop : `${prop}`
       try {
+        logger.debug(`Setting property ${key} to ${this.properties[key]} for video element`)
         this.video.setAttribute(prop, this.properties[key])
       } catch (e) {
         logger.error(`Error setting property ${key} on video element: ${e}`)
@@ -51,6 +52,7 @@ export class VideoElement {
     this.sources = this.constructSources()
     this.video.append(...this.sources)
     this.video.muted = true
+    this.video.defaultMuted = true
     logger.debug("video element: %o", this.video)
     logger.debug("sources: %o", this.sources)
     this.picture = this.constructPictureElement()

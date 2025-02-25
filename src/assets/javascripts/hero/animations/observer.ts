@@ -148,11 +148,28 @@ export class HeroObservation {
   private onLoad() {
     this.transitionTl.pause()
     gsap.set(this.footer, { autoAlpha: 0 })
-    gsap.set(this.header, { autoAlpha: 0 })
+    this.header?.forEach((header) => {
+      if (header instanceof HTMLElement && header.style.opacity.length) {
+        header.style.opacity = "1"
+      }
+    })
+    logger.debug("Observer header:", this.header)
+    if (this.footer && this.footer instanceof HTMLElement && this.footer.style.opacity.length) {
+      this.footer.style.opacity = "1"
+    }
     this.subscriptions.add(
       navigationEvents$.pipe(filter((url) => !isHome(url))).subscribe(() => {
-        gsap.set(this.footer, { autoAlpha: 1 })
-        gsap.set(this.header, { autoAlpha: 1 })
+        this.header?.forEach((header) => {
+          if ("hidden" in header && header.hidden) {
+            header.hidden = false
+          }
+          if (header instanceof HTMLElement && header.style.background.length) {
+            header.style.background = ""
+          }
+        })
+        this.footer?.removeAttribute("hidden")
+        gsap.set(this.footer, { autoAlpha: 1, opacity: 1 })
+        gsap.set(this.header, { autoAlpha: 1, opacity: 1 })
       }),
     )
     const outerWrappers = gsap.utils.toArray(".outer")
@@ -299,10 +316,12 @@ export class HeroObservation {
           nextIndex++
           remainingSections--
         } else {
+          this.animating = false
           break // Exit loop if condition fails
         }
       }
     }
+    this.animating = false
     return
   }
 
@@ -335,6 +354,9 @@ export class HeroObservation {
     if (section.animation && section.animation.totalDuration() > 0) {
       tl.add(section.animation, ">")
     }
+    tl.add(() => {
+      this.animating = false
+    }, ">")
     logger.info(`Transition for section ${index} is set and will trigger now`)
     return tl
   }

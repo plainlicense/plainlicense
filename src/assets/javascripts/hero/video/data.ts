@@ -165,7 +165,7 @@ export const rawHeroVideos = [
     },
     parentPath: `${origin}/assets/videos/hero/tokyo_shuffle`,
     baseName: HeroName.TokyoShuffle,
-    message: "No more legal nonsense.",
+    message: "STOP FIGHTING LEGAL NONSENSE.",
   },
   {
     variants: {
@@ -237,6 +237,6 @@ export const rawHeroVideos = [
     },
     parentPath: `${origin}/assets/videos/hero/break_free`,
     baseName: HeroName.BreakFree,
-    message: "Break free from confusion.",
+    message: "FREE YOUR CREATIONS.",
   },
 ] as HeroVideo[]

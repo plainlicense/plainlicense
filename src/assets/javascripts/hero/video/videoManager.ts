@@ -64,10 +64,10 @@ export class VideoManager {
   private poster: HTMLPictureElement
 
   private container: HTMLDivElement =
-    (document.querySelector(".hero.first .hero__container") as HTMLDivElement) ||
+    (document.querySelector(".hero.first .media__container") as HTMLDivElement) ||
     (() => {
       const div = document.createElement("div")
-      div.classList.add("hero__container")
+      div.classList.add("media__container")
       const parent = document.querySelector(".hero.first .hero__bg")
       parent?.append(div)
       return div
@@ -79,15 +79,18 @@ export class VideoManager {
   private logo: HTMLDivElement = (() => {
     const div = document.createElement("div") as HTMLDivElement
     div.classList.add("hero__logo")
+    const parent = document.querySelector(".hero.first .logo__container") || this.container
+    logger.debug("logo parent:", parent)
+    parent.appendChild(div)
     const img = document.createElement("img")
-    const viewportWidth = window.innerWidth
+    const { innerWidth, innerHeight } = window
     img.src = plainLogo.href
     img.alt = "Plain License Logo"
-    img.width = gsap.utils.clamp(64, 400, viewportWidth * 0.1)
+    img.width = gsap.utils.clamp(48, innerWidth * 0.1, innerHeight * 0.05)
     img.height = img.width
     div.appendChild(img)
     gsap.set(div, { autoAlpha: 0, scale: 0, yPercent: 5 })
-    this.ctaContainer.append(div)
+    logger.debug("Logo created and appended:", img)
     return div
   })()
 
@@ -141,7 +144,22 @@ export class VideoManager {
     ]).pipe(
       tap(() => {
         logger.info("Video is stalled or waiting, pausing video")
-        this.pause()
+        Promise.resolve(
+          setTimeout(() => {
+            if (
+              this.element.currentTime > 0 &&
+              this.element.paused === false &&
+              !this.element.ended
+            ) {
+              return
+            } else {
+              this.pause()
+              this.element.oncanplaythrough = () => {
+                this.play()
+              }
+            }
+          }, 5000),
+        )
       }),
       switchMap(() => fromEvent(this.element, "canplaythrough")),
       tap(() => {
@@ -215,23 +233,29 @@ export class VideoManager {
     )
 
     const textAnimator$ = fromEvent(this.element, "timeupdate").pipe(
-      filter((ev) => {
-        return (
-          ev.target instanceof HTMLMediaElement &&
-          ev.target.duration > 0 &&
-          ev.target.currentTime >= this.titleStart
-        )
+      map((ev) => {
+        return ev instanceof Event && ev.target instanceof HTMLMediaElement ? ev.target : null
       }),
-      map(() => {
-        return true
+      filter((el): el is HTMLMediaElement => el !== null),
+      map((target) => {
+        const canAnimate = target.currentTime >= this.titleStart
+        const isAnimating = this.textAnimationTimeline.isActive()
+        return { canAnimate, isAnimating, isPlaying: this.isPlaying() }
       }),
-      distinctUntilChanged(),
-      switchMap(() => {
-        if (!this.textAnimationTimeline.isActive()) {
-          return of(this.textAnimationTimeline.play())
-        } else {
-          return EMPTY
+      distinctUntilKeyChanged("canAnimate"),
+      switchMap(({ canAnimate, isAnimating, isPlaying }) => {
+        if (canAnimate) {
+          if (isAnimating && !isPlaying) {
+            return EMPTY
+          } else if (isPlaying) {
+            gsap.set(this.element, { autoAlpha: 0 })
+            this.stop()
+            return of(this.textAnimationTimeline.play())
+          }
+        } else if (isAnimating && !isPlaying && this.status !== "on_delay") {
+          this.textAnimationTimeline.restart().pause()
         }
+        return EMPTY
       }),
     )
 
@@ -314,7 +338,7 @@ export class VideoManager {
       } else {
         this.backupPicture = this.video.picture.cloneNode(true) as HTMLPictureElement
       }
-      this.backupPicture.classList.add("hero__backup", "hero__poster,", "hero__backup--inactive")
+      toggleActiveClass(this.backupPicture, "hero__backup", false)
       this.container.append(this.backupPicture)
 
       this.backupPicture.style.display = "none"
@@ -396,8 +420,10 @@ export class VideoManager {
           gsap.to(this.element, { autoAlpha: 1, duration: 0.5 })
           gsap.to(ctaHeaders, { autoAlpha: 1, duration: 0.5 })
           this.status = "paused"
-          this.timeline.play()
-          this.textAnimationTimeline.restart().pause()
+          Promise.resolve(() => {
+            this.stop()
+            this.play()
+          })
         },
       })
       .add(
@@ -421,15 +447,19 @@ export class VideoManager {
             ease: "power3.inOut",
             autoAlpha: 1,
             xPercent: 0,
-            startAt: { scale: 0, autoAlpha: 0, xPercent: -100 },
+            yPercent: 0,
+            startAt: { scale: 0, autoAlpha: 0, xPercent: -100, yPercent: 5 },
           })
         } else {
           logoTl.to(this.logo, {
             autoAlpha: 1,
             duration: 5,
+            yoyo: true,
+            repeat: 1,
+            ease: "power1.inOut",
             scale: 1,
             xPercent: 0,
-            startAt: { scale: 0, autoAlpha: 0 },
+            startAt: { scale: 0, autoAlpha: 0, yPercent: 0 },
           })
         }
         this.textAnimationTimeline.add(logoTl, "<=+2")
@@ -547,6 +577,22 @@ export class VideoManager {
     }
   }
 
+  // I couldn't resist
+  private failPlay(): void {
+    this.element
+      .play()
+      .then(() => {
+        if (this.isPlaying()) {
+          this.timeline.play()
+        } else {
+          throw new Error("Failed to play video")
+        }
+      })
+      .catch(() => {
+        this.addPlayOnInteraction()
+      })
+  }
+
   private loadBackup(): void {
     const backup =
       this.poster.classList.contains("hero__poster--active") ? this.poster : this.backupPicture
@@ -577,10 +623,7 @@ export class VideoManager {
       this.textAnimationTimeline.pause()
       this.element.pause()
     } else {
-      this.element.play().catch(() => {
-        this.addPlayOnInteraction()
-      })
-      this.timeline.play()
+      this.failPlay()
     }
   }
 
@@ -593,11 +636,26 @@ export class VideoManager {
         this.initiateFallback()
       })
     }
-    this.transitionToVideo(true)
-    document.addEventListener("click", playOnInteraction)
-    document.addEventListener("touchstart", playOnInteraction)
+    try {
+      const evt = new Event("click", { bubbles: true, cancelable: true })
+      this.element.dispatchEvent(evt)
+    } catch (error) {
+      logger.error("Error creating event:", error)
+    }
+    this.element
+      .play()
+      .then(() => {
+        if (this.isPlaying()) {
+          this.timeline.play()
+        }
+      })
+      .catch(() => {
+        this.transitionToVideo(true)
+        document.addEventListener("click", playOnInteraction)
+        document.addEventListener("touchstart", playOnInteraction)
 
-    logger.info("Added play on interaction listeners")
+        logger.info("Added play on interaction listeners")
+      })
   }
 
   private initiateFallback(): void {
@@ -642,9 +700,8 @@ export class VideoManager {
           toggleActiveClass(this.element, "hero__video", false)
         }
       })
-      .set(this.container, { autoAlpha: 1 })
-      .to(this.ctaContainer, { autoAlpha: 1, duration: 0.5 })
-      ["animateMessage"](this.container, {
+      .set(".text-animation__container", { autoAlpha: 1 })
+      ["animateMessage"](".text-animation__container", {
         message: this.message,
         repeat: 0,
         duration: 5,
@@ -706,7 +763,7 @@ export class VideoManager {
   private handleMediaError(error: MediaError): void {
     switch (error.code) {
       case 1:
-        this.play()
+        setTimeout(() => this.play(), 2000)
         break
       case 2:
         logger.error("Video element encountered an error. Network error.")
@@ -725,8 +782,15 @@ export class VideoManager {
         break
       default:
         logger.error("Video element encountered an error.", error)
+        Promise.resolve(this.tryNewSource()).catch(() => {
+          this.initiateFallback()
+        })
         break
     }
+  }
+
+  private isPlaying(): boolean {
+    return this.element.currentTime > 0 && !this.element.paused && !this.element.ended
   }
 
   private tryNewSource(): void {
@@ -750,9 +814,16 @@ export class VideoManager {
     if (this.element.currentSrc !== currentSrc) {
       this.element.load()
       fromEvent(this.element, "canplaythrough").subscribe(() => {
-        this.element.play().catch(() => {
-          this.addPlayOnInteraction()
-        })
+        this.element
+          .play()
+          .then(() => {
+            if (this.isPlaying()) {
+              this.timeline.play()
+            }
+          })
+          .catch(() => {
+            this.addPlayOnInteraction()
+          })
       })
     }
   }

@@ -4,113 +4,120 @@
     <div class="inner">
       <div class="hero__bg">
         <div class="hero__container">
-          <noscript>
-            {{ no_script_image }}
+          <!-- Right side: Video/Poster content -->
+          <div class="media__container">
+            <!-- Video and poster elements will be injected here by JavaScript -->
+            <div class="text-animation__container">
+              <div class="logo__container">
+                <!-- Logo will be injected here by JavaScript -->
+              </div>
+              <!-- Text animation will be injected here by JavaScript -->
+            </div>
+            <noscript>
+              {{ no_script_image }}
 
-            <style>
-              html {
-                scroll-behavior: smooth;
-              }
-
-              header#header-target {
-                opacity: 1;
-                visibility: visible;
-              }
-
-              #hero-tabs {
-                opacity: 1;
-                visibility: visible;
-              }
-
-              .section.hero .cta__container h1 {
-                animation: glow 3000ms ease-in-out infinite alternate;
-              }
-
-              .section.hero {
-                opacity: 1;
-                visibility: visible;
-                transition:
-                  background-color 350ms ease-in-out,
-                  color 300ms ease-in-out,
-                  scale 350ms ease-in;
-                position: relative;
-                z-index: 1;
-                padding-bottom: 1rem;
-                content-visibility: visible;
-              }
-
-              .section.hero .hero__backup {
-                display: block;
-                opacity: 1;
-                visibility: visible;
-              }
-
-              .section.hero .outer,
-              .section.hero .inner {
-                display: none;
-                opacity: 0;
-                visibility: hidden;
-                transition: opacity 300ms ease-in-out, visibility 300ms ease-in-out;
-                z-index: -1000;
-              }
-
-              .section.hero .hero__bg {
-                display: none;
-                opacity: 0;
-                visibility: hidden;
-                transition: opacity 300ms ease-in-out, visibility 300ms ease-in-out;
-                z-index: -1000;
-              }
-
-              .section.hero .cta__container h1,
-              .section.hero .cta__container h2 {
-                visibility: visible;
-                opacity: 1;
-                display: block;
-                transition: opacity 300ms ease-in-out, visibility 300ms ease-in-out;
-                z-index: 1;
-              }
-
-              .section.hero .hero__container {
-                opacity: 1;
-                visibility: visible;
-                content-visibility: visible;
-              }
-
-              .section.hero .md-typeset {
-                opacity: 1;
-                visibility: visible;
-              }
-
-              @media screen and (prefers-reduced-motion: reduce) {
+              <style>
                 html {
-                  scroll-behavior: instant;
+                  scroll-behavior: smooth;
                 }
-              }
-            </style>
 
-          </noscript>
-          {{ backup_image }}
+                #hero-header, #hero-footer, #hero-tabs {
+                  opacity: 1;
+                }
+
+                .section.hero .cta__container h1 {
+                  animation: glow 3000ms ease-in-out infinite alternate;
+                }
+
+                .section.hero {
+                  opacity: 1;
+                  visibility: visible;
+                  transition:
+                    background-color 350ms ease-in-out,
+                    color 300ms ease-in-out,
+                    scale 350ms ease-in;
+                  position: relative;
+                  z-index: 1;
+                  padding-bottom: 1rem;
+                  content-visibility: visible;
+                }
+
+                .section.hero .hero__backup {
+                  display: block;
+                  opacity: 1;
+                  visibility: visible;
+                }
+
+                .section.hero .outer,
+                .section.hero .inner {
+                  display: none;
+                  opacity: 0;
+                  visibility: hidden;
+                  transition: opacity 300ms ease-in-out, visibility 300ms ease-in-out;
+                  z-index: -1000;
+                }
+
+                .section.hero .hero__bg {
+                  display: none;
+                  opacity: 0;
+                  visibility: hidden;
+                  transition: opacity 300ms ease-in-out, visibility 300ms ease-in-out;
+                  z-index: -1000;
+                }
+
+                .section.hero .cta__container h1,
+                .section.hero .cta__container h2 {
+                  visibility: visible;
+                  opacity: 1;
+                  display: block;
+                  transition: opacity 300ms ease-in-out, visibility 300ms ease-in-out;
+                  z-index: 1;
+                }
+
+                .section.hero .hero__container {
+                  opacity: 1;
+                  visibility: visible;
+                  content-visibility: visible;
+                }
+
+                .section.hero .md-typeset {
+                  opacity: 1;
+                  visibility: visible;
+                }
+
+                .section.hero .text-animation__container {
+                  display: none;
+                  opacity: 0;
+                  visibility: hidden;
+                  z-index: -1000;
+                }
+
+                @media screen and (prefers-reduced-motion: reduce) {
+                  html {
+                    scroll-behavior: instant;
+                  }
+                }
+              </style>
+            </noscript>
+            {{ backup_image }}
+          </div>
           <div class="cta__container">
-            <h1 contenteditable="false" class="cta__container--header">Join the
-              Fight
-            </h1>
-            <h2 contenteditable="false" class="cta__container--subtitle">To End Confusion!</h2>
+            <h1 contenteditable="false" class="cta__container--header">Licenses don't have to be confusing</h1><br/>
+            <h2 contenteditable="false" class="cta__container--subtitle">Get clarity with <br/><span class="emerald">plain license</span></h2>
             <a class="cta__container--target-selector" href="#pt3-hero-content-section"
               contenteditable="false">
-              <button contenteditable="false" class="md-button">Get
-                Clear
-                Terms
-              </button>
-            </a>
-            <a href="#pt3-hero-content-section" class="cta__container--target-selector">
-              <svg viewBox="0 0 24 24" class="cta__container--down-indicator" id="arrow-down"
-                title="scroll down for more" xmlns="http://www.w3.org/2000/svg" role="button"
-                contenteditable="false">
-                <path d="M11 4h2v12l5.5-5.5 1.42 1.42L12 19.84l-7.92-7.92L5.5 10.5 11 16z"></path>
-              </svg>
+              <button contenteditable="false" class="md-button">Embrace Clarity</button>
             </a>
           </div>
+
+          <!-- Scroll indicator -->
+          <a href="#pt3-hero-content-section" class="cta__container--target-selector">
+            <svg viewBox="0 0 24 24" class="cta__container--down-indicator" id="arrow-down"
+              title="scroll down for more" xmlns="http://www.w3.org/2000/svg" role="button"
+              contenteditable="false">
+              <path d="M11 4h2v12l5.5-5.5 1.42 1.42L12 19.84l-7.92-7.92L5.5 10.5 11 16z"></path>
+            </svg>
+          </a>
         </div>
       </div>
     </div>

@@ -32,7 +32,6 @@ import {
 import gsap from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { ScrollToPlugin } from "gsap/ScrollToPlugin"
-
 import { HeroStore } from "~/state"
 import { feedback } from "~/feedback"
 import { initLicenseFeature } from "./licenses"
@@ -40,12 +39,16 @@ import { HeroObservation, VideoManager } from "~/hero"
 import {
   createScript,
   fixSvgDimensions,
+  heroTextSizeWatch,
   isHelpingIndex,
   isHome,
   isLicense,
   isOnSite,
   logger,
   navigationEvents$,
+  removeHiddenAttr,
+  setNavId,
+  supportsHasSelector,
   watchLicenseHash,
   windowEvents,
 } from "~/utils"
@@ -75,6 +78,15 @@ const insertAnalytics = () => {
     console.warn("Analytics failed to load:", e)
   }
 }
+const imgLogo = document.querySelector("img.simple_logo")
+if (
+  imgLogo &&
+  imgLogo instanceof HTMLElement &&
+  supportsHasSelector() &&
+  imgLogo.hasAttribute("hidden")
+) {
+  removeHiddenAttr(imgLogo)
+}
 
 const insertButtonScript = () => createScript("https://buttons.github.io/buttons.js", true, true)
 
@@ -85,12 +97,14 @@ const onDom$ = (obs: Observable<T>) => {
 const analytic$ = onDom$(of(insertAnalytics()))
 const feedback$ = onDom$(of(feedback()))
 const buttonScript$ = onDom$(of(insertButtonScript()))
+const nav$ = of(setNavId())
+const heroTextSize$ = (async function () {
+  return from(await heroTextSizeWatch())
+})()
 const color$ = of(document.body.setAttribute("data-md-color-scheme", "slate"))
 const observer$ = of(HeroObservation.getInstance())
 const videoManager$ = of(VideoManager.getInstance())
-//const videoManager$ = of(VideoManager.getInstance())
 const licenseHashHandler$ = onDom$(watchLicenseHash())
-// const animationDebugger$ = onDom$(of(new AnimationDebugger()))
 const license$ = navigationEvents$.pipe(
   filter(isLicense),
   switchMap(() => initLicenseFeature()),
@@ -103,7 +117,7 @@ const pageConfigs: PageConfig[] = [
   {
     matcher: isHome,
     location: "home",
-    observables: [color$, observer$, videoManager$],
+    observables: [nav$, color$, from(heroTextSize$), observer$, videoManager$],
   },
   {
     matcher: isLicense,

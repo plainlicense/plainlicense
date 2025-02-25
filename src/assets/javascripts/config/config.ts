@@ -51,8 +51,8 @@ const FADE_IN_CONFIG: FadeInConfig = {
  * @description Configuration for the observer
  */
 export const OBSERVER_CONFIG: ObserverConfig = {
-  header: "#header-target, .md-tabs",
-  footer: ".md-footer",
+  header: "#hero-header, nav.md-tabs",
+  footer: "#hero-footer",
   fades: {
     fadeInSections: gsap.utils.toArray("section"),
     fadeInDuration: 0.5,
@@ -65,7 +65,7 @@ export const OBSERVER_CONFIG: ObserverConfig = {
     scrollPause: 10,
   },
   clickTargets: ".cta__container--target-selector",
-  ignoreTargets: "a, button, header, navigation, .md-tabs",
+  ignoreTargets: "a, button, header, navigation, nav.md-tabs",
   emphasisTargets: {
     subtle: "button.md-button",
     strong: ".cta__container--down-indicator",

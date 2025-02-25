@@ -7,7 +7,7 @@
  */
 
 
-// src/cacheWorker.HY2NZKN2.js
+// src/cacheWorker.4OWGWVKB.js
 var woff2Inter = new URL("assets/fonts/inter-v.5HMTI5F7.woff2", self.location.origin);
 var woff2Bangers = new URL("assets/fonts/bangers-regular.BIV5PPSH.woff2", self.location.origin);
 var woff2SourceCodePro = new URL("assets/fonts/sourcecodepro-regular.CK7SPIOU.woff2", self.location.origin);
@@ -117,6 +117,10 @@ var getCryptoHashlessBaseName = (url) => {
     return hashlessName.join(".");
   }
   return "";
+};
+var isHTML = (url) => {
+  const u = normalizeUrl(url);
+  return u.pathname.endsWith(".html");
 };
 var CacheManager = class {
   constructor() {
@@ -281,9 +285,17 @@ var CacheManager = class {
    */
   async tryFetch(request, init) {
     try {
+      const normalized = normalizeUrl(request);
+      const isHTMLRequest = isHTML(normalized);
       const response = await fetch(request, init);
       if (!response.ok) {
         throw new NetworkError("Network response was not ok", response.status);
+      }
+      if (isHTMLRequest) {
+        const name = normalized.pathname.split("/").pop();
+        if (name === "index.html" || name === "/") {
+          response.headers.set("Permissions-Policy", "autoplay=(self)");
+        }
       }
       this.cacheKeys.push(request.toString());
       return response;
@@ -333,7 +345,7 @@ var _CacheStrategies = class _CacheStrategies {
       return fetch(request);
     }
     const url = new URL(request.url);
-    if (url.origin !== self.location.origin || url.origin === self.location.origin && !url.href.includes("assets") && (url.href.endsWith(".png") || url.href.endsWith(".ico") || url.href.endsWith(".jpg"))) {
+    if (url.origin !== self.location.origin || url.origin === self.location.origin && !url.href.includes("assets") && (url.href.endsWith(".png") || url.href.endsWith(".ico") || url.href.endsWith(".jpg") || url.href === self.location.href)) {
       return fetch(request);
     }
     const strat = _CacheStrategies;
@@ -484,4 +496,4 @@ self.addEventListener("message", (event) => {
  * @author Adam Poulemanos <adam<at>plainlicense<dot>org>
  * @copyright No rights reserved.
  */
-//# sourceMappingURL=cacheWorker.HY2NZKN2.js.map
+//# sourceMappingURL=cacheWorker.4OWGWVKB.js.map

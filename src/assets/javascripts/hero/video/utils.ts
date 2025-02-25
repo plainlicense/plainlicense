@@ -82,11 +82,42 @@ export function srcToAttributes(src: string): [VideoCodec, VideoWidth] {
   return [codec as VideoCodec, width as VideoWidth]
 }
 
+/**
+ * Gets the activity classes for the given base class
+ * @param baseClass - The base class name
+ * @returns An object containing the active and inactive class names
+ */
 function getActivityClasses(baseClass: string) {
   return {
     active: `${baseClass}--active`,
     inactive: `${baseClass}--inactive`,
   }
+}
+
+/**
+ * Filters the class list to include only active or inactive classes
+ * @param classList - The list of classes to filter
+ * @param baseClass - The base class name to derive active/inactive classes
+ * @returns An object containing the active or inactive class name if present, otherwise null
+ */
+function filterActiveClass(
+  classList: DOMTokenList,
+  baseClass: string,
+): Record<"active" | "inactive", string | null> {
+  const { active, inactive } = getActivityClasses(baseClass)
+  const classObj = { active: "", inactive: "" }
+  Array.from(classList)
+    .filter((c) => c in classObj)
+    .forEach((c) => {
+      if (c === active) {
+        classObj.active = active
+      } else if (c === inactive) {
+        classObj.inactive = inactive
+      }
+    })
+  return Object.fromEntries(
+    Object.entries(classObj).map(([k, v]) => (v !== "" && k ? [k, v] : [k, null])),
+  ) as Record<"active" | "inactive", string | null>
 }
 
 /**
@@ -96,17 +127,27 @@ function getActivityClasses(baseClass: string) {
  * @param makeActive - Whether to make the element active or inactive (active is true)
  */
 export function toggleActiveClass(el: HTMLElement, classBase: string, makeActive: boolean) {
-  const { active, inactive } = getActivityClasses(classBase)
-  const alreadyPresent =
-    el.classList.contains(makeActive ? active : inactive) &&
-    !el.classList.contains(makeActive ? inactive : active)
-  if (alreadyPresent) {
+  const { active, inactive } = filterActiveClass(el.classList, classBase)
+  if ((makeActive && active && !inactive) || (!makeActive && !active && inactive)) {
     return
   }
-  el.classList.remove(makeActive ? inactive : active)
-  el.classList.add(makeActive ? active : inactive)
+  const targetNames = getActivityClasses(classBase)
+  if (makeActive && inactive) {
+    el.classList.replace(inactive, targetNames.active)
+  } else if (!makeActive && active) {
+    el.classList.replace(active, targetNames.inactive)
+  } else {
+    el.classList.add(makeActive ? targetNames.active : targetNames.inactive)
+  }
 }
 
+/**
+ * Swaps the active class between two elements.
+ * Deactivates one element and activates another, using a common base class.
+ * @param inactivateElement - The element to deactivate.
+ * @param activateElement - The element to activate.
+ * @param classBase - The base class name for active/inactive states.
+ */
 export function swapActiveClass(
   inactivateElement: HTMLElement,
   activateElement: HTMLElement,

@@ -156,6 +156,9 @@ const metaOutputMap = async (output: esbuildOutputs): Promise<buildJson> => {
   const logoKey =
     keys.find((key) => key.includes("logo_named")) ||
     Object.values(newFileLocs).find((value) => value.includes("logo_named"))
+  const simpleLogoKey =
+    keys.find((key) => key.includes("logo_only_color_transp")) ||
+    Object.values(newFileLocs).find((value) => value.includes("logo_only_color_transp"))
   const noScriptImageContent = await buildNoScriptImage(noScriptImage)
 
   const mapping = {
@@ -163,6 +166,7 @@ const metaOutputMap = async (output: esbuildOutputs): Promise<buildJson> => {
     SCRIPTBUNDLE: jsSrcKey?.replace("docs/", "") || "",
     CSSBUNDLE: cssSrcKey?.replace("docs/", "") || "",
     LOGONAMED: (logoKey as string)?.replace("docs/", "") || "",
+    LOGOSIMPLE: (simpleLogoKey as string)?.replace("docs/", "") || "",
   }
   const outputMetaPath = path.join("overrides", "buildmeta.json")
   await fs.writeFile(outputMetaPath, JSON.stringify(mapping, null, 2))

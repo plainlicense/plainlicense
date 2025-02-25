@@ -227,6 +227,11 @@ export function generateNonVisibleElementReport(
   })
 }
 
+/**
+ * Checks if an element is visible within the viewport.
+ * @param el - The element to check.
+ * @returns Whether the element is visible.
+ */
 export function headerShouldDisplay() {
   return gsap.utils
     .toArray(OBSERVER_CONFIG.header)

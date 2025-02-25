@@ -161,6 +161,12 @@ export function range(size: number, startAt: number = 0): ReadonlyArray<number> 
   return [...Array(size).keys()].map((i) => i + startAt)
 }
 
+/**
+ * Logs an object to the console.
+ * Iterates through objects and arrays and logs their contents with labels.
+ * @param obj - the object to log
+ * @param label - an optional label to prepend to the log messages
+ */
 export function logObject(obj: any, label: string = "") {
   if (!obj) {
     logger.error(`No object to log for ${label}`)
@@ -177,5 +183,45 @@ export function logObject(obj: any, label: string = "") {
     })
   } else {
     logger.debug(`${label}: `, obj)
+  }
+}
+
+export function setNavId() {
+  const nav = document.querySelector("nav.md-tabs")
+  if (!nav) {
+    logger.error("No nav element found")
+    return
+  }
+  nav.setAttribute("id", "hero-tabs")
+  logger.debug("Set nav id to 'hero-tabs'")
+}
+
+/**
+ * Unhides the 'hidden' attribute of an HTML element.
+ * @param element An HTMLElement to unhide
+ */
+export function removeHiddenAttr(element: HTMLElement) {
+  if ("hidden" in element) {
+    element.hidden = false
+  }
+}
+
+/**
+ * Checks if :has() selector is supported
+ */
+export function supportsHasSelector(): boolean {
+  try {
+    // Try to compile a :has() selector
+    document.querySelector(":has()")
+    return true
+  } catch {
+    // If it throws, :has() is not supported
+    try {
+      // Double-check with CSS.supports()
+      return CSS.supports("selector(:has(*))")
+    } catch {
+      // If both checks fail, :has() is definitely not supported
+      return false
+    }
   }
 }

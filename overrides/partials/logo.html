@@ -21,9 +21,4 @@
 -->
 
 <!-- Logo -->
-{% if config.theme.logo %}
 <img src="{{ logo_named | url }}" alt="logo" />
-{% else %}
-{% set icon = config.theme.icon.logo or "material/library" %}
-{% include ".icons/" ~ icon ~ ".svg" %}
-{% endif %}

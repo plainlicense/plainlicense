@@ -21,7 +21,7 @@
 
 import gsap from "gsap"
 import { OBSERVER_CONFIG, VIDEO_MANAGER_ELEMENTS } from "~/config"
-import { headerShouldDisplay, isValidElement, logger, logObject } from "~/utils"
+import { isValidElement, logger, logObject } from "~/utils"
 import {
   AnimateMessageConfig,
   Direction,
@@ -78,7 +78,13 @@ gsap.registerEffect({
     return gsap
       .timeline({ extendTimeline: true, paused: false })
       .add(gsap.set(targets, { zIndex: 0, autoAlpha: 0 }))
-      .add(gsap.to(section.bg, { yPercent: -15 * dFactor, zIndex: 0 }))
+      .add(gsap.to(section.bg, { yPercent: -15 * dFactor, zIndex: 0, opacity: 0 }))
+      .add(
+        gsap.set([section.outerWrapper, section.innerWrapper], {
+          zIndex: -1,
+          opacity: 1,
+        }),
+      )
       .add(gsap.set(section.content, { autoAlpha: 0, zIndex: 1 }))
   },
 })
@@ -169,20 +175,30 @@ gsap.registerEffect({
     logger.debug(`fadeInTargets: ${logObject(fadeInTargets, "fadeInTargets")}`)
     const header = gsap.utils.toArray(OBSERVER_CONFIG.header)
     let revealHeader = gsap.timeline()
-    if (headerShouldDisplay() && header.length > 0 && index === 0) {
-      revealHeader.add(
-        gsap.fromTo(
-          header,
-          { autoAlpha: 0, zIndex: 1, yPercent: 100, backgroundColor: "transparent" },
-          {
+    if (header.length > 0 && index === 0) {
+      logger.debug("Revealing header")
+      revealHeader
+        .add(() => {
+          header.forEach((el) => {
+            if (el instanceof HTMLElement && "hidden" in el && el.hidden) {
+              el.hidden = false
+            }
+          })
+        })
+        .add(
+          gsap.to(header, {
             autoAlpha: 1,
             zIndex: 300,
             duration: 0.5,
             yPercent: 0,
-            backgroundColor: "transparent",
-          },
-        ),
-      )
+            opacity: 1,
+            background: "transparent",
+            startAt: { background: "transparent", yPercent: -100 },
+          }),
+        )
+    } else {
+      logger.debug("No header to reveal")
+      logger.debug(`header classlists: ${logObject(header, "header classlist")}`)
     }
     return gsap
       .timeline({ extendTimeline: true })
@@ -194,11 +210,11 @@ gsap.registerEffect({
         },
         {
           yPercent: 0,
-          zIndex: -100,
+          zIndex: -500,
         },
         0,
       )
-      .fromTo(section.bg, { yPercent: 15 * dFactor }, { yPercent: 0, zIndex: -99 }, 0)
+      .fromTo(section.bg, { yPercent: 15 * dFactor }, { yPercent: 0, zIndex: -300, opacity: 1 }, 0)
       .add(
         ["fadeIn", fade(fadeInTargets, { ...OBSERVER_CONFIG.fades, out: false, direction })],
         ">",
@@ -335,14 +351,15 @@ gsap.registerEffect({
 gsap.registerEffect({
   name: "animateMessage",
   extendTimeline: true,
-  defaults: { extendTimeline: true, repeat: 0 },
+  defaults: { extendTimeline: true, repeat: 0, paused: true },
+  paused: true,
   effect: (targets: gsap.TweenTarget, config: AnimateMessageConfig) => {
     if (Array.isArray(targets) && targets.length > 1) {
       logger.warn("Multiple targets provided for animateMessage. Only animating the first.")
     }
     const containerTarget =
       (targets instanceof Array ? targets[0] : targets) ||
-      document.querySelector(".hero__container")
+      document.querySelector(".text-animation__container")
     if (!containerTarget) {
       logger.error("No target provided for animateMessage.")
       return gsap.timeline()
@@ -357,7 +374,31 @@ gsap.registerEffect({
       }
       const fragDivs = Array.from(innerContainer.children)
       containerTarget.append(msgFrag)
-      const messageTimeline = gsap.timeline()
+      const messageTimeline = gsap.timeline({
+        paused: true,
+        repeat: 0,
+        extendTimeline: true,
+        onStart: () => {
+          const element = this?.element || document.querySelector("section.hero.first .hero__video")
+          if (!element) {
+            messageTimeline.pause()
+          }
+          if (element && element instanceof HTMLMediaElement) {
+            const { currentTime, duration } = element
+            if (currentTime === 0 && duration > 0) {
+              element.play()
+              messageTimeline.pause()
+            } else if (currentTime === 0 && duration === 0) {
+              messageTimeline.pause()
+            } else if (currentTime && duration && duration - currentTime > 5) {
+              element.play()
+              messageTimeline.pause()
+            } else {
+              element.pause()
+            }
+          }
+        },
+      })
       gsap.set(containerTarget, { autoAlpha: 1 })
       let fromVars = config.entranceFromVars || {}
       let toVars = config.entranceToVars || {}
@@ -369,16 +410,17 @@ gsap.registerEffect({
           if (reducedMotion) {
             fromVars.yPercent = 50
             toVars.ease = "power1.inOut"
-            toVars.stagger = { each: 0.04, from: "start" }
+            toVars.stagger = { from: "start" }
             toVars.duration = modifyDurationForReducedMotion(toVars.duration || 1)
-            exitVars.duration = modifyDurationForReducedMotion(exitVars.duration || 0.5)
+            exitVars.duration = modifyDurationForReducedMotion(exitVars.duration || 1)
             exitVars.yPercent = -50
             exitVars.ease = "power1.inOut"
-            exitVars.stagger = { each: 0.04, from: "end" }
+            exitVars.stagger = { from: "end" }
           }
         })
       messageTimeline
-        .add(gsap.set(containerTarget, { contentVisibility: "visible" }))
+        .add(gsap.set(containerTarget, { contentVisibility: "visible", autoAlpha: 1 }))
+        .add(gsap.set(innerContainer, { autoAlpha: 1 }))
         .add(
           [
             "randomEntrance",
@@ -387,10 +429,12 @@ gsap.registerEffect({
               { autoAlpha: 0, yPercent: gsap.utils.random(-150, 150, 10), ...fromVars },
               {
                 autoAlpha: 1,
+                zIndex: 350,
                 yPercent: 0,
                 contentVisibility: "visible",
                 stagger: { each: 0.03, from: "random" },
-                duration: 1.2,
+                duration: 1,
+                ease: "power4.out",
                 ...toVars,
               },
             ),
@@ -402,9 +446,10 @@ gsap.registerEffect({
             "randomExit",
             gsap.to(fragDivs, {
               autoAlpha: 0,
-              duration: 0.5,
+              duration: 1,
               contentVisibility: "hidden",
               yPercent: gsap.utils.random(-150, 150, 10),
+              zIndex: -10,
               stagger: { each: 0.03, from: "random" },
               onComplete: () => {
                 logger.info("Animation complete for exit effect.")
@@ -412,8 +457,9 @@ gsap.registerEffect({
               ...exitVars,
             }),
           ],
-          4.5,
+          ">+=4",
         )
+        .add(gsap.set(innerContainer, { autoAlpha: 0 }))
       return messageTimeline
     } else {
       logger.info("No message provided for animation.")
