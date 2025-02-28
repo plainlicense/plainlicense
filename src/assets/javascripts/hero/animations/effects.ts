@@ -36,6 +36,10 @@ import {
   modifyDurationForReducedMotion,
   wordsToLetterDivs,
 } from "./utils"
+import { toggleActiveClass } from "../video/utils"
+import type { VideoManager } from "../video"
+
+type VideoEffectThis = ThisType<VideoManager>
 
 /**
  * Retrieves the fade variables for autoAlpha and yPercent.
@@ -338,6 +342,140 @@ gsap.registerEffect({
   },
 })
 
+function animateLogo(this: VideoManager) {
+  const logoTl = gsap.timeline()
+  gsap
+    .matchMedia()
+    .add({ reducedMotion: "(prefers-reduced-motion: reduce)" }, (context: gsap.Context) => {
+      const { reducedMotion } = context.conditions as ReducedMotionCondition
+      const logoTl = gsap.timeline({ label: "logo" })
+      if (!reducedMotion) {
+        logoTl.to(this.logo, {
+          scale: 1,
+          duration: 2.5,
+          yoyo: true,
+          repeat: 1,
+          ease: "power3.inOut",
+          autoAlpha: 1,
+          xPercent: 0,
+          yPercent: 0,
+          startAt: { scale: 0, autoAlpha: 0, xPercent: -100, yPercent: 5 },
+        })
+      } else {
+        logoTl.to(this.logo, {
+          autoAlpha: 1,
+          duration: 5,
+          yoyo: true,
+          repeat: 1,
+          ease: "power1.inOut",
+          scale: 1,
+          xPercent: 0,
+          startAt: { scale: 0, autoAlpha: 0, yPercent: 0 },
+        })
+      }
+    })
+  return logoTl
+}
+
+function animateText(this: VideoManager, targets: gsap.TweenTarget, config: AnimateMessageConfig) {
+  if (Array.isArray(targets) && targets.length > 1) {
+    logger.warn("Multiple targets provided for animateMessage. Only animating the first.")
+  }
+  const containerTarget =
+    (targets instanceof Array ? targets[0] : targets) ||
+    document.querySelector(".text-animation__container")
+  if (!containerTarget) {
+    logger.error("No target provided for animateMessage.")
+    return gsap.timeline()
+  }
+  if (config.message) {
+    logger.debug(`Animating message: ${config.message}`)
+    const msgFrag = wordsToLetterDivs(config.message)
+    const innerContainer = msgFrag.querySelector(".hero__letter--container--inner")
+    if (!innerContainer) {
+      logger.error("No inner container found in message fragment.")
+      return gsap.timeline()
+    }
+    const fragDivs = Array.from(innerContainer.children)
+    containerTarget.append(msgFrag)
+
+    const messageTimeline = gsap.timeline({
+      paused: true,
+      repeat: 0,
+      extendTimeline: true,
+      log: true,
+    })
+    gsap.set(containerTarget, { autoAlpha: 1 })
+    let fromVars = config.entranceFromVars || {}
+    let toVars = config.entranceToVars || {}
+    let exitVars = config.exitVars || {}
+    gsap
+      .matchMedia()
+      .add({ reducedMotion: "(prefers-reduced-motion: reduce)" }, (context: gsap.Context) => {
+        const { reducedMotion } = context.conditions as ReducedMotionCondition
+        if (reducedMotion) {
+          fromVars.yPercent = 50
+          toVars.ease = "power1.inOut"
+          toVars.stagger = { from: "start" }
+          toVars.duration = modifyDurationForReducedMotion(toVars.duration || 1)
+          exitVars.duration = modifyDurationForReducedMotion(exitVars.duration || 1)
+          exitVars.yPercent = -50
+          exitVars.ease = "power1.inOut"
+          exitVars.stagger = { from: "end" }
+        }
+      })
+    messageTimeline
+      .add(gsap.set(containerTarget, { contentVisibility: "visible", autoAlpha: 1 }))
+      .add(gsap.set(innerContainer, { autoAlpha: 1 }))
+      .add(
+        [
+          "randomEntrance",
+          gsap.fromTo(
+            fragDivs,
+            { autoAlpha: 0, yPercent: gsap.utils.random(-150, 150, 10), ...fromVars },
+            {
+              autoAlpha: 1,
+              zIndex: 350,
+              yPercent: 0,
+              contentVisibility: "visible",
+              stagger: { each: 0.03, from: "random" },
+              duration: 1,
+              ease: "power4.out",
+              z: 1,
+              ...toVars,
+            },
+          ),
+        ],
+        0.02,
+      )
+      .add(animateLogo.bind(this)(), ">")
+      .add(
+        [
+          "randomExit",
+          gsap.to(fragDivs, {
+            autoAlpha: 0,
+            duration: 1,
+            contentVisibility: "hidden",
+            yPercent: gsap.utils.random(-150, 150, 10),
+            zIndex: -10,
+            z: 0,
+            stagger: { each: 0.03, from: "random" },
+            onComplete: () => {
+              logger.info("Animation complete for exit effect.")
+            },
+            ...exitVars,
+          }),
+        ],
+        ">+=4",
+      )
+      .add(gsap.set(innerContainer, { autoAlpha: 0 }))
+    return messageTimeline
+  } else {
+    logger.info("No message provided for animation.")
+    return gsap.timeline()
+  }
+}
+
 /**
  * Animates a message.
  * Note: The message will be animated by drawing text from the target element(s) if
@@ -351,119 +489,10 @@ gsap.registerEffect({
 gsap.registerEffect({
   name: "animateMessage",
   extendTimeline: true,
-  defaults: { extendTimeline: true, repeat: 0, paused: true },
+  defaults: { extendTimeline: true, repeat: 0, paused: true, log: true },
   paused: true,
-  effect: (targets: gsap.TweenTarget, config: AnimateMessageConfig) => {
-    if (Array.isArray(targets) && targets.length > 1) {
-      logger.warn("Multiple targets provided for animateMessage. Only animating the first.")
-    }
-    const containerTarget =
-      (targets instanceof Array ? targets[0] : targets) ||
-      document.querySelector(".text-animation__container")
-    if (!containerTarget) {
-      logger.error("No target provided for animateMessage.")
-      return gsap.timeline()
-    }
-    if (config.message) {
-      logger.debug(`Animating message: ${config.message}`)
-      const msgFrag = wordsToLetterDivs(config.message)
-      const innerContainer = msgFrag.querySelector(".hero__letter--container--inner")
-      if (!innerContainer) {
-        logger.error("No inner container found in message fragment.")
-        return gsap.timeline()
-      }
-      const fragDivs = Array.from(innerContainer.children)
-      containerTarget.append(msgFrag)
-      const messageTimeline = gsap.timeline({
-        paused: true,
-        repeat: 0,
-        extendTimeline: true,
-        onStart: () => {
-          const element = this?.element || document.querySelector("section.hero.first .hero__video")
-          if (!element) {
-            messageTimeline.pause()
-          }
-          if (element && element instanceof HTMLMediaElement) {
-            const { currentTime, duration } = element
-            if (currentTime === 0 && duration > 0) {
-              element.play()
-              messageTimeline.pause()
-            } else if (currentTime === 0 && duration === 0) {
-              messageTimeline.pause()
-            } else if (currentTime && duration && duration - currentTime > 5) {
-              element.play()
-              messageTimeline.pause()
-            } else {
-              element.pause()
-            }
-          }
-        },
-      })
-      gsap.set(containerTarget, { autoAlpha: 1 })
-      let fromVars = config.entranceFromVars || {}
-      let toVars = config.entranceToVars || {}
-      let exitVars = config.exitVars || {}
-      gsap
-        .matchMedia()
-        .add({ reducedMotion: "(prefers-reduced-motion: reduce)" }, (context: gsap.Context) => {
-          const { reducedMotion } = context.conditions as ReducedMotionCondition
-          if (reducedMotion) {
-            fromVars.yPercent = 50
-            toVars.ease = "power1.inOut"
-            toVars.stagger = { from: "start" }
-            toVars.duration = modifyDurationForReducedMotion(toVars.duration || 1)
-            exitVars.duration = modifyDurationForReducedMotion(exitVars.duration || 1)
-            exitVars.yPercent = -50
-            exitVars.ease = "power1.inOut"
-            exitVars.stagger = { from: "end" }
-          }
-        })
-      messageTimeline
-        .add(gsap.set(containerTarget, { contentVisibility: "visible", autoAlpha: 1 }))
-        .add(gsap.set(innerContainer, { autoAlpha: 1 }))
-        .add(
-          [
-            "randomEntrance",
-            gsap.fromTo(
-              fragDivs,
-              { autoAlpha: 0, yPercent: gsap.utils.random(-150, 150, 10), ...fromVars },
-              {
-                autoAlpha: 1,
-                zIndex: 350,
-                yPercent: 0,
-                contentVisibility: "visible",
-                stagger: { each: 0.03, from: "random" },
-                duration: 1,
-                ease: "power4.out",
-                ...toVars,
-              },
-            ),
-          ],
-          0.02,
-        )
-        .add(
-          [
-            "randomExit",
-            gsap.to(fragDivs, {
-              autoAlpha: 0,
-              duration: 1,
-              contentVisibility: "hidden",
-              yPercent: gsap.utils.random(-150, 150, 10),
-              zIndex: -10,
-              stagger: { each: 0.03, from: "random" },
-              onComplete: () => {
-                logger.info("Animation complete for exit effect.")
-              },
-              ...exitVars,
-            }),
-          ],
-          ">+=4",
-        )
-        .add(gsap.set(innerContainer, { autoAlpha: 0 }))
-      return messageTimeline
-    } else {
-      logger.info("No message provided for animation.")
-      return gsap.timeline()
-    }
+  log: true,
+  effect: function (this: VideoManager, targets: gsap.TweenTarget, config: AnimateMessageConfig) {
+    return animateText.bind(this)(targets, config)
   },
 })

@@ -16,9 +16,9 @@
   --zaffre: rgb(13, 25, 163);
   --emerald: rgb(21, 219, 149);
   --dutch-white: rgb(244, 228, 193);
-  --ecru: #e4c581;
+  --ecru: rgb(228, 197, 129);
 
-  --white: #ffffff;
+  --white: rgb(255, 255, 255);
 
   /* zaffre */
   --air-superiority-blue: rgb(108, 166, 193);
@@ -44,7 +44,7 @@
   --cafe-noir: rgb(50, 38, 11);
 
   /* ecru */
-  --saffron: #e8c547;
+  --saffron: rgb(232, 197, 71);
   --smoky-black: rgb(33, 26, 7);
   --smokier-black: rgb(22, 17, 5);
 

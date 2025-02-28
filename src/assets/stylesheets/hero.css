@@ -14,9 +14,13 @@
   --bg-gradient:
     linear-gradient(180deg, rgba(var(--gunmetal-rgb), 0.6) 0%, rgba(var(--gunmetal-rgb), 0.3) 100%);
   --h1-color: var(--ecru);
-  --h2-color: var(--ecru);
+  --h2-color: var(--vivid-sky-blue);
   --hero-h1-size: clamp(24px, min(6vw, 128px), 14rem);
   --hero-h2-size: calc(var(--hero-h1-size) * 0.8);
+  --video-top: 0;
+  --video-left: 0;
+  --video-height: 100%;
+  --video-width: 100%;
 }
 
 /* ------------------------------------------------------------------------------
@@ -244,20 +248,42 @@ section.hero .media__container .hero__poster--image {
   opacity: 1;
 }
 
-section.hero .media__container::before {
+section.hero .media__container:has(.hero__video--active)::before {
   position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 100;
-  width: 100%;
-  height: 100%;
+  top: var(--video-top);
+  left: var(--video-left);
+  z-index: 3;
+  width: var(--video-width);
+  height: var(--video-height);
+  pointer-events: none;
   content: "";
   background:
+    radial-gradient(
+      closest-side,
+      rgba(var(--gunmetal-rgb), 0.5) 0%,
+      rgba(var(--gunmetal-rgb), 0.3) 15%,
+      rgba(var(--gunmetal-rgb), 0.4) 90%,
+      rgba(var(--gunmetal-rgb), 0.5) 100%
+    ),
     linear-gradient(
-      135deg,
-      rgba(var(--gunmetal-rgb), 0.2) 0%,
-      rgba(var(--gunmetal-rgb), 0.25) 50%,
-      rgba(var(--gunmetal-rgb), 0.3) 100%
+      180deg,
+      rgba(var(--gunmetal-rgb), 1) 0%,
+      rgba(var(--gunmetal-rgb), 0) 15%,
+    ),
+    linear-gradient(
+      180deg,
+      rgba(var(--gunmetal-rgb), 0) 85%,
+      rgba(var(--gunmetal-rgb), 1) 100%
+    ),
+    linear-gradient(
+      90deg,
+      rgba(var(--gunmetal-rgb), 1) 0%,
+      rgba(var(--gunmetal-rgb), 0) 20%
+    ),
+    linear-gradient(
+      90deg,
+      rgba(var(--gunmetal-rgb), 0) 80%,
+      rgba(var(--gunmetal-rgb), 1) 100%
     );
 }
 

@@ -30,7 +30,7 @@ import {
   tap,
 } from "rxjs"
 import { getViewportOffset, getViewportSize } from "~/browser"
-import { Header, getComponentElement, watchTabs } from "~/components"
+import { getComponentElement, watchTabs } from "~/components"
 import { SectionIndex } from "~/hero"
 import {
   isDev,

@@ -7,7 +7,7 @@
  */
 
 
-// src/cacheWorker.4OWGWVKB.js
+// src/cacheWorker.4PJF5622.js
 var woff2Inter = new URL("assets/fonts/inter-v.5HMTI5F7.woff2", self.location.origin);
 var woff2Bangers = new URL("assets/fonts/bangers-regular.BIV5PPSH.woff2", self.location.origin);
 var woff2SourceCodePro = new URL("assets/fonts/sourcecodepro-regular.CK7SPIOU.woff2", self.location.origin);
@@ -319,7 +319,7 @@ var CacheManager = class {
       return response;
     } else {
       const errorMessage = response instanceof Response ? await response.json() : "No response";
-      logger.error("Failed to fetch:", new Error(errorMessage));
+      logger.error("Failed to fetch request for ".concat(request.toString(), " "), new Error(errorMessage));
       logger.error("Attempting fallback fetch");
       const url = new URL(request.toString());
       const name = getCryptoHashlessBaseName(url);
@@ -381,7 +381,7 @@ var _CacheStrategies = class _CacheStrategies {
       await cacheManager.cacheIt(request, response.clone());
       return response;
     } catch (error) {
-      logger.error("Cache first strategy failed:", error);
+      logger.error("CatchFirst strategy failed for ".concat(request.url), error);
       throw error;
     }
   }
@@ -400,7 +400,10 @@ var _CacheStrategies = class _CacheStrategies {
       await cacheManager.cacheIt(request, response.clone());
       return response;
     }).catch((error) => {
-      logger.error("Network fetch failed:", error);
+      logger.error(
+        "Network fetch in staleWhileRevalidate failed for ".concat(request.url, " "),
+        error
+      );
       throw error;
     });
     if (cached) {
@@ -452,7 +455,7 @@ self.addEventListener("fetch", (event) => {
       try {
         return await CacheStrategies.routeToStrategy(event.request);
       } catch (error) {
-        logger.error("Fetch failed:", error);
+        logger.error("Failed to fetch request for ".concat(event.request.url), error);
         throw error;
       }
     })()
@@ -496,4 +499,4 @@ self.addEventListener("message", (event) => {
  * @author Adam Poulemanos <adam<at>plainlicense<dot>org>
  * @copyright No rights reserved.
  */
-//# sourceMappingURL=cacheWorker.4OWGWVKB.js.map
+//# sourceMappingURL=cacheWorker.4PJF5622.js.map

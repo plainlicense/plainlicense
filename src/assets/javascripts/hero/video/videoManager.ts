@@ -5,6 +5,7 @@ import {
   Subscription,
   catchError,
   combineLatest,
+  debounceTime,
   distinctUntilChanged,
   distinctUntilKeyChanged,
   exhaustMap,
@@ -15,7 +16,11 @@ import {
   merge,
   mergeAll,
   of,
+  skip,
+  skipUntil,
   switchMap,
+  take,
+  takeUntil,
   tap,
 } from "rxjs"
 import {
@@ -23,14 +28,15 @@ import {
   OBSERVER_CONFIG,
   STRONG_EMPHASIS_CONFIG,
   SUBTLE_EMPHASIS_CONFIG,
+  VIDEO_END_BUFFER,
 } from "~/config"
 import { HeroStore } from "~/state"
-import { elementInDom, logger, parsePath } from "~/utils"
+import { elementInDom, logger, parsePath, setCssVariable } from "~/utils"
 import { HeroVideo, VideoStatus } from "./types"
-import { getHeroVideos, toggleActiveClass } from "./utils"
+import { getHeroVideos, swapActiveClass, toggleActiveClass } from "./utils"
 import { VideoElement } from "./videoElement"
 import { plainLogo } from "./data"
-import { ReducedMotionCondition } from "../animations"
+import { SectionIndex } from "../animations"
 
 let customWindow: CustomWindow = window as unknown as CustomWindow
 
@@ -58,10 +64,10 @@ export class VideoManager {
   private video: VideoElement
 
   // @ts-ignore - we delay initialization for home arrival
-  private element: HTMLVideoElement
+  public element: HTMLVideoElement
 
   // @ts-ignore - we delay initialization for home arrival
-  private poster: HTMLPictureElement
+  public poster: HTMLPictureElement
 
   private container: HTMLDivElement =
     (document.querySelector(".hero.first .media__container") as HTMLDivElement) ||
@@ -74,9 +80,15 @@ export class VideoManager {
     })()
 
   private ctaContainer: HTMLDivElement =
-    (document.querySelector(".cta__container") as HTMLDivElement) || document.createElement("div")
+    (document.querySelector(".cta__container") as HTMLDivElement) ||
+    (() => {
+      const div = document.createElement("div")
+      div.classList.add("cta__container")
+      this.container.append(div)
+      return div
+    })()
 
-  private logo: HTMLDivElement = (() => {
+  public logo: HTMLDivElement = (() => {
     const div = document.createElement("div") as HTMLDivElement
     div.classList.add("hero__logo")
     const parent = document.querySelector(".hero.first .logo__container") || this.container
@@ -94,36 +106,101 @@ export class VideoManager {
     return div
   })()
 
-  public timeline: GSAPTimeline = gsap.timeline()
-
-  private textAnimationTimeline: GSAPTimeline = gsap.timeline()
-
-  private subscriptions: Subscription = new Subscription()
-
   public hasPlayed: boolean = false
 
   public status: VideoStatus = "not_initialized"
 
   public canPlay: boolean = false
 
-  private videoDuration: number = 0
+  private get videoDuration(): number {
+    return this.element?.duration ?? VIDEO_END_BUFFER
+  }
 
-  private titleStart: number = 0
+  private get titleStart(): number {
+    return Math.max(this.videoDuration - VIDEO_END_BUFFER + 0.5, VIDEO_END_BUFFER + 0.5)
+  }
+
+  public videoTimeline: GSAPTimeline = gsap.timeline({
+    defaults: { paused: true, callbackScope: this },
+    paused: true,
+    callbackScope: this,
+    label: "videoTimeline",
+    duration: () => {
+      return this.titleStart
+    },
+    onStart: () => {
+      this.transitionToVideo()
+      this.element.play()
+      this.status = "playing"
+    },
+    onComplete: () => {
+      this.status = "on_textAnimation"
+      this.element.pause()
+      this.element.currentTime = 0
+    },
+    repeat: 0,
+    ease: "none",
+  })
+
+  public textAnimationTimeline: GSAPTimeline = gsap.timeline({
+    defaults: { paused: true, repeat: 0, callbackScope: this },
+    paused: true,
+    callbackScope: this,
+    repeat: 0,
+    label: "textTimeline",
+    onStart: () => {
+      logger.debug("Text animation timeline started")
+      this.hasPlayed = true
+      this.status = "on_textAnimation"
+      this.videoTimeline.restart().pause()
+      this.element.pause()
+      this.element.currentTime = 0
+      gsap.set(this.element, { autoAlpha: 0 })
+    },
+  })
+
+  public masterTimeline: GSAPTimeline = gsap.timeline({
+    callbackScope: this,
+    repeat: -1,
+    paused: true,
+    label: "masterTimeline",
+    onStart: () => {
+      if (!this.isPlaying()) {
+        this.foulPlay()
+      }
+    },
+    onRepeat: () => {
+      if (!this.isPlaying()) {
+        this.foulPlay()
+      }
+    },
+    onComplete: () => {
+      toggleActiveClass(this.element, "hero__video", true)
+      this.videoTimeline.restart()
+      this.textAnimationTimeline.restart()
+      this.element.currentTime = 0
+      this.setEmphasisAnimations().play()
+    },
+  })
+
+  private subscriptions: Subscription = new Subscription()
 
   // @ts-ignore - we delay initialization for home arrival
   private backupPicture: HTMLPictureElement
 
-  private message: string = ""
+  public message: string = ""
 
   /**
-   * @method init_subscriptions
+   * @method initSubscriptions
    * @private
    * @description Initializes the subscriptions for the VideoManager
    */
-  private init_subscriptions(): void {
-    const { videoState$ } = this.store
+  private initSubscriptions(): void {
+    const { videoState$, state$ } = this.store
 
-    const video$ = videoState$.pipe(
+    const video$ = state$.pipe(
+      // change from this.store.state$ to state$
+      skipUntil(videoState$),
       distinctUntilKeyChanged("canPlay"),
       tap((canPlay) => {
         logger.info("video manager video$ observable received new value", canPlay)
@@ -133,40 +210,162 @@ export class VideoManager {
       }),
     )
 
+    const statusSetter$ = state$.pipe(
+      map(({ canPlay, prefersReducedMotion, currentSection }) => {
+        return { canPlay, prefersReducedMotion, currentSection }
+      }),
+      tap(({ prefersReducedMotion }) => {
+        if (prefersReducedMotion) {
+          this.masterTimeline.pause()
+          this.element?.pause()
+          this.canPlay = false
+          this.status = "on_fallback"
+          this.initiateFallback()
+        }
+      }),
+      distinctUntilChanged(
+        (prev, cur) => prev.canPlay === cur.canPlay && prev.currentSection === cur.currentSection,
+      ),
+      debounceTime(100),
+      tap(({ prefersReducedMotion, currentSection, canPlay }) => {
+        if (prefersReducedMotion) {
+          return
+        }
+        const posterInDom = elementInDom(this.poster)
+        const videoInDom = elementInDom(this.element)
+        if (canPlay) {
+          if (!videoInDom || !posterInDom || !this.element.duration) {
+            this.status = "not_initialized"
+          } else if (
+            posterInDom &&
+            videoInDom &&
+            (!this.element.duration || this.element.readyState <= 3)
+          ) {
+            this.status = "loading"
+          } else if (videoInDom && this.element.readyState === 4 && !this.isPlaying()) {
+            if (currentSection >= SectionIndex.Impact) {
+              this.status = "paused"
+            } else {
+              this.status = "loaded"
+            }
+          } else if (this.isPlaying()) {
+            this.status = "playing"
+          } else if (
+            this.element.readyState === 4 &&
+            this.masterTimeline.totalDuration() > 0 &&
+            this.masterTimeline.isActive() &&
+            this.masterTimeline.currentLabel() === "textTimeline"
+          ) {
+            this.status = "on_textAnimation"
+          }
+        } else if (this.status === "on_fallback") {
+          return
+        } else if (currentSection >= SectionIndex.Impact && this.status !== "not_initialized") {
+          this.status = "paused"
+        } else if (videoInDom && this.element.duration) {
+          if (this.element.currentTime > 0) {
+            this.status = "paused"
+          } else if (this.element.readyState === 4) {
+            this.status = "loaded"
+          } else if (videoInDom && posterInDom && this.element.readyState <= 3) {
+            this.status = "loading"
+          } else {
+            this.status = "not_initialized"
+          }
+        }
+      }),
+    )
+
+    const canplaythrough$ = fromEvent(this.element, "canplaythrough").pipe(
+      filter((ev) => {
+        return ev.target instanceof HTMLMediaElement
+      }),
+      map(({ target }) => {
+        return target as HTMLMediaElement
+      }),
+      distinctUntilChanged(
+        (prev, cur) => prev.currentSrc === cur.currentSrc && prev.duration === cur.duration,
+      ),
+    )
+
+    const play$ = canplaythrough$.pipe(
+      filter(() => this.canPlay === true && this.element.readyState === 4 && !this.isPlaying()),
+      tap(() => {
+        logger.debug("Video can play through")
+        this.transitionToVideo()
+        this.play()
+      }),
+      catchError((e) => {
+        logger.error("Failed to play video", e)
+        this.handleMediaError(e)
+        return EMPTY
+      }),
+    )
+
     const motionSub$ = this.store.state$.pipe(
       distinctUntilKeyChanged("prefersReducedMotion"),
       filter(({ prefersReducedMotion }) => prefersReducedMotion),
+      tap(() => {
+        this.masterTimeline.pause()
+        this.element?.pause()
+        this.canPlay = false
+        this.initiateFallback()
+      }),
     )
 
     const stallHandler$ = combineLatest([
       videoState$.pipe(filter((state) => state.canPlay === true)),
-      merge(fromEvent(this.element, "stalled"), fromEvent(this.element, "waiting")),
+      fromEvent(this.element, "stalled"),
     ]).pipe(
-      tap(() => {
-        logger.info("Video is stalled or waiting, pausing video")
-        Promise.resolve(
-          setTimeout(() => {
-            if (
-              this.element.currentTime > 0 &&
-              this.element.paused === false &&
-              !this.element.ended
-            ) {
-              return
-            } else {
-              this.pause()
-              this.element.oncanplaythrough = () => {
-                this.play()
-              }
-            }
-          }, 5000),
-        )
+      takeUntil(canplaythrough$),
+      switchMap(() => {
+        return canplaythrough$
       }),
-      switchMap(() => fromEvent(this.element, "canplaythrough")),
       tap(() => {
         if (!elementInDom(this.element)) {
           this.container.append(this.element)
         }
-        this.resume()
+      }),
+      switchMap(() => {
+        if (this.element.currentTime > 0 && this.element.paused) {
+          return of(this.resume())
+        } else if (this.element.paused) {
+          return play$
+        } else {
+          return EMPTY
+        }
+      }),
+      catchError((e) => {
+        logger.error("Error in stallHandler", e)
+        return EMPTY
+      }),
+    )
+
+    const varSet$ = fromEvent(this.element, "loadedmetadata").pipe(
+      filter((ev) => ev && ev.target instanceof HTMLMediaElement),
+      map(({ target }) => target as HTMLMediaElement),
+      take(1),
+      tap((target) => {
+        logger.info("Received loadedmetadata event")
+        logger.debug("Video metadata:", target)
+        logger.debug("Video rect:", target.getBoundingClientRect())
+        this.setVideoDimensionVars()
+        this.videoDuration
+        this.titleStart
+        this.syncToVideo()
+      }),
+    )
+
+    const resize$ = this.store.state$.pipe(
+      skipUntil(varSet$),
+      map(({ viewport: { offset } }) => offset),
+      distinctUntilKeyChanged("y"),
+      debounceTime(500),
+      distinctUntilChanged((previous, current) => {
+        return Math.abs(previous.y - current.y) < 15
+      }),
+      switchMap(() => {
+        return of(this.setVideoDimensionVars())
       }),
     )
 
@@ -190,72 +389,25 @@ export class VideoManager {
       }),
     )
 
-    const metadata$ = fromEvent(this.element, "loadedmetadata").pipe(
-      filter((ev) => {
-        return ev.target instanceof HTMLMediaElement
-      }),
-      distinctUntilChanged(),
-      tap(() => {
-        this.videoDuration = this.element.duration
-        this.titleStart = this.videoDuration - 5
-      }),
-    )
-
-    const canplaythrough$ = fromEvent(this.element, "canplaythrough").pipe(
-      filter((ev) => {
-        return ev.target instanceof HTMLMediaElement
-      }),
-      distinctUntilChanged(),
-      tap(() => {
-        this.status = "loaded"
-        this.transitionToVideo()
-        this.play()
-      }),
-      catchError((e) => {
-        logger.error("Failed to play video", e)
-        this.handleMediaError(e)
-        return EMPTY
-      }),
-    )
-
     const playing$ = fromEvent(this.element, "playing").pipe(
       filter((ev) => {
         return ev.target instanceof HTMLMediaElement
       }),
       distinctUntilChanged(),
+      filter(
+        () => this.canPlay === true && this.status !== "playing" && this.status !== "on_fallback",
+      ),
       tap(() => {
-        this.status = "playing"
-        this.timeline.play()
+        if (!this.isPlaying()) {
+          this.foulPlay()
+        }
+        if (!this.masterTimeline.isActive()) {
+          this.masterTimeline.play()
+        }
         toggleActiveClass(this.poster, "hero__poster", false)
         toggleActiveClass(this.element, "hero__video", true)
         logger.info("Received playing event")
-      }),
-    )
-
-    const textAnimator$ = fromEvent(this.element, "timeupdate").pipe(
-      map((ev) => {
-        return ev instanceof Event && ev.target instanceof HTMLMediaElement ? ev.target : null
-      }),
-      filter((el): el is HTMLMediaElement => el !== null),
-      map((target) => {
-        const canAnimate = target.currentTime >= this.titleStart
-        const isAnimating = this.textAnimationTimeline.isActive()
-        return { canAnimate, isAnimating, isPlaying: this.isPlaying() }
-      }),
-      distinctUntilKeyChanged("canAnimate"),
-      switchMap(({ canAnimate, isAnimating, isPlaying }) => {
-        if (canAnimate) {
-          if (isAnimating && !isPlaying) {
-            return EMPTY
-          } else if (isPlaying) {
-            gsap.set(this.element, { autoAlpha: 0 })
-            this.stop()
-            return of(this.textAnimationTimeline.play())
-          }
-        } else if (isAnimating && !isPlaying && this.status !== "on_delay") {
-          this.textAnimationTimeline.restart().pause()
-        }
-        return EMPTY
+        this.setVideoDimensionVars()
       }),
     )
 
@@ -265,19 +417,27 @@ export class VideoManager {
       }),
       distinctUntilChanged(),
       tap(() => {
-        this.pause()
+        logger.info("Received waiting event")
       }),
+      filter(
+        () =>
+          this.canPlay === true &&
+          this.status !== "playing" &&
+          this.status !== "on_fallback" &&
+          this.element.readyState === 4,
+      ),
+      switchMap(() => play$),
     )
 
     const secondaryObservables = [
+      varSet$,
       motionSub$,
       stallHandler$,
       errorHandler$,
-      canplaythrough$,
+      play$,
       playing$,
+      resize$,
       waiting$,
-      metadata$,
-      textAnimator$,
     ]
 
     const videoObserver = {
@@ -305,8 +465,8 @@ export class VideoManager {
         this.subscriptions.add(video$.subscribe(videoObserver))
       },
     }
-
     this.subscriptions.add(video$.subscribe(videoObserver))
+    this.subscriptions.add(statusSetter$.subscribe())
   }
 
   private constructor() {
@@ -314,9 +474,10 @@ export class VideoManager {
     logger.info("Initializing VideoManager")
     this.videoStore = getHeroVideos()
     this.initVideo()
-    this.constructTimeline()
-    this.constructTextTimeline()
-    this.init_subscriptions()
+    this.buildVideoTimeline()
+    this.buildTextTimeline()
+    this.masterTimeline.add(this.videoTimeline, "<").add(this.textAnimationTimeline, ">")
+    this.initSubscriptions()
   }
 
   private initVideo(): void {
@@ -334,211 +495,19 @@ export class VideoManager {
       this.poster = this.video.picture
       this.message = this.video.message
       if (this.videoStore.length > 1 && this.video?.heroVideo.baseName !== BACKUP_PICTURE) {
-        this.backupPicture = new VideoElement(randomized[1]).picture
+        this.backupPicture = new VideoElement(
+          randomized.find((hero) => hero.baseName === BACKUP_PICTURE) || randomized[1],
+        ).picture
       } else {
         this.backupPicture = this.video.picture.cloneNode(true) as HTMLPictureElement
       }
       toggleActiveClass(this.backupPicture, "hero__backup", false)
       this.container.append(this.backupPicture)
-
-      this.backupPicture.style.display = "none"
     }
   }
 
   public static getInstance(): VideoManager {
     return (this.instance ??= new VideoManager())
-  }
-
-  private handleCanPlay(): void {
-    this.canPlay = true
-    logger.info("Handling can play event")
-    switch (this.status) {
-      case "loading":
-        logger.info("Video loading. Preparing to play.")
-        break
-      case "playing":
-        break
-      case "paused":
-        logger.info("Video paused. Resuming.")
-        this.play()
-        break
-      case "on_delay":
-        logger.info("Video on delay. Resuming.")
-        this.timeline.play()
-        break
-      case "loaded":
-        logger.info("Video loaded. Playing.")
-        this.play()
-        break
-      case "not_initialized":
-        logger.info("Video not initialized. Initializing.")
-        this.status = "loading"
-        toggleActiveClass(this.poster, "hero__poster", true)
-        this.loadPoster()
-        logger.info("Poster loaded. Initialized video")
-        this.loadVideo()
-        logger.info("Video loaded")
-        this.play()
-        break
-      default:
-        logger.error("Unhandled status:", this.status)
-        logger.info("Initiating fallback")
-        this.initiateFallback()
-        break
-    }
-  }
-
-  private handleStopPlay(): void {
-    this.canPlay = false
-    this.pause()
-    if (this.hasPlayed && this.videoStore.length > 1) {
-      this.reinit()
-      this.status = "loading"
-    }
-
-    logger.info("Video stopped. Reinitiating.")
-  }
-
-  private constructTextTimeline(): void {
-    const ctaHeaders = gsap.utils.toArray(this.ctaContainer.querySelectorAll("h1, h2"))
-    this.textAnimationTimeline = gsap
-      .timeline({
-        defaults: { paused: true, callbackScope: this },
-        paused: true,
-        callbackScope: this,
-        repeat: 0,
-        onStart: () => {
-          if (!this.hasPlayed) {
-            this.setEmphasisAnimations()
-          }
-          gsap.to(this.element, { autoAlpha: 0, duration: 0.5 })
-          this.status = "on_delay"
-          this.timeline.restart().pause()
-          this.hasPlayed = true
-        },
-        onComplete: () => {
-          gsap.to(this.element, { autoAlpha: 1, duration: 0.5 })
-          gsap.to(ctaHeaders, { autoAlpha: 1, duration: 0.5 })
-          this.status = "paused"
-          Promise.resolve(() => {
-            this.stop()
-            this.play()
-          })
-        },
-      })
-      .add(
-        gsap.to(ctaHeaders, {
-          autoAlpha: 0,
-          duration: 0.5,
-        }),
-      )
-      .add(this.animateText())
-    gsap
-      .matchMedia()
-      .add({ reducedMotion: "(prefers-reduced-motion: reduce)" }, (context: gsap.Context) => {
-        const { reducedMotion } = context.conditions as ReducedMotionCondition
-        const logoTl = gsap.timeline()
-        if (!reducedMotion) {
-          logoTl.to(this.logo, {
-            scale: 1,
-            duration: 2.5,
-            yoyo: true,
-            repeat: 1,
-            ease: "power3.inOut",
-            autoAlpha: 1,
-            xPercent: 0,
-            yPercent: 0,
-            startAt: { scale: 0, autoAlpha: 0, xPercent: -100, yPercent: 5 },
-          })
-        } else {
-          logoTl.to(this.logo, {
-            autoAlpha: 1,
-            duration: 5,
-            yoyo: true,
-            repeat: 1,
-            ease: "power1.inOut",
-            scale: 1,
-            xPercent: 0,
-            startAt: { scale: 0, autoAlpha: 0, yPercent: 0 },
-          })
-        }
-        this.textAnimationTimeline.add(logoTl, "<=+2")
-      })
-  }
-
-  // sets initial timeline properties
-  private constructTimeline(): void {
-    this.timeline = gsap
-      .timeline({
-        defaults: { paused: true, callbackScope: this },
-        paused: true,
-        callbackScope: this,
-        onStart: () => {
-          this.transitionToVideo()
-          this.element.play()
-          this.status = "playing"
-          if (!this.videoDuration && this.element.duration) {
-            this.videoDuration = this.element.duration
-            this.titleStart = this.videoDuration - 5
-          }
-        },
-        onUpdate: () => {
-          if (!this.element.played.length && this.element.error) {
-            this.timeline.pause()
-            this.status = "loading"
-            try {
-              this.tryNewSource()
-            } catch (e) {
-              logger.error("Failed to switch codec", e)
-              this.initiateFallback()
-            }
-          }
-        },
-        onComplete: () => {
-          if (!this.textAnimationTimeline.isActive()) {
-            this.textAnimationTimeline.play()
-          }
-        },
-        repeat: 0, // we handle this manually to control the video
-        ease: "none",
-      })
-      .add(
-        [
-          "startVideo",
-          () => {
-            this.element.play().catch((e) => {
-              logger.error("Failed to play video", e)
-              this.addPlayOnInteraction()
-            })
-          },
-        ],
-        "<",
-      )
-      .add(gsap.set(this.container, { autoAlpha: 1 }))
-  }
-
-  private setEmphasisAnimations(): GSAPTimeline {
-    const { subtle, strong } = OBSERVER_CONFIG.emphasisTargets
-    const subtleTargets = gsap.utils.toArray(subtle)
-    const strongTargets = gsap.utils.toArray(strong)
-    return gsap
-      .timeline()
-      .add(
-        [
-          "subtleEmphasis",
-          gsap.timeline()["emphasize"](subtleTargets, SUBTLE_EMPHASIS_CONFIG),
-          ">",
-        ],
-        ">",
-      )
-      .add(
-        [
-          "strongEmphasis",
-          gsap.timeline()["emphasize"](strongTargets, STRONG_EMPHASIS_CONFIG),
-          ">",
-        ],
-        ">=0.5",
-      )
   }
 
   private loadVideo(): void {
@@ -577,36 +546,172 @@ export class VideoManager {
     }
   }
 
-  // I couldn't resist
-  private failPlay(): void {
-    this.element
-      .play()
-      .then(() => {
-        if (this.isPlaying()) {
-          this.timeline.play()
-        } else {
-          throw new Error("Failed to play video")
+  private handleCanPlay(): void {
+    this.canPlay = true
+    logger.info("Handling can play event")
+    switch (this.status) {
+      case "loading":
+        this.loadPoster()
+        logger.info("Video loading. Preparing to play.")
+        break
+      case "playing":
+        if (!this.isPlaying()) {
+          this.foulPlay()
         }
+        if (!this.masterTimeline.isActive()) {
+          this.masterTimeline.play()
+        }
+        break
+      case "paused":
+        logger.info("Video paused. Resuming.")
+        this.play()
+        break
+      case "on_textAnimation":
+        if (!this.masterTimeline.isActive()) {
+          this.masterTimeline.play()
+        }
+        break
+      case "loaded":
+        logger.info("Video loaded. Playing.")
+        if (!this.isPlaying()) {
+          this.foulPlay()
+        } if (!this.masterTimeline.isActive()) {
+          this.masterTimeline.play()
+        }
+        break
+      case "not_initialized":
+        logger.info("Video not initialized. Initializing.")
+        this.status = "loading"
+        toggleActiveClass(this.poster, "hero__poster", true)
+        this.loadPoster()
+        logger.info("Poster loaded. Initialized video")
+        this.loadVideo()
+        logger.info("Video loaded")
+        this.play()
+        break
+      default:
+        logger.error("Unhandled status:", this.status)
+        logger.info("Initiating fallback")
+        this.initiateFallback()
+        break
+    }
+  }
+
+  /*================== Animations =================*/
+
+  private animateText(overrideVars: gsap.TweenVars = {}): GSAPTimeline {
+    return gsap
+      .timeline()
+      .set(".text-animation__container", { autoAlpha: 1 })
+      ["animateMessage"](".text-animation__container", {
+        message: this.message,
+        repeat: 0,
+        log: true,
+        duration: 5,
+        callbackScope: this,
+        extendTimeline: true,
+        ...overrideVars,
       })
-      .catch(() => {
-        this.addPlayOnInteraction()
+      .add(() => {
+        logger.info("Text animation completed")
       })
   }
 
-  private loadBackup(): void {
-    const backup =
-      this.poster.classList.contains("hero__poster--active") ? this.poster : this.backupPicture
-    if (!elementInDom(backup)) {
-      requestAnimationFrame(() => {
-        this.container.append(backup)
-        backup.querySelector("img")?.classList.add("hero__poster--image")
-        toggleActiveClass(backup, "hero__poster", true)
+  private syncToVideo(): void {
+    logger.debug(`Syncing video to ${this.timeLeft()} seconds`)
+    this.videoTimeline.isActive() ?
+      this.videoTimeline.duration(this.timeLeft() - (VIDEO_END_BUFFER - 0.5))
+    : this.videoTimeline.duration(this.videoDuration)
+  }
+
+  // sets initial timeline properties
+  private buildVideoTimeline(): void {
+    logger.debug("Building the video timeline")
+    this.videoTimeline
+      .add(
+        [
+          "startVideo",
+          () => {
+            this.element.play().catch((e) => {
+              logger.error("Failed to play video", e)
+              this.addPlayOnInteraction()
+            })
+          },
+        ],
+        "<",
+      )
+      .set(this.container, { autoAlpha: 1 })
+      .set(this.element, { autoAlpha: 1 })
+      .set(this.ctaContainer, { autoAlpha: 1 })
+      .add(
+        // we make sure the timeline syncs with the video
+        gsap.delayedCall(2, () => {
+          if (
+            this.isPlaying() &&
+            this.videoTimeline.totalDuration() > this.timeLeft() - VIDEO_END_BUFFER
+          ) {
+            this.syncToVideo()
+          } else if (!this.isPlaying()) {
+            this.videoTimeline.restart().pause()
+            this.foulPlay()
+          }
+        }),
+        "<",
+      )
+  }
+
+  private buildTextTimeline(): void {
+    const ctaHeaders = gsap.utils.toArray("h1, h2", this.ctaContainer)
+    this.textAnimationTimeline
+      .add(
+        gsap.to(ctaHeaders, {
+          autoAlpha: 0,
+          duration: 0.5,
+        }),
+        "<",
+      )
+      .set(this.element, { autoAlpha: 0 })
+      .add(this.animateText(), "<=+0.5")
+      .add(
+        gsap.to(ctaHeaders, {
+          autoAlpha: 1,
+          duration: 0.5,
+        }),
+        ">",
+      )
+      .add(() => {
+        logger.info("Text timeline completed")
       })
-    }
+  }
 
-    gsap.to(backup, { autoAlpha: 1, duration: 1 })
-
-    logger.info("Backup loaded and set to visible:", backup)
+  private setEmphasisAnimations(): GSAPTimeline {
+    const { subtle, strong } = OBSERVER_CONFIG.emphasisTargets
+    const subtleTargets = gsap.utils.toArray(subtle)
+    const strongTargets = gsap.utils.toArray(strong)
+    return gsap
+      .timeline({
+        repeat: -1,
+        paused: false,
+        delay: Math.min(VIDEO_END_BUFFER, 2),
+        repeatDelay: 2,
+        defaults: { repeat: -1, paused: false },
+      })
+      .add(
+        [
+          "subtleEmphasis",
+          gsap.timeline()["emphasize"](subtleTargets, SUBTLE_EMPHASIS_CONFIG),
+          ">",
+        ],
+        ">",
+      )
+      .add(
+        [
+          "strongEmphasis",
+          gsap.timeline()["emphasize"](strongTargets, STRONG_EMPHASIS_CONFIG),
+          ">",
+        ],
+        ">=0.5",
+      )
   }
 
   private transitionToVideo(revert: boolean = false): void {
@@ -619,146 +724,15 @@ export class VideoManager {
     toggleActiveClass(this.element, "hero__video", !revert)
     toggleActiveClass(this.poster, "hero__poster", revert)
     if (revert) {
-      this.timeline.pause()
-      this.textAnimationTimeline.pause()
+      this.videoTimeline.restart().pause()
       this.element.pause()
     } else {
-      this.failPlay()
+      this.masterTimeline.play("videoTimeline")
     }
   }
 
-  private addPlayOnInteraction(): void {
-    const playOnInteraction = () => {
-      this.element.play().catch((e) => {
-        logger.error("Failed to play on interaction", e)
-        document.removeEventListener("click", playOnInteraction)
-        document.removeEventListener("touchstart", playOnInteraction)
-        this.initiateFallback()
-      })
-    }
-    try {
-      const evt = new Event("click", { bubbles: true, cancelable: true })
-      this.element.dispatchEvent(evt)
-    } catch (error) {
-      logger.error("Error creating event:", error)
-    }
-    this.element
-      .play()
-      .then(() => {
-        if (this.isPlaying()) {
-          this.timeline.play()
-        }
-      })
-      .catch(() => {
-        this.transitionToVideo(true)
-        document.addEventListener("click", playOnInteraction)
-        document.addEventListener("touchstart", playOnInteraction)
-
-        logger.info("Added play on interaction listeners")
-      })
-  }
-
-  private initiateFallback(): void {
-    if (this.status === "on_fallback") {
-      return
-    }
-    const fallback =
-      this.poster.classList.contains("hero__poster--active") ? this.poster : this.backupPicture
-    if (fallback !== this.poster) {
-      this.loadBackup()
-    }
-    if (!elementInDom(fallback)) {
-      this.container.append(fallback)
-    }
-    toggleActiveClass(fallback, "hero__poster", true)
-    const newTl = gsap.timeline({ paused: false, defaults: { repeat: 0 } })
-    newTl
-      .add(["fallback", gsap.set(this.element, { autoAlpha: 0, duration: 0.5 })], 0)
-      .call(() => {
-        this.element.classList.add("hero__video--inactive")
-        this.status = "on_fallback"
-        if (elementInDom(this.element)) {
-          this.container.removeChild(this.element)
-        }
-      })
-      .set(this.container, { autoAlpha: 1 })
-      .set(this.ctaContainer, { autoAlpha: 1 })
-    newTl.add(this.animateText({ onComplete: () => {} }))
-    newTl.add(this.setEmphasisAnimations())
-    this.timeline.kill()
-    this.timeline = newTl
-    this.timeline.play()
-    this.subscriptions.unsubscribe()
-    logger.info("Initiated fallback")
-  }
-
-  private animateText(overrideVars: gsap.TweenVars = {}): GSAPTimeline {
-    return gsap
-      .timeline()
-      .call(() => {
-        if (this.element.classList.contains("hero__video--active")) {
-          toggleActiveClass(this.element, "hero__video", false)
-        }
-      })
-      .set(".text-animation__container", { autoAlpha: 1 })
-      ["animateMessage"](".text-animation__container", {
-        message: this.message,
-        repeat: 0,
-        duration: 5,
-        callbackScope: this,
-        ...overrideVars,
-      })
-      .call(() => {
-        logger.info("Text animation completed")
-      })
-  }
-
-  public play(): void {
-    if (!this.timeline.isActive() && this.status !== "on_fallback" && this.status !== "on_delay") {
-      this.transitionToVideo()
-    } else if (this.status === "on_delay" && !this.textAnimationTimeline.isActive()) {
-      this.textAnimationTimeline.restart().play()
-    }
-  }
-
-  public pause(): void {
-    if (this.status === "on_fallback") {
-      return
-    }
-    this.textAnimationTimeline.pause()
-    this.timeline.pause()
-    this.element.pause()
-    this.status = "paused"
-  }
-
-  public resume(): void {
-    if (this.status === "on_fallback") {
-      return
-    }
-    if (this.status === "on_delay" && !this.textAnimationTimeline.isActive()) {
-      this.stop()
-    }
-    this.play()
-  }
-
-  public stop(): void {
-    this.element.pause()
-    this.element.currentTime = 0
-    this.timeline.restart().pause()
-    this.textAnimationTimeline.restart().pause()
-    // check if video is loaded
-    if (this.element.readyState === 4) {
-      this.status = "loaded"
-    } else {
-      this.status = "loading"
-    }
-  }
-
-  private reinit(): void {
-    this.timeline.kill()
-    VideoManager.instance = undefined
-    VideoManager.getInstance()
-  }
+  /*=============================================*/
+  /* Error handling and tear down */
 
   private handleMediaError(error: MediaError): void {
     switch (error.code) {
@@ -789,8 +763,65 @@ export class VideoManager {
     }
   }
 
-  private isPlaying(): boolean {
-    return this.element.currentTime > 0 && !this.element.paused && !this.element.ended
+  // I couldn't resist
+  private foulPlay(): void {
+    this.element
+      .play()
+      .then(() => {
+        if (this.isPlaying()) {
+          this.masterTimeline.play()
+          this.status = "playing"
+        } else {
+          throw new Error("Failed to play video")
+        }
+      })
+      .catch(() => {
+        this.addPlayOnInteraction()
+      })
+  }
+
+  private addPlayOnInteraction(): void {
+    const playOnInteraction = () => {
+      this.element.play().catch((e) => {
+        logger.error("Failed to play on interaction", e)
+        document.removeEventListener("click", playOnInteraction)
+        document.removeEventListener("touchstart", playOnInteraction)
+        this.initiateFallback()
+      })
+    }
+    try {
+      const evt = new Event("click", { bubbles: true, cancelable: true })
+      this.element.dispatchEvent(evt)
+    } catch (error) {
+      logger.error("Error creating event:", error)
+    }
+    this.element
+      .play()
+      .then(() => {
+        if (this.isPlaying()) {
+          this.videoTimeline.play()
+        }
+      })
+      .catch(() => {
+        this.transitionToVideo(true)
+        document.addEventListener("click", playOnInteraction)
+        document.addEventListener("touchstart", playOnInteraction)
+
+        logger.info("Added play on interaction listeners")
+      })
+  }
+
+  private setVideoDimensionVars(): void {
+    if (this.status !== "on_fallback" && this.canPlay && this.element.readyState >= 3) {
+      const { height, width, left } = this.element.getBoundingClientRect()
+      if (height && width) {
+        const absoluteLeft = left + window.scrollX
+        setCssVariable("--video-height", `${height}px`)
+        setCssVariable("--video-width", `${width}px`)
+        setCssVariable("--video-left", `${absoluteLeft}px`)
+        logger.debug(`Set video dimensions: ${width}x${height}, ${absoluteLeft}`)
+      }
+    }
   }
 
   private tryNewSource(): void {
@@ -818,7 +849,7 @@ export class VideoManager {
           .play()
           .then(() => {
             if (this.isPlaying()) {
-              this.timeline.play()
+              this.videoTimeline.play()
             }
           })
           .catch(() => {
@@ -826,5 +857,140 @@ export class VideoManager {
           })
       })
     }
+  }
+
+  private loadBackup(): void {
+    if (!elementInDom(this.backupPicture)) {
+      requestAnimationFrame(() => {
+        this.container.append(this.backupPicture)
+        this.backupPicture.querySelector("img")?.classList.add("hero__poster--image")
+        toggleActiveClass(this.backupPicture, "hero__poster", true)
+      })
+    }
+
+    gsap.to(this.backupPicture, { autoAlpha: 1, duration: 1 })
+
+    logger.info("Backup loaded and set to visible:", this.backupPicture)
+  }
+
+  private initiateFallback(): void {
+    if (this.status === "on_fallback") {
+      return
+    }
+    if (this.poster.classList.contains("hero__poster--active") && elementInDom(this.poster)) {
+      this.poster.style.opacity = "1"
+      this.poster.style.visibility = "visible"
+    }
+    if (this.poster === this.backupPicture) {
+      this.loadPoster()
+    } else {
+      this.loadBackup()
+      toggleActiveClass(this.poster, "hero__poster", false)
+      toggleActiveClass(this.backupPicture, "hero__poster", true)
+    }
+    const newTl = gsap.timeline({ paused: false, defaults: { repeat: 0 } })
+    newTl
+      .add(["fallback", gsap.set(this.element, { autoAlpha: 0, duration: 0.5 })], 0)
+      .call(() => {
+        this.element.classList.add("hero__video--inactive")
+        this.status = "on_fallback"
+        if (elementInDom(this.element)) {
+          this.container.removeChild(this.element)
+        }
+      })
+      .set(this.container, { autoAlpha: 1 })
+      .set(this.ctaContainer, { autoAlpha: 1 })
+    newTl.add(this.setEmphasisAnimations())
+    this.masterTimeline.kill()
+    this.videoTimeline.kill()
+    this.textAnimationTimeline.kill()
+    this.videoTimeline = gsap.timeline()
+    this.textAnimationTimeline = gsap.timeline()
+    this.masterTimeline = newTl
+    this.masterTimeline.play()
+    this.subscriptions.unsubscribe()
+    logger.info("Initiated fallback")
+  }
+
+  private handleStopPlay(): void {
+    this.canPlay = false
+    this.pause()
+    if (this.hasPlayed && this.videoStore.length > 1) {
+      this.reinit()
+      this.status = "loading"
+    }
+    logger.info("Video stopped. Reinitiating.")
+  }
+
+  private reinit(): void {
+    this.videoTimeline.kill()
+    this.textAnimationTimeline.kill()
+    VideoManager.instance = undefined
+    VideoManager.getInstance()
+  }
+
+  /*=============================================*/
+  /* Public convenience methods */
+
+  public isPlaying(): boolean {
+    return (
+      this.element &&
+      this.element.duration > 0 &&
+      this.element.currentTime > 0 &&
+      !this.element.paused &&
+      !this.element.ended
+    )
+  }
+
+  public timeLeft(): number {
+    return this.videoDuration - this.element.currentTime
+  }
+
+  public getStatus(): string {
+    return this.status
+  }
+
+  public play(): void {
+    if (
+      !this.masterTimeline.isActive() &&
+      this.status !== "on_fallback" &&
+      this.status !== "on_textAnimation"
+    ) {
+      this.transitionToVideo()
+    } else if (this.status === "on_textAnimation" && !this.masterTimeline.isActive()) {
+      this.masterTimeline.play("textTimeline")
+    } else if (this.status === "on_fallback") {
+      return
+    }
+  }
+
+  public pause(): void {
+    if (this.status === "on_fallback") {
+      return
+    }
+    this.textAnimationTimeline.pause()
+    this.videoTimeline.pause()
+    this.element.pause()
+    this.status = "paused"
+  }
+
+  public resume(): void {
+    if (this.status === "on_fallback") {
+      return
+    }
+    this.play()
+  }
+
+  public stop(): void {
+    this.element.pause()
+    this.element.currentTime = 0
+    this.masterTimeline.restart().pause()
+    // Check if video is loaded
+    if (this.element.readyState === 4) {
+      this.status = "loaded"
+    } else {
+      this.status = "loading"
+    }
+    logger.info("Video stopped and reset.")
   }
 }

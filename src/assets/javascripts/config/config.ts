@@ -121,3 +121,5 @@ export const STRONG_EMPHASIS_CONFIG: EmphasisConfig = {
   jumpConfig: {},
   scaleUpConfig: { duration: 1, scale: 1.1 },
 } as const
+
+export const VIDEO_END_BUFFER = 5 as const

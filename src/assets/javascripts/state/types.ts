@@ -3,7 +3,6 @@
  * @description Types for the Hero feature state management.
  */
 
-import gsap from "gsap"
 import { Header } from "~/components"
 import { SectionIndex } from "~/hero"
 
@@ -65,7 +64,6 @@ export type VideoState = { canPlay: boolean }
 export type TransitionState = { isTransitioning: boolean }
 
 export type StateValue = VideoState | TransitionState
-
 
 /**
  * @exports ComponentUpdateFunction

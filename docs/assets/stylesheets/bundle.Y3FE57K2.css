@@ -6196,8 +6196,8 @@ html .md-typeset .footnote-ref {
   --zaffre: rgb(13, 25, 163);
   --emerald: rgb(21, 219, 149);
   --dutch-white: rgb(244, 228, 193);
-  --ecru: #e4c581;
-  --white: #ffffff;
+  --ecru: rgb(228, 197, 129);
+  --white: rgb(255, 255, 255);
   --air-superiority-blue: rgb(108, 166, 193);
   --alice-blue: rgb(212, 229, 237);
   --aquamarine: rgb(106, 241, 194);
@@ -6215,7 +6215,7 @@ html .md-typeset .footnote-ref {
   --shamrock-green: rgb(40, 150, 90);
   --peach-yellow: rgb(234, 208, 154);
   --cafe-noir: rgb(50, 38, 11);
-  --saffron: #e8c547;
+  --saffron: rgb(232, 197, 71);
   --smoky-black: rgb(33, 26, 7);
   --smokier-black: rgb(22, 17, 5);
   --oxford-blue: rgb(0, 0, 34);
@@ -7127,9 +7127,13 @@ p.md-nav__description.license {
       rgba(var(--gunmetal-rgb), 0.6) 0%,
       rgba(var(--gunmetal-rgb), 0.3) 100%);
   --h1-color: var(--ecru);
-  --h2-color: var(--ecru);
+  --h2-color: var(--vivid-sky-blue);
   --hero-h1-size: clamp(24px, min(6vw, 128px), 14rem);
   --hero-h2-size: calc(var(--hero-h1-size) * 0.8);
+  --video-top: 0;
+  --video-left: 0;
+  --video-height: 100%;
+  --video-width: 100%;
 }
 @media screen and (min-width <= 600px) {
   :root {
@@ -7314,20 +7318,38 @@ section.hero .media__container .hero__poster--image {
   object-fit: cover;
   opacity: 1;
 }
-section.hero .media__container::before {
+section.hero .media__container:has(.hero__video--active)::before {
   position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 100;
-  width: 100%;
-  height: 100%;
+  top: var(--video-top);
+  left: var(--video-left);
+  z-index: 3;
+  width: var(--video-width);
+  height: var(--video-height);
+  pointer-events: none;
   content: "";
   background:
+    radial-gradient(
+      closest-side,
+      rgba(var(--gunmetal-rgb), 0.5) 0%,
+      rgba(var(--gunmetal-rgb), 0.3) 15%,
+      rgba(var(--gunmetal-rgb), 0.4) 90%,
+      rgba(var(--gunmetal-rgb), 0.5) 100%),
     linear-gradient(
-      135deg,
-      rgba(var(--gunmetal-rgb), 0.2) 0%,
-      rgba(var(--gunmetal-rgb), 0.25) 50%,
-      rgba(var(--gunmetal-rgb), 0.3) 100%);
+      180deg,
+      rgba(var(--gunmetal-rgb), 1) 0%,
+      rgba(var(--gunmetal-rgb), 0) 15%, ),
+    linear-gradient(
+      180deg,
+      rgba(var(--gunmetal-rgb), 0) 85%,
+      rgba(var(--gunmetal-rgb), 1) 100%),
+    linear-gradient(
+      90deg,
+      rgba(var(--gunmetal-rgb), 1) 0%,
+      rgba(var(--gunmetal-rgb), 0) 20%),
+    linear-gradient(
+      90deg,
+      rgba(var(--gunmetal-rgb), 0) 80%,
+      rgba(var(--gunmetal-rgb), 1) 100%);
 }
 section.hero .media__container:has(.hero__backup--active) .hero__poster {
   display: none;
@@ -7659,4 +7681,4 @@ section.hero.third .hero__bg {
 }
 
 /* src/assets/stylesheets/bundle.css */
-/*# sourceMappingURL=bundle.ZYBS6NJL.css.map */
+/*# sourceMappingURL=bundle.Y3FE57K2.css.map */

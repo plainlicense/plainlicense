@@ -65,7 +65,6 @@ export class VideoElement {
       playsinline: String(true),
       preload: "metadata",
       muted: String(true),
-      loop: String(true),
       autoplay: "",
       dataNoSnippet: String(true),
       volume: "0.0",

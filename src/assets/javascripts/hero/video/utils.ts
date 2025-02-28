@@ -139,6 +139,10 @@ export function toggleActiveClass(el: HTMLElement, classBase: string, makeActive
   } else {
     el.classList.add(makeActive ? targetNames.active : targetNames.inactive)
   }
+  Array.from(el.classList)
+    .filter((c) => (makeActive ? c.endsWith("inactive") : c.endsWith("active")))
+    .filter((c) => c && c.length)
+    .forEach((c) => el.classList.remove(c))
 }
 
 /**

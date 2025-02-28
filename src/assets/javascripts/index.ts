@@ -39,7 +39,6 @@ import { HeroObservation, VideoManager } from "~/hero"
 import {
   createScript,
   fixSvgDimensions,
-  heroTextSizeWatch,
   isHelpingIndex,
   isHome,
   isLicense,
@@ -98,9 +97,6 @@ const analytic$ = onDom$(of(insertAnalytics()))
 const feedback$ = onDom$(of(feedback()))
 const buttonScript$ = onDom$(of(insertButtonScript()))
 const nav$ = of(setNavId())
-const heroTextSize$ = (async function () {
-  return from(await heroTextSizeWatch())
-})()
 const color$ = of(document.body.setAttribute("data-md-color-scheme", "slate"))
 const observer$ = of(HeroObservation.getInstance())
 const videoManager$ = of(VideoManager.getInstance())
@@ -117,7 +113,7 @@ const pageConfigs: PageConfig[] = [
   {
     matcher: isHome,
     location: "home",
-    observables: [nav$, color$, from(heroTextSize$), observer$, videoManager$],
+    observables: [nav$, color$, observer$, videoManager$],
   },
   {
     matcher: isLicense,

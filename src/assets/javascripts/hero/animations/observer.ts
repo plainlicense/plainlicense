@@ -310,7 +310,7 @@ export class HeroObservation {
       let remainingSections = this.sectionIndexLength - nextIndex
 
       while (remainingSections > 0) {
-        await new Promise((resolve) => setTimeout(resolve, 5000))
+        await new Promise((resolve) => setTimeout(resolve, 3000))
         if (this.currentIndex !== this.sectionIndexLength && this.currentIndex === nextIndex) {
           this.goToSection(nextIndex + Direction.Down, direction)
           nextIndex++

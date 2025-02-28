@@ -406,7 +406,7 @@ class CacheManager {
       return response
     } else {
       const errorMessage = response instanceof Response ? await response.json() : "No response"
-      logger.error("Failed to fetch:", new Error(errorMessage))
+      logger.error(`Failed to fetch request for ${request.toString()} `, new Error(errorMessage))
       logger.error("Attempting fallback fetch")
       const url = new URL(request.toString())
       const name = getCryptoHashlessBaseName(url)
@@ -506,7 +506,7 @@ class CacheStrategies {
       await cacheManager.cacheIt(request, response.clone())
       return response
     } catch (error) {
-      logger.error("Cache first strategy failed:", error as Error)
+      logger.error(`CatchFirst strategy failed for ${request.url}`, error as Error)
       throw error
     }
   }
@@ -532,7 +532,10 @@ class CacheStrategies {
         return response
       })
       .catch((error) => {
-        logger.error("Network fetch failed:", error as Error)
+        logger.error(
+          `Network fetch in staleWhileRevalidate failed for ${request.url} `,
+          error as Error,
+        )
         throw error
       })
 
@@ -577,7 +580,7 @@ self.addEventListener("fetch", (event: FetchEvent) => {
       try {
         return await CacheStrategies.routeToStrategy(event.request)
       } catch (error) {
-        logger.error("Fetch failed:", error as Error)
+        logger.error(`Failed to fetch request for ${event.request.url}`, error as Error)
         throw error
       }
     })(),
