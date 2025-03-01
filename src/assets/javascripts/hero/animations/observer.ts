@@ -428,8 +428,6 @@ export class HeroObservation {
       this.animating = false
       logger.info(`Transition to section ${index} complete`)
       this.updateIndex(index)
-      logger.debug("Hidden elements in section:")
-      logger.table(generateNonVisibleElementReport(this.sections[index].element))
     }
   }
 
@@ -437,6 +435,10 @@ export class HeroObservation {
     return () => {
       if (!this.animating) {
         this.transition(direction, scenicRoute)
+
+        logger.info(
+          `Action function triggered - direction: ${direction}, scenicRoute: ${scenicRoute}`,
+        )
       } else {
         logger.warn("Transition is already in progress")
       }

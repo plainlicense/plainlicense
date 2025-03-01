@@ -160,3 +160,51 @@ export function swapActiveClass(
   toggleActiveClass(inactivateElement, classBase, false)
   toggleActiveClass(activateElement, classBase, true)
 }
+
+export function mediaTimeline(media: string | HTMLMediaElement, config: gsap.TweenConfig) {
+  if (typeof media === "string" && (document.querySelector(media) instanceof HTMLMediaElement)) {
+    media = document.querySelector(media)
+  } else if (!(media instanceof HTMLMediaElement)) {
+    logger.error("Invalid media selector, reverting to default")
+    return
+  }
+    let duration = media.duration,
+      onUpdate = config && config.onUpdate,
+      tl = gsap.timeline({
+        paused: true,
+        onUpdate() {
+          if (tl.paused() || Math.abs(tl.time() * duration - media.currentTime) > 0.5) {
+            media.currentTime = tl.time() * duration
+          }
+          onUpdate && onUpdate.call(tl)
+        },
+      }),
+      updateDuration = () => {
+        duration = media.duration
+        tl.timeScale(1 / duration)
+      },
+      pause = tl.pause,
+      play = tl.play
+  }
+  tl.set({}, {}, 1)
+  media.addEventListener("durationchange", updateDuration)
+  updateDuration()
+  media.onplay = () => tl.play()
+  media.onpause = () => tl.pause()
+  media.ontimeupdate = () => {
+    tl.time(media.currentTime / duration, true)
+  }
+  tl.pause = function () {
+    media.pause()
+    pause.apply(tl, arguments)
+  }
+  tl.play = function () {
+    media.play()
+    play.apply(tl, arguments)
+    if (arguments.length) {
+      media.currentTime = arguments[0]
+    }
+  }
+  tl.media = media
+  return tl
+}
