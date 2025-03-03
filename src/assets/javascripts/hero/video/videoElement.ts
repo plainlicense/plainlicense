@@ -53,6 +53,7 @@ export class VideoElement {
     this.video.append(...this.sources)
     this.video.muted = true
     this.video.defaultMuted = true
+    this.video.dataset["noSnippet"] = "true"
     logger.debug("video element: %o", this.video)
     logger.debug("sources: %o", this.sources)
     this.picture = this.constructPictureElement()
@@ -66,7 +67,6 @@ export class VideoElement {
       preload: "metadata",
       muted: String(true),
       autoplay: "",
-      dataNoSnippet: String(true),
       volume: "0.0",
       ...properties,
     }

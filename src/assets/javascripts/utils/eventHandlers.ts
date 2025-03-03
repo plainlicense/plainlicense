@@ -99,7 +99,7 @@ export const watchMediaQuery = (query: string): Observable<boolean> => {
 export const isPageVisible$ = fromEvent(document, "visibilitychange").pipe(
   map(() => !document.hidden || document.visibilityState === "visible"),
   debounceTime(200),
-  distinctUntilChanged(),
+  distinctUntilChanged((prev, curr) => prev === curr),
   startWith(document.visibilityState === "visible"),
   shareReplay(1),
 )
@@ -160,7 +160,7 @@ export function isPartiallyInViewport(el: HTMLElement): Observable<boolean> {
       const elementHeight = el.offsetHeight
       return y < height && y + elementHeight > 0
     }),
-    distinctUntilChanged(),
+    distinctUntilChanged((prev, curr) => prev === curr),
     shareReplay(1),
   )
 }
@@ -411,7 +411,7 @@ const footer = document.querySelector("#hero-footer") as HTMLElement
 export function handleHomeHeader() {
   return navigationEvents$.pipe(
     filter((url) => isHome(url)),
-    distinctUntilChanged(),
+    distinctUntilChanged((prev, curr) => prev.pathname === curr.pathname),
     tap(() => {
       if (header) {
         header.hidden = true

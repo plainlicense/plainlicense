@@ -25,14 +25,7 @@ import { HeroState, HeroStore } from "~/state"
 import { Direction, Section, SectionIndex } from "./types"
 import { getContentElements } from "./utils"
 // Make sure we have the effects registered
-import {
-  generateNonVisibleElementReport,
-  isHome,
-  isValidElement,
-  logger,
-  navigationEvents$,
-  range,
-} from "~/utils"
+import { isHome, isValidElement, logger, navigationEvents$, range } from "~/utils"
 import "./effects"
 
 gsap.registerPlugin(Observer)
@@ -118,13 +111,15 @@ export class HeroObservation {
       filter((atHome: boolean) => atHome),
     )
 
-    const index$ = this.indexSubject
-      .asObservable()
-      .pipe(distinctUntilChanged(), skipUntil(atHome$), distinctUntilChanged())
+    const index$ = this.indexSubject.asObservable().pipe(
+      distinctUntilChanged((a, b) => a === b),
+      skipUntil(atHome$),
+      distinctUntilChanged((a, b) => a === b),
+    )
 
     const tearDown$ = this.store.state$.pipe(
       map((state: HeroState) => state.atHome),
-      distinctUntilChanged(),
+      distinctUntilChanged((a, b) => a === b),
       filter((atHome: boolean) => !atHome),
       debounceTime(5000),
     )
@@ -204,7 +199,6 @@ export class HeroObservation {
 
   /**
    * @description Set up the first load of the Hero feature.
-   * Filters out the emphasis targets and fades in the content.
    * Emphasis animations are handled in videoManager.ts.
    */
   private setupFirstSection(startImmediately: boolean = false) {

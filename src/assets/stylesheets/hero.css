@@ -13,7 +13,7 @@
   --grid-template-columns: repeat(3, 1fr);
   --bg-gradient:
     linear-gradient(180deg, rgba(var(--gunmetal-rgb), 0.6) 0%, rgba(var(--gunmetal-rgb), 0.3) 100%);
-  --h1-color: var(--ecru);
+  --h1-color: var(--emerald);
   --h2-color: var(--vivid-sky-blue);
   --hero-h1-size: clamp(24px, min(6vw, 128px), 14rem);
   --hero-h2-size: calc(var(--hero-h1-size) * 0.8);
@@ -363,8 +363,9 @@ section.hero .cta__container {
 ------------------------------------------------------------------------------ */
 section.hero .cta__container h1 {
   place-self: center center;
-  margin: 0 0 1rem;
-  line-height: 1.1;
+  padding: 0.05rem;
+  margin: 0 0 0.1rem;
+  line-height: 1;
   color: var(--h1-color);
   text-align: center;
   text-shadow: 0.01rem 0.01rem 0 var(--oxford-blue);
@@ -372,11 +373,29 @@ section.hero .cta__container h1 {
 
 section.hero .cta__container h2 {
   place-self: center center;
-  margin: 0 0 2rem;
-  line-height: 1.2;
+  margin: 0.01rem 0.01rem 1rem;
+  line-height: 1;
   color: var(--h2-color);
   text-align: center;
   text-shadow: 0.01rem 0.01rem 0 var(--oxford-blue);
+}
+
+section.hero h2:has(.cta__container__subtitle--inner) {
+  place-self: center start;
+  padding: 0 10vw 2vw 2vw;
+  line-height: 0;
+}
+
+.cta__container__subtitle--inner {
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: center;
+  justify-content: start;
+  width: min-content;
+  height: min-content;
+  padding: -2rem 0.1rem 0.1rem;
+  line-height: 0.14;
+  text-align: start;
 }
 
 /* ------------------------------------------------------------------------------

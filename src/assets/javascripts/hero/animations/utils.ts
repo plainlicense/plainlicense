@@ -145,38 +145,6 @@ export function getTargetsArray(targets: gsap.TweenTarget): Element[] {
 }
 
 /**
- * Modifies the duration of a tween for reduced motion.
- * @param duration - The duration to modify.
- * @returns The modified duration.
- */
-export function modifyDurationForReducedMotion(
-  duration: gsap.TweenValue,
-): number | gsap.TweenValue {
-  let newDuration: number | gsap.TweenValue = duration
-  getMatchMediaInstance().add(
-    { reducedMotion: "(prefers-reduced-motion: reduce)" },
-    (context: gsap.Context) => {
-      const { reducedMotion } = context.conditions as ReducedMotionCondition
-      if (reducedMotion) {
-        switch (typeof duration) {
-          case "number":
-            newDuration = duration * 2
-            break
-          case "string":
-            newDuration = parseFloat(duration) * 2
-            break
-          default:
-            newDuration = duration
-        }
-      } else {
-        newDuration = duration
-      }
-    },
-  )
-  return newDuration
-}
-
-/**
  * Splits text or text within an element into divs for individual letter animations.
  * Appends the divs to a document fragment.
  * @param el - The element or text to split into divs.

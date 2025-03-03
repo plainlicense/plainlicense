@@ -305,3 +305,26 @@ li.md-meta__item,
 li.md-meta__link {
   font-size: 0.85rem;
 }
+
+.plain__license {
+  font-family: Raleway, Montserrat, "Noto Sans", "Open Sans", Lato, Helvetica, Arial, system-ui, sans-serif;
+  text-transform: capitalize;
+}
+
+.plain__license .plain {
+  font-weight: 800;
+  color: var(--zaffre);
+}
+
+.plain__license .license {
+  font-weight: 400;
+  color: var(--emerald);
+}
+
+[data-md-color-scheme="slate"] .plain__license .plain {
+  color: var(--white);
+}
+
+[data-md-color-scheme="slate"] .plain__license .license {
+  color: var(--ecru);
+}

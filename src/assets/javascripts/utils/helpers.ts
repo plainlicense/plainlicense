@@ -172,6 +172,10 @@ export function logObject(obj: any, label: string = "") {
     logger.error(`No object to log for ${label}`)
     return
   }
+  if (typeof obj === "string" || typeof obj === "number" || typeof obj === "boolean") {
+    logger.debug(`${label}: `, obj)
+    return
+  }
   if (Array.isArray(obj)) {
     obj.forEach((item, i) => {
       logger.debug(`${label}[${i}]: `, item)

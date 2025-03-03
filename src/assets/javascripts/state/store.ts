@@ -38,6 +38,7 @@ import {
   isPageVisible$,
   isPartiallyInViewport,
   logger,
+  logObject,
   navigationEvents$,
   prefersReducedMotion$,
   setCssVariable,
@@ -120,16 +121,18 @@ export class HeroStore {
       size: getViewportSize(),
     },
     header: { height: 0, hidden: true },
-    parallaxHeight: getViewportOffset().y * 1.4,
+    parallaxHeight: parseFloat((getViewportOffset().y * 1.4).toFixed(2)),
     location: initialUrl,
-    isTransitioning: false,
+    isTransitioning: true,
     tearDown: false,
     currentSection: SectionIndex.NotInitialized,
   })
 
   public videoState$ = new BehaviorSubject<VideoState>({ canPlay: false })
 
-  public parallaxHeight$ = new BehaviorSubject<number>(getViewportOffset().y * 1.4)
+  public parallaxHeight$ = new BehaviorSubject<number>(
+    parseFloat((getViewportOffset().y * 1.4).toFixed(2)),
+  )
 
   // defaulting to true keeps the video from playing on page load
   public transitionState$ = new BehaviorSubject<TransitionState>({ isTransitioning: true })
@@ -193,7 +196,7 @@ export class HeroStore {
    */
   public updateHeroState(updates: Partial<HeroState>, component?: AnimationComponent): void {
     logger.debug("external component updating state; updates:")
-    logger.table(updates)
+    logObject(updates)
     this.updateState(updates, component)
   }
 
@@ -225,7 +228,7 @@ export class HeroStore {
   private initSubscriptions(): void {
     const atHome$ = navigationEvents$.pipe(
       map(isHome),
-      distinctUntilChanged(),
+      distinctUntilChanged((a, b) => a === b),
       startWith(isHome(initialUrl)),
       shareReplay(1),
       tap(this.createObserver("atHome$", (atHome) => ({ atHome }))),
@@ -238,7 +241,7 @@ export class HeroStore {
       map(([landingVisible, _currentSection]) => {
         return landingVisible
       }),
-      distinctUntilChanged(),
+      distinctUntilChanged((a, b) => a === b),
       shareReplay(1),
     )
 
@@ -262,7 +265,7 @@ export class HeroStore {
     )
 
     const view$ = viewport$.pipe(
-      distinctUntilChanged(),
+      distinctUntilChanged((a, b) => a.offset.x === b.offset.x && a.offset.y === b.offset.y),
       debounceTime(100),
       shareReplay(1),
       tap((viewport) => {
@@ -306,9 +309,10 @@ export class HeroStore {
       }),
       map(({ viewHeight, headerHeight, portrait }) => {
         const adjustedHeight = Math.abs(viewHeight - headerHeight)
-        return portrait ? adjustedHeight * 1.4 : adjustedHeight * 1.6
+        const height = portrait ? adjustedHeight * 1.4 : adjustedHeight * 1.6
+        return parseFloat(height.toFixed(2))
       }),
-      distinctUntilChanged(),
+      distinctUntilChanged((a, b) => a === b),
       shareReplay(1),
       tap((parallaxHeight) => {
         setCssVariable("--parallax-height", `${parallaxHeight}px`)
@@ -317,7 +321,9 @@ export class HeroStore {
     )
 
     const video$ = this.getVideoState$((canPlay) => {
-      this.videoState$.next({ canPlay } as unknown as VideoState)
+      if (canPlay && "canPlay" in canPlay) {
+        this.videoState$.next(canPlay as VideoState)
+      }
     })
 
     const transition$ = this.getTransitionState$((t) => {
@@ -338,7 +344,7 @@ export class HeroStore {
           currentSection,
         })),
       ),
-      distinctUntilChanged(),
+      distinctUntilChanged((a, b) => a === b),
       shareReplay(1),
     )
 
@@ -432,9 +438,11 @@ export class HeroStore {
   private getVideoState$(observerFunc: ComponentStateUpdateFunction): Observable<boolean> {
     return this.state$.pipe(
       map((state) => predicates.videoPredicate(state).canPlay), // Return boolean directly
-      distinctUntilChanged(),
+      distinctUntilChanged((a, b) => a === b),
       shareReplay(1),
-      tap(this.getComponentObserver("videoState$", observerFunc)),
+      tap((videoState) => {
+        observerFunc({ canPlay: videoState })
+      }),
     )
   }
 
@@ -458,7 +466,7 @@ export class HeroStore {
         return
       }
       logger.debug("State received changes:")
-      logger.table(changes)
+      logObject(changes)
       logger.debug("New state:", stringify({ ...oldState, ...updates }))
       Object.entries(predicates)
         .filter(([_, value]) => typeof value === "function")

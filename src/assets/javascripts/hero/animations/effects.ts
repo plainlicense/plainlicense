@@ -30,13 +30,7 @@ import {
   ReducedMotionCondition,
   TransitionConfig,
 } from "./types"
-import {
-  getDistanceToViewport,
-  getMatchMediaInstance,
-  modifyDurationForReducedMotion,
-  wordsToLetterDivs,
-} from "./utils"
-import { toggleActiveClass } from "../video/utils"
+import { getDistanceToViewport, getMatchMediaInstance, wordsToLetterDivs } from "./utils"
 import type { VideoManager } from "../video"
 
 type VideoEffectThis = ThisType<VideoManager>
@@ -132,11 +126,10 @@ const fade = (
         let modified: Partial<typeof vars> = { ...vars }
         if (modified.yPercent) {
           delete modified.yPercent
-        } else if (modified.duration) {
-          modified.duration = modifyDurationForReducedMotion(vars.duration || 0.5)
         }
         return modified
       })
+      tl.timeScale(0.6)
       tl.add(gsap.fromTo(targets, modifiedVars[0], modifiedVars[1]))
     } else {
       tl.add(
@@ -204,9 +197,16 @@ gsap.registerEffect({
       logger.debug("No header to reveal")
       logger.debug(`header classlists: ${logObject(header, "header classlist")}`)
     }
+    const leaving = index === 1 && Direction.Down
+    if (index === 0 || leaving) {
+      gsap.to(".cta__container", {
+        autoAlpha: leaving ? 0 : 1,
+        duration: 0.3,
+      })
+    }
     return gsap
       .timeline({ extendTimeline: true })
-      .set(targets, { zIndex: 1, autoAlpha: 1 })
+      .set(targets, { zIndex: 1, autoAlpha: 1, z: 1 })
       .fromTo(
         [section.outerWrapper, section.innerWrapper],
         {
@@ -261,13 +261,12 @@ gsap.registerEffect({
  */
 const blink = (targets: gsap.TweenTarget, config: gsap.TweenVars = {}) => {
   logger.debug(`blink: targets: ${logObject(targets, "blink target")}`)
-  const duration = modifyDurationForReducedMotion(config.duration || 0.5)
   return gsap.to(targets, {
     autoAlpha: 0,
     ease: "power4.in",
+    duration: 0.5,
     startAt: { filter: "brightness(1.3)" },
     ...config,
-    duration,
   })
 }
 
@@ -280,7 +279,6 @@ const blink = (targets: gsap.TweenTarget, config: gsap.TweenVars = {}) => {
 const jump = (targets: gsap.TweenTarget, config: gsap.TweenVars = {}) => {
   logger.debug(`jump: targets: ${logObject(targets, "jump target")}`)
   config.y ? config["delete"]("y") : null
-  const duration = modifyDurationForReducedMotion(config.duration || 0.5)
   return gsap.to(targets, {
     y: (_index: number, target: Element, _targets: Element[]) => {
       const distance = Math.abs(getDistanceToViewport(target))
@@ -290,8 +288,8 @@ const jump = (targets: gsap.TweenTarget, config: gsap.TweenVars = {}) => {
     yoyoEase: "bounce",
     ease: "elastic",
     repeatDelay: 2,
+    duration: 0.5,
     ...config,
-    duration,
   })
 }
 
@@ -303,8 +301,7 @@ const jump = (targets: gsap.TweenTarget, config: gsap.TweenVars = {}) => {
  */
 const scaleUp = (targets: gsap.TweenTarget, config: gsap.TweenVars = {}) => {
   logger.debug(`scaleUp: targets: ${logObject(targets, "scaleUp target")}`)
-  const duration = modifyDurationForReducedMotion(config.duration || 0.5)
-  return gsap.to(targets, { scale: 1.5, ease: "elastic", ...config, duration })
+  return gsap.to(targets, { scale: 1.5, ease: "elastic", duration: 0.5, ...config })
 }
 
 /**
@@ -318,9 +315,8 @@ gsap.registerEffect({
   extendTimeline: true,
   defaults: { repeat: -1, yoyo: true, extendTimeline: true },
   effect: (targets: gsap.TweenTarget, config: EmphasisConfig) => {
-    logger.debug(`emphasize: targets: ${logObject(targets, "emphasize target")}`)
-    if (!targets) {
-      return null
+    if (!targets || (Array.isArray(targets) && !targets.length)) {
+      return gsap.timeline()
     }
     const { blinkConfig, jumpConfig, scaleUpConfig } = config
     const emphasisTimeline = gsap.timeline()
@@ -364,7 +360,6 @@ function animateLogo(this: VideoManager) {
       } else {
         logoTl.to(this.logo, {
           autoAlpha: 1,
-          duration: 5,
           yoyo: true,
           repeat: 1,
           ease: "power1.inOut",
@@ -414,11 +409,10 @@ function animateText(this: VideoManager, targets: gsap.TweenTarget, config: Anim
       .add({ reducedMotion: "(prefers-reduced-motion: reduce)" }, (context: gsap.Context) => {
         const { reducedMotion } = context.conditions as ReducedMotionCondition
         if (reducedMotion) {
+          messageTimeline.timeScale(0.6)
           fromVars.yPercent = 50
           toVars.ease = "power1.inOut"
           toVars.stagger = { from: "start" }
-          toVars.duration = modifyDurationForReducedMotion(toVars.duration || 1)
-          exitVars.duration = modifyDurationForReducedMotion(exitVars.duration || 1)
           exitVars.yPercent = -50
           exitVars.ease = "power1.inOut"
           exitVars.stagger = { from: "end" }

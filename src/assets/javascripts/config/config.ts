@@ -67,8 +67,8 @@ export const OBSERVER_CONFIG: ObserverConfig = {
   clickTargets: ".cta__container--target-selector",
   ignoreTargets: "a, button, header, navigation, nav.md-tabs",
   emphasisTargets: {
-    subtle: "button.md-button",
-    strong: ".cta__container--down-indicator",
+    subtle: "#hero-button",
+    strong: "#arrow-down",
   },
 } as const
 

@@ -13,6 +13,7 @@
               </div>
               <!-- Text animation will be injected here by JavaScript -->
             </div>
+            {{ backup_image }}
             <noscript>
               {{ no_script_image }}
 
@@ -21,7 +22,9 @@
                   scroll-behavior: smooth;
                 }
 
-                #hero-header, #hero-footer, #hero-tabs {
+                #hero-header,
+                #hero-footer,
+                #hero-tabs {
                   opacity: 1;
                 }
 
@@ -99,25 +102,34 @@
                 }
               </style>
             </noscript>
-            {{ backup_image }}
           </div>
           <div class="cta__container">
-            <h1 contenteditable="false" class="cta__container--header">Licenses don't have to be confusing</h1><br/>
-            <h2 contenteditable="false" class="cta__container--subtitle"><span class="emerald">plain license</span></h2>
+            <h1 contenteditable="false" class="cta__container--header">Licenses don't have to be confusing
+            </h1>
+            <h2 contenteditable="false" class="cta__container--subtitle">
+              <div class="cta__container__subtitle--inner">
+                <span class="plain__license">
+                  <span class="plain">Plain</span>
+                  <br />
+                  <span class="license">License</span>
+                </span>
+              </div>
+            </h2>
             <a class="cta__container--target-selector" href="#pt3-hero-content-section"
               contenteditable="false">
-              <button contenteditable="false" class="md-button">Get Clear Terms</button>
+              <button contenteditable="false" class="md-button" id="hero-button">Get Clear
+                Terms
+              </button>
+            </a>
+            <!-- Scroll indicator -->
+            <a href="#pt3-hero-content-section" class="cta__container--target-selector">
+              <svg viewBox="0 0 24 24" class="cta__container--down-indicator" id="arrow-down"
+                title="scroll down for more" xmlns="http://www.w3.org/2000/svg" role="button"
+                contenteditable="false">
+                <path d="M11 4h2v12l5.5-5.5 1.42 1.42L12 19.84l-7.92-7.92L5.5 10.5 11 16z"></path>
+              </svg>
             </a>
           </div>
-
-          <!-- Scroll indicator -->
-          <a href="#pt3-hero-content-section" class="cta__container--target-selector">
-            <svg viewBox="0 0 24 24" class="cta__container--down-indicator" id="arrow-down"
-              title="scroll down for more" xmlns="http://www.w3.org/2000/svg" role="button"
-              contenteditable="false">
-              <path d="M11 4h2v12l5.5-5.5 1.42 1.42L12 19.84l-7.92-7.92L5.5 10.5 11 16z"></path>
-            </svg>
-          </a>
         </div>
       </div>
     </div>

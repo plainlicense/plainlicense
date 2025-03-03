@@ -1,6 +1,6 @@
 import { HeroVideo, VideoCodec, VideoWidth } from "./types"
 import { rawHeroVideos } from "./data"
-import { logger, parsePath } from "~/utils"
+import { parsePath } from "~/utils"
 
 /**
  * Gets the hero videos
@@ -120,6 +120,15 @@ function filterActiveClass(
   ) as Record<"active" | "inactive", string | null>
 }
 
+function ensureImageClass(el: HTMLPictureElement) {
+  const img = el.querySelector("img")
+  if (img && !img.classList.contains("hero__poster--image")) {
+    img.classList.add("hero__poster--image")
+  } else if (!img) {
+    throw new Error("Image element not found")
+  }
+}
+
 /**
  * Toggles the active class based on the makeActive parameter
  * @param el - The HTML element to modify
@@ -130,6 +139,9 @@ export function toggleActiveClass(el: HTMLElement, classBase: string, makeActive
   const { active, inactive } = filterActiveClass(el.classList, classBase)
   if ((makeActive && active && !inactive) || (!makeActive && !active && inactive)) {
     return
+  }
+  if (el instanceof HTMLPictureElement && makeActive) {
+    ensureImageClass(el)
   }
   const targetNames = getActivityClasses(classBase)
   if (makeActive && inactive) {
@@ -161,50 +173,13 @@ export function swapActiveClass(
   toggleActiveClass(activateElement, classBase, true)
 }
 
-export function mediaTimeline(media: string | HTMLMediaElement, config: gsap.TweenConfig) {
-  if (typeof media === "string" && (document.querySelector(media) instanceof HTMLMediaElement)) {
-    media = document.querySelector(media)
-  } else if (!(media instanceof HTMLMediaElement)) {
-    logger.error("Invalid media selector, reverting to default")
-    return
-  }
-    let duration = media.duration,
-      onUpdate = config && config.onUpdate,
-      tl = gsap.timeline({
-        paused: true,
-        onUpdate() {
-          if (tl.paused() || Math.abs(tl.time() * duration - media.currentTime) > 0.5) {
-            media.currentTime = tl.time() * duration
-          }
-          onUpdate && onUpdate.call(tl)
-        },
-      }),
-      updateDuration = () => {
-        duration = media.duration
-        tl.timeScale(1 / duration)
-      },
-      pause = tl.pause,
-      play = tl.play
-  }
-  tl.set({}, {}, 1)
-  media.addEventListener("durationchange", updateDuration)
-  updateDuration()
-  media.onplay = () => tl.play()
-  media.onpause = () => tl.pause()
-  media.ontimeupdate = () => {
-    tl.time(media.currentTime / duration, true)
-  }
-  tl.pause = function () {
-    media.pause()
-    pause.apply(tl, arguments)
-  }
-  tl.play = function () {
-    media.play()
-    play.apply(tl, arguments)
-    if (arguments.length) {
-      media.currentTime = arguments[0]
-    }
-  }
-  tl.media = media
-  return tl
+export function isMediaElement(media: string | HTMLMediaElement): media is HTMLMediaElement {
+  return (
+    (typeof media === "string" && document.querySelector(media) instanceof HTMLMediaElement) ||
+    media instanceof HTMLMediaElement
+  )
+}
+
+export function relativeTime(time: number, comparisonTime: number): number {
+  return time / (comparisonTime || time)
 }

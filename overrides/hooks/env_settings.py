@@ -46,6 +46,7 @@ def get_build_meta_values() -> dict[str, str]:
     json_data = json.loads(path.read_text())
     img_element: str = json_data["noScriptImage"]
     json_data["noScriptImage"] = img_element.replace("docs/", f"{server}/")
+    json_data["backup_image"] = img_element.replace("docs/", f"{server}/").replace("hero__backup", "hero__backup--inactive").replace("hero__poster--active", "")
     return json_data
 
 
