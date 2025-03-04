@@ -16128,6 +16128,125 @@ var VideoElement = class {
   }
 };
 
+// src/assets/javascripts/hero/video/timelineManager.ts
+var TimelineManager = class {
+  constructor() {
+    this.paused = true;
+    this.timelines = [];
+    this.currentTimeline = null;
+    this.wrapper = gsapWithCSS.utils.wrap(this.timelines);
+  }
+  get timelinesDuration() {
+    return this.timelines.reduce((acc, timeline2) => acc + timeline2.duration(), 0);
+  }
+  get currentTimelineIndex() {
+    if (!this.currentTimeline) {
+      return -1;
+    }
+    return this.timelines.indexOf(this.currentTimeline);
+  }
+  getSeekLocation(time) {
+    this.timelines.forEach((timeline2) => {
+      timeline2.restart().pause();
+      if (time > timeline2.duration()) {
+        time -= timeline2.duration();
+      } else {
+        timeline2.seek(time);
+        time = 0;
+      }
+    });
+  }
+  updateSelf(timeline2) {
+    this.currentTimeline = timeline2;
+    this.paused = false;
+  }
+  onComplete() {
+    var _a2;
+    (_a2 = this.currentTimeline) == null ? void 0 : _a2.restart().pause();
+    this.currentTimeline = this.wrapper(this.currentTimelineIndex + 1);
+    this.currentTimeline.play();
+  }
+  add(timeline2) {
+    timeline2.pause().seek(0);
+    const currentOnStart = timeline2.eventCallback("onStart");
+    const currentOnComplete = timeline2.eventCallback("onComplete");
+    timeline2.eventCallback("onStart", () => {
+      this.updateSelf.bind(this)(timeline2);
+      if (currentOnStart) {
+        currentOnStart();
+      }
+    });
+    timeline2.eventCallback("onComplete", () => {
+      this.onComplete.bind(this)();
+      if (currentOnComplete) {
+        currentOnComplete();
+      }
+    });
+    this.timelines.push(timeline2);
+    if (!this.currentTimeline) {
+      this.currentTimeline = timeline2;
+    }
+    return this;
+  }
+  restart() {
+    this.timelines.forEach((timeline2) => {
+      timeline2.restart().pause();
+    });
+    this.currentTimeline = this.timelines[0];
+    this.paused = false;
+    return this.play();
+  }
+  play() {
+    if (this.currentTimeline) {
+      this.currentTimeline.play();
+    } else if (this.timelines.length > 0) {
+      this.currentTimeline = this.timelines[0];
+      this.currentTimeline.play();
+    }
+    this.paused = false;
+    return this;
+  }
+  resume() {
+    if (this.currentTimeline) {
+      this.currentTimeline.resume();
+    }
+    this.paused = false;
+    return this;
+  }
+  pause() {
+    if (this.currentTimeline) {
+      this.currentTimeline.pause();
+    }
+    this.paused = true;
+    return this;
+  }
+  seek(time) {
+    this.getSeekLocation(time);
+    return this.play();
+  }
+  isActive() {
+    var _a2;
+    return ((_a2 = this.currentTimeline) == null ? void 0 : _a2.isActive()) || false;
+  }
+  video() {
+    return this.timelines.find((timeline2) => timeline2.vars[0] === "videoTimeline");
+  }
+  text() {
+    return this.timelines.find((timeline2) => timeline2.vars[0] === "textTimeline");
+  }
+  getActiveTimeline() {
+    return this.currentTimeline;
+  }
+  kill() {
+    this.timelines.forEach((timeline2) => {
+      timeline2.kill();
+    });
+    this.timelines = [];
+    this.currentTimeline = null;
+    this.paused = true;
+  }
+};
+
 // src/assets/javascripts/hero/video/videoManager.ts
 var customWindow2 = window;
 var { document$: document$2 } = customWindow2;
@@ -16213,34 +16332,7 @@ var VideoManager = class _VideoManager {
         gsapWithCSS.set(gsapWithCSS.utils.toArray("*", this.container.querySelector(".text-animation__container")), { visibility: "hidden" });
       }
     };
-    this.masterTimeline = gsapWithCSS.timeline({
-      callbackScope: this,
-      repeat: -1,
-      paused: true,
-      log: true,
-      onRepeat: () => {
-        this.hasPlayed = true;
-        if (!this.emphasisSet) {
-          this.setEmphasisAnimations().play();
-        }
-        this.element.currentTime = Math.min(this.element.currentTime, 0);
-        this.element.load();
-        this.status = "playing";
-      },
-      onStart: () => {
-        gsapWithCSS.set(this.parentContainer, {
-          visibility: "visible",
-          opacity: 1,
-          contentVisibility: "visible"
-        });
-        logger.debug("Master timeline started");
-        this.debugDump();
-      },
-      onComplete: () => {
-        logger.debug("Master timeline completed");
-        this.debugDump();
-      }
-    });
+    this.timelineManager = new TimelineManager();
     this.subscriptions = new Subscription();
     this.message = "";
     this.store = HeroStore.getInstance();
@@ -16359,11 +16451,11 @@ var VideoManager = class _VideoManager {
     }));
     const secondaryObservables = [
       varSet$,
-      motionSub$,
       stallHandler$,
       errorHandler$,
       playing$,
-      resize$
+      resize$,
+      motionSub$
     ];
     const videoObserver = {
       next: (videoState) => {
@@ -16372,10 +16464,11 @@ var VideoManager = class _VideoManager {
         logger.info("Manager Can play: ", this.canPlay);
         if (videoState.canPlay) {
           logger.info("Received can play signal");
-          secondaryObservables.forEach((obs) => {
-            if (obs !== motionSub$) {
-              logger.debug("Subscribing to secondary observable: ".concat(logObject(obs)));
+          secondaryObservables.forEach((obs, i) => {
+            if (i !== secondaryObservables.length - 1) {
               this.subscriptions.add(obs.subscribe());
+            } else {
+              obs.subscribe();
             }
           });
           this.handleCanPlay();
@@ -16433,16 +16526,6 @@ var VideoManager = class _VideoManager {
     var _a2;
     return (_a2 = this.instance) != null ? _a2 : this.instance = new _VideoManager();
   }
-  transition(el, hide = false) {
-    const contentVisibilityProp = gsapWithCSS.getProperty(el, "contentVisibility");
-    if (contentVisibilityProp === "hidden" && !hide || contentVisibilityProp === "visible" && hide) {
-      gsapWithCSS.set(el, { contentVisibility: hide ? "hidden" : "visible" });
-    }
-    gsapWithCSS.to(el, {
-      autoAlpha: hide ? 0 : 1,
-      duration: 0.5
-    });
-  }
   loadVideo() {
     if (!elementInDom(this.poster)) {
       this.loadPoster();
@@ -16455,8 +16538,12 @@ var VideoManager = class _VideoManager {
       this.container.append(this.element);
       Promise.resolve(this.element.load()).then(() => {
         if (this.canPlay) {
-          this.transition(this.element);
-          this.transition(this.container);
+          gsapWithCSS.set(this.element, { opacity: 1, visibility: "visible" });
+          gsapWithCSS.set(this.container, {
+            opacity: 1,
+            visibility: "visible",
+            contentVisibility: "visible"
+          });
           this.handleCanPlay();
         }
         logger.info("Video element loaded");
@@ -16535,12 +16622,10 @@ var VideoManager = class _VideoManager {
         break;
       case "loaded":
         logger.info("Video loaded. Playing.");
-        if (!this.masterTimeline.isActive()) {
-          this.masterTimeline.play();
-        }
+        this.timelineManager.play();
         break;
       default:
-        if (!this.masterTimeline.duration() || !this.element.duration) {
+        if (!this.timelineManager.timelinesDuration || !this.element.duration) {
           this.initVideo();
         } else {
           this.initiateFallback();
@@ -16552,20 +16637,21 @@ var VideoManager = class _VideoManager {
   /*================== Animations =================*/
   animateText(overrideVars = {}) {
     const tl = gsapWithCSS.timeline(this.textDefaults);
-    return tl.call(function() {
+    return tl.call(() => {
+      tl.timeScale(this.timeScale * this.videoDuration);
       logger.info("Text animation started");
     }, [], 0).set(".text-animation__container", { autoAlpha: 1 })["animateMessage"](".text-animation__container", {
       message: this.message,
       repeat: 0,
-      duration: () => this.relativeToDuration(7),
+      duration: 7,
       callbackScope: this,
       extendTimeline: true,
       entranceToVars: {
-        stagger: { each: this.relativeToDuration(0.08) },
-        duration: this.relativeToDuration(2),
+        stagger: { each: 0.08 },
+        duration: 2,
         ease: "power2.out"
       },
-      exitVars: { duration: this.relativeToDuration(2) },
+      exitVars: { duration: 2 },
       ...overrideVars
     }).call(function() {
       logger.info("Text animation completed");
@@ -16573,23 +16659,13 @@ var VideoManager = class _VideoManager {
     }, [], ">");
   }
   buildMasterTimeline() {
-    this.masterTimeline.add(this.mediaTimeline(), "videoTimeline").add(["textTimeline", this.buildTextTimeline()], ">");
-    this.masterTimeline["video"] = (() => {
-      const tl = this.masterTimeline.getChildren(false, false, true).filter((tl2) => tl2 instanceof gsapWithCSS.core.Timeline).find((tl2) => {
-        return tl2.vars[0] === "videoTimeline";
-      });
-      if (!tl) {
-        throw new Error("Video timeline not found");
-      }
-      return tl;
-    })();
+    this.timelineManager.add(this.mediaTimeline()).add(this.buildTextTimeline());
   }
   buildTextTimeline() {
-    const ctaHeaders = gsapWithCSS.utils.toArray("h1, h2", this.ctaContainer);
-    return gsapWithCSS.timeline(["textTimeline", this.textDefaults]).add(this.animateText(), 0).add(gsapWithCSS.to(ctaHeaders, {
+    return gsapWithCSS.timeline(["textTimeline", this.textDefaults]).add(this.animateText(), 0).add(gsapWithCSS.to(".cta__container h1", {
       autoAlpha: 1,
       duration: 0.5
-    }), ">").add(() => {
+    }), ">").add(gsapWithCSS.to(".cta__container h2", { autoAlpha: 1, duration: 0.5 }), ">").add(() => {
       logger.info("Text timeline completed");
     });
   }
@@ -16638,10 +16714,10 @@ var VideoManager = class _VideoManager {
     toggleActiveClass(this.element, "hero__video", !revert);
     toggleActiveClass(this.poster, "hero__poster", revert);
     if (revert) {
-      this.masterTimeline.pause();
-      this.masterTimeline.seek("videoTimeline");
+      this.timelineManager.pause();
+      this.timelineManager.seek(0);
     } else {
-      this.masterTimeline.play("videoTimeline");
+      this.timelineManager.restart().play();
     }
   }
   /**
@@ -16657,11 +16733,14 @@ var VideoManager = class _VideoManager {
     let duration = this.videoDuration, onUpdate = config6 && config6.onUpdate, tl = gsapWithCSS.timeline([
       "videoTimeline",
       {
-        onStart: function() {
+        onStart: () => {
           this.transitionToVideo();
+          updateDuration();
+          this.element.style.visibility = "visible";
+          this.element.style.opacity = "1";
           gsapWithCSS.set(this.element, { autoAlpha: 1, visibility: "visible" });
           if (!this.isPlaying()) {
-            this.element.foulPlay();
+            this.foulPlay();
             tl.seek(this.videoDuration ? this.element.currentTime : 0, true);
           }
         },
@@ -16683,10 +16762,13 @@ var VideoManager = class _VideoManager {
     tl["media"] = this.element;
     tl["status"] = this.status;
     tl["foulPlay"] = this.foulPlay.bind(this);
-    tl.set({}, {}, 1).set([this.element, this.container, this.ctaContainer], { autoAlpha: 1 }, 0).add(gsapWithCSS.to(ctaHeadings, { autoAlpha: 1, duration: this.relativeToDuration(0.3) }), 0).add(gsapWithCSS.to(gsapWithCSS.utils.toArray("h1, h2", this.ctaContainer), {
+    tl.set({}, {}, 1).set([this.element, this.container, this.ctaContainer], { opacity: 1, visibility: "visible" }, 0).add(gsapWithCSS.to(ctaHeadings, { autoAlpha: 1, duration: this.relativeToDuration(0.3) }), 0).add(gsapWithCSS.to(gsapWithCSS.utils.toArray("h1", this.ctaContainer), {
       autoAlpha: 0,
       duration: this.relativeToDuration(0.5)
-    }), this.relativeToDuration(this.titleStart)).add(gsapWithCSS.to(this.element, { autoAlpha: 0, duration: this.relativeToDuration(0.5) }), this.relativeToDuration(this.titleStart));
+    }), this.relativeToDuration(this.titleStart)).add(gsapWithCSS.to(this.element, { autoAlpha: 0, duration: this.relativeToDuration(0.5) }), this.relativeToDuration(this.titleStart)).add(gsapWithCSS.to(gsapWithCSS.utils.toArray("h2", this.ctaContainer), {
+      autoAlpha: 0,
+      duration: this.relativeToDuration(0.5)
+    }), this.relativeToDuration(this.titleStart + 0.5));
     this.element.addEventListener("durationchange", updateDuration);
     updateDuration();
     this.element.onplay = () => tl.play();
@@ -16754,13 +16836,14 @@ var VideoManager = class _VideoManager {
   // Add these methods to the VideoManager class
   handleReducedMotion({ prefersReducedMotion }) {
     if (prefersReducedMotion) {
-      this.masterTimeline.pause();
+      this.timelineManager.pause();
       this.canPlay = false;
       this.status = "on_fallback";
       this.initiateFallback();
     }
   }
   determineVideoStatus(canPlay, currentSection) {
+    var _a2;
     const posterInDom = elementInDom(this.poster);
     const videoInDom = elementInDom(this.element);
     if (!videoInDom || !posterInDom) {
@@ -16774,8 +16857,8 @@ var VideoManager = class _VideoManager {
       } else if (this.element.readyState === 4) {
         if (this.isPlaying()) {
           return "playing";
-        } else if (currentSection >= 1 /* Impact */ || this.masterTimeline.paused()) {
-          return this.masterTimeline.totalProgress() > 0 || this.hasPlayed ? "paused" : "loaded";
+        } else if (currentSection >= 1 /* Impact */ || this.timelineManager.paused) {
+          return this.timelineManager.isActive() && ((_a2 = this.timelineManager.getActiveTimeline()) == null ? void 0 : _a2.time()) > 0 || this.hasPlayed ? "paused" : "loaded";
         } else if (this.isOnTextAnimation()) {
           return "on_textAnimation";
         } else {
@@ -16783,11 +16866,11 @@ var VideoManager = class _VideoManager {
         }
       }
     } else {
-      if (currentSection >= 1 /* Impact */ && this.status !== "not_initialized" || this.hasPlayed || this.masterTimeline.paused()) {
+      if (currentSection >= 1 /* Impact */ && this.status !== "not_initialized" || this.hasPlayed || this.timelineManager.paused) {
         return this.element.currentTime > 0 || this.hasPlayed ? "paused" : "loaded";
       } else if (!this.element.duration && this.element.readyState === 0 || !elementInDom(this.element)) {
         return "not_initialized";
-      } else if (this.masterTimeline.totalProgress() > 0) {
+      } else if (this.timelineManager.timelines.length > 0 && this.timelineManager.currentTimeline.totalProgress() > 0) {
         return "paused";
       } else if (this.element.readyState === 4) {
         return "loaded";
@@ -16798,7 +16881,7 @@ var VideoManager = class _VideoManager {
     return "not_initialized";
   }
   isOnTextAnimation() {
-    return this.element.readyState === 4 && this.masterTimeline.totalDuration() > 0 && this.masterTimeline.isActive() && this.masterTimeline.currentLabel() === "textTimeline";
+    return this.element.readyState === 4 && this.timelineManager.currentTimeline === this.timelineManager.text();
   }
   /*=============================================*/
   /* Error handling and tear down */
@@ -16832,27 +16915,29 @@ var VideoManager = class _VideoManager {
   }
   // I couldn't resist
   foulPlay() {
-    if (this.isPlaying() || this.status === "on_fallback" || this.masterTimeline.isActive()) {
+    if (this.isPlaying() || this.status === "on_fallback" || this.timelineManager.isActive()) {
       return;
     }
     this.element.play().then(() => {
       this.beginPlay();
     }).catch(() => {
-      this.masterTimeline.seek("videoTimeline").pause();
+      this.timelineManager.pause();
+      this.timelineManager.restart().pause();
       this.addPlayOnInteraction();
     });
   }
   beginPlay() {
     logger.debug("entered beginPlay function");
     this.transitionToVideo();
-    if (!this.masterTimeline.isActive()) {
-      logger.debug("Master timeline is not active. trying to play.");
-      this.masterTimeline.play();
+    if (!this.timelineManager.isActive()) {
+      logger.debug("Timeline is not active. Trying to play.");
+      this.timelineManager.play();
     } else {
-      logger.debug("Master timeline is active. Resuming.");
-      this.masterTimeline.resume();
+      logger.debug("Timeline is active. Resuming.");
+      this.timelineManager.resume();
     }
     logger.debug("Playing video");
+    gsapWithCSS.set(this.element, { autoAlpha: 1, visibility: "visible" });
     this.status = "playing";
     this.setVideoDimensionVars();
     document.removeEventListener("click", this.addPlayOnInteraction);
@@ -16918,7 +17003,7 @@ var VideoManager = class _VideoManager {
       this.element.play().then(() => {
         this.beginPlay();
       }).catch(() => {
-        this.masterTimeline.seek("videoTimeline").pause();
+        this.timelineManager.restart().pause();
         this.addPlayOnInteraction();
       });
     });
@@ -16954,14 +17039,13 @@ var VideoManager = class _VideoManager {
       }
     }).set(this.container, { autoAlpha: 1 }).set(this.ctaContainer, { autoAlpha: 1 }).to(this.backupPicture, { autoAlpha: 1, duration: 1 });
     newTl.add(this.setEmphasisAnimations());
-    this.masterTimeline.kill();
-    this.masterTimeline = newTl;
-    this.masterTimeline.play();
+    this.timelineManager.kill();
+    this.timelineManager = new TimelineManager().add(newTl).play();
     this.subscriptions.unsubscribe();
     logger.info("Initiated fallback");
   }
   reinit() {
-    this.masterTimeline.kill();
+    this.timelineManager.kill();
     this.status = "not_initialized";
     _VideoManager.instance = void 0;
     _VideoManager.getInstance();
@@ -16970,21 +17054,18 @@ var VideoManager = class _VideoManager {
     if (this.isOnFallback()) {
       return;
     }
-    if (this.masterTimeline.isActive()) {
-      logger.debug("Master timeline is active. Resuming.");
-      this.masterTimeline.resume();
+    if (this.timelineManager.isActive()) {
+      logger.debug("Timeline manager is active. Resuming.");
+      this.timelineManager.resume();
       return;
     }
-    this.masterTimeline.play();
+    this.timelineManager.play();
     logger.info("Video playback started.");
   }
   debugDump() {
-    const videoTl = this.masterTimeline.getChildren(false, false, true).find((tl) => {
-      return tl.vars[0] === "videoTimeline";
-    });
-    const textTl = this.masterTimeline.getChildren(false, false, true).find((tl) => {
-      return tl.vars[0] === "textTimeline";
-    });
+    var _a2;
+    const videoTl = this.timelineManager.video();
+    const textTl = this.timelineManager.text();
     logger.debug("Debugging VideoManager State", {
       status: this.status,
       currentTime: this.element.currentTime,
@@ -16993,11 +17074,11 @@ var VideoManager = class _VideoManager {
       hasPlayed: this.hasPlayed
     });
     logger.debug("Debugging VideoManager timelines: ", {
-      masterTimeline: this.masterTimeline,
+      timelineManager: this.timelineManager,
       textTimeline: textTl || null,
       videoTimeline: videoTl || null,
-      masterDuration: this.masterTimeline.duration(),
-      masterTimeScale: this.masterTimeline.timeScale(),
+      managerDuration: this.timelineManager.timelinesDuration,
+      currentTimescale: (_a2 = this.timelineManager.currentTimeline) == null ? void 0 : _a2.timeScale(),
       vidDuration: videoTl == null ? void 0 : videoTl.duration(),
       vidTimeScale: videoTl == null ? void 0 : videoTl.timeScale(),
       textDuration: textTl == null ? void 0 : textTl.duration(),
@@ -17038,21 +17119,21 @@ var VideoManager = class _VideoManager {
     if (this.status === "on_fallback") {
       return;
     }
-    this.masterTimeline.pause();
+    this.timelineManager.pause();
   }
   resume() {
     if (this.status === "on_fallback") {
       return;
     }
-    if (!this.masterTimeline.isActive()) {
-      this.masterTimeline.resume();
+    if (!this.timelineManager.isActive()) {
+      this.timelineManager.resume();
     }
   }
   restart() {
-    this.masterTimeline.restart();
+    this.timelineManager.restart().play();
   }
   seek(time) {
-    this.masterTimeline.seek(time);
+    this.timelineManager.seek(time);
   }
 };
 
@@ -17875,4 +17956,4 @@ gsap/ScrollToPlugin.js:
    * @author: Jack Doyle, jack@greensock.com
   *)
 */
-//# sourceMappingURL=index.2POCEY5D.js.map
+//# sourceMappingURL=index.XQNLPHYX.js.map

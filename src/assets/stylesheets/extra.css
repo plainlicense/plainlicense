@@ -307,8 +307,10 @@ li.md-meta__link {
 }
 
 .plain__license {
+  display: flex;
   font-family: Raleway, Montserrat, "Noto Sans", "Open Sans", Lato, Helvetica, Arial, system-ui, sans-serif;
   text-transform: capitalize;
+  letter-spacing: 2px;
 }
 
 .plain__license .plain {
@@ -323,8 +325,10 @@ li.md-meta__link {
 
 [data-md-color-scheme="slate"] .plain__license .plain {
   color: var(--white);
+  text-shadow: 0.03rem 0.03rem 0.02rem var(--ecru);
 }
 
 [data-md-color-scheme="slate"] .plain__license .license {
   color: var(--ecru);
+  text-shadow: 0.03rem 0.03rem 0.02rem var(--white);
 }
