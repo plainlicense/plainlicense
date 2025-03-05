@@ -22,6 +22,7 @@
 import gsap from "gsap"
 import { OBSERVER_CONFIG, VIDEO_MANAGER_ELEMENTS } from "~/config"
 import { isValidElement, logger, logObject } from "~/utils"
+import type { VideoManager } from "../video"
 import {
   AnimateMessageConfig,
   Direction,
@@ -31,7 +32,6 @@ import {
   TransitionConfig,
 } from "./types"
 import { getDistanceToViewport, getMatchMediaInstance, wordsToLetterDivs } from "./utils"
-import type { VideoManager } from "../video"
 
 type VideoEffectThis = ThisType<VideoManager>
 
@@ -188,7 +188,7 @@ gsap.registerEffect({
             zIndex: 300,
             duration: 0.5,
             yPercent: 0,
-            opacity: 1,
+            opacity: 0.8,
             background: "transparent",
             startAt: { background: "transparent", yPercent: -100 },
           }),

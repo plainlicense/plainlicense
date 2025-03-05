@@ -1,4 +1,7 @@
 {
+  "eslint.format.enable": true,
+  "eslint.lintTask.enable": true,
+  "vs-code-prettier-eslint.prettierLast": true,
   "[css]": {
     "editor.defaultFormatter": "stylelint.vscode-stylelint",
     "editor.codeActionsOnSave": {
@@ -26,8 +29,10 @@
     "editor.defaultFormatter": "rvest.vs-code-prettier-eslint",
     "editor.formatOnPaste": true,
     "editor.formatOnSave": true,
-    "editor.formatOnType": true,
+    "editor.formatOnSaveMode": "file",
+    "editor.formatOnType": false,
     "editor.maxTokenizationLineLength": 10000,
+    "files.autoSave": "onFocusChange",
     "editor.codeActionsOnSave": {
       "source.fixAll": "always",
       "source.fixAll.eslint": "always",
@@ -35,7 +40,7 @@
     },
     "editor.codeActions.triggerOnFocusChange": true,
     "editor.pasteAs.preferences": [
-      
+
     ]
   },
   "[json]": {
@@ -83,10 +88,12 @@
       "source.organizeImports.ts": "always",
       "source.addMissingImports.ts": "always",
     },
+    "editor.formatOnSaveMode": "file",
+    "files.autoSave": "onFocusChange",
     "editor.defaultFormatter": "rvest.vs-code-prettier-eslint",
     "editor.formatOnPaste": true,
     "editor.formatOnSave": true,
-    "editor.formatOnType": true,
+    "editor.formatOnType": false,
     "github.copilot.editor.enableAutoCompletions": true
   },
   "[yaml]": {

@@ -1,4 +1,5 @@
 import gsap from "gsap"
+import { logger } from "~/utils"
 
 /**
  * TimelineManager
@@ -17,7 +18,7 @@ export class TimelineManager {
     }
     return this.timelines.indexOf(this.currentTimeline)
   }
-    wrapper: (index: number) => GSAPTimeline
+  wrapper: (index: number) => GSAPTimeline
   constructor() {
     this.timelines = []
     this.currentTimeline = null
@@ -37,14 +38,18 @@ export class TimelineManager {
   }
 
   updateSelf(timeline: GSAPTimeline) {
+    logger.debug("TimelineManager.updateSelf", timeline)
     this.currentTimeline = timeline
     this.paused = false
   }
 
   onComplete() {
-    this.currentTimeline?.restart().pause()
+    logger.debug("TimelineManager.onComplete")
     this.currentTimeline = this.wrapper(this.currentTimelineIndex + 1)
     this.currentTimeline.play()
+    this.wrapper(this.currentTimelineIndex - 1)
+      .seek(0)
+      .pause()
   }
 
   add(timeline: GSAPTimeline) {
@@ -52,13 +57,13 @@ export class TimelineManager {
     const currentOnStart = timeline.eventCallback("onStart")
     const currentOnComplete = timeline.eventCallback("onComplete")
     timeline.eventCallback("onStart", () => {
-      this.updateSelf.bind(this)(timeline)
+      this.updateSelf(timeline)
       if (currentOnStart) {
         currentOnStart()
       }
     })
     timeline.eventCallback("onComplete", () => {
-      this.onComplete.bind(this)()
+      this.onComplete()
       if (currentOnComplete) {
         currentOnComplete()
       }
@@ -74,13 +79,13 @@ export class TimelineManager {
     this.timelines.forEach((timeline) => {
       timeline.restart().pause()
     })
-      this.currentTimeline = this.timelines[0]
-      this.paused = false
+    this.currentTimeline = this.timelines[0]
+    this.paused = false
     return this.play()
   }
 
   play() {
-    if (this.currentTimeline) {
+    if (this.currentTimeline && !this.isActive()) {
       this.currentTimeline.play()
     } else if (this.timelines.length > 0) {
       this.currentTimeline = this.timelines[0]
@@ -91,10 +96,10 @@ export class TimelineManager {
   }
 
   resume() {
-      if (this.currentTimeline) {
-        this.currentTimeline.resume()
-      }
-      this.paused = false
+    if (this.currentTimeline && !this.currentTimeline.isActive()) {
+      this.currentTimeline.resume()
+    }
+    this.paused = false
     return this
   }
 
@@ -108,7 +113,7 @@ export class TimelineManager {
 
   seek(time: number) {
     this.getSeekLocation(time)
-    return this.play()
+    return this.resume()
   }
 
   isActive() {
@@ -127,12 +132,12 @@ export class TimelineManager {
     return this.currentTimeline
   }
 
-    kill() {
-      this.timelines.forEach((timeline) => {
-        timeline.kill()
-      })
-      this.timelines = []
-      this.currentTimeline = null
-      this.paused = true
-    }
+  kill() {
+    this.timelines.forEach((timeline) => {
+      timeline.kill()
+    })
+    this.timelines = []
+    this.currentTimeline = null
+    this.paused = true
+  }
 }
