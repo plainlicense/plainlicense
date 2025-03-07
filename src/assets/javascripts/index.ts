@@ -16,6 +16,9 @@
 import "./utils/fetchWorker"
 // @ts-ignore - TODO: figure out how to fix this annoying error
 import "@/bundle"
+import gsap from "gsap"
+import { ScrollToPlugin } from "gsap/ScrollToPlugin"
+import { ScrollTrigger } from "gsap/ScrollTrigger"
 import {
   EMPTY,
   Observable,
@@ -29,13 +32,9 @@ import {
   switchMap,
   tap,
 } from "rxjs"
-import gsap from "gsap"
-import { ScrollTrigger } from "gsap/ScrollTrigger"
-import { ScrollToPlugin } from "gsap/ScrollToPlugin"
-import { HeroStore } from "~/state"
 import { feedback } from "~/feedback"
-import { initLicenseFeature } from "./licenses"
 import { HeroObservation, VideoManager } from "~/hero"
+import { HeroStore } from "~/state"
 import {
   createScript,
   fixSvgDimensions,
@@ -51,6 +50,7 @@ import {
   watchLicenseHash,
   windowEvents,
 } from "~/utils"
+import { initLicenseFeature } from "./licenses"
 import type { PageConfig } from "./types"
 
 gsap.registerPlugin(ScrollTrigger, ScrollToPlugin)

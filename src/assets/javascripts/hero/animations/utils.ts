@@ -10,7 +10,6 @@
 import gsap from "gsap"
 import { HeroStore } from "~/state"
 import { isValidElement } from "~/utils"
-import { ReducedMotionCondition } from "./types"
 
 /**
  * Randomly selects and removes an item from an array, reshuffling if depleted.
@@ -116,7 +115,7 @@ function tryObject(obj: any) {
   const newValues = []
   for (const value of values) {
     if (value === null || value === undefined) {
-      newValues.push(null)
+      newValues.push("null")
     } else if (value instanceof Element) {
       newValues.push(value)
     } else if (typeof value === "string") {

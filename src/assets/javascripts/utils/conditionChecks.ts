@@ -19,9 +19,9 @@ const isProd = (url: URL) => {
 // tests if the site is in a development environment
 export const isDev = (url: URL) => {
   return (
-    (url.hostname === "localhost" && url.port === "8000") ||
-    (url.hostname === "127.0.0.1" && url.port === "8000") ||
-    typeof window !== "undefined"
+    url.protocol === "http" &&
+    ((url.hostname === "localhost" && url.port === "8000") ||
+      (url.hostname === "127.0.0.1" && url.port === "8000"))
   )
 }
 

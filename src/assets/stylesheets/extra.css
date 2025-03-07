@@ -176,6 +176,10 @@ body {
   text-align: left;
 }
 
+.md-source-file__facts {
+  font-size: 0.75rem;
+}
+
 /* Styling for the header and navigation tabs */
 a.md-header__button.md-logo img {
   width: auto;

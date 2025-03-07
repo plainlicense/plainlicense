@@ -9,9 +9,7 @@ export class TimelineManager {
   public timelines: GSAPTimeline[]
   public currentTimeline: GSAPTimeline | null
   public paused: boolean = true
-  get timelinesDuration() {
-    return this.timelines.reduce((acc, timeline) => acc + timeline.duration(), 0)
-  }
+  public timelinesDuration: number = 0
   get currentTimelineIndex() {
     if (!this.currentTimeline) {
       return -1
@@ -37,45 +35,50 @@ export class TimelineManager {
     })
   }
 
-  updateSelf(timeline: GSAPTimeline) {
-    logger.debug("TimelineManager.updateSelf", timeline)
-    this.currentTimeline = timeline
+  onInit() {
+    this.currentTimeline =
+      this.currentTimelineIndex === -1 ? this.timelines[0] : this.wrapper(this.currentTimelineIndex)
     this.paused = false
+    logger.debug("Starting timeline", this.currentTimeline.vars[0])
   }
 
-  onComplete() {
-    logger.debug("TimelineManager.onComplete")
+  onEnd() {
+    logger.debug("TimelineManager.onEnd")
     this.currentTimeline = this.wrapper(this.currentTimelineIndex + 1)
-    this.currentTimeline.play()
-    this.wrapper(this.currentTimelineIndex - 1)
-      .seek(0)
-      .pause()
+    logger.debug("Moving to timeline: ", this.currentTimeline.vars[0])
+    this.currentTimeline.restart().play() // plays the next timeline, restarting if it's already completed
+    this.paused = false
   }
 
   add(timeline: GSAPTimeline) {
     timeline.pause().seek(0)
-    const currentOnStart = timeline.eventCallback("onStart")
-    const currentOnComplete = timeline.eventCallback("onComplete")
-    timeline.eventCallback("onStart", () => {
-      this.updateSelf(timeline)
-      if (currentOnStart) {
-        currentOnStart()
-      }
-    })
-    timeline.eventCallback("onComplete", () => {
-      this.onComplete()
-      if (currentOnComplete) {
-        currentOnComplete()
-      }
-    })
-    this.timelines.push(timeline)
-    if (!this.currentTimeline) {
-      this.currentTimeline = timeline
+    const currentOnStart = timeline["onStart"]
+    const currentOnComplete = timeline["onComplete"]
+    logger.debug("Adding timeline: ", timeline.vars[0])
+    logger.debug("Timeline duration: ", timeline.duration())
+    logger.debug("Timeline total duration: ", this.timelinesDuration)
+    timeline["onComplete"] = () => {
+      currentOnComplete && currentOnComplete()
+      this.onEnd()
+      return timeline
     }
+    timeline["onStart"] = () => {
+      this.onInit()
+      currentOnStart && currentOnStart()
+      return timeline
+    }
+    this.timelines.push(timeline)
+    this.currentTimeline ??= timeline
+    logger.debug("Current timeline set to: ", this.currentTimeline?.vars[0])
+    this.timelinesDuration += timeline.duration()
     return this
   }
 
   restart() {
+    if (this.timelines.length === 0) {
+      logger.warn("No timelines available to restart.")
+      return this
+    }
     this.timelines.forEach((timeline) => {
       timeline.restart().pause()
     })
@@ -85,7 +88,15 @@ export class TimelineManager {
   }
 
   play() {
-    if (this.currentTimeline && !this.isActive()) {
+    if (
+      this.currentTimeline &&
+      !this.isActive() &&
+      this.currentTimeline.duration() !== this.currentTimeline.time()
+    ) {
+      this.currentTimeline.play()
+    } else if (this.currentTimeline?.duration() === this.currentTimeline?.time()) {
+      this.currentTimeline?.seek(0).pause()
+      this.currentTimeline = this.wrapper(this.currentTimelineIndex + 1)
       this.currentTimeline.play()
     } else if (this.timelines.length > 0) {
       this.currentTimeline = this.timelines[0]
@@ -104,7 +115,7 @@ export class TimelineManager {
   }
 
   pause() {
-    if (this.currentTimeline) {
+    if (this.currentTimeline && this.currentTimeline.isActive()) {
       this.currentTimeline.pause()
     }
     this.paused = true
