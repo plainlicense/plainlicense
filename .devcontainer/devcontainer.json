@@ -7,9 +7,14 @@
 	"forwardPorts": [
 		6000,
 		6499,
+		7890,
 		8000,
 		9222
 	],
+	"features": {
+		"ghcr.io/va-h/devcontainers-features/uv:1": {"shellautocompletion": true},
+		"ghcr.io/devcontainers-extra/features/ripgrep:1": {}
+	},
 	"portsAttributes": {
 		"6499": {
 			"label": "Bun debug"
@@ -20,6 +25,11 @@
 			"icon": "firefox",
 			"onAutoForward": "notify",
 			"elevateIfNeeded": true
+		},
+		"7890": {
+			"label": "http proxy",
+			"protocol": "http",
+			"icon": "globe"
 		},
 		"8000": {
 			"label": "MKDocs dev server",

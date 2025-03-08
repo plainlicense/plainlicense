@@ -1,4 +1,4 @@
-
+#!/usr/bin/env zsh
 # Path to your Oh My Zsh installation.
 export ZSH=$HOME/.oh-my-zsh
 zstyle ':omz:update' mode auto      # update automatically without asking
@@ -38,7 +38,7 @@ export LANG=en_US.UTF-8
  fi
 
 export bash_completion="$HOME/.local/share/bash-completion/completions"
-export BUN_INSTALL="/home/vscode/.bun"
+export BUN_INSTALL="$HOME/.bun"
 export RUSTUP_TERM_COLOR=always
 export RUSTUP_TOOLCHAIN=stable-x86_64-unknown-linux-gnu
 alias rgg='rg --no-ignore --trim --pretty --colors "match:fg:white" --colors "path:fg:blue" --smart-case --search-zip --hidden'
@@ -65,7 +65,6 @@ export FILEHANDLER_ENABLED="true"
 export LOG_PATH="$HOME/logs"
 SIGNING_KEY="$(ssh-add -L)"
 export SIGNING_KEY
-updatedb
 source "$HOME/.oh-my-zsh/oh-my-zsh.sh"
 fpath+=$HOME/.zfunc
 setopt extended_glob
@@ -80,7 +79,7 @@ if [ -f "$HOME/.source_zshrc" ]; then
 fi
 
 # fnm
-FNM_PATH="/home/vscode/.local/share/fnm"
+FNM_PATH="$HOME/.local/share/fnm"
 if [ -d "$FNM_PATH" ]; then
   export PATH="$FNM_PATH:$PATH"
   eval "$(fnm env)"
@@ -95,3 +94,8 @@ if [ ! -f "/usr/bin/node" ] && [ ! -L "/usr/bin/node" ] && [ -f "$node_bin" ]; t
 fi
 
 source /workspaces/PlainLicense/.venv/bin/activate
+
+PATH=~/.console-ninja/.bin:$PATH
+
+# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
+[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
