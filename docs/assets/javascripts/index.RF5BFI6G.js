@@ -5367,31 +5367,25 @@ var BACKUP_PICTURE = "break_free";
 var FADE_IN_CONFIG = {
   prefersReducedMotion: {
     from: {
-      autoAlpha: 0,
       duration: 0.75,
       y: 0
     },
     to: {
-      autoAlpha: 1,
       duration: 0.75,
       y: 0
     }
   },
   normal: {
     from: {
-      autoAlpha: 0,
       yPercent: 75
     },
     to: {
-      autoAlpha: 1,
       duration: 0.5,
       yPercent: 0
     }
   },
   defaults: {
-    autoAlpha: 0,
     ease: "power1.inOut",
-    repeat: 0,
     paused: false
   }
 };
@@ -5459,7 +5453,7 @@ var isProd = (url2) => {
   return url2.hostname === "plainlicense.org" && url2.protocol === "https:";
 };
 var isDev = (url2) => {
-  return url2.protocol === "http" && (url2.hostname === "localhost" && url2.port === "8000" || url2.hostname === "127.0.0.1" && url2.port === "8000");
+  return url2.hostname === "localhost" && url2.port === "8000" || url2.hostname === "127.0.0.1" && url2.port === "8000";
 };
 var isOnSite = (url2) => {
   return isProd(url2) || isDev(url2);
@@ -13405,9 +13399,9 @@ var _refresh100vh = function _refresh100vh2() {
   _100vh = !_normalizer2 && _div100vh.offsetHeight || _win4.innerHeight;
   _body3.removeChild(_div100vh);
 };
-var _hideAllMarkers = function _hideAllMarkers2(hide) {
+var _hideAllMarkers = function _hideAllMarkers2(hide2) {
   return _toArray2(".gsap-marker-start, .gsap-marker-end, .gsap-marker-scroller-start, .gsap-marker-scroller-end").forEach(function(el) {
-    return el.style.display = hide ? "none" : "block";
+    return el.style.display = hide2 ? "none" : "block";
   });
 };
 var _refreshAll = function _refreshAll2(force, skipRevert) {
@@ -15235,10 +15229,36 @@ function getContentElements(element) {
   };
   return gsapWithCSS.utils.toArray("*", element).filter((el) => el instanceof Element && el !== element && isValidElement(el, element)).filter((el) => !hasExcludedClass(el) && hasContent(el));
 }
+var hide = (vars = {}) => {
+  return {
+    ...vars,
+    opacity: 0,
+    visibility: "visible",
+    contentVisibility: vars["contentVisibility"] && vars["contentVisibility"] === "visible" ? "visible" : void 0
+  };
+};
+var show = (vars = {}) => {
+  return {
+    ...vars,
+    opacity: 1,
+    visibility: "visible",
+    contentVisibility: vars["contentVisibility"] && vars["contentVisibility"] === "visible" ? "visible" : void 0
+  };
+};
 function wordsToLetterDivs(el) {
   const docFragment = document.createDocumentFragment();
   const innerContainer = document.createElement("div");
   innerContainer.classList.add("hero__letter--container--inner");
+  const wordDiv = () => {
+    const div = document.createElement("div");
+    div.classList.add("hero__letter--word-container");
+    return div;
+  };
+  const letterDiv = () => {
+    const div = document.createElement("div");
+    div.classList.add("hero__letter");
+    return div;
+  };
   let text = "";
   if (Array.isArray(el)) {
     if (el.every((item) => typeof item === "string")) {
@@ -15254,21 +15274,27 @@ function wordsToLetterDivs(el) {
     text = el.innerText;
     gsapWithCSS.set(el, { innerText: "" });
   }
-  const letters = text.trim().split("");
-  letters.forEach((letter, idx) => {
-    if (idx === 0 && (letter === " " || letter === "\n")) {
-      return;
-    } else if (idx === letters.length - 1 && letter === " ") {
+  const words = text.trim().split(" ");
+  words.forEach((word) => {
+    if (word === "" || word === "\n") {
       return;
     }
-    const textNode = document.createTextNode(letter);
-    const newDiv = document.createElement("div");
-    newDiv.appendChild(textNode);
-    newDiv.classList.add("hero__letter");
+    const newDiv = wordDiv();
     innerContainer.appendChild(newDiv);
+    const letters = word.trim().split("");
+    letters.forEach((letter, idx) => {
+      if (idx === 0 && (letter === " " || letter === "\n") || idx === letters.length - 1 && letter === " ") {
+        return;
+      }
+      const textNode = document.createTextNode(letter);
+      const newLetter = letterDiv();
+      newLetter.appendChild(textNode);
+      newDiv.appendChild(newLetter);
+      gsapWithCSS.set(newLetter, hide());
+    });
   });
-  const fragmentDivs = gsapWithCSS.utils.toArray("div", innerContainer);
-  gsapWithCSS.set(fragmentDivs, { display: "inline-block", autoAlpha: 0 });
+  const fragmentDivs = gsapWithCSS.utils.toArray(".hero__letter--word-container", innerContainer);
+  gsapWithCSS.set(fragmentDivs, hide());
   if (el instanceof HTMLElement && el.tagName === "SPAN") {
     el.appendChild(innerContainer);
     docFragment.appendChild(el);
@@ -15301,10 +15327,10 @@ gsapWithCSS.registerEffect({
     const { direction, section } = config6;
     logger.info("setting up section for transition");
     const dFactor = getDFactor(direction);
-    return gsapWithCSS.timeline({ extendTimeline: true, paused: false }).add(gsapWithCSS.set(targets, { zIndex: 0, autoAlpha: 0 })).add(gsapWithCSS.to(section.bg, { yPercent: -15 * dFactor, zIndex: 0, opacity: 0 })).add(gsapWithCSS.set([section.outerWrapper, section.innerWrapper], {
+    return gsapWithCSS.timeline({ extendTimeline: true, paused: false }).add(gsapWithCSS.set(targets, { zIndex: 0, ...hide() })).add(gsapWithCSS.to(section.bg, { yPercent: -15 * dFactor, zIndex: 0, opacity: 0 })).add(gsapWithCSS.set([section.outerWrapper, section.innerWrapper], {
       zIndex: -1,
-      opacity: 1
-    })).add(gsapWithCSS.set(section.content, { autoAlpha: 0, zIndex: 1 }));
+      ...show()
+    })).add(gsapWithCSS.set(section.content, { ...show(), zIndex: 1 }));
   }
 });
 var fade = (targets, config6 = { out: false, direction: 1, fromConfig: {}, toConfig: {} }) => {
@@ -15469,121 +15495,177 @@ gsapWithCSS.registerEffect({
     return emphasisTimeline;
   }
 });
-function animateLogo() {
-  const logoTl = gsapWithCSS.timeline();
+function animateLogo(scope, config6) {
+  const logoTl = gsapWithCSS.timeline({ ...config6.sharedVars, defaults: {} });
   gsapWithCSS.matchMedia().add({ reducedMotion: "(prefers-reduced-motion: reduce)" }, (context4) => {
     const { reducedMotion } = context4.conditions;
     const logoTl2 = gsapWithCSS.timeline({ label: "logo" });
+    const duration = config6.duration || scope.textDuration || 10;
     if (!reducedMotion) {
-      logoTl2.to(this.logo, {
+      logoTl2.set(scope.logo, hide({
+        scale: 0,
+        xPercent: -100,
+        yPercent: 5,
+        z: -1
+      }));
+      logoTl2.to(scope.logo, show({
         scale: 1,
-        duration: 2.5,
+        duration: duration / 1.5,
         yoyo: true,
         repeat: 1,
         ease: "power3.inOut",
-        autoAlpha: 1,
         xPercent: 0,
         yPercent: 0,
-        startAt: { scale: 0, autoAlpha: 0, xPercent: -100, yPercent: 5 }
-      });
+        z: 50
+      }));
     } else {
-      logoTl2.to(this.logo, {
-        autoAlpha: 1,
+      logoTl2.set(scope.logo, hide({
+        scale: 0,
+        xPercent: 0,
+        yPercent: 0,
+        z: -1
+      }));
+      logoTl2.to(scope.logo, show({
         yoyo: true,
         repeat: 1,
         ease: "power1.inOut",
+        duration: duration / 1.5,
         scale: 1,
-        xPercent: 0,
-        startAt: { scale: 0, autoAlpha: 0, yPercent: 0 }
-      });
+        z: 10
+      }));
     }
   });
   return logoTl;
 }
-function animateText(targets, config6) {
+function animateText(scope, targets, config6) {
+  var _a2;
   if (Array.isArray(targets) && targets.length > 1) {
     logger.warn("Multiple targets provided for animateMessage. Only animating the first.");
   }
+  const message = (_a2 = config6.message) != null ? _a2 : scope.message;
   const containerTarget = (targets instanceof Array ? targets[0] : targets) || document.querySelector(".text-animation__container");
-  if (!containerTarget) {
-    logger.error("No target provided for animateMessage.");
+  if (!containerTarget || !message) {
+    logger.error(message ? "No target provided for animateMessage." : "No message provided for animateMessage.");
     return gsapWithCSS.timeline();
   }
-  if (config6.message) {
-    logger.debug("Animating message: ".concat(config6.message));
-    const msgFrag = wordsToLetterDivs(config6.message);
-    const innerContainer = msgFrag.querySelector(".hero__letter--container--inner");
-    if (!innerContainer) {
-      logger.error("No inner container found in message fragment.");
-      return gsapWithCSS.timeline();
+  logger.debug("Animating message: ".concat(message));
+  const msgFrag = wordsToLetterDivs(message);
+  const innerContainer = msgFrag.querySelector(".hero__letter--container--inner");
+  if (!innerContainer || !containerTarget || !msgFrag) {
+    logger.error("Needed element(s) not found for message animation. \n  msgFrag: ".concat(logObject(msgFrag), ", \n  innerContainer: ").concat(logObject(innerContainer), ", \n  containerTarget: ").concat(logObject(containerTarget)));
+    return gsapWithCSS.timeline();
+  }
+  const fragDivs = gsapWithCSS.utils.toArray(".hero__letter--word-container", msgFrag);
+  containerTarget.append(msgFrag);
+  const totalDuration = config6.duration || scope.textDuration || 10;
+  const messageTimeline = gsapWithCSS.timeline({
+    paused: true,
+    repeat: 0,
+    duration: totalDuration,
+    ...config6.sharedVars
+  });
+  logger.debug("Fragdiv count: ".concat(fragDivs.length));
+  const containers = [
+    ...fragDivs,
+    innerContainer,
+    innerContainer.parentElement,
+    containerTarget,
+    containerTarget.parentElement
+  ].flat().reduce((acc, el) => {
+    if (el instanceof Element && !acc.includes(el)) {
+      acc.push(el);
     }
-    const fragDivs = Array.from(innerContainer.children);
-    containerTarget.append(msgFrag);
-    const messageTimeline = gsapWithCSS.timeline({
-      paused: true,
-      repeat: 0,
-      extendTimeline: true,
-      log: true
-    });
-    gsapWithCSS.set(containerTarget, { autoAlpha: 1 });
-    let fromVars = config6.entranceFromVars || {};
-    let toVars = config6.entranceToVars || {};
-    let exitVars = config6.exitVars || {};
-    gsapWithCSS.matchMedia().add({ reducedMotion: "(prefers-reduced-motion: reduce)" }, (context4) => {
-      const { reducedMotion } = context4.conditions;
-      if (reducedMotion) {
-        messageTimeline.timeScale(0.6);
-        fromVars.yPercent = 50;
-        toVars.ease = "power1.inOut";
-        toVars.stagger = { from: "start" };
-        exitVars.yPercent = -50;
-        exitVars.ease = "power1.inOut";
-        exitVars.stagger = { from: "end" };
-      }
-    });
-    messageTimeline.add(gsapWithCSS.set(containerTarget, { contentVisibility: "visible", autoAlpha: 1 })).add(gsapWithCSS.set(innerContainer, { autoAlpha: 1 })).add([
-      "randomEntrance",
-      gsapWithCSS.fromTo(fragDivs, { autoAlpha: 0, yPercent: gsapWithCSS.utils.random(-150, 150, 10), ...fromVars }, {
-        autoAlpha: 1,
-        zIndex: 350,
+    return acc;
+  }, []);
+  logger.debug("Container count: ".concat(containers.length));
+  logObject(containers, "Containers");
+  gsapWithCSS.set(containers, hide({ zIndex: -1 }));
+  if (config6.sharedVars && Object.keys(config6.sharedVars).length) {
+    config6.fromVars = config6.fromVars && Object.keys(config6.fromVars).length ? { ...config6.fromVars, ...config6.sharedVars } : config6.sharedVars;
+    config6.toVars = config6.toVars && Object.keys(config6.toVars).length ? { ...config6.toVars, ...config6.sharedVars } : config6.sharedVars;
+  }
+  let fromVars = config6.fromVars || {};
+  let toVars = config6.toVars || {};
+  gsapWithCSS.matchMedia().add({ reducedMotion: "(prefers-reduced-motion: reduce)" }, (context4) => {
+    const { reducedMotion } = context4.conditions;
+    if (reducedMotion) {
+      messageTimeline.timeScale(0.6);
+      fromVars.yPercent = 50;
+      toVars.ease = "power1.inOut";
+      toVars.stagger = { from: "start" };
+    }
+  });
+  fragDivs.forEach((div) => {
+    if (!div || !(div instanceof HTMLDivElement) || !div.children.length) {
+      return;
+    }
+    gsapWithCSS.set(div, hide());
+    const letters = gsapWithCSS.utils.toArray(".hero__letter", div);
+    gsapWithCSS.set(letters, hide());
+  });
+  return messageTimeline.add(() => logger.debug("Starting text animation timeline effect"), 0).add([
+    "wordAnimation",
+    gsapWithCSS.fromTo(fragDivs, hide({
+      yPercent: function() {
+        return gsapWithCSS.utils.random(-150, 150, 10);
+      },
+      zIndex: 10,
+      ...fromVars
+    }), {
+      onStart: () => {
+        logger.debug("Word animation starting");
+        gsapWithCSS.set([containerTarget, innerContainer], show({
+          display: "flex",
+          zIndex: 10
+        }));
+        fragDivs.forEach((div) => {
+          if (div instanceof HTMLDivElement) {
+            logger.debug("Animating letters in word");
+            gsapWithCSS.set(div, { visibility: "visible", display: "flex" });
+            const letters = gsapWithCSS.utils.toArray(".hero__letter", div);
+            gsapWithCSS.fromTo(letters, hide({
+              yPercent: () => gsapWithCSS.utils.random(-150, 150, 10),
+              ...fromVars
+            }), show({
+              yPercent: 0,
+              stagger: { each: 0.03, from: "random" },
+              duration: totalDuration,
+              ease: "power4.out",
+              repeatDelay: totalDuration / 2.5,
+              zIndex: 50,
+              yoyo: true,
+              repeat: 1,
+              ...toVars
+            }));
+          }
+        });
+      },
+      ...show({
+        stagger: { each: 0.1, from: "start" },
+        zIndex: 15,
         yPercent: 0,
-        contentVisibility: "visible",
-        stagger: { each: 0.03, from: "random" },
-        duration: 1,
+        duration: totalDuration,
+        yoyo: true,
+        repeatDelay: totalDuration / 2.5,
+        repeat: 1,
         ease: "power4.out",
-        z: 1,
         ...toVars
       })
-    ], 0.02).add(animateLogo.bind(this)(), ">").add([
-      "randomExit",
-      gsapWithCSS.to(fragDivs, {
-        autoAlpha: 0,
-        duration: 1,
-        contentVisibility: "hidden",
-        yPercent: gsapWithCSS.utils.random(-150, 150, 10),
-        zIndex: -10,
-        z: 0,
-        stagger: { each: 0.03, from: "random" },
-        onComplete: () => {
-          logger.info("Animation complete for exit effect.");
-        },
-        ...exitVars
-      })
-    ], ">+=4").add(gsapWithCSS.set(innerContainer, { autoAlpha: 0 }));
-    return messageTimeline;
-  } else {
-    logger.info("No message provided for animation.");
-    return gsapWithCSS.timeline();
-  }
+    })
+  ], 0.02).add(animateLogo(scope, config6), "<=2.5").add(() => logger.debug("Finishing text animation"), ">").add(gsapWithCSS.set([containerTarget, innerContainer], hide()), ">");
 }
 gsapWithCSS.registerEffect({
   name: "animateMessage",
   extendTimeline: true,
-  defaults: { extendTimeline: true, repeat: 0, paused: true, log: true },
   paused: true,
-  log: true,
   effect: function(targets, config6) {
-    return animateText.bind(this)(targets, config6);
+    var _a2, _b, _c;
+    const scope = ((_a2 = config6.sharedVars) == null ? void 0 : _a2.callbackScope) || config6.callbackScope || ((_b = config6.sharedVars) == null ? void 0 : _b["defaults"]["callbackScope"]) || ((_c = config6.toVars) == null ? void 0 : _c.callbackScope);
+    if (!config6 || !targets || !scope) {
+      logger.error("No targets or scope provided for animateMessage");
+      return gsapWithCSS.timeline();
+    }
+    return animateText(scope, targets, config6);
   }
 });
 
@@ -16445,7 +16527,13 @@ var TimelineManager = class {
     this.timelinesDuration = 0;
     this.timelines = [];
     this.currentTimeline = null;
-    this.wrapper = gsapWithCSS.utils.wrap(this.timelines);
+    this.wrapper = (number) => {
+      logger.debug("Wrapping timeline with: ", number);
+      const wrapped = gsapWithCSS.utils.wrap(this.timelines, number);
+      logger.debug("Wrapped timeline: ", this.getTimelineName(wrapped));
+      logger.debug("Wrapped timeline index: ", this.timelines.indexOf(wrapped));
+      return wrapped;
+    };
   }
   get currentTimelineIndex() {
     if (!this.currentTimeline) {
@@ -16465,39 +16553,55 @@ var TimelineManager = class {
     });
   }
   onInit() {
+    var _a2;
+    logger.debug("TimelineManager.onInit called for timeline ", this.getTimelineName());
+    logger.debug("Timeline's duration: ", (_a2 = this.currentTimeline) == null ? void 0 : _a2.duration());
     this.currentTimeline = this.currentTimelineIndex === -1 ? this.timelines[0] : this.wrapper(this.currentTimelineIndex);
     this.paused = false;
-    logger.debug("Starting timeline", this.currentTimeline.vars[0]);
+    logger.debug("Starting timeline", this.getTimelineName());
+    if (!this.currentTimeline.isActive()) {
+      this.currentTimeline.play();
+    }
   }
   onEnd() {
-    logger.debug("TimelineManager.onEnd");
-    this.currentTimeline = this.wrapper(this.currentTimelineIndex + 1);
-    logger.debug("Moving to timeline: ", this.currentTimeline.vars[0]);
-    this.currentTimeline.restart().play();
+    var _a2, _b, _c, _d;
+    logger.debug("TimelineManager.onEnd called for timeline ", this.getTimelineName());
+    logger.debug("Timeline ended at time: ", (_a2 = this.currentTimeline) == null ? void 0 : _a2.time());
+    const currentIndex = this.currentTimelineIndex;
+    (_b = this.currentTimeline) == null ? void 0 : _b.restart().pause();
+    this.currentTimeline = this.wrapper(currentIndex + 1);
+    (_c = this.currentTimeline) == null ? void 0 : _c.pause().seek(0);
+    (_d = this.currentTimeline) == null ? void 0 : _d.play();
     this.paused = false;
+    logger.debug("Moving to timeline: ", this.getTimelineName());
   }
   add(timeline2) {
-    var _a2, _b;
+    var _a2;
     timeline2.pause().seek(0);
-    const currentOnStart = timeline2["onStart"];
-    const currentOnComplete = timeline2["onComplete"];
-    logger.debug("Adding timeline: ", timeline2.vars[0]);
+    const currentOnStart = timeline2.eventCallback("onStart");
+    const currentOnComplete = timeline2.eventCallback("onComplete");
+    logger.debug("Adding timeline: ", this.getTimelineName(timeline2));
     logger.debug("Timeline duration: ", timeline2.duration());
     logger.debug("Timeline total duration: ", this.timelinesDuration);
-    timeline2["onComplete"] = () => {
-      currentOnComplete && currentOnComplete();
+    timeline2.eventCallback("onComplete", () => {
+      logger.warn("Timeline ".concat(this.getTimelineName(timeline2), " completed"));
+      if (currentOnComplete) {
+        currentOnComplete.call(timeline2);
+      }
       this.onEnd();
-      return timeline2;
-    };
-    timeline2["onStart"] = () => {
+    });
+    timeline2.eventCallback("onStart", () => {
+      logger.warn("Timeline ".concat(this.getTimelineName(timeline2), " started"));
       this.onInit();
-      currentOnStart && currentOnStart();
-      return timeline2;
-    };
+      if (currentOnStart) {
+        currentOnStart.call(timeline2);
+      }
+    });
     this.timelines.push(timeline2);
     (_a2 = this.currentTimeline) != null ? _a2 : this.currentTimeline = timeline2;
-    logger.debug("Current timeline set to: ", (_b = this.currentTimeline) == null ? void 0 : _b.vars[0]);
+    logger.debug("Current timeline set to: ", this.getTimelineName());
     this.timelinesDuration += timeline2.duration();
+    logObject(timeline2, "Timeline: ".concat(this.getTimelineName()));
     return this;
   }
   restart() {
@@ -16513,15 +16617,22 @@ var TimelineManager = class {
     return this.play();
   }
   play() {
-    var _a2, _b, _c;
-    if (this.currentTimeline && !this.isActive() && this.currentTimeline.duration() !== this.currentTimeline.time()) {
+    if (this.timelines.length === 0) {
+      logger.warn("No timelines to play");
+      return this;
+    }
+    if (this.currentTimeline && Math.abs(this.currentTimeline.duration() - this.currentTimeline.time()) < 0.01) {
+      logger.warn("Current timeline appears complete, moving to next");
+      const currentIndex = this.currentTimelineIndex;
+      this.currentTimeline = this.wrapper(currentIndex + 1);
+      logger.warn("Manually advancing to timeline: ".concat(this.getTimelineName()));
+      this.currentTimeline.restart().play();
+    } else if (this.currentTimeline && !this.isActive()) {
+      logger.warn("Playing timeline: ".concat(this.getTimelineName()));
       this.currentTimeline.play();
-    } else if (((_a2 = this.currentTimeline) == null ? void 0 : _a2.duration()) === ((_b = this.currentTimeline) == null ? void 0 : _b.time())) {
-      (_c = this.currentTimeline) == null ? void 0 : _c.seek(0).pause();
-      this.currentTimeline = this.wrapper(this.currentTimelineIndex + 1);
-      this.currentTimeline.play();
-    } else if (this.timelines.length > 0) {
+    } else if (!this.currentTimeline && this.timelines.length > 0) {
       this.currentTimeline = this.timelines[0];
+      logger.warn("Starting first timeline: ".concat(this.getTimelineName()));
       this.currentTimeline.play();
     }
     this.paused = false;
@@ -16543,20 +16654,25 @@ var TimelineManager = class {
   }
   seek(time) {
     this.getSeekLocation(time);
-    return this.resume();
+    this.resume();
+    return this;
   }
   isActive() {
     var _a2;
     return ((_a2 = this.currentTimeline) == null ? void 0 : _a2.isActive()) || false;
   }
   video() {
-    return this.timelines.find((timeline2) => timeline2.vars[0] === "videoTimeline");
+    return this.timelines.find((timeline2) => this.getTimelineName(timeline2) === "videoTimeline" || timeline2["media"] instanceof HTMLVideoElement);
   }
   text() {
-    return this.timelines.find((timeline2) => timeline2.vars[0] === "textTimeline");
+    return this.timelines.find((timeline2) => this.getTimelineName(timeline2) === "textTimeline");
   }
   getActiveTimeline() {
     return this.currentTimeline;
+  }
+  getTimelineName(timeline2 = this.currentTimeline) {
+    var _a2;
+    return (_a2 = timeline2 == null ? void 0 : timeline2.vars[0]) != null ? _a2 : "not named";
   }
   kill() {
     this.timelines.forEach((timeline2) => {
@@ -16607,7 +16723,7 @@ var VideoManager = class _VideoManager {
       img.width = gsapWithCSS.utils.clamp(48, innerWidth2 * 0.1, innerHeight2 * 0.05);
       img.height = img.width;
       logoContainer.appendChild(img);
-      gsapWithCSS.set(logoContainer, { autoAlpha: 0, scale: 0, yPercent: 5 });
+      gsapWithCSS.set(logoContainer, hide({ scale: 0, yPercent: 5 }));
       logger.debug("Logo created and appended:", img);
       return img;
     })();
@@ -16624,39 +16740,32 @@ var VideoManager = class _VideoManager {
       onStart: () => {
         this.transitionToVideo();
       },
-      repeat: 0,
-      paused: true
-    };
-    this.textDuration = 10;
-    this.textDefaults = {
-      defaults: {
-        paused: true,
-        repeat: 0,
-        callbackScope: this
-      },
-      duration: this.textDuration,
-      paused: true,
-      callbackScope: this,
-      repeat: 0,
-      onStart: () => {
-        logger.debug("Text animation timeline started");
-        this.hasPlayed = true;
-        gsapWithCSS.set(gsapWithCSS.utils.toArray("*", this.container.querySelector(".text-animation__container")), {
-          visibility: "visible"
-        });
-      },
       onComplete: () => {
-        logger.debug("Text animation timeline completed");
-        this.element.currentTime = 0;
-        gsapWithCSS.set(gsapWithCSS.utils.toArray("*", this.container.querySelector(".text-animation__container")), { visibility: "hidden" });
-      }
+        toggleActiveClass(this.element, "hero__video", false);
+      },
+      repeat: 0,
+      duration: 1,
+      paused: true
     };
     this.subscriptions = new Subscription();
     this.message = "";
+    this.textDuration = 10;
+    this.textDefaults = {
+      sharedVars: {
+        callbackScope: this,
+        paused: true
+      },
+      duration: this.textDuration,
+      toVars: {},
+      fromVars: {}
+    };
+    var _a2;
     this.store = HeroStore.getInstance();
-    logger.info("Initializing VideoManager");
-    this.videoStore = getHeroVideos();
-    this.initSubscriptions();
+    (_a2 = this.videoStore) != null ? _a2 : this.videoStore = getHeroVideos();
+    if (!_VideoManager.instance || !this.initialized) {
+      logger.info("Initializing VideoManager");
+      this.initSubscriptions();
+    }
   }
   get videoDuration() {
     var _a2;
@@ -16793,6 +16902,7 @@ var VideoManager = class _VideoManager {
     }));
   }
   initVideo() {
+    var _a2;
     if (this.videoStore.length === 0) {
       this.initiateFallback();
       throw new Error("No videos found");
@@ -16804,11 +16914,12 @@ var VideoManager = class _VideoManager {
       this.video = new VideoElement(randomized[0]);
       this.backupPicture = new VideoElement(randomized.find((hero) => hero.baseName === BACKUP_PICTURE) || randomized[1]).picture;
     }
+    this.message = ((_a2 = this.video) == null ? void 0 : _a2.message) || "";
+    this.textDefaults["message"] = this.message;
     const promises = [];
     if (this.video) {
       this.element = this.video.video;
       this.poster = this.video.picture;
-      this.message = this.video.message;
       if (!this.container.getElementsByTagName("video").length) {
         this.container.append(this.element);
       }
@@ -16818,15 +16929,11 @@ var VideoManager = class _VideoManager {
       this.backupPicture.classList.replace("hero__poster", "hero__backup");
       this.backupPicture.classList.replace("hero__poster--active", "hero__backup--inactive");
       this.container.append(this.backupPicture);
-      gsapWithCSS.set(this.container, { visibility: "visible", contentVisibility: "visible" });
-      gsapWithCSS.set(this.parentContainer, {
-        visibility: "visible",
-        opacity: 1,
-        contentVisibility: "visible"
-      });
+      gsapWithCSS.set([this.container, this.parentContainer], show());
       promises.push(new Promise(() => this.loadSequence()));
     }
-    promises.push(new Promise(() => this.buildMasterTimeline()));
+    promises.push(new Promise(() => this.mediaTimeline()));
+    promises.push(new Promise(() => this.buildTextTimeline()));
     promises.push(new Promise(() => {
       this.initialized = true;
       this.debugDump();
@@ -16848,16 +16955,12 @@ var VideoManager = class _VideoManager {
       return;
     }
     document$2.subscribe(() => {
-      gsapWithCSS.set(this.element, { autoAlpha: 0 });
+      gsapWithCSS.set(this.element, hide());
       this.container.append(this.element);
       Promise.resolve(this.element.load()).then(() => {
         if (this.canPlay) {
-          gsapWithCSS.set(this.element, { opacity: 1, visibility: "visible" });
-          gsapWithCSS.set(this.container, {
-            opacity: 1,
-            visibility: "visible",
-            contentVisibility: "visible"
-          });
+          gsapWithCSS.set(this.element, show());
+          gsapWithCSS.set(this.container, show());
           this.handleCanPlay();
         }
         logger.info("Video element loaded");
@@ -16887,12 +16990,12 @@ var VideoManager = class _VideoManager {
         this.container.append(this.poster);
       });
     }
-    gsapWithCSS.set(this.poster, { autoAlpha: 0 });
+    gsapWithCSS.set(this.poster, hide());
     this.exchangePosters(this.poster, this.backupPicture);
     const img = this.poster.querySelector("img");
     const transition = () => {
-      gsapWithCSS.to(this.poster, { autoAlpha: 1, duration: 0.5 });
-      gsapWithCSS.to(this.container, { autoAlpha: 1, contentVisibility: "visible" });
+      gsapWithCSS.to(this.poster, { ...show(), duration: 0.5 });
+      gsapWithCSS.to(this.container, show());
     };
     if (img && img instanceof HTMLImageElement) {
       if (img.complete) {
@@ -16928,38 +17031,34 @@ var VideoManager = class _VideoManager {
   }
   /*================== Animations =================*/
   animateText(overrideVars = {}) {
-    const tl = gsapWithCSS.timeline(this.textDefaults);
-    return tl.call(() => {
-      tl.timeScale(this.timeScale * this.videoDuration);
-      logger.info("Text animation started");
-    }, [], 0).set(".text-animation__container", { autoAlpha: 1 })["animateMessage"](".text-animation__container", {
+    const tl = gsapWithCSS.timeline(this.textDefaults.sharedVars);
+    return tl.set(".text-animation__container", show())["animateMessage"](".text-animation__container", {
       message: this.message,
-      repeat: 0,
-      duration: 7,
-      callbackScope: this,
-      extendTimeline: true,
-      entranceToVars: {
-        stagger: { each: 0.08 },
-        duration: 2,
-        ease: "power2.out"
-      },
-      exitVars: { duration: 2 },
       ...overrideVars
-    }).call(function() {
-      logger.info("Text animation completed");
-      logger.debug("text timeline vars, duration: ".concat(tl.duration(), ", exitVars duration: ").concat(tl["exitVars"].duration));
-    }, [tl], ">");
-  }
-  buildMasterTimeline() {
-    this.timelineManager.add(this.mediaTimeline()).add(this.buildTextTimeline());
+    });
   }
   buildTextTimeline() {
-    return gsapWithCSS.timeline(["textTimeline", this.textDefaults]).add(this.animateText(), 0).add(gsapWithCSS.to(".cta__container h1", {
-      autoAlpha: 1,
+    const textTimeline = gsapWithCSS.timeline([
+      "textTimeline",
+      {
+        ...this.textDefaults.sharedVars,
+        onStart: () => {
+          logger.debug("Text animation timeline started");
+          this.hasPlayed = true;
+        },
+        onComplete: () => {
+          logger.debug("Text animation timeline completed");
+          this.element.currentTime = 0;
+        }
+      }
+    ]).timeScale(1).add(this.animateText(this.textDefaults), 0).add(gsapWithCSS.to(this.ctaContainer, { ...show, duration: 0.5 })).add(gsapWithCSS.to(".cta__container h1", {
+      ...show(),
       duration: 0.5
-    }), ">").add(gsapWithCSS.to(".cta__container h2", { autoAlpha: 1, duration: 0.5 }), ">").add(() => {
+    }), ">").add(gsapWithCSS.to(".cta__container h2", { opacity: void 0, visibility: void 0, duration: 0.5 }), ">").add(() => {
       logger.info("Text timeline completed");
+      logger.debug("Setting up for next cycle");
     });
+    this.timelineManager.add(textTimeline);
   }
   setEmphasisAnimations() {
     const { subtle, strong } = OBSERVER_CONFIG.emphasisTargets;
@@ -16997,11 +17096,11 @@ var VideoManager = class _VideoManager {
     if (this.onFallback) {
       return;
     }
-    gsapWithCSS.to(revert ? this.element : this.poster, { autoAlpha: 0, duration: 0.5 });
-    gsapWithCSS.to(revert ? this.poster : this.element, { autoAlpha: 1, duration: 0.5 });
-    gsapWithCSS.set(this.container, { autoAlpha: 1, contentVisibility: "visible" });
-    gsapWithCSS.set(revert ? this.element : this.poster, { autoAlpha: 0 });
-    gsapWithCSS.set(revert ? this.poster : this.element, { autoAlpha: 1 });
+    gsapWithCSS.to(revert ? this.element : this.poster, { ...hide(), duration: 0.5 });
+    gsapWithCSS.to(revert ? this.poster : this.element, { ...show(), duration: 0.5 });
+    gsapWithCSS.set(this.container, { contentVisibility: "visible" });
+    gsapWithCSS.set(revert ? this.element : this.poster, hide());
+    gsapWithCSS.set(revert ? this.poster : this.element, show());
     toggleActiveClass(this.element, "hero__video", !revert);
     toggleActiveClass(this.poster, "hero__poster", revert);
   }
@@ -17010,34 +17109,34 @@ var VideoManager = class _VideoManager {
    * This allows for animations to be timed with the media playback.
    * *slightly modified from https://gsap.com/community/forums/topic/22234-control-video-html-tag/#comment-187059 thanks Jack!*
    * @param config - GSAP timeline configuration.
-   * @returns A GSAP timeline instance linked to the media element.
    */
   mediaTimeline() {
     const config6 = this.vidDefaults;
+    const existingOnStart = config6.onStart;
+    const existingOnComplete = config6.onComplete;
     let duration = this.videoDuration, existingOnUpdate = config6 && config6.onUpdate, tl = gsapWithCSS.timeline([
       "videoTimeline",
       {
+        ...config6,
+        duration: 1,
         onStart: () => {
-          this.transitionToVideo();
+          existingOnStart && existingOnStart();
           updateDuration();
-          this.element.style.visibility = "visible";
-          this.element.style.opacity = "1";
           gsapWithCSS.set([this.element, this.container, this.ctaContainer], {
-            autoAlpha: 1,
-            visibility: "visible",
+            ...show(),
             duration: 0.3
           });
-          gsapWithCSS.set(".cta_container h1", { autoAlpha: 1, duration: 0.5 });
-          gsapWithCSS.set(".cta_container h2", { autoAlpha: 1, duration: 0.5 });
+          gsapWithCSS.set(".cta_container h1", { ...show(), duration: 0.5 });
+          gsapWithCSS.set(".cta_container h2", { ...show(), duration: 0.5 });
           if (!this.isPlaying()) {
             this.foulPlay();
             tl.seek(this.videoDuration ? this.element.currentTime : 0, true);
           }
         },
         onComplete: () => {
+          existingOnComplete && existingOnComplete();
           gsapWithCSS.set(this.ctaContainer, {
-            autoAlpha: 0,
-            visibility: "hidden",
+            ...hide(),
             duration: 0.5
           });
           toggleActiveClass(this.element, "hero__video", false);
@@ -17089,16 +17188,20 @@ var VideoManager = class _VideoManager {
       }
     };
     this.element.onended = () => {
-      gsapWithCSS.set([this.element, this.ctaContainer], { autoAlpha: 0, visibility: "hidden" });
-      if (tl.isActive()) {
-        tl.restart().pause();
+      logger.info("Video ended event triggered");
+      toggleActiveClass(this.element, "hero__video", false);
+      gsapWithCSS.to(this.ctaContainer, { ...hide(), duration: 0.5 });
+      logger.info("Video ended event detected");
+      logger.debug("Video ended at ".concat(this.element.currentTime, " \n Video duration: ").concat(this.videoDuration, " \n Timeline time: ").concat(tl.time(), " \n Timeline duration: ").concat(tl.duration(), " \n Timeline progress: ").concat(tl.progress(), " \n Timeline paused: ").concat(tl.paused(), " \n Timeline isActive: ").concat(tl.isActive()));
+      if (tl && tl.progress() !== 1) {
+        tl.progress(1, true).eventCallback("onComplete")();
       }
     };
     this.element.onplaying = () => {
       if (!tl.isActive()) {
         tl.play();
       }
-      gsapWithCSS.to(this.element, { autoAlpha: 1, visibility: "visible", duration: 0.5 });
+      gsapWithCSS.to(this.element, { ...show(), duration: 0.5 });
     };
     this.element.onloadedmetadata = () => {
       updateDuration();
@@ -17119,16 +17222,17 @@ var VideoManager = class _VideoManager {
       return tl;
     };
     tl.play = function() {
+      var _a2;
       tl["foulPlay"]();
       play.apply(tl, Array.from(arguments).slice(0, 2));
       if (arguments.length) {
-        tl["media"].currentTime = arguments[0];
+        tl["media"].currentTime = (_a2 = arguments[0]) != null ? _a2 : 0;
       }
       return tl;
     };
     tl.restart = function() {
       restart.apply(tl, Array.from(arguments).slice(0, 2));
-      tl["media"].fastSeek(0);
+      tl["media"].currentTime = 0;
       tl.time(0, true);
       return tl;
     };
@@ -17139,7 +17243,7 @@ var VideoManager = class _VideoManager {
       return tl;
     };
     tl.timeScale(this.timeScale);
-    return tl;
+    this.timelineManager.add(tl);
   }
   /*=============================================*/
   /* Error handling and tear down */
@@ -17202,7 +17306,7 @@ var VideoManager = class _VideoManager {
       }
     }
     logger.debug("Playing video");
-    gsapWithCSS.set(this.element, { autoAlpha: 1, visibility: "visible" });
+    gsapWithCSS.set(this.element, show());
     this.setVideoDimensionVars();
     document.removeEventListener("click", this.addPlayOnInteraction);
     document.removeEventListener("touchstart", this.addPlayOnInteraction);
@@ -17289,7 +17393,7 @@ var VideoManager = class _VideoManager {
         this.exchangePosters(this.backupPicture, this.poster);
       });
     }
-    gsapWithCSS.to(this.backupPicture, { autoAlpha: 1, duration: 1 });
+    gsapWithCSS.to(this.backupPicture, { ...show(), duration: 1 });
     logger.info("Backup loaded and set to visible:", this.backupPicture);
   }
   initiateFallback() {
@@ -17298,12 +17402,12 @@ var VideoManager = class _VideoManager {
     }
     this.loadBackup();
     const newTl = gsapWithCSS.timeline({ paused: false, defaults: { repeat: 0 } });
-    newTl.add(["fallback", gsapWithCSS.set(this.element, { autoAlpha: 0, duration: 0.5 })], 0).call(() => {
+    newTl.add(["fallback", gsapWithCSS.set(this.element, { ...hide(), duration: 0.5 })], 0).call(() => {
       toggleActiveClass(this.element, "hero__video", false);
       if (elementInDom(this.element)) {
         this.container.removeChild(this.element);
       }
-    }).set(this.container, { autoAlpha: 1 }).set(this.ctaContainer, { autoAlpha: 1 }).to(this.backupPicture, { autoAlpha: 1, duration: 1 });
+    }).set(this.container, show()).set(this.ctaContainer, show()).to(this.backupPicture, { ...show(), duration: 1 });
     newTl.add(this.setEmphasisAnimations());
     this.timelineManager.kill();
     newTl.play();
@@ -17316,14 +17420,29 @@ var VideoManager = class _VideoManager {
     _VideoManager.getInstance();
   }
   handlePlay() {
+    var _a2, _b;
     if (this.onFallback) {
       logger.debug("On fallback. Cannot play.");
       return;
     }
     if (this.timelineManager.isActive()) {
       return;
+    } else if (this.isPlaying()) {
+      this.timelineManager.resume();
+      return;
+    } else if (this.timelineManager.currentTimeline && this.timelineManager.currentTimeline["media"]) {
+      try {
+        if (this.timelineManager.currentTimeline["media"].ended && !((_b = (_a2 = this.timelineManager) == null ? void 0 : _a2.text()) == null ? void 0 : _b.isActive())) {
+          this.element.currentTime = 0;
+          this.timelineManager.restart().play();
+        }
+      } catch (error) {
+        logger.error("Error handling video play: ", error);
+      }
     }
-    this.timelineManager.play();
+    if (!this.timelineManager.isActive()) {
+      this.timelineManager.play();
+    }
     logger.info("Video playback started.");
   }
   debugDump() {
@@ -17898,4 +18017,4 @@ gsap/ScrollTrigger.js:
    * @author: Jack Doyle, jack@greensock.com
   *)
 */
-//# sourceMappingURL=index.BGXMJEUA.js.map
+//# sourceMappingURL=index.RF5BFI6G.js.map

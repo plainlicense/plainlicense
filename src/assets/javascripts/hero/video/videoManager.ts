@@ -31,6 +31,8 @@ import {
 } from "~/config"
 import { HeroStore, VideoState } from "~/state"
 import { elementInDom, logger, parsePath, prefersReducedMotion$, setCssVariable } from "~/utils"
+import { AnimateMessageConfig } from "../animations"
+import { hide, show } from "../animations/utils"
 import { plainLogo } from "./data"
 import { TimelineManager } from "./timelineManager"
 import {
@@ -118,7 +120,7 @@ export class VideoManager {
     img.width = gsap.utils.clamp(48, innerWidth * 0.1, innerHeight * 0.05)
     img.height = img.width
     logoContainer.appendChild(img)
-    gsap.set(logoContainer, { autoAlpha: 0, scale: 0, yPercent: 5 })
+    gsap.set(logoContainer, hide({ scale: 0, yPercent: 5 }))
     logger.debug("Logo created and appended:", img)
     return img
   })()
@@ -144,7 +146,6 @@ export class VideoManager {
 
   public timelineManager: TimelineManager = new TimelineManager()
 
-
   private failCount: number = 0
 
   private vidDefaults: gsap.TimelineVars = {
@@ -152,41 +153,12 @@ export class VideoManager {
     onStart: () => {
       this.transitionToVideo()
     },
-    repeat: 0,
-    paused: true,
-  }
-
-  private textDuration: number = 10
-
-  private textDefaults: gsap.TimelineVars = {
-    defaults: {
-      paused: true,
-      repeat: 0,
-      callbackScope: this,
-    },
-    duration: this.textDuration,
-    paused: true,
-    callbackScope: this,
-    repeat: 0,
-    onStart: () => {
-      logger.debug("Text animation timeline started")
-      this.hasPlayed = true
-      gsap.set(
-        gsap.utils.toArray("*", this.container.querySelector(".text-animation__container")),
-        {
-          visibility: "visible",
-        },
-      )
-    },
     onComplete: () => {
-      logger.debug("Text animation timeline completed")
-      // Prepare the video for the next cycle
-      this.element.currentTime = 0
-      gsap.set(
-        gsap.utils.toArray("*", this.container.querySelector(".text-animation__container")),
-        { visibility: "hidden" },
-      )
+      toggleActiveClass(this.element, "hero__video", false)
     },
+    repeat: 0,
+    duration: 1,
+    paused: true,
   }
 
   private subscriptions: Subscription = new Subscription()
@@ -195,6 +167,18 @@ export class VideoManager {
   private backupPicture: HTMLPictureElement
 
   public message: string = ""
+
+  public textDuration: number = 10
+
+  private textDefaults: AnimateMessageConfig = {
+    sharedVars: {
+      callbackScope: this,
+      paused: true,
+    },
+    duration: this.textDuration,
+    toVars: {},
+    fromVars: {},
+  }
 
   /**
    * @method initSubscriptions
@@ -395,9 +379,11 @@ export class VideoManager {
   }
   private constructor() {
     this.store = HeroStore.getInstance()
-    logger.info("Initializing VideoManager")
-    this.videoStore = getHeroVideos()
-    this.initSubscriptions()
+    this.videoStore ??= getHeroVideos()
+    if (!VideoManager.instance || !this.initialized) {
+      logger.info("Initializing VideoManager")
+      this.initSubscriptions()
+    }
   }
 
   private initVideo(): void {
@@ -415,11 +401,13 @@ export class VideoManager {
         randomized.find((hero) => hero.baseName === BACKUP_PICTURE) || randomized[1],
       ).picture
     }
+
+    this.message = this.video?.message || ""
+    this.textDefaults["message"] = this.message
     const promises = []
     if (this.video) {
       this.element = this.video.video
       this.poster = this.video.picture
-      this.message = this.video.message
       if (!this.container.getElementsByTagName("video").length) {
         this.container.append(this.element)
       }
@@ -429,15 +417,11 @@ export class VideoManager {
       this.backupPicture.classList.replace("hero__poster", "hero__backup")
       this.backupPicture.classList.replace("hero__poster--active", "hero__backup--inactive")
       this.container.append(this.backupPicture)
-      gsap.set(this.container, { visibility: "visible", contentVisibility: "visible" })
-      gsap.set(this.parentContainer, {
-        visibility: "visible",
-        opacity: 1,
-        contentVisibility: "visible",
-      })
+      gsap.set([this.container, this.parentContainer], show())
       promises.push(new Promise(() => this.loadSequence()))
     }
-    promises.push(new Promise(() => this.buildMasterTimeline()))
+    promises.push(new Promise(() => this.mediaTimeline()))
+    promises.push(new Promise(() => this.buildTextTimeline()))
     promises.push(
       new Promise(() => {
         this.initialized = true
@@ -462,17 +446,13 @@ export class VideoManager {
       return
     }
     document$.subscribe(() => {
-      gsap.set(this.element, { autoAlpha: 0 })
+      gsap.set(this.element, hide())
       this.container.append(this.element)
       Promise.resolve(this.element.load())
         .then(() => {
           if (this.canPlay) {
-            gsap.set(this.element, { opacity: 1, visibility: "visible" })
-            gsap.set(this.container, {
-              opacity: 1,
-              visibility: "visible",
-              contentVisibility: "visible",
-            })
+            gsap.set(this.element, show())
+            gsap.set(this.container, show())
             this.handleCanPlay()
           }
           logger.info("Video element loaded")
@@ -505,12 +485,12 @@ export class VideoManager {
         this.container.append(this.poster)
       })
     }
-    gsap.set(this.poster, { autoAlpha: 0 })
+    gsap.set(this.poster, hide())
     this.exchangePosters(this.poster, this.backupPicture)
     const img = this.poster.querySelector("img")
     const transition = () => {
-      gsap.to(this.poster, { autoAlpha: 1, duration: 0.5 })
-      gsap.to(this.container, { autoAlpha: 1, contentVisibility: "visible" })
+      gsap.to(this.poster, { ...show(), duration: 0.5 })
+      gsap.to(this.container, show())
     }
     if (img && img instanceof HTMLImageElement) {
       if (img.complete) {
@@ -558,63 +538,52 @@ export class VideoManager {
 
   /*================== Animations =================*/
 
-  private animateText(overrideVars: gsap.TweenVars = {}): GSAPTimeline {
-    const tl = gsap.timeline(this.textDefaults)
+  private animateText(overrideVars: AnimateMessageConfig = {}): GSAPTimeline {
+    const tl = gsap.timeline(this.textDefaults.sharedVars as gsap.TimelineVars)
     return tl
-      .call(
-        () => {
-          tl.timeScale(this.timeScale * this.videoDuration)
-          logger.info("Text animation started")
-        },
-        [],
-        0,
-      )
-      .set(".text-animation__container", { autoAlpha: 1 })
+      .set(".text-animation__container", show())
       ["animateMessage"](".text-animation__container", {
         message: this.message,
-        repeat: 0,
-        duration: 7,
-        callbackScope: this,
-        extendTimeline: true,
-        entranceToVars: {
-          stagger: { each: 0.08 },
-          duration: 2,
-          ease: "power2.out",
-        },
-        exitVars: { duration: 2 },
         ...overrideVars,
       })
-      .call(
-        function () {
-          logger.info("Text animation completed")
-          logger.debug(
-            `text timeline vars, duration: ${tl.duration()}, exitVars duration: ${tl["exitVars"].duration}`,
-          )
+  }
+
+  private buildTextTimeline() {
+    const textTimeline = gsap
+      .timeline([
+        "textTimeline",
+        {
+          ...this.textDefaults.sharedVars,
+          onStart: () => {
+            logger.debug("Text animation timeline started")
+            this.hasPlayed = true
+          },
+          onComplete: () => {
+            logger.debug("Text animation timeline completed")
+            // Prepare the video for the next cycle
+            this.element.currentTime = 0
+          },
         },
-        [tl],
-        ">",
-      )
-  }
-
-  private buildMasterTimeline(): void {
-    this.timelineManager.add(this.mediaTimeline()).add(this.buildTextTimeline())
-  }
-
-  private buildTextTimeline(): GSAPTimeline {
-    return gsap
-      .timeline(["textTimeline", this.textDefaults])
-      .add(this.animateText(), 0)
+      ])
+      .timeScale(1)
+      .add(this.animateText(this.textDefaults), 0)
+      .add(gsap.to(this.ctaContainer, { ...show, duration: 0.5 }))
       .add(
         gsap.to(".cta__container h1", {
-          autoAlpha: 1,
+          ...show(),
           duration: 0.5,
         }),
         ">",
       )
-      .add(gsap.to(".cta__container h2", { autoAlpha: 1, duration: 0.5 }), ">")
+      .add(
+        gsap.to(".cta__container h2", { opacity: undefined, visibility: undefined, duration: 0.5 }),
+        ">",
+      )
       .add(() => {
         logger.info("Text timeline completed")
+        logger.debug("Setting up for next cycle")
       })
+    this.timelineManager.add(textTimeline)
   }
 
   private setEmphasisAnimations(): GSAPTimeline {
@@ -661,11 +630,11 @@ export class VideoManager {
     if (this.onFallback) {
       return
     }
-    gsap.to(revert ? this.element : this.poster, { autoAlpha: 0, duration: 0.5 })
-    gsap.to(revert ? this.poster : this.element, { autoAlpha: 1, duration: 0.5 })
-    gsap.set(this.container, { autoAlpha: 1, contentVisibility: "visible" })
-    gsap.set(revert ? this.element : this.poster, { autoAlpha: 0 })
-    gsap.set(revert ? this.poster : this.element, { autoAlpha: 1 })
+    gsap.to(revert ? this.element : this.poster, { ...hide(), duration: 0.5 })
+    gsap.to(revert ? this.poster : this.element, { ...show(), duration: 0.5 })
+    gsap.set(this.container, { contentVisibility: "visible" })
+    gsap.set(revert ? this.element : this.poster, hide())
+    gsap.set(revert ? this.poster : this.element, show())
     toggleActiveClass(this.element, "hero__video", !revert)
     toggleActiveClass(this.poster, "hero__poster", revert)
   }
@@ -675,36 +644,36 @@ export class VideoManager {
    * This allows for animations to be timed with the media playback.
    * *slightly modified from https://gsap.com/community/forums/topic/22234-control-video-html-tag/#comment-187059 thanks Jack!*
    * @param config - GSAP timeline configuration.
-   * @returns A GSAP timeline instance linked to the media element.
    */
-  private mediaTimeline(): GSAPTimeline {
+  private mediaTimeline() {
     const config = this.vidDefaults
+    const existingOnStart = config.onStart
+    const existingOnComplete = config.onComplete
     let duration = this.videoDuration,
       existingOnUpdate = config && config.onUpdate,
       tl = gsap.timeline([
         "videoTimeline",
         {
+          ...config,
+          duration: 1,
           onStart: () => {
-            this.transitionToVideo()
+            existingOnStart && existingOnStart()
             updateDuration()
-            this.element.style.visibility = "visible"
-            this.element.style.opacity = "1"
             gsap.set([this.element, this.container, this.ctaContainer], {
-              autoAlpha: 1,
-              visibility: "visible",
+              ...show(),
               duration: 0.3,
             })
-            gsap.set(".cta_container h1", { autoAlpha: 1, duration: 0.5 })
-            gsap.set(".cta_container h2", { autoAlpha: 1, duration: 0.5 })
+            gsap.set(".cta_container h1", { ...show(), duration: 0.5 })
+            gsap.set(".cta_container h2", { ...show(), duration: 0.5 }) // Update h2 with show()
             if (!this.isPlaying()) {
               this.foulPlay()
               tl.seek(this.videoDuration ? this.element.currentTime : 0, true)
             }
           },
           onComplete: () => {
+            existingOnComplete && existingOnComplete()
             gsap.set(this.ctaContainer, {
-              autoAlpha: 0,
-              visibility: "hidden",
+              ...hide(),
               duration: 0.5,
             })
             toggleActiveClass(this.element, "hero__video", false)
@@ -761,16 +730,25 @@ export class VideoManager {
       }
     }
     this.element.onended = () => {
-      gsap.set([this.element, this.ctaContainer], { autoAlpha: 0, visibility: "hidden" })
-      if (tl.isActive()) {
-        tl.restart().pause()
+      logger.info("Video ended event triggered")
+      toggleActiveClass(this.element, "hero__video", false)
+      gsap.to(this.ctaContainer, { ...hide(), duration: 0.5 })
+      logger.info("Video ended event detected")
+      logger.debug(
+        `Video ended at ${this.element.currentTime} \n Video duration: ${this.videoDuration} \n Timeline time: ${tl.time()} \n Timeline duration: ${tl.duration()} \n Timeline progress: ${tl.progress()} \n Timeline paused: ${tl.paused()} \n Timeline isActive: ${tl.isActive()}`,
+      )
+
+      // Add this to properly signal completion to the timeline when video ends
+      if (tl && tl.progress() !== 1) {
+        // Force the timeline to complete
+        tl.progress(1, true).eventCallback("onComplete")()
       }
     }
     this.element.onplaying = () => {
       if (!tl.isActive()) {
         tl.play()
       }
-      gsap.to(this.element, { autoAlpha: 1, visibility: "visible", duration: 0.5 })
+      gsap.to(this.element, { ...show(), duration: 0.5 })
     }
     this.element.onloadedmetadata = () => {
       updateDuration()
@@ -794,13 +772,13 @@ export class VideoManager {
       tl["foulPlay"]()
       play.apply(tl, Array.from(arguments).slice(0, 2) as TimelinePlayResumeArgs)
       if (arguments.length) {
-        tl["media"].currentTime = arguments[0] as number
+        tl["media"].currentTime = (arguments[0] ?? 0) as number
       }
       return tl
     }
     tl.restart = function () {
       restart.apply(tl, Array.from(arguments).slice(0, 2) as TimelineRestartArgs)
-      tl["media"].fastSeek(0)
+      tl["media"].currentTime = 0
       tl.time(0, true)
       return tl
     }
@@ -811,7 +789,7 @@ export class VideoManager {
       return tl
     }
     tl.timeScale(this.timeScale)
-    return tl
+    this.timelineManager.add(tl)
   }
 
   /*=============================================*/
@@ -880,7 +858,7 @@ export class VideoManager {
       }
     }
     logger.debug("Playing video")
-    gsap.set(this.element, { autoAlpha: 1, visibility: "visible" })
+    gsap.set(this.element, show())
     this.setVideoDimensionVars()
     document.removeEventListener("click", this.addPlayOnInteraction)
     document.removeEventListener("touchstart", this.addPlayOnInteraction)
@@ -982,7 +960,7 @@ export class VideoManager {
         this.exchangePosters(this.backupPicture, this.poster)
       })
     }
-    gsap.to(this.backupPicture, { autoAlpha: 1, duration: 1 })
+    gsap.to(this.backupPicture, { ...show(), duration: 1 })
 
     logger.info("Backup loaded and set to visible:", this.backupPicture)
   }
@@ -994,16 +972,16 @@ export class VideoManager {
     this.loadBackup()
     const newTl = gsap.timeline({ paused: false, defaults: { repeat: 0 } })
     newTl
-      .add(["fallback", gsap.set(this.element, { autoAlpha: 0, duration: 0.5 })], 0)
+      .add(["fallback", gsap.set(this.element, { ...hide(), duration: 0.5 })], 0)
       .call(() => {
         toggleActiveClass(this.element, "hero__video", false)
         if (elementInDom(this.element)) {
           this.container.removeChild(this.element)
         }
       })
-      .set(this.container, { autoAlpha: 1 })
-      .set(this.ctaContainer, { autoAlpha: 1 })
-      .to(this.backupPicture, { autoAlpha: 1, duration: 1 })
+      .set(this.container, show())
+      .set(gsap.utils.toArray("*", this.ctaContainer), show())
+      .to(this.backupPicture, { ...show(), duration: 1 })
     newTl.add(this.setEmphasisAnimations())
     this.timelineManager.kill()
     newTl.play()
@@ -1024,8 +1002,28 @@ export class VideoManager {
     }
     if (this.timelineManager.isActive()) {
       return
+    } else if (this.isPlaying()) {
+      this.timelineManager.resume()
+      return
+    } else if (
+      this.timelineManager.currentTimeline &&
+      this.timelineManager.currentTimeline["media"]
+    ) {
+      try {
+        if (
+          this.timelineManager.currentTimeline["media"].ended &&
+          !this.timelineManager?.text()?.isActive()
+        ) {
+          this.element.currentTime = 0
+          this.timelineManager.restart().play()
+        }
+      } catch (error) {
+        logger.error("Error handling video play: ", error)
+      }
     }
-    this.timelineManager.play()
+    if (!this.timelineManager.isActive()) {
+      this.timelineManager.play()
+    }
     logger.info("Video playback started.")
   }
 

@@ -82,7 +82,7 @@ fi
 FNM_PATH="$HOME/.local/share/fnm"
 if [ -d "$FNM_PATH" ]; then
   export PATH="$FNM_PATH:$PATH"
-  eval "$(fnm env)"
+  eval "$(fnm env --use-on-cd --version-file-strategy=rescursive)"
 fi
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.

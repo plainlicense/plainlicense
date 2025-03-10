@@ -4,6 +4,7 @@
 LOG_FILE="$HOME/container_setup.log"
 ERROR_LOG="$HOME/container_setup_errors.log"
 NODE_VERSION="22"
+BACKUP_NODE_VERSION="v22.14.0"
 
 # Create log function
 log() {
@@ -153,29 +154,8 @@ initial_installs() {
     log "Installing fnm"
     run_cmd "curl -fsSL https://fnm.vercel.app/install | bash" "Installing fnm" "false" 3 &&
 
-        # Install Node.js directly as fallback if fnm fails
-        re_source
-    local FNM_PATH="$HOME/.local/share/fnm"
-    if [ -d "$FNM_PATH" ]; then
-        export PATH="$FNM_PATH:$PATH"
-        export FNM_DIR="$FNM_PATH"
-        log "fnm is successfully installed, setting Node.js version"
-        run_cmd "$FNM_PATH/fnm install $NODE_VERSION" "Installing Node.js via fnm" "false" 3 &&
-        run_cmd "$FNM_PATH/fnm use $NODE_VERSION" "Setting Node.js version to $NODE_VERSION" "false" 3
-    else
-        error_log "fnm not found at $FNM_PATH/fnm, proceeding with Node.js installation"
-        log "fnm not installed successfully, trying alternative Node.js installation"
-        run_cmd "curl -fsSL https://deb.nodesource.com/setup_$NODE_VERSION.x | sudo -E bash -" "Adding NodeSource repository" "false" 3 ||
-            run_cmd "sudo apt-get install -y nodejs" "Installing Node.js via apt" "false" 3 &&
-            log "Node.js installation completed via apt"
-    fi
-
-    if command -v node >/dev/null 2>&1; then
-        log "Node.js installation verified"
-        node --version >>"$LOG_FILE" 2>>"$ERROR_LOG"
-    else
-        error_log "Node.js installation failed after setting version"
-    fi
+    # Install Node.js directly as fallback if fnm fails
+    re_source
 
     # Install bun with retry
     log "Installing bun"
@@ -228,22 +208,56 @@ initial_installs() {
     log "Initial installations completed"
 }
 
+attempt_direct_node_install() {
+    log "Attempting direct Node.js installation"
+    run_cmd "curl -fsSL https://deb.nodesource.com/setup_$NODE_VERSION.x | sudo -E bash -" "Adding NodeSource repository" "false" 3 || { error_log "Failed to add NodeSource repository"; return 1; }
+}
+
+install_backup_node() {
+    local backup_node
+    backup_node="/workspaces/PlainLicense/.devcontainer/node-$BACKUP_NODE_VERSION-linux.x64.tar.xz"
+
+    if [ -f "$backup_node" ]; then
+        local tempdir install_path node_dir
+        tempdir=$(mktemp -d)
+        install_path="${FNM_DIR:-$HOME/.local/share/fnm}/node-versions/$BACKUP_NODE_VERSION"
+
+        log "Backup Node.js archive found, extracting to $tempdir"
+        log "Found backup Node.js archive"
+        mkdir -p "$install_path" 2>>"$ERROR_LOG" || { error_log "Failed to create backup Node.js directory"; return 1; }
+        tar -xvf "$backup_node" -C "$tempdir" 2>>"$ERROR_LOG" || { error_log "Failed to extract Node.js archive from backup"; return 1; }
+        if [ -d "$tempdir/node-$BACKUP_NODE_VERSION-linux.x64" ]; then
+            node_dir=$(find "$tempdir" -maxdepth 1 -type d -name "node-$BACKUP_NODE_VERSION-linux.x64" | head -n 1)
+            cp -r "$node_dir"/* "$install_path" 2>>"$ERROR_LOG" || { error_log "Failed to copy Node.js files from backup"; return 1; }
+            log "Backup Node.js installation copied to $install_path"
+            rm -rf "$tempdir" 2>>"$ERROR_LOG" || error_log "Failed to remove temporary directory"
+        else
+            error_log "Backup Node.js directory not found in archive"
+        fi
+    else
+        error_log "Backup Node.js archive not found: $backup_node"
+    fi
+}
+
 setup_node() {
     log "Setting up Node environment"
     re_source
     local fnmloc="${FNM_PATH:-$HOME/.local/share/fnm}/fnm"
 
+    local FNM_PATH="$HOME/.local/share/fnm"
+    if [ -d "$FNM_PATH" ]; then
+        export PATH="$FNM_PATH:$PATH"
+        run_cmd "fnm install $NODE_VERSION" "Installing Node $NODE_VERSION" "false" 3 || attempt_direct_node_install || install_backup_node
+    else
+        error_log "FNM_PATH not found: $FNM_PATH"
+        attempt_direct_node_install || install_backup_node
+    fi
 
-    if [ ! -f "$fnmloc" ]; then
-        error_log "fnm not found at $fnmloc, checking if Node.js is available via other methods"
-        if command -v node >/dev/null 2>&1; then
-            log "Node.js is already available via alternative installation"
-            node --version >>"$LOG_FILE" 2>>"$ERROR_LOG"
-            return 0
-        else
-            error_log "No Node.js installation found"
-            return 1
-        fi
+    if command -v node >/dev/null 2>&1; then
+        log "Node.js installation verified"
+        node --version >>"$LOG_FILE" 2>>"$ERROR_LOG"
+    else
+        error_log "Node.js installation failed after setting version"
     fi
 
     log "Installing Node $NODE_VERSION via fnm"
@@ -513,15 +527,24 @@ log "Opening a new terminal"
 log "Opening a new terminal"
 # Use VS Code's built-in command to open a terminal through the API
 if command -v code >/dev/null 2>&1; then
-    code --remote "wsl+default" --wait --command "workbench.action.terminal.new" >>"$LOG_FILE" 2>>"$ERROR_LOG" || \
-    error_log "Automatic terminal launch via VS Code API failed. This may occur in non-GUI environments or because I didn't handle forwarding correctly. Please open a new terminal manually to apply all changes."
+    code --remote "wsl+default" --wait --command "workbench.action.terminal.new" >>"$LOG_FILE" 2>>"$ERROR_LOG" ||
+        error_log "Automatic terminal launch via VS Code API failed. This may occur in non-GUI environments or because I didn't handle forwarding correctly. Please open a new terminal manually to apply all changes."
 else
+    log "Creating completion marker"
+    echo "Setup completed at $(date)" > "$HOME/.devcontainer_setup_complete"
+
+    # Create a notification file that VS Code extensions can detect
+    mkdir -p /workspaces/PlainLicense/.vscode/notifications
+    # shellcheck disable=SC2034 # it is used....
+    current_date=$(date -Iseconds)
+    cat > /workspaces/PlainLicense/.vscode/notifications/setup-complete.json << 'EOF'
+    {
+    "message": "Container setup complete! Please open a new terminal for the changes to take effect.",
+    "type": "info",
+    "date": "$current_date"
+    }
+EOF
+
     log "==== Container setup completed ===="
-    echo ""
-    echo "=========================================="
-    echo "    Setup complete! 🎉"
-    echo "    Please open a new terminal manually for"
-    echo "    all changes to take effect."
-    echo "=========================================="
-    echo ""
+    log "Please open a new terminal manually to use the environment"
 fi

@@ -143,6 +143,25 @@ export function getTargetsArray(targets: gsap.TweenTarget): Element[] {
     .filter((el): el is Element => el !== null && el !== undefined && el instanceof Element)
 }
 
+export const hide = (vars: gsap.TweenVars = {}) => {
+  return {
+    ...vars,
+    opacity: 0,
+    visibility: "visible",
+    contentVisibility:
+      vars["contentVisibility"] && vars["contentVisibility"] === "visible" ? "visible" : undefined,
+  }
+}
+export const show = (vars: gsap.TweenVars = {}) => {
+  return {
+    ...vars,
+    opacity: 1,
+    visibility: "visible",
+    contentVisibility:
+      vars["contentVisibility"] && vars["contentVisibility"] === "visible" ? "visible" : undefined,
+  }
+}
+
 /**
  * Splits text or text within an element into divs for individual letter animations.
  * Appends the divs to a document fragment.
@@ -155,6 +174,16 @@ export function wordsToLetterDivs(
   const docFragment = document.createDocumentFragment()
   const innerContainer = document.createElement("div")
   innerContainer.classList.add("hero__letter--container--inner")
+  const wordDiv = () => {
+    const div = document.createElement("div")
+    div.classList.add("hero__letter--word-container")
+    return div
+  }
+  const letterDiv = () => {
+    const div = document.createElement("div")
+    div.classList.add("hero__letter")
+    return div
+  }
   let text = ""
   if (Array.isArray(el)) {
     if (el.every((item) => typeof item === "string")) {
@@ -170,21 +199,31 @@ export function wordsToLetterDivs(
     text = el.innerText
     gsap.set(el, { innerText: "" })
   }
-  const letters = text.trim().split("")
-  letters.forEach((letter, idx) => {
-    if (idx === 0 && (letter === " " || letter === "\n")) {
-      return
-    } else if (idx === letters.length - 1 && letter === " ") {
+  const words = text.trim().split(" ")
+  words.forEach((word) => {
+    if (word === "" || word === "\n") {
       return
     }
-    const textNode = document.createTextNode(letter)
-    const newDiv = document.createElement("div")
-    newDiv.appendChild(textNode)
-    newDiv.classList.add("hero__letter")
+    const newDiv = wordDiv()
     innerContainer.appendChild(newDiv)
+
+    const letters = word.trim().split("")
+    letters.forEach((letter, idx) => {
+      if (
+        (idx === 0 && (letter === " " || letter === "\n")) ||
+        (idx === letters.length - 1 && letter === " ")
+      ) {
+        return
+      }
+      const textNode = document.createTextNode(letter)
+      const newLetter = letterDiv()
+      newLetter.appendChild(textNode)
+      newDiv.appendChild(newLetter)
+      gsap.set(newLetter, hide())
+    })
   })
-  const fragmentDivs = gsap.utils.toArray("div", innerContainer)
-  gsap.set(fragmentDivs, { display: "inline-block", autoAlpha: 0 })
+  const fragmentDivs = gsap.utils.toArray(".hero__letter--word-container", innerContainer)
+  gsap.set(fragmentDivs, hide())
   if (el instanceof HTMLElement && el.tagName === "SPAN") {
     el.appendChild(innerContainer)
     docFragment.appendChild(el)
