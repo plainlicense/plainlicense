@@ -85,7 +85,7 @@ gsap.registerEffect({
       .add(
         gsap.set([section.outerWrapper, section.innerWrapper], {
           zIndex: -1,
-          ...show()
+          ...show(),
         }),
       )
       .add(gsap.set(section.content, { ...show(), zIndex: 1 }))

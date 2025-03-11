@@ -1,4 +1,3 @@
-import gsap from "gsap"
 import { logger, logObject } from "~/utils"
 
 /**
@@ -9,6 +8,7 @@ export class TimelineManager {
   public timelines: GSAPTimeline[]
   public currentTimeline: GSAPTimeline | null
   public paused: boolean = true
+  public isTransitioning: boolean = false
   public timelinesDuration: number = 0
   get currentTimelineIndex() {
     if (!this.currentTimeline) {
@@ -21,11 +21,7 @@ export class TimelineManager {
     this.timelines = []
     this.currentTimeline = null
     this.wrapper = (number: number) => {
-      logger.debug("Wrapping timeline with: ", number)
-      const wrapped = gsap.utils.wrap(this.timelines, number)
-      logger.debug("Wrapped timeline: ", this.getTimelineName(wrapped))
-      logger.debug("Wrapped timeline index: ", this.timelines.indexOf(wrapped))
-      return wrapped
+      return this.timelines[number % this.timelines.length]
     }
   }
 
@@ -41,8 +37,25 @@ export class TimelineManager {
     })
   }
 
+  transition() {
+    const currentIndex = this.currentTimelineIndex
+    if (!this.isTransitioning && !this.wrapper(currentIndex + 1)?.isActive()) {
+      this.isTransitioning = true
+      this.currentTimeline?.restart().pause()
+      this.currentTimeline = this.wrapper(currentIndex + 1)
+      this.currentTimeline?.pause().seek(0)
+      this.currentTimeline?.play()
+      this.paused = false
+      logger.debug("Moving to timeline: ", this.getTimelineName())
+      this.isTransitioning = false
+    } else {
+      logger.debug("OnEnd: Timeline is transitioning or next timeline is active")
+    }
+  }
+
   onInit() {
-    logger.debug("TimelineManager.onInit called for timeline ", this.getTimelineName()) // Direct logger for debugging
+    this.isTransitioning = false
+    logger.debug("TimelineManager.onInit called for timeline ", this.getTimelineName())
     logger.debug("Timeline's duration: ", this.currentTimeline?.duration())
     this.currentTimeline =
       this.currentTimelineIndex === -1 ? this.timelines[0] : this.wrapper(this.currentTimelineIndex)
@@ -56,13 +69,8 @@ export class TimelineManager {
   onEnd() {
     logger.debug("TimelineManager.onEnd called for timeline ", this.getTimelineName()) // Direct logger for debugging
     logger.debug("Timeline ended at time: ", this.currentTimeline?.time())
-    const currentIndex = this.currentTimelineIndex
-    this.currentTimeline?.restart().pause()
-    this.currentTimeline = this.wrapper(currentIndex + 1)
-    this.currentTimeline?.pause().seek(0)
-    this.currentTimeline?.play()
-    this.paused = false
-    logger.debug("Moving to timeline: ", this.getTimelineName())
+    this.transition()
+    logger.debug(`Transition complete to timeline: ${this.getTimelineName(this.currentTimeline)}`)
   }
 
   add(timeline: GSAPTimeline) {
@@ -91,6 +99,7 @@ export class TimelineManager {
       if (currentOnStart) {
         currentOnStart.call(timeline)
       }
+      this.isTransitioning ??= false
     })
 
     this.timelines.push(timeline)
@@ -120,22 +129,19 @@ export class TimelineManager {
       logger.warn("No timelines to play")
       return this
     }
-
+    if (this.isTransitioning) {
+      logger.warn("Timeline is transitioning, cannot play")
+      return this
+    }
     // Force check if the current timeline is at its end
     if (
       this.currentTimeline &&
       Math.abs(this.currentTimeline.duration() - this.currentTimeline.time()) < 0.01
     ) {
-      logger.warn("Current timeline appears complete, moving to next")
-      // Get the current index
-      const currentIndex = this.currentTimelineIndex
-      // Move to the next timeline
-      this.currentTimeline = this.wrapper(currentIndex + 1)
-      logger.warn(`Manually advancing to timeline: ${this.getTimelineName()}`)
-      this.currentTimeline.restart().play()
+      this.transition()
     }
     // Normal play logic
-    else if (this.currentTimeline && !this.isActive()) {
+    else if (this.currentTimeline && !this.isActive() && !this.isTransitioning) {
       logger.warn(`Playing timeline: ${this.getTimelineName()}`)
       this.currentTimeline.play()
     }
@@ -145,8 +151,7 @@ export class TimelineManager {
       logger.warn(`Starting first timeline: ${this.getTimelineName()}`)
       this.currentTimeline.play()
     }
-
-    this.paused = false
+    this
     return this
   }
 
@@ -203,5 +208,8 @@ export class TimelineManager {
     this.timelines = []
     this.currentTimeline = null
     this.paused = true
+    this.isTransitioning = false
+    this.timelinesDuration = 0
+    return this
   }
 }
