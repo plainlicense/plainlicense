@@ -2,7 +2,9 @@ import { logger, logObject } from "~/utils"
 
 /**
  * TimelineManager
- * @description Manages multiple GSAP timelines in a loop; using a master timeline doesn't work with the video tweening, so we need to daisy chain the timelines together
+ * @description Manages multiple GSAP timelines in a loop;
+ * using a master timeline doesn't work with the video tweening,
+ * so we need to daisy chain the timelines together.
  */
 export class TimelineManager {
   public timelines: GSAPTimeline[]
@@ -10,24 +12,57 @@ export class TimelineManager {
   public paused: boolean = true
   public isTransitioning: boolean = false
   public timelinesDuration: number = 0
+
   get currentTimelineIndex() {
-    if (!this.currentTimeline) {
-      return -1
-    }
-    return this.timelines.indexOf(this.currentTimeline)
+    return this.currentTimeline ? this.timelines.indexOf(this.currentTimeline) : -1
   }
+
   public wrapper: (index: number) => GSAPTimeline
+
   constructor() {
     this.timelines = []
     this.currentTimeline = null
     this.wrapper = (number: number) => {
-      return this.timelines[number % this.timelines.length]
+      const nextIndex = this.timelines.length > number ? number : 0
+      return this.timelines[nextIndex]
     }
+  }
+
+  /**
+   * Helper to reset a timeline: restart and then pause.
+   */
+  private resetTimeline(timeline: GSAPTimeline): void {
+    timeline.restart().pause()
+  }
+
+  /**
+   * Helper to register callbacks into a timeline.
+   */
+  private registerTimelineCallbacks(timeline: GSAPTimeline) {
+    const currentOnStart = timeline.eventCallback("onStart")
+    const currentOnComplete = timeline.eventCallback("onComplete")
+
+    timeline.eventCallback("onStart", () => {
+      logger.warn(`Timeline ${this.getTimelineName(timeline)} started`)
+      this.onInit()
+      if (currentOnStart) {
+        currentOnStart.call(timeline)
+      }
+      this.isTransitioning = false
+    })
+
+    timeline.eventCallback("onComplete", () => {
+      logger.warn(`Timeline ${this.getTimelineName(timeline)} completed`)
+      if (currentOnComplete) {
+        currentOnComplete.call(timeline)
+      }
+      this.onEnd()
+    })
   }
 
   private getSeekLocation(time: number) {
     this.timelines.forEach((timeline) => {
-      timeline.restart().pause()
+      this.resetTimeline(timeline)
       if (time > timeline.duration()) {
         time -= timeline.duration()
       } else {
@@ -39,12 +74,11 @@ export class TimelineManager {
 
   transition() {
     const currentIndex = this.currentTimelineIndex
-    if (!this.isTransitioning && !this.wrapper(currentIndex + 1)?.isActive()) {
+    const nextTimeline = this.wrapper(currentIndex + 1)
+    if (!this.isTransitioning && nextTimeline && !nextTimeline.isActive()) {
       this.isTransitioning = true
-      this.currentTimeline?.restart().pause()
-      this.currentTimeline = this.wrapper(currentIndex + 1)
-      this.currentTimeline?.pause().seek(0)
-      this.currentTimeline?.play()
+      this.currentTimeline = nextTimeline
+      this.currentTimeline.restart()
       this.paused = false
       logger.debug("Moving to timeline: ", this.getTimelineName())
       this.isTransitioning = false
@@ -55,7 +89,7 @@ export class TimelineManager {
 
   onInit() {
     this.isTransitioning = false
-    logger.debug("TimelineManager.onInit called for timeline ", this.getTimelineName())
+    logger.debug("TimelineManager.onInit called for timeline", this.getTimelineName())
     logger.debug("Timeline's duration: ", this.currentTimeline?.duration())
     this.currentTimeline =
       this.currentTimelineIndex === -1 ? this.timelines[0] : this.wrapper(this.currentTimelineIndex)
@@ -67,46 +101,25 @@ export class TimelineManager {
   }
 
   onEnd() {
-    logger.debug("TimelineManager.onEnd called for timeline ", this.getTimelineName()) // Direct logger for debugging
-    logger.debug("Timeline ended at time: ", this.currentTimeline?.time())
+    logger.debug("TimelineManager.onEnd called for timeline", this.getTimelineName())
+    logger.debug("Timeline ended at time:", this.currentTimeline?.time())
     this.transition()
     logger.debug(`Transition complete to timeline: ${this.getTimelineName(this.currentTimeline)}`)
   }
 
   add(timeline: GSAPTimeline) {
     timeline.pause().seek(0)
-
-    // Use GSAP's official callback registration method instead
-    const currentOnStart = timeline.eventCallback("onStart")
-    const currentOnComplete = timeline.eventCallback("onComplete")
-
     logger.debug("Adding timeline: ", this.getTimelineName(timeline))
     logger.debug("Timeline duration: ", timeline.duration())
     logger.debug("Timeline total duration: ", this.timelinesDuration)
 
-    // Register callbacks using GSAP's official method
-    timeline.eventCallback("onComplete", () => {
-      logger.warn(`Timeline ${this.getTimelineName(timeline)} completed`) // Direct logger log for debugging
-      if (currentOnComplete) {
-        currentOnComplete.call(timeline)
-      }
-      this.onEnd()
-    })
-
-    timeline.eventCallback("onStart", () => {
-      logger.warn(`Timeline ${this.getTimelineName(timeline)} started`) // Direct logger log for debugging
-      this.onInit()
-      if (currentOnStart) {
-        currentOnStart.call(timeline)
-      }
-      this.isTransitioning ??= false
-    })
+    // Register callbacks using helper
+    this.registerTimelineCallbacks(timeline)
 
     this.timelines.push(timeline)
     this.currentTimeline ??= timeline
-    logger.debug("Current timeline set to: ", this.getTimelineName())
     this.timelinesDuration += timeline.duration()
-    logObject(timeline, `Timeline: ${this.getTimelineName()}`)
+    logObject(timeline, `Timeline: ${this.getTimelineName(timeline)}`)
     return this
   }
 
@@ -115,16 +128,13 @@ export class TimelineManager {
       logger.warn("No timelines available to restart.")
       return this
     }
-    this.timelines.forEach((timeline) => {
-      timeline.restart().pause()
-    })
+    this.timelines.forEach((timeline) => this.resetTimeline(timeline))
     this.currentTimeline = this.timelines[0]
     this.paused = false
     return this.play()
   }
 
   play() {
-    // If we have no timelines, do nothing
     if (this.timelines.length === 0) {
       logger.warn("No timelines to play")
       return this
@@ -133,25 +143,7 @@ export class TimelineManager {
       logger.warn("Timeline is transitioning, cannot play")
       return this
     }
-    // Force check if the current timeline is at its end
-    if (
-      this.currentTimeline &&
-      Math.abs(this.currentTimeline.duration() - this.currentTimeline.time()) < 0.01
-    ) {
-      this.transition()
-    }
-    // Normal play logic
-    else if (this.currentTimeline && !this.isActive() && !this.isTransitioning) {
-      logger.warn(`Playing timeline: ${this.getTimelineName()}`)
-      this.currentTimeline.play()
-    }
-    // Default to first timeline
-    else if (!this.currentTimeline && this.timelines.length > 0) {
-      this.currentTimeline = this.timelines[0]
-      logger.warn(`Starting first timeline: ${this.getTimelineName()}`)
-      this.currentTimeline.play()
-    }
-    this
+    this.resume()
     return this
   }
 

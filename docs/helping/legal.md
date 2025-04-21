@@ -83,7 +83,7 @@ Let's work together to improve Plain License.
 
 If your contributions are more focused on writing or editing, please see our [Crafting Licenses][crafting] guide for more information on how you can help. We are always looking for clear, concise, and legally accurate language in our licenses.
 
-[discussions]: https://github.com/seekinginfiniteloop/PlainLicense/discussions/categories/attorney-talk "Attorney Talk Discussions"
-[legalissue]: https://github.com/seekinginfiniteloop/PlainLicense/issues/new?assignees=seekinginfiniteloop&labels=bug%2Ctriage&projects=&template=legal_issue.yml&title=%5BLegalFlaw%5D%3A+ "Create a new issue"
+[discussions]: https://github.com/plainlicense/plainlicense/discussions/categories/attorney-talk "Attorney Talk Discussions"
+[legalissue]: https://github.com/plainlicense/plainlicense/issues/new?assignees=plainlicense&labels=bug%2Ctriage&projects=&template=legal_issue.yml&title=%5BLegalFlaw%5D%3A+ "Create a new issue"
 [helping]: index.md "Helping Plain License"
 [crafting]: craft.md "Crafting Licenses"

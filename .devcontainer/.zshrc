@@ -53,12 +53,12 @@ alias updatedb="lolcate --update > /dev/null 2>&1 &"
 alias node='node %u || bunx --bun %u'
 export PATH="$BUN_INSTALL/bin:$HOME/.cargo/bin:$HOME/bin:$HOME/sbin:$PATH:/opt/bin:/opt/sbin:/opt/local/bin:/opt/local/sbin"
 export UV_PYTHON_DOWNLOADS="automatic"
-export UV_CACHE_DIR="/workspaces/PlainLicense/.cache/uv"
+export UV_CACHE_DIR="/workspaces/plainlicense/.cache/uv"
 export UV_COLOR="always"
 export UV_PYTHON="cpython-3.13.0-linux-x86_64-gnu"
 export UV_PYTHON_PREFERENCE="managed"
 export UV_COMPILE_BYTECODE="true"
-export PYVENV="/workspaces/PlainLicense/.venv/bin/activate"
+export PYVENV="/workspaces/plainlicense/.venv/bin/activate"
 export FORCE_COLOR=1
 export CLICOLOR_FORCE=1
 export FILEHANDLER_ENABLED="true"
@@ -93,7 +93,7 @@ if [ ! -f "/usr/bin/node" ] && [ ! -L "/usr/bin/node" ] && [ -f "$node_bin" ]; t
   sudo ln -s "$node_bin" /usr/bin/node > /dev/null 2>&1
 fi
 
-source /workspaces/PlainLicense/.venv/bin/activate
+source /workspaces/plainlicense/.venv/bin/activate
 
 PATH=~/.console-ninja/.bin:$PATH
 

@@ -13,9 +13,9 @@ Your support helps us make licensing more accessible and understandable for ever
 
 ### GitHub Sponsors
 
-The easiest way to donate to Plain License is through [GitHub Sponsors][sponsors]. Your donations help cover our operational costs and support our ongoing development efforts.
+The easiest way to donate to Plain License is through [GitHub Sponsors][sponsors][^1]. Your donations help cover our operational costs and support our ongoing development efforts.
 
-<iframe src="https://github.com/sponsors/seekinginfiniteloop/button" title="Sponsor seekinginfiniteloop" height="32" width="114" style="border: 0; border-radius: 6px;"></iframe>
+<iframe src="https://github.com/sponsors/seekinginfiniteloop/button" title="Sponsor plainlicense (through founder)" height="32" width="114" style="border: 0; border-radius: 6px;"></iframe>
 
 Every contribution, no matter the size, makes a difference. Thank you for your support!
 
@@ -65,6 +65,8 @@ Remember, financial contributions aren't the only way to support Plain License. 
 Every form of support helps us move closer to our goal of making licensing simple and accessible for everyone.
 
 Thank you for considering a donation to Plain License. Your support makes our work possible!
+
+[^1]: The sponsorship is through the founder of Plain License, Adam. Plain License is not yet an official non-profit organization, but your contributions will help us become one.
 
 [sponsors]: https://github.com/sponsors/seekinginfiniteloop "Sponsor seekinginfiniteloop for Plain License"
 [contact]: mailto:adam@plainlicense.org "Email Adam for more information"

@@ -869,7 +869,7 @@ class LicenseContent:
 
             ## Need Help?
 
-            Bring your questions to our [GitHub Discussions](https://github.com/seekinginfiniteloop/PlainLicense/discussions "visit Plain License's discussions page") for help and support.
+            Bring your questions to our [GitHub Discussions](https://github.com/plainlicense/plainlicense/discussions "visit Plain License's discussions page") for help and support.
             """)
 
     @property

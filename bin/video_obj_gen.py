@@ -11,7 +11,7 @@ from typing import Literal, NamedTuple, TypedDict, cast
 #================================================
 #                 Configuration
 #================================================
-SAVE_PATH: Path = Path("/workspaces/PlainLicense/src/assets/javascripts/features/hero/video/data.ts")
+SAVE_PATH: Path = Path("/workspaces/plainlicense/src/assets/javascripts/features/hero/video/data.ts")
 NAMES: list[str] = ["tokyo_shuffle", "break_free"]
 CODECS: list[str] = ["av1", "vp9", "h264"]
 VIDEO_EXTENSIONS: dict[str, str] = {"av1": "webm", "vp9": "webm", "h264": "mp4"}

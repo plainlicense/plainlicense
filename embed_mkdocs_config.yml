@@ -1,7 +1,7 @@
 site_name: Plain License
 site_url: https://plainlicense.org
-repo_url: https://github.com/seekinginfiniteloop/PlainLicense
-repo_name: PlainLicense
+repo_url: https://github.com/plainlicense/plainlicense
+repo_name: plainlicense
 edit_uri: edit/main/docs/
 copyright: Plain License's authors dedicate all original content to the public domain. No rights reserved.
 site_description: >
@@ -103,8 +103,8 @@ markdown_extensions:
       repo_url_shorthand: true
       social_url_shorthand: true
       provider: github
-      user: seekinginfiniteloop
-      repo: PlainLicense
+      user: plainlicense
+      repo: plainlicense
   - pymdownx.progressbar:
       progress_increment: 20
   - pymdownx.smartsymbols

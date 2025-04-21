@@ -45,7 +45,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/seekinginfiniteloop/PlainLicense.git"
+    "url": "https://github.com/plainlicense/plainlicense.git"
   },
   "keywords": [
     "legal",
@@ -60,7 +60,7 @@
   },
   "license": "Plain Unlicense",
   "bugs": {
-    "url": "https://github.com/seekinginfiniteloop/PlainLicense/issues",
+    "url": "https://github.com/plainlicense/plainlicense/issues",
     "email": "adam@plainlicense.org"
   },
   "engines": {

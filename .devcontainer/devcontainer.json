@@ -64,10 +64,10 @@
 		"UV_PYTHON": "cpython-3.13.0-linux-x86_64-gnu",
 		"UV_PYTHON_PREFERENCE": "managed",
 		"UV_PYTHON_DOWNLOADS": "automatic",
-		"PYVENV": "/workspaces/PlainLicense/.venv/bin/activate",
-		"UV_CACHE_DIR": "/workspaces/PlainLicense/.cache/uv"
+		"PYVENV": "/workspaces/plainlicense/.venv/bin/activate",
+		"UV_CACHE_DIR": "/workspaces/plainlicense/.cache/uv"
 	},
-	"postCreateCommand": "chmod +x /workspaces/PlainLicense/.devcontainer/container-setup.sh && /workspaces/PlainLicense/.devcontainer/container-setup.sh",
+	"postCreateCommand": "chmod +x /workspaces/plainlicense/.devcontainer/container-setup.sh && /workspaces/plainlicense/.devcontainer/container-setup.sh",
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	"customizations": {
 		"vscode": {

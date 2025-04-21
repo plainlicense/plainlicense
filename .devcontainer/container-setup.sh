@@ -82,7 +82,7 @@ log "Adding nameservers to resolve.conf"
 
 cat /etc/resolv.conf >>"$LOG_FILE"
 
-cd /workspaces/PlainLicense || {
+cd /workspaces/plainlicense || {
     error_log "Failed to change to project directory"
     cd "$HOME" || exit 1
 }
@@ -179,8 +179,8 @@ initial_installs() {
     mkdir -p "$HOME/.fonts" 2>>"$ERROR_LOG" || error_log "Failed to create fonts directory"
     echo 'xterm*faceName: MesloLGS NF' >"$HOME/.Xresources" 2>>"$ERROR_LOG" || error_log "Failed to create .Xresources"
 
-    if [ -d "/workspaces/PlainLicense/.devcontainer/.fonts" ]; then
-        cp -r /workspaces/PlainLicense/.devcontainer/.fonts "$HOME" 2>>"$ERROR_LOG" || error_log "Failed to copy fonts"
+    if [ -d "/workspaces/plainlicense/.devcontainer/.fonts" ]; then
+        cp -r /workspaces/plainlicense/.devcontainer/.fonts "$HOME" 2>>"$ERROR_LOG" || error_log "Failed to copy fonts"
     else
         error_log "Fonts directory not found"
     fi
@@ -200,7 +200,7 @@ initial_installs() {
     fi
 
     # Return to project directory
-    cd /workspaces/PlainLicense || {
+    cd /workspaces/plainlicense || {
         error_log "Failed to change back to project directory"
         return 1
     }
@@ -215,7 +215,7 @@ attempt_direct_node_install() {
 
 install_backup_node() {
     local backup_node
-    backup_node="/workspaces/PlainLicense/.devcontainer/node-$BACKUP_NODE_VERSION-linux.x64.tar.xz"
+    backup_node="/workspaces/plainlicense/.devcontainer/node-$BACKUP_NODE_VERSION-linux.x64.tar.xz"
 
     if [ -f "$backup_node" ]; then
         local tempdir install_path node_dir
@@ -274,11 +274,11 @@ set_configs() {
     export bash_completion="$HOME/.local/share/bash-completion/completions"
 
     # Define configuration files
-    ZSHRC="/workspaces/PlainLicense/.devcontainer/.zshrc"
-    BASHRC="/workspaces/PlainLicense/.devcontainer/.bashrc"
-    P10K="/workspaces/PlainLicense/.devcontainer/.p10k.zsh"
-    LOLCATE_CONFIG="/workspaces/PlainLicense/.devcontainer/lolcate_config.toml"
-    LOLCATE_IGNORES="/workspaces/PlainLicense/.devcontainer/lolcate_ignores"
+    ZSHRC="/workspaces/plainlicense/.devcontainer/.zshrc"
+    BASHRC="/workspaces/plainlicense/.devcontainer/.bashrc"
+    P10K="/workspaces/plainlicense/.devcontainer/.p10k.zsh"
+    LOLCATE_CONFIG="/workspaces/plainlicense/.devcontainer/lolcate_config.toml"
+    LOLCATE_IGNORES="/workspaces/plainlicense/.devcontainer/lolcate_ignores"
 
     log "Setting configurations for zsh, powerlevel10k, bash, and completions"
 
@@ -321,11 +321,11 @@ set_configs() {
     unalias ll 2>>"$ERROR_LOG" || true # Non-critical, continue if fails
     mkdir -p "$HOME/.zfunc" 2>>"$ERROR_LOG" || error_log "Failed to create .zfunc directory"
     mkdir -p "$HOME/logs" 2>>"$ERROR_LOG" || error_log "Failed to create logs directory"
-    mkdir -p /workspaces/PlainLicense/.workbench 2>>"$ERROR_LOG" || error_log "Failed to create .workbench directory"
+    mkdir -p /workspaces/plainlicense/.workbench 2>>"$ERROR_LOG" || error_log "Failed to create .workbench directory"
 
     # Create symlink if it doesn't exist
-    if [ ! -L "/workspaces/PlainLicense/.workbench/logs" ]; then
-        ln -s "$HOME/logs" "/workspaces/PlainLicense/.workbench/logs" 2>>"$ERROR_LOG" || error_log "Failed to create logs symlink"
+    if [ ! -L "/workspaces/plainlicense/.workbench/logs" ]; then
+        ln -s "$HOME/logs" "/workspaces/plainlicense/.workbench/logs" 2>>"$ERROR_LOG" || error_log "Failed to create logs symlink"
     fi
 
     # Set up cron job for lolcate
@@ -412,8 +412,8 @@ install_uv() {
     $uvloc tool install pre-commit -q >>"$LOG_FILE" 2>>"$ERROR_LOG" || error_log "Failed to install pre-commit"
 
     # Activate virtual environment
-    if [ -f "/workspaces/PlainLicense/.venv/bin/activate" ]; then
-        source /workspaces/PlainLicense/.venv/bin/activate 2>>"$ERROR_LOG" || error_log "Failed to activate virtual environment"
+    if [ -f "/workspaces/plainlicense/.venv/bin/activate" ]; then
+        source /workspaces/plainlicense/.venv/bin/activate 2>>"$ERROR_LOG" || error_log "Failed to activate virtual environment"
         $uvloc sync --all-extras >>"$LOG_FILE" 2>>"$ERROR_LOG" || error_log "Failed to sync dependencies"
     else
         error_log "Virtual environment activation file not found"
@@ -534,10 +534,10 @@ else
     echo "Setup completed at $(date)" > "$HOME/.devcontainer_setup_complete"
 
     # Create a notification file that VS Code extensions can detect
-    mkdir -p /workspaces/PlainLicense/.vscode/notifications
+    mkdir -p /workspaces/plainlicense/.vscode/notifications
     # shellcheck disable=SC2034 # it is used....
     current_date=$(date -Iseconds)
-    cat > /workspaces/PlainLicense/.vscode/notifications/setup-complete.json << 'EOF'
+    cat > /workspaces/plainlicense/.vscode/notifications/setup-complete.json << 'EOF'
     {
     "message": "Container setup complete! Please open a new terminal for the changes to take effect.",
     "type": "info",
