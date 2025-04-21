@@ -68,25 +68,6 @@ run_cmd() {
     return "$([ "$success" = "true" ] && echo 0 || echo 1)"
 }
 
-# Update and install packages
-log "Adding nameservers to resolve.conf"
-{
-    echo "nameserver 1.1.1.2" | sudo tee /etc/resolv.conf >/dev/null
-    echo "nameserver 1.0.0.2" | sudo tee -a /etc/resolv.conf >/dev/null
-    echo "nameserver 103.247.36.36" | sudo tee -a /etc/resolv.conf >/dev/null
-    echo "nameserver 103.247.37.37" | sudo tee -a /etc/resolv.conf >/dev/null
-    echo "nameserver 8.8.8.8" | sudo tee -a /etc/resolv.conf >/dev/null # Added Google DNS as backup
-    echo "options attempts:5" | sudo tee -a /etc/resolv.conf >/dev/null # Increased attempts
-    echo "options timeout:8" | sudo tee -a /etc/resolv.conf >/dev/null  # Increased timeout
-} >>"$LOG_FILE" 2>>"$ERROR_LOG" || error_log "Failed to set up DNS servers"
-
-cat /etc/resolv.conf >>"$LOG_FILE"
-
-cd /workspaces/plainlicense || {
-    error_log "Failed to change to project directory"
-    cd "$HOME" || exit 1
-}
-
 run_cmd "sudo sh -c 'DEBIAN_FRONTEND=noninteractive'" "Setting DEBIAN_FRONTEND" "false"
 
 # Install packages with retry logic for apt
@@ -129,18 +110,11 @@ apt_install_with_retry
 
 # Source environment files safely
 re_source() {
-    if [ -f "$HOME/.zshrc" ]; then
-        log "Found .zshrc file but will not source it from bash"
-    fi
     if [ -f "$HOME/.bashrc" ]; then
         source "$HOME/.bashrc" 2>>"$ERROR_LOG" || error_log "Failed to source .bashrc"
     fi
     if [ -f "$HOME/.cargo/env" ]; then
         source "$HOME/.cargo/env" 2>>"$ERROR_LOG" || error_log "Failed to source cargo env"
-    fi
-    if [ -d "$FNM_DIR" ]; then
-        export PATH="$FNM_DIR:$PATH"
-        eval "$(fnm env)"
     fi
 }
 
@@ -150,9 +124,14 @@ initial_installs() {
     export BUN_INSTALL="$HOME/.bun"
     export UV_PYTHON_DOWNLOADS="automatic"
 
-    # Install fnm with retry and fallback
-    log "Installing fnm"
-    run_cmd "curl -fsSL https://fnm.vercel.app/install | bash" "Installing fnm" "false" 3 &&
+
+    # Install rustup with retry
+    log "Installing rustup"
+    run_cmd "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y" "Installing rustup" "false" 3 &&
+
+    log "Installing binstall and mise"
+    curl -L --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh | /bin/bash 2>&1 &&
+    curl https://mise.run | /bin/sh 2>&1 &&
 
     # Install Node.js directly as fallback if fnm fails
     re_source
@@ -161,9 +140,6 @@ initial_installs() {
     log "Installing bun"
     run_cmd "curl -fsSL https://bun.sh/install | bash" "Installing bun" "false" 3 &&
 
-        # Install rustup with retry
-        log "Installing rustup"
-    run_cmd "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y" "Installing rustup" "false" 3 &&
 
         # Source cargo environment
         if [ -f "$HOME/.cargo/env" ]; then
@@ -198,6 +174,8 @@ initial_installs() {
         log "Sourcing .zshrc"
         source "$HOME/.zshrc" 2>>"$ERROR_LOG" || error_log "Failed to source .zshrc"
     fi
+    
+    attempt_direct_node_install || install_backup_node
 
     # Return to project directory
     cd /workspaces/plainlicense || {
@@ -210,7 +188,8 @@ initial_installs() {
 
 attempt_direct_node_install() {
     log "Attempting direct Node.js installation"
-    run_cmd "curl -fsSL https://deb.nodesource.com/setup_$NODE_VERSION.x | sudo -E bash -" "Adding NodeSource repository" "false" 3 || { error_log "Failed to add NodeSource repository"; return 1; }
+    local mise="$HOME/.local/bin/mise"
+    run_cmd "curl -fsSL https://deb.nodesource.com/setup_$NODE_VERSION.x | sudo -E bash -" "Adding NodeSource repository" "false" 3 || eval "$($mise activate bash)" && $mise use -gy usage && $mise use -gy "node@$NODE_VERSION"  || { error_log "Failed to add NodeSource repository"; return 1; }
 }
 
 install_backup_node() {
@@ -239,35 +218,6 @@ install_backup_node() {
     fi
 }
 
-setup_node() {
-    log "Setting up Node environment"
-    re_source
-    local fnmloc="${FNM_PATH:-$HOME/.local/share/fnm}/fnm"
-
-    local FNM_PATH="$HOME/.local/share/fnm"
-    if [ -d "$FNM_PATH" ]; then
-        export PATH="$FNM_PATH:$PATH"
-        run_cmd "fnm install $NODE_VERSION" "Installing Node $NODE_VERSION" "false" 3 || attempt_direct_node_install || install_backup_node
-    else
-        error_log "FNM_PATH not found: $FNM_PATH"
-        attempt_direct_node_install || install_backup_node
-    fi
-
-    if command -v node >/dev/null 2>&1; then
-        log "Node.js installation verified"
-        node --version >>"$LOG_FILE" 2>>"$ERROR_LOG"
-    else
-        error_log "Node.js installation failed after setting version"
-    fi
-
-    log "Installing Node $NODE_VERSION via fnm"
-    run_cmd "$fnmloc install $NODE_VERSION" "Installing Node $NODE_VERSION" "false" 3
-
-    log "Setting Node $NODE_VERSION as default"
-    run_cmd "$fnmloc use $NODE_VERSION" "Setting Node $NODE_VERSION as default" "false" 3
-
-    log "Node setup complete"
-}
 
 set_configs() {
     log "Setting up configurations"
