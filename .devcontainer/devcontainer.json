@@ -12,7 +12,9 @@
 		9222
 	],
 	"features": {
-		"ghcr.io/va-h/devcontainers-features/uv:1": {"shellautocompletion": true},
+		"ghcr.io/va-h/devcontainers-features/uv:1": {
+			"shellautocompletion": true
+		},
 		"ghcr.io/devcontainers-extra/features/ripgrep:1": {}
 	},
 	"portsAttributes": {
@@ -145,7 +147,8 @@
 				"Perkovec.emoji",
 				"bierner.markdown-emoji",
 				"Gydunhn.vsc-essentials",
-				"bierner.emojisense"
+				"bierner.emojisense",
+				"1YiB.rust-bundle"
 			]
 		}
 	}

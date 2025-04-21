@@ -6,6 +6,10 @@ ERROR_LOG="$HOME/container_setup_errors.log"
 NODE_VERSION="22"
 BACKUP_NODE_VERSION="v22.14.0"
 
+# Cleanup any ownership issues
+sudo chown -R vscode:vscode "$HOME" 2>/dev/null || true
+sudo chown -R vscode:vscode /workspaces 2>/dev/null || true
+
 # Create log function
 log() {
     local timestamp
@@ -174,7 +178,7 @@ initial_installs() {
         log "Sourcing .zshrc"
         source "$HOME/.zshrc" 2>>"$ERROR_LOG" || error_log "Failed to source .zshrc"
     fi
-    
+
     attempt_direct_node_install || install_backup_node
 
     # Return to project directory
@@ -299,7 +303,7 @@ set_configs() {
 enable-ssh-support
 default-cache-ttl 1200
 max-cache-ttl 7200
-pinentry-program /usr/bin/pinentry-curses
+pinentry-program /usr/bin/pinentry-qt
 EOF
 
     # Handling any error with the gpg commands gracefully
