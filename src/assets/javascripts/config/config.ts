@@ -17,31 +17,25 @@ export const BACKUP_PICTURE = "break_free" as const
 const FADE_IN_CONFIG: FadeInConfig = {
   prefersReducedMotion: {
     from: {
-      autoAlpha: 0,
       duration: 0.75,
       y: 0,
     },
     to: {
-      autoAlpha: 1,
       duration: 0.75,
       y: 0,
     },
   },
   normal: {
     from: {
-      autoAlpha: 0,
       yPercent: 75,
     },
     to: {
-      autoAlpha: 1,
       duration: 0.5,
       yPercent: 0,
     },
   },
   defaults: {
-    autoAlpha: 0,
     ease: "power1.inOut",
-    repeat: 0,
     paused: false,
   },
 } as const

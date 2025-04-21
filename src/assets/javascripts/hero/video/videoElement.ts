@@ -6,9 +6,10 @@
  * @copyright No rights reserved
  */
 
-import { MAX_WIDTHS } from "~/config"
+import { BACKUP_PICTURE, MAX_WIDTHS } from "~/config"
 import { logger } from "~/utils"
-import { HeroVideo, ImageIndex, VideoWidth } from "./types"
+import { rawHeroVideos } from "./data"
+import { HeroName, HeroVideo, ImageIndex, VideoWidth } from "./types"
 import { getMediaType, srcToAttributes } from "./utils"
 
 /**
@@ -17,24 +18,48 @@ import { getMediaType, srcToAttributes } from "./utils"
  * @param heroVideo - The hero video object (required)
  */
 export class VideoElement {
-  public video: HTMLVideoElement = document.createElement("video")
+  private createEl: (tag: string, classes: string[]) => HTMLElement = (tag, classes) => {
+    const el = document.createElement(tag)
+    el.classList.add(...classes)
+    return el
+  }
+
+  public video: HTMLVideoElement = this.createEl("video", [
+    "hero__video",
+    "hero__video--active",
+  ]) as HTMLVideoElement
 
   private sources: HTMLSourceElement[]
 
   public heroVideo: HeroVideo
 
+  public baseName: HeroName
+
   private poster: ImageIndex
 
-  public picture = document.createElement("picture")
+  public picture = this.createEl("picture", [
+    "hero__poster",
+    "hero__poster--active",
+  ]) as HTMLPictureElement
+
+  private backupPoster: ImageIndex
+
+  public backupPicture: HTMLPictureElement = this.createEl("picture", [
+    "hero__backup",
+  ]) as HTMLPictureElement
 
   private properties: { [key: string]: string } = {}
 
   public message: string = ""
 
   constructor(heroVideo: HeroVideo, properties?: { [key: string]: string }) {
-    this.video.classList.add("hero__video", "hero__video--active")
     this.heroVideo = heroVideo
+    this.baseName = heroVideo.baseName
     this.poster = heroVideo.poster
+    this.backupPoster =
+      this.isSamePoster ?
+        heroVideo.poster
+      : rawHeroVideos.find((video) => video.baseName === BACKUP_PICTURE)?.poster || heroVideo.poster
     this.message = heroVideo.message || ""
     this.properties = this.getProperties(properties || {})
     logger.debug("Video Properties: ")
@@ -57,6 +82,19 @@ export class VideoElement {
     logger.debug("video element: %o", this.video)
     logger.debug("sources: %o", this.sources)
     this.picture = this.constructPictureElement()
+    this.backupPicture =
+      this.isSamePoster ?
+        (() => {
+          const picture = this.picture.cloneNode(true) as HTMLPictureElement
+          this.backupPicture.classList.replace("hero__poster", "hero__backup")
+          this.backupPicture.classList.replace("hero__poster--active", "hero__backup--inactive")
+          return picture
+        })()
+      : this.constructPictureElement(this.backupPicture, this.backupPoster)
+  }
+
+  private get isSamePoster() {
+    return this.baseName === BACKUP_PICTURE
   }
 
   // assign properties to the video element
@@ -147,10 +185,10 @@ export class VideoElement {
   }
 
   // construct the picture element
-  private constructPictureElement() {
-    const picture = document.createElement("picture")
-    picture.classList.add("hero__poster", "hero__poster--active")
-    const { poster } = this
+  private constructPictureElement(
+    picture: HTMLPictureElement = this.picture,
+    poster: ImageIndex = this.poster,
+  ) {
     let srcs = []
     for (const type of Object.keys(poster)) {
       // type guard
@@ -183,8 +221,7 @@ export class VideoElement {
     img.draggable = false
     img.fetchPriority = "high"
     img.classList.add("hero__poster--image")
-    picture.classList.add("hero__poster")
-    picture.role = "presentation"
+    picture.role = picture.classList.contains("hero__poster") ? "presentation" : ""
     picture.append(img)
     return picture
   }

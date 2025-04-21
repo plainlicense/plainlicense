@@ -22,7 +22,7 @@
 import gsap from "gsap"
 import { OBSERVER_CONFIG, VIDEO_MANAGER_ELEMENTS } from "~/config"
 import { isValidElement, logger, logObject } from "~/utils"
-import type { VideoManager } from "../video"
+import { VideoManager } from "../video"
 import {
   AnimateMessageConfig,
   Direction,
@@ -31,9 +31,13 @@ import {
   ReducedMotionCondition,
   TransitionConfig,
 } from "./types"
-import { getDistanceToViewport, getMatchMediaInstance, wordsToLetterDivs } from "./utils"
-
-type VideoEffectThis = ThisType<VideoManager>
+import {
+  getDistanceToViewport,
+  getMatchMediaInstance,
+  hide,
+  show,
+  wordsToLetterDivs,
+} from "./utils"
 
 /**
  * Retrieves the fade variables for autoAlpha and yPercent.
@@ -58,6 +62,7 @@ function getDFactor(direction: Direction) {
 // ! WARNING: gsap warns about nesting effects within effects.
 // ! I Don't know what happens if you do...implosion of the multiverse?
 // ! We avoid that be creating tweens/timelines and then creating effects from those tweens/timelines.
+// ! (it's probably just easy to get in an infinite recursion loop)
 
 /**
  * Sets the specified section up for a transition.
@@ -75,15 +80,15 @@ gsap.registerEffect({
     const dFactor = getDFactor(direction)
     return gsap
       .timeline({ extendTimeline: true, paused: false })
-      .add(gsap.set(targets, { zIndex: 0, autoAlpha: 0 }))
+      .add(gsap.set(targets, { zIndex: 0, ...hide() }))
       .add(gsap.to(section.bg, { yPercent: -15 * dFactor, zIndex: 0, opacity: 0 }))
       .add(
         gsap.set([section.outerWrapper, section.innerWrapper], {
           zIndex: -1,
-          opacity: 1,
+          ...show(),
         }),
       )
-      .add(gsap.set(section.content, { autoAlpha: 0, zIndex: 1 }))
+      .add(gsap.set(section.content, { ...show(), zIndex: 1 }))
   },
 })
 
@@ -338,138 +343,222 @@ gsap.registerEffect({
   },
 })
 
-function animateLogo(this: VideoManager) {
-  const logoTl = gsap.timeline()
+function animateLogo(scope: VideoManager, config: AnimateMessageConfig) {
+  const logoTl = gsap.timeline({ ...(config.sharedVars as gsap.TimelineVars), defaults: {} })
   gsap
     .matchMedia()
     .add({ reducedMotion: "(prefers-reduced-motion: reduce)" }, (context: gsap.Context) => {
       const { reducedMotion } = context.conditions as ReducedMotionCondition
       const logoTl = gsap.timeline({ label: "logo" })
+      const duration = config.duration || scope.textDuration || 10
       if (!reducedMotion) {
-        logoTl.to(this.logo, {
-          scale: 1,
-          duration: 2.5,
-          yoyo: true,
-          repeat: 1,
-          ease: "power3.inOut",
-          autoAlpha: 1,
-          xPercent: 0,
-          yPercent: 0,
-          startAt: { scale: 0, autoAlpha: 0, xPercent: -100, yPercent: 5 },
-        })
+        logoTl.set(
+          scope.logo,
+          hide({
+            scale: 0,
+            xPercent: -100,
+            yPercent: 5,
+            z: -1,
+          }),
+        )
+        logoTl.to(
+          scope.logo,
+          show({
+            scale: 1,
+            duration: duration / 1.5,
+            yoyo: true,
+            repeat: 1,
+            ease: "power3.inOut",
+            xPercent: 0,
+            yPercent: 0,
+            z: 50,
+          }),
+        )
       } else {
-        logoTl.to(this.logo, {
-          autoAlpha: 1,
-          yoyo: true,
-          repeat: 1,
-          ease: "power1.inOut",
-          scale: 1,
-          xPercent: 0,
-          startAt: { scale: 0, autoAlpha: 0, yPercent: 0 },
-        })
+        logoTl.set(
+          scope.logo,
+          hide({
+            scale: 0,
+            xPercent: 0,
+            yPercent: 0,
+            z: -1,
+          }),
+        )
+        logoTl.to(
+          scope.logo,
+          show({
+            yoyo: true,
+            repeat: 1,
+            ease: "power1.inOut",
+            duration: duration / 1.5,
+            scale: 1,
+            z: 10,
+          }),
+        )
       }
     })
   return logoTl
 }
 
-function animateText(this: VideoManager, targets: gsap.TweenTarget, config: AnimateMessageConfig) {
+function animateText(scope: VideoManager, targets: gsap.TweenTarget, config: AnimateMessageConfig) {
   if (Array.isArray(targets) && targets.length > 1) {
     logger.warn("Multiple targets provided for animateMessage. Only animating the first.")
   }
+  const message = config.message ?? scope.message
   const containerTarget =
     (targets instanceof Array ? targets[0] : targets) ||
     document.querySelector(".text-animation__container")
-  if (!containerTarget) {
-    logger.error("No target provided for animateMessage.")
+  if (!containerTarget || !message) {
+    logger.error(
+      message ?
+        "No target provided for animateMessage."
+      : "No message provided for animateMessage.",
+    )
     return gsap.timeline()
   }
-  if (config.message) {
-    logger.debug(`Animating message: ${config.message}`)
-    const msgFrag = wordsToLetterDivs(config.message)
-    const innerContainer = msgFrag.querySelector(".hero__letter--container--inner")
-    if (!innerContainer) {
-      logger.error("No inner container found in message fragment.")
-      return gsap.timeline()
-    }
-    const fragDivs = Array.from(innerContainer.children)
-    containerTarget.append(msgFrag)
-
-    const messageTimeline = gsap.timeline({
-      paused: true,
-      repeat: 0,
-      extendTimeline: true,
-      log: true,
+  logger.debug(`Animating message: ${message}`)
+  const msgFrag = wordsToLetterDivs(message)
+  const innerContainer = msgFrag.querySelector(".hero__letter--container--inner")
+  if (!innerContainer || !containerTarget || !msgFrag) {
+    logger.error(
+      `Needed element(s) not found for message animation. \n  msgFrag: ${logObject(msgFrag)}, \n  innerContainer: ${logObject(innerContainer)}, \n  containerTarget: ${logObject(containerTarget)}`,
+    )
+    return gsap.timeline()
+  }
+  const fragDivs = gsap.utils.toArray(".hero__letter--word-container", msgFrag)
+  containerTarget.append(msgFrag)
+  const totalDuration = config.duration || scope.textDuration || 10
+  const messageTimeline = gsap.timeline({
+    paused: true,
+    repeat: 0,
+    duration: totalDuration,
+    ...(config.sharedVars as gsap.TimelineVars),
+  })
+  logger.debug(`Fragdiv count: ${fragDivs.length}`)
+  const containers = [
+    ...fragDivs,
+    innerContainer,
+    innerContainer.parentElement,
+    containerTarget,
+    containerTarget.parentElement,
+  ]
+    .flat()
+    .reduce((acc, el) => {
+      if (el instanceof Element && !acc.includes(el)) {
+        acc.push(el)
+      }
+      return acc
+    }, [])
+  logger.debug(`Container count: ${containers.length}`)
+  logObject(containers, "Containers")
+  gsap.set(containers, hide({ zIndex: -1 }))
+  if (config.sharedVars && Object.keys(config.sharedVars).length) {
+    config.fromVars =
+      config.fromVars && Object.keys(config.fromVars).length ?
+        { ...config.fromVars, ...config.sharedVars }
+      : config.sharedVars
+    config.toVars =
+      config.toVars && Object.keys(config.toVars).length ?
+        { ...config.toVars, ...config.sharedVars }
+      : config.sharedVars
+  }
+  let fromVars: GSAPTweenVars = config.fromVars || {}
+  let toVars: GSAPTweenVars = config.toVars || {}
+  // Configure for reduced motion
+  gsap
+    .matchMedia()
+    .add({ reducedMotion: "(prefers-reduced-motion: reduce)" }, (context: gsap.Context) => {
+      const { reducedMotion } = context.conditions as ReducedMotionCondition
+      if (reducedMotion) {
+        messageTimeline.timeScale(0.6)
+        fromVars.yPercent = 50
+        toVars.ease = "power1.inOut"
+        toVars.stagger = { from: "start" }
+      }
     })
-    gsap.set(containerTarget, { autoAlpha: 1 })
-    let fromVars = config.entranceFromVars || {}
-    let toVars = config.entranceToVars || {}
-    let exitVars = config.exitVars || {}
-    gsap
-      .matchMedia()
-      .add({ reducedMotion: "(prefers-reduced-motion: reduce)" }, (context: gsap.Context) => {
-        const { reducedMotion } = context.conditions as ReducedMotionCondition
-        if (reducedMotion) {
-          messageTimeline.timeScale(0.6)
-          fromVars.yPercent = 50
-          toVars.ease = "power1.inOut"
-          toVars.stagger = { from: "start" }
-          exitVars.yPercent = -50
-          exitVars.ease = "power1.inOut"
-          exitVars.stagger = { from: "end" }
-        }
-      })
-    messageTimeline
-      .add(gsap.set(containerTarget, { contentVisibility: "visible", autoAlpha: 1 }))
-      .add(gsap.set(innerContainer, { autoAlpha: 1 }))
-      .add(
-        [
-          "randomEntrance",
-          gsap.fromTo(
-            fragDivs,
-            { autoAlpha: 0, yPercent: gsap.utils.random(-150, 150, 10), ...fromVars },
-            {
-              autoAlpha: 1,
-              zIndex: 350,
-              yPercent: 0,
-              contentVisibility: "visible",
-              stagger: { each: 0.03, from: "random" },
-              duration: 1,
-              ease: "power4.out",
-              z: 1,
-              ...toVars,
-            },
-          ),
-        ],
-        0.02,
-      )
-      .add(animateLogo.bind(this)(), ">")
-      .add(
-        [
-          "randomExit",
-          gsap.to(fragDivs, {
-            autoAlpha: 0,
-            duration: 1,
-            contentVisibility: "hidden",
-            yPercent: gsap.utils.random(-150, 150, 10),
-            zIndex: -10,
-            z: 0,
-            stagger: { each: 0.03, from: "random" },
-            onComplete: () => {
-              logger.info("Animation complete for exit effect.")
-            },
-            ...exitVars,
-          }),
-        ],
-        ">+=4",
-      )
-      .add(gsap.set(innerContainer, { autoAlpha: 0 }))
-    return messageTimeline
-  } else {
-    logger.info("No message provided for animation.")
-    return gsap.timeline()
-  }
-}
 
+  // Set up individual letters
+  fragDivs.forEach((div) => {
+    if (!div || !(div instanceof HTMLDivElement) || !div.children.length) {
+      return
+    }
+    gsap.set(div, hide())
+    const letters = gsap.utils.toArray(".hero__letter", div)
+    gsap.set(letters, hide())
+  })
+  return messageTimeline
+    .add(() => logger.debug("Starting text animation timeline effect"), 0)
+    .add(
+      [
+        "wordAnimation",
+        gsap.fromTo(
+          fragDivs,
+          hide({
+            yPercent: function () {
+              return gsap.utils.random(-150, 150, 10)
+            },
+            zIndex: 10,
+            ...fromVars,
+          }),
+          {
+            onStart: () => {
+              logger.debug("Word animation starting")
+              // Force parent container to be visible
+              gsap.set(
+                [containerTarget, innerContainer],
+                show({
+                  display: "flex",
+                  zIndex: 10,
+                }),
+              )
+
+              fragDivs.forEach((div) => {
+                if (div instanceof HTMLDivElement) {
+                  logger.debug("Animating letters in word")
+                  // Make div visible
+                  gsap.set(div, { visibility: "visible", display: "flex" })
+                  const letters = gsap.utils.toArray(".hero__letter", div)
+                  gsap.fromTo(
+                    letters,
+                    hide({
+                      yPercent: () => gsap.utils.random(-150, 150, 10),
+                      ...fromVars,
+                    }),
+                    show({
+                      yPercent: 0,
+                      stagger: { each: 0.03, from: "random" },
+                      duration: totalDuration,
+                      ease: "power4.out",
+                      repeatDelay: totalDuration / 2.5,
+                      zIndex: 50,
+                      yoyo: true,
+                      repeat: 1,
+                      ...toVars,
+                    }),
+                  )
+                }
+              })
+            },
+            ...show({
+              stagger: { each: 0.1, from: "start" },
+              zIndex: 15,
+              yPercent: 0,
+              duration: totalDuration,
+              yoyo: true,
+              repeatDelay: totalDuration / 2.5,
+              repeat: 1,
+              ease: "power4.out",
+              ...toVars,
+            }),
+          },
+        ),
+      ],
+      0.02,
+    )
+    .add(animateLogo(scope, config), "<=2.5")
+    .add(() => logger.debug("Finishing text animation"), ">")
+    .add(gsap.set([containerTarget, innerContainer], hide()), ">")
+}
 /**
  * Animates a message.
  * Note: The message will be animated by drawing text from the target element(s) if
@@ -483,10 +572,17 @@ function animateText(this: VideoManager, targets: gsap.TweenTarget, config: Anim
 gsap.registerEffect({
   name: "animateMessage",
   extendTimeline: true,
-  defaults: { extendTimeline: true, repeat: 0, paused: true, log: true },
   paused: true,
-  log: true,
-  effect: function (this: VideoManager, targets: gsap.TweenTarget, config: AnimateMessageConfig) {
-    return animateText.bind(this)(targets, config)
+  effect: function (targets: gsap.TweenTarget, config: AnimateMessageConfig) {
+    const scope =
+      config.sharedVars?.callbackScope ||
+      config.callbackScope ||
+      config.sharedVars?.["defaults"]["callbackScope"] ||
+      config.toVars?.callbackScope
+    if (!config || !targets || !scope) {
+      logger.error("No targets or scope provided for animateMessage")
+      return gsap.timeline()
+    }
+    return animateText(scope, targets, config)
   },
 })

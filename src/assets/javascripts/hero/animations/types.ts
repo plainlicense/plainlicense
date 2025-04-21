@@ -65,7 +65,8 @@ export interface TransitionConfig extends gsap.TweenVars {
 
 export interface AnimateMessageConfig extends gsap.TweenVars {
   message?: string
-  entranceFromVars?: gsap.TweenVars
-  entranceToVars?: gsap.TweenVars
-  exitVars?: gsap.TweenVars
+  duration?: number
+  sharedVars?: gsap.TweenVars
+  fromVars?: gsap.TweenVars
+  toVars?: gsap.TweenVars
 }
