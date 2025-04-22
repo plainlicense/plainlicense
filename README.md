@@ -1,5 +1,7 @@
 # Plain License
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/245ff2eeea34433f8a60ea949debf351)](https://app.codacy.com/gh/plainlicense/plainlicense?utm_source=github.com&utm_medium=referral&utm_content=plainlicense/plainlicense&utm_campaign=Badge_Grade)
+
 ## **Visit us at [plainlicense.org](plainlicense.org) for all the details!**
 
 **Plain License** is an initiative to rewrite popular software and creative licenses in plain, approachable language. Our goal is to make common licenses easy to understand for an average person with no legal background. We seek to recraft licenses in a way that is accessible, clear, and concise while maintaining the legal integrity and enforceability of the original licenses.
