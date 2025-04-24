@@ -1,6 +1,6 @@
 #!/bin/bash
 # Author: Adam Poulemanos - adam<at>plainlicense<dot>org
-# Produced for PlainLicense.org - https://plainlicense.org
+# Produced for plainlicense.org - https://plainlicense.org
 # Use for any purpose, without any restrictions.
 # License: Plain Unlicense - https://plainlicense.org/licenses/public-domain/unlicense.html
 # No rights reserved. Use at your own risk.

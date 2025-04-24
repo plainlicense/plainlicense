@@ -59,7 +59,7 @@ hide:
     ---
 
     :nounproject-about:{ .xl .ecru }
-    Check out our [FAQ](faq/index.md "Plain license's frequently asked questions") to get answers to your questions about Plain License, or go to our [discussions](https://github.com/seekinginfiniteloop/PlainLicense/discussions "Plain License discussions on GitHub") if your question isn't in the FAQ.
+    Check out our [FAQ](faq/index.md "Plain license's frequently asked questions") to get answers to your questions about Plain License, or go to our [discussions](https://github.com/plainlicense/plainlicense/discussions "Plain License discussions on GitHub") if your question isn't in the FAQ.
 
     __[:octicons-arrow-right-24: we have answers](faq/index.md "Get answers to common questions")__
 

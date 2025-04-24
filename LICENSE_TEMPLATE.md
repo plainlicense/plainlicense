@@ -49,7 +49,7 @@
 template: license.html
 plain_name: > # don't include version number or "the" in the plain name
   {{ plain_name }}
-# spdx_id: SPDX identifier for the original license, find it at https://spdx.org/licenses/ or in our repository at https://github.com/seekinginfiniteloop/PlainLicense/external/license-list-data/json/licenses.json (both are pulled from the same source)
+# spdx_id: SPDX identifier for the original license, find it at https://spdx.org/licenses/ or in our repository at https://github.com/plainlicense/plainlicense/external/license-list-data/json/licenses.json (both are pulled from the same source)
 # If the license is a Plain License original, try to copy the spdx convention when naming it, and prefix it with `Plain-`. Following SPDX convention, use the major.minor version number at the end of the spdx_id. Example: `Plain-Public-Work-1.0`
 spdx_id: >
   {{ spdx_id }}
@@ -81,10 +81,10 @@ note: >
 # will in the future. Their system divides tags into permissions, conditions, and limitations
 # SELECT ONLY TAGS THAT APPLY TO THE LICENSE, AND REMOVE THE REST. If the license is already on choosealicense.com,
 # please use the same tags as on their site. You can find all choosealicense.com licenses and their tags at
-# https://github.com/seekinginfiniteloop/PlainLicense/external/choosealicense.com/_licenses_/
+# https://github.com/plainlicense/plainlicense/external/choosealicense.com/_licenses_/
 # If the license is not on choosealicense.com, use the tags that best describe the license
 # Descriptions of the tags are here:
-# https://github.com/seekinginfiniteloop/PlainLicense/external/choosealicense.com/_data/rules.yml
+# https://github.com/plainlicense/plainlicense/external/choosealicense.com/_data/rules.yml
 # AS APPLICABLE:
 permissions:
   - distribution

@@ -74,9 +74,9 @@ def find_repo_root() -> Path:
     """
     current_path = Path.cwd()
     while not (current_path / ".git").exists():
-        if current_path.parent == current_path and current_path.stem != "PlainLicense":
+        if current_path.parent == current_path and current_path.stem != "plainlicense":
             raise FileNotFoundError("Could not find the repository root directory.")
-        if current_path.stem == "PlainLicense":
+        if current_path.stem == "plainlicense":
             return current_path
         current_path = current_path.parent
     return current_path

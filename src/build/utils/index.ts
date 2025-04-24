@@ -26,6 +26,12 @@ import type {
   VideoWidth,
 } from "../types"
 
+/**
+ * Calculates the SHA384 integrity hash of a given buffer.
+ * Hashes the provided content using SHA384 and returns the result as a base64-encoded string prefixed with "sha384-".
+ * @param content - The buffer to calculate the hash from.
+ * @returns A promise that resolves to the SHA384 integrity hash string.
+ */
 export async function calculateIntegrity(content: Buffer): Promise<string> {
   const hash = crypto.createHash("sha384")
   hash.update(content)
@@ -53,6 +59,7 @@ export async function fileExists(filePath: string): Promise<boolean> {
     .catch(() => false)
 }
 
+/** Checks if a path is a directory */
 export async function isDir(filePath: string): Promise<boolean> {
   return await fs
     .stat(filePath)
@@ -60,6 +67,10 @@ export async function isDir(filePath: string): Promise<boolean> {
     .catch(() => false)
 }
 
+/*
+ * Retrieves the file hash for a file, if it's available.
+ * Returns an empty string if the hash is not found.
+ */
 export function getHash(filePath: string): string {
   const pattern = new RegExp(hashPattern)
   const match = filePath.match(pattern)

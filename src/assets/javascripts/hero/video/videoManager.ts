@@ -30,13 +30,7 @@ import { AnimateMessageConfig } from "../animations"
 import { hide, show } from "../animations/utils"
 import { plainLogo } from "./data"
 import { TimelineManager } from "./timelineManager"
-import {
-  HeroVideo,
-  TimelinePauseArgs,
-  TimelinePlayResumeArgs,
-  TimelineRestartArgs,
-  TimelineSeekArgs,
-} from "./types"
+import { HeroVideo } from "./types"
 import { getHeroVideos, toggleActiveClass } from "./utils"
 import { VideoElement } from "./videoElement"
 
@@ -47,13 +41,8 @@ const { document$ } = customWindow
 /**
  * @class VideoManager
  * @description A class to manage video elements and their sources.
- ** NOTE: Use the class's pause(), play(), resume(), and stop() methods to control the
- ** video, not the video element's or timeline's methods.
- * @method @static getInstance - Returns the singleton instance of the VideoManager
- * @method play - Plays the video and timeline
- * @method pause - Pauses the video and timeline
- * @method resume - Resumes the video and timeline
- * @method stop - Stops the video and timeline (resets to the beginning)
+ * NOTE: Use the class's pause(), play(), resume(), and stop() methods to control the
+ * video, not the video element's or timeline's methods.
  */
 export class VideoManager {
   private static instance: VideoManager | undefined
@@ -147,11 +136,13 @@ export class VideoManager {
   // @ts-ignore - it is used in a callback
   private emphasisSet: boolean = false
 
-  private get videoDuration(): number {
+  private videoDuration = () => {
     return this.element?.duration
   }
 
-  private timeScale = () => 1 / this.videoDuration || 1
+  private timeScale = () => {
+    return 1 / this.videoDuration() || 1
+  }
 
   public timelineManager: TimelineManager = new TimelineManager()
 
@@ -159,12 +150,6 @@ export class VideoManager {
 
   private vidDefaults: gsap.TimelineVars = {
     callbackScope: this,
-    onStart: () => {
-      this.transitionToVideo()
-    },
-    onComplete: () => {
-      toggleActiveClass(this.element, "hero__video", false)
-    },
     repeat: 0,
     duration: 1,
     paused: true,
@@ -204,6 +189,7 @@ export class VideoManager {
         this.canPlay = state.canPlay
       }),
       filter((state) => state.canPlay),
+      debounceTime(300),
     )
 
     const canplaythrough$ = defer(() =>
@@ -220,15 +206,14 @@ export class VideoManager {
       ),
     )
 
-    // we handle the very unlikely edge case of someone turning off prefersReducedMotion while on site; we handle the normal case in statusSetter$
     const motionSub$ = defer(() =>
       prefersReducedMotion$.pipe(
         distinctUntilChanged((prev, cur) => prev === cur),
         skipUntil(videoState$),
         skipUntil(
           prefersReducedMotion$.pipe(filter((prefersReducedMotion) => prefersReducedMotion)),
-        ), // skip until we get a reduced signal
-        skipWhile((prefersReducedMotion) => prefersReducedMotion), // then skip until we don't get one again
+        ),
+        skipWhile((prefersReducedMotion) => prefersReducedMotion),
         distinctUntilChanged((prev, cur) => prev === cur),
         tap(() => {
           this.reinit()
@@ -285,7 +270,9 @@ export class VideoManager {
           } else if (!target.getBoundingClientRect().height) {
             return
           }
-          logger.debug("Setting video dimensions from loadedmetadata event, " + this.videoDuration)
+          logger.debug(
+            "Setting video dimensions from loadedmetadata event, " + this.videoDuration(),
+          )
           this.setVideoDimensionVars()
         }),
       ),
@@ -334,7 +321,7 @@ export class VideoManager {
       stallHandler$,
       errorHandler$,
       resize$,
-      motionSub$, // motionsub$ needs to be last
+      motionSub$, // motionSub$ needs to be last
     ]
 
     const videoObserver = {
@@ -344,7 +331,7 @@ export class VideoManager {
         logger.info("Received can play signal")
         secondaryObservables.forEach((obs: Observable<any>, i: number) => {
           if (i !== secondaryObservables.length - 1) {
-            // motionSub$ needs to stay alive when others are unsubscribed by prefersReducedMotion signal
+            // motionSub$ stays alive when others unsubscribe
             this.subscriptions.add(obs.subscribe())
           } else {
             obs.subscribe()
@@ -533,29 +520,17 @@ export class VideoManager {
           onComplete: () => {
             logger.debug("Text animation timeline completed")
             // Prepare the video for the next cycle
-            if (!this.isPlaying()) {
-              this.element.currentTime = 0
-            }
           },
         },
       ])
       .timeScale(1)
       .add(this.animateText(this.textDefaults), 0)
-      .add(gsap.to(this.ctaContainer, { ...show(), duration: 0.5 }))
-      .add(
-        gsap.to(".cta__container h1", {
-          ...show(),
-          duration: 0.5,
-        }),
-        ">",
-      )
-      .add(
-        gsap.to(".cta__container h2", { opacity: undefined, visibility: undefined, duration: 0.5 }),
-        ">",
-      )
       .add(() => {
         logger.info("Text timeline completed")
         logger.debug("Setting up for next cycle")
+        if (!this.emphasisSet) {
+          this.setEmphasisAnimations()
+        }
       })
     this.timelineManager.add(textTimeline)
   }
@@ -617,67 +592,70 @@ export class VideoManager {
    * Creates a GSAP timeline that synchronizes with a media element.
    * This allows for animations to be timed with the media playback.
    * *slightly modified from https://gsap.com/community/forums/topic/22234-control-video-html-tag/#comment-187059 thanks Jack!*
-   * @param config - GSAP timeline configuration.
    */
   private mediaTimeline() {
     const config = this.vidDefaults
     const existingOnStart = config.onStart
     const existingOnComplete = config.onComplete
-    const toggleHeaders = (vis: boolean) => {
+    const toggleHeadings = (vis: boolean) => {
       gsap.set(".cta__container h2", vis ? { ...show(), duration: 0.5 } : { ...hide() })
       gsap.set(".cta__container h1", vis ? { ...show(), duration: 0.5 } : { ...hide() })
     }
     const existingOnUpdate = config && config.onUpdate
+
     const tl = gsap.timeline([
-        "videoTimeline",
-        {
-          ...config,
-          duration: 1,
-          onStart: () => {
-            existingOnStart && existingOnStart()
-            updateDuration()
-            this.transitionToVideo()
-            gsap.set([this.element, this.container, this.ctaContainer], {
-              ...show(),
-              duration: 0.3,
-            })
-            toggleHeaders(true)
-            if (!this.isPlaying()) {
-              this.foulPlay()
-            }
-          },
-          onComplete: () => {
-            existingOnComplete && existingOnComplete()
-            gsap.set(this.ctaContainer, {
-              ...hide(),
-              duration: 0.5,
-            })
-            toggleHeaders(false)
-            toggleActiveClass(this.element, "hero__video", false)
-          },
-          callbackScope: this,
-          paused: true,
-          onUpdate() {
-            if (
-              tl.paused() ||
-              Math.abs(tl.time() * this.videoDuration - this.element.currentTime) > 0.5
-            ) {
-              this.element.currentTime = tl.time() * this.videoDuration
-            }
-            existingOnUpdate && existingOnUpdate.call(tl)
-          },
+      "videoTimeline",
+      {
+        ...config,
+        duration: 1,
+        onStart: () => {
+          existingOnStart && existingOnStart()
+          updateDuration()
+
+          this.transitionToVideo()
+          gsap.set([this.element, this.container, this.ctaContainer], {
+            ...show(),
+            duration: 0.3,
+          })
+          toggleHeadings(true)
+          if (!this.isPlaying()) {
+            this.foulPlay()
+          }
         },
-      ]),
-      updateDuration = () => {
-        tl.timeScale(this.timeScale())
+        onComplete: () => {
+          existingOnComplete && existingOnComplete()
+          gsap.set([this.element, this.ctaContainer], { ...hide(), duration: 0.5 })
+          toggleHeadings(false)
+          toggleActiveClass(this.element, "hero__video", false)
+          this.hasPlayed = true
+        },
+        callbackScope: this,
+        paused: true,
+        onUpdate: () => {
+          if (
+            tl.paused() ||
+            Math.abs(tl.time() * this.videoDuration() - this.element.currentTime) > 0.5
+          ) {
+            this.element.currentTime = tl.time() * this.videoDuration()
+          }
+          existingOnUpdate && existingOnUpdate()
+        },
       },
-      pause = tl.pause,
-      play = tl.play,
-      restart = tl.restart,
-      seek = tl.seek
+    ])
+    const updateDuration = () => {
+      tl.timeScale(this.timeScale())
+    }
+    // Store original timeline methods for wrapping
+    const originalPause = tl.pause.bind(tl)
+    const originalPlay = tl.play.bind(tl)
+    const originalRestart = tl.restart.bind(tl)
+    const originalSeek = tl.seek.bind(tl)
+
     tl.set({}, {}, 0)
     tl["media"] = this.element || document.querySelector(".hero__video")
     tl["foulPlay"] = this.foulPlay.bind(this)
+
+    // Setup element event listeners
     this.element.addEventListener("durationchange", updateDuration)
     updateDuration()
     this.element.onplay = () => {
@@ -700,60 +678,54 @@ export class VideoManager {
     }
     this.element.onended = () => {
       logger.info("Video ended event triggered")
-      logger.info("Video ended event detected")
       logger.debug(
-        `Video ended at ${tl["media"].currentTime} \n Video duration: ${this.videoDuration} \n Timeline time: ${tl.time()} \n Timeline duration: ${tl.duration()} \n Timeline progress: ${tl.progress()} \n Timeline paused: ${tl.paused()} \n Timeline isActive: ${tl.isActive()}`,
+        `Video ended at ${tl["media"].currentTime} \n Video duration: ${this.videoDuration()} \n Timeline time: ${tl.time()} \n Timeline duration: ${tl.duration()} \n Timeline progress: ${tl.progress()} \n Timeline paused: ${tl.paused()} \n Timeline isActive: ${tl.isActive()}`,
       )
       if (tl && tl.progress() !== 1 && !this.timelineManager.isTransitioning) {
-        // Force the timeline to complete
         tl.progress(1, true).eventCallback("onComplete")()
       }
     }
     this.element.onloadedmetadata = () => {
       updateDuration()
     }
-    this.element.onpause = () => {
-      if (tl.isActive()) {
-        tl.pause()
-      }
-    }
     this.element.onwaiting = () => {
+      updateDuration()
       if (tl.isActive()) {
-        this.element.pause()
         tl.pause()
       }
     }
-    tl.pause = function () {
+    tl.pause = (...args: any[]) => {
       tl["media"].pause()
-      pause.apply(tl, Array.from(arguments).slice(0, 2) as TimelinePauseArgs)
+      originalPause(...args)
       return tl
     }
-    tl.play = function () {
+    tl.play = (...args: any[]) => {
       tl["foulPlay"]()
-      play.apply(tl, Array.from(arguments).slice(0, 2) as TimelinePlayResumeArgs)
-      if (arguments.length) {
-        tl["media"].currentTime = (arguments[0] ?? 0) as number
+      originalPlay(...args)
+      if (args.length) {
+        tl["media"].currentTime = args[0] as number
       }
       return tl
     }
-    tl.restart = function () {
-      restart.apply(tl, Array.from(arguments).slice(0, 2) as TimelineRestartArgs)
-      if (arguments.length) {
-        tl["media"].currentTime = setTimeout(() => tl["media"].play(), arguments[0])
+    tl.restart = (...args: any[]) => {
+      originalRestart(...args)
+      if (args.length) {
+        setTimeout(() => tl["media"].play(), args[0] as number)
       }
       return tl
     }
-    tl.seek = function () {
-      seek.apply(tl, Array.from(arguments).slice(0, 2) as TimelineSeekArgs)
-      if (arguments.length) {
-        tl["media"].currentTime = arguments[0] * tl["media"].duration
+    tl.seek = (position: any, suppressEvents?: boolean) => {
+      originalSeek(position, suppressEvents)
+      if (position !== undefined) {
+        tl["media"].currentTime = position * tl["media"].duration
       }
-      tl.time(arguments[0] / tl["media"].duration || 0, arguments[1] ?? true)
+      tl.time(position / tl["media"].duration || 0, suppressEvents ?? true)
       return tl
     }
     tl.timeScale(this.timeScale())
     this.timelineManager.add(tl)
   }
+  // Updated portion starting with handleMediaError
 
   /*=============================================*/
   /* Error handling and tear down */
@@ -762,11 +734,9 @@ export class VideoManager {
     if (!this.okToPlay()) {
       return
     }
-    switch (error.code) {
-      case 1:
-        setTimeout(() => this.play(), 2000)
-        break
-      case 2:
+    const errorActions: Record<number, () => void> = {
+      1: () => setTimeout(() => this.play(), 2000),
+      2: () => {
         logger.error("Video element encountered an error. Network error.")
         try {
           this.element.load()
@@ -774,35 +744,33 @@ export class VideoManager {
           logger.error("Failed to reload video element.", err)
         }
         this.tryNewSource()
-        break
-      case 3:
-      case 4:
-        const name = error.code === 3 ? "decoder error" : "source error"
-        logger.error(`Video element encountered an error. ${name}.`)
+      },
+      3: () => {
+        logger.error("Video element encountered an error. Decoder error.")
         this.tryNewSource()
-        break
-      default:
-        logger.error("Video element encountered an error.", error)
-        Promise.resolve(this.tryNewSource()).catch(() => {
-          this.initiateFallback()
-        })
-        break
+      },
+      4: () => {
+        logger.error("Video element encountered an error. Source error.")
+        this.tryNewSource()
+      },
+    }
+    if (errorActions[error.code]) {
+      errorActions[error.code]()
+    } else {
+      logger.error("Video element encountered an error.", error)
+      Promise.resolve(this.tryNewSource()).catch(() => this.initiateFallback())
     }
   }
 
-  // I couldn't resist
-  private foulPlay(): void {
+  // Simplified foulPlay: triggers video transition and plays the video
+  private foulPlay = (): void => {
     if (!this.okToPlay()) {
-      // logger.debug("entered foulPlay, but not okToPlay, ")
-      // this.debugDump()
       return
     }
     this.transitionToVideo()
     this.element
       .play()
-      .then(() => {
-        this.beginPlay()
-      })
+      .then(() => this.beginPlay())
       .catch((error) => {
         logger.error("Error occurred during playback:", error)
         if (!this.timelineManager.isTransitioning && !this.onFallback) {
@@ -835,9 +803,9 @@ export class VideoManager {
         this.timelineManager.currentTimeline?.["media"] &&
         !this.timelineManager.currentTimeline?.duration()
       ) {
-        this.timelineManager.currentTimeline?.duration(1)
-        this.timelineManager.currentTimeline?.time(this.timeScale() * this.element.currentTime)
-        this.timelineManager.currentTimeline?.timeScale(this.timeScale())
+        this.timelineManager.currentTimeline.duration(1)
+        this.timelineManager.currentTimeline.time(this.timeScale() * this.element.currentTime)
+        this.timelineManager.currentTimeline.timeScale(this.timeScale())
       }
     }
     this.setVideoDimensionVars()
@@ -845,13 +813,11 @@ export class VideoManager {
     document.removeEventListener("touchstart", this.addPlayOnInteraction)
   }
 
-  private addPlayOnInteraction(): void {
+  private addPlayOnInteraction = (): void => {
     const playOnInteraction = () => {
       this.element
         .play()
-        .then(() => {
-          this.beginPlay()
-        })
+        .then(() => this.beginPlay())
         .catch((e) => {
           if (this.hasPlayed || this.onFallback || this.otherTimelineActive()) {
             return
@@ -873,9 +839,7 @@ export class VideoManager {
     }
     this.element
       .play()
-      .then(() => {
-        this.beginPlay()
-      })
+      .then(() => this.beginPlay())
       .catch(() => {
         this.transitionToVideo(true)
         document.addEventListener("click", playOnInteraction)
@@ -899,7 +863,6 @@ export class VideoManager {
 
   private tryNewSource(): void {
     logger.info("Switching codec...")
-    // Replace this.element.src with a URL pointing to a video that uses a supported codec -- the mimetype details should prevent this, but sometimes browsers aren't the brightest
     const { currentSrc } = this.element
     const parsedSrc = parsePath(currentSrc)
     const { name } = parsedSrc
@@ -919,9 +882,7 @@ export class VideoManager {
     fromEvent(this.element, "canplaythrough").subscribe(() => {
       this.element
         .play()
-        .then(() => {
-          this.beginPlay()
-        })
+        .then(() => this.beginPlay())
         .catch(() => {
           this.timelineManager.restart().pause()
           this.addPlayOnInteraction()
@@ -931,11 +892,12 @@ export class VideoManager {
 
   private loadBackup(): void {
     requestAnimationFrame(() => {
-      !elementInDom(this.backupPicture) && this.container.append(this.backupPicture)
+      if (!elementInDom(this.backupPicture)) {
+        this.container.append(this.backupPicture)
+      }
     })
     this.exchangePosters(this.backupPicture, this.poster)
     gsap.to(this.backupPicture, { ...show(), duration: 1 })
-
     logger.info("Backup loaded and set to visible:", this.backupPicture)
   }
 
@@ -983,7 +945,7 @@ export class VideoManager {
       onFallback: this.onFallback,
       otherTimelineActive: this.otherTimelineActive(),
     })
-    logger.debug("Debugging VideoManager timelines: ", {
+    logger.debug("Debugging VideoManager timelines:", {
       timelineManager: this.timelineManager,
       textTimeline: textTl || null,
       videoTimeline: videoTl || null,
@@ -1012,12 +974,12 @@ export class VideoManager {
     )
   }
 
-  public relativeToDuration(realTime: number = this.element.currentTime) {
-    return realTime / this.videoDuration
+  public relativeToDuration(realTime: number = this.element.currentTime): number {
+    return realTime / this.videoDuration()
   }
 
   public timeLeft(): number {
-    return this.videoDuration - this.element.currentTime
+    return this.videoDuration() - this.element.currentTime
   }
 
   public play(): void {
@@ -1048,5 +1010,13 @@ export class VideoManager {
 
   public seek(time: number): void {
     this.timelineManager.seek(time)
+    this.updateVideoTime()
+  }
+
+  private updateVideoTime(): void {
+    if (this.element && this.timelineManager.currentTimeline) {
+      const currentTime = this.timelineManager.currentTimeline.time() ?? 0
+      this.element.currentTime = currentTime
+    }
   }
 }

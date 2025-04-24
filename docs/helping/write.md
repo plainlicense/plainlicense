@@ -5,14 +5,15 @@ description: Learn how to write clearly and accessibly for Plain License, includ
 ---
 # Plain Language Writing Guidelines
 
-Plain License aims to make legal concepts accessible to everyone using plain language. We need your help. Consider every word you write and how it can be made clearer and more understandable. Here are some guidelines to help you write effectively for Plain License.
+Plain License aims to make legal concepts accessible to everyone using plain language. We need your help. Consider every word you write and how it can be clearer and more understandable. Here are some guidelines to help you write effectively for Plain License.
 
 **Remember your goal: make your message clear and accessible for as wide an audience as possible.**
 
-## Core Principles
+## General Guidelines
 
 - Use simple words and sentences.
-- Capture ideas, not structure. Don't feel bound by the original format.
+- Try to write in the "Plain License voice" – friendly, approachable, and clear. See [Plain License Voice][voice] for more details.
+- Capture ideas, not structure. You don't need to follow the original format.
 - Use active voice and an informal tone.
 - Be consistent with word choice. Use the same term for a concept every time.
 - Avoid specialized language. If you must use a technical term, explain it, or use a simpler term alongside it.
@@ -35,22 +36,39 @@ If a license talks about "contributors" as well as 'licensors' (or similar), we 
 
 1.  **Use Simple Language**
 
-    - Choose common, everyday words
-    - Break long sentences into shorter ones
-    - Explain complex ideas step-by-step
-    - Test your writing for readability
+    -   Choose common, everyday words
+
+        - ✅ "You give up all rights to your work."
+        - ❌ "You relinquish all proprietary claim to intellectual property."
+
+    -   Break long sentences into shorter ones
+
+        - ✅ "This license lets others see your work, but limits commercial use."
+        - ❌ "This particular license provides transparency regarding your work while simultaneously imposing restrictions on utilization within commercial contexts."
+
+    -   Explain complex ideas step-by-step
+    -   Test your writing for readability
 
 2.  **Focus on Ideas, Not Structure**
 
     - Think about the core message you want to convey, and organize your writing around that
-    - Don't feel bound by the original format
+    - You don't need to follow the original format or structure
     - Group related information together
 
 3.  **Use Active Voice and Informal Tone**
 
-    - Write as if you're speaking to the reader
-    - Avoid formal or stuffy language
-    - Use "you" to address the reader directly. If you need to distinguish between different groups, a table can help. For example:
+    -   Use active voice to make your writing more direct and engaging
+
+        - ✅ "You can use this license to share your work."
+        - ❌ "This license can be used by you to share your work."
+
+    -   Avoid formal or stuffy language
+    -   Speak directly to people
+
+        - ✅ "You can use this license when you want credit for your work"
+        - ❌ "This license is applicable in scenarios where attribution is desired"
+
+    -   Use "you" to address the reader directly. If you need to distinguish between different groups, a table can help. For example:
 
     If you are a developer... | If you are a user...
     ---------------------------|-------------------
@@ -66,9 +84,12 @@ If a license talks about "contributors" as well as 'licensors' (or similar), we 
 
 5.  **Avoid Specialized Language**
 
-    - Explain technical terms if you must use them
-    - Don't use legal jargon. If you must, explain it in plain language
-    - Rephrase idioms or cultural references to be more universal
+    -   Explain technical terms if you must use them
+    -   Don't use legal jargon. If you must, explain it in plain language
+    -   Rephrase idioms or cultural references to be more universal
+
+        - ✅ "You keep control of your work"
+        - ❌ "You retain the reins on your intellectual property"
 
 6.  **Structure for Readability**
 
@@ -105,6 +126,12 @@ If a license talks about "contributors" as well as 'licensors' (or similar), we 
      - Ask someone unfamiliar with the topic to read it
      - Use readability tools to assess complexity
      - Get feedback on the effectiveness of your visual elements
+
+### Writing Levels
+
+- Aim for 8th-grade reading level
+- Use tools like Hemingway Editor to check
+- Remember: clarity isn't "dumbing down" – it's effective communication
 
 ## Resources
 

@@ -1,7 +1,7 @@
 site_name: Plain License
 site_url: https://plainlicense.org
-repo_url: https://github.com/seekinginfiniteloop/PlainLicense
-repo_name: PlainLicense
+repo_url: https://github.com/plainlicense/plainlicense
+repo_name: plainlicense
 edit_uri: edit/main/docs/
 copyright: Plain License's authors dedicate all original content to the public domain. No rights reserved.
 hooks:
@@ -42,6 +42,7 @@ nav:
       - legal: helping/legal.md
       - translate: helping/translate.md
       - code: helping/code.md
+      - speak: helping/voice.md
       - donate: helping/donate.md
   - blog: blog/index.md
 theme:
@@ -196,8 +197,8 @@ markdown_extensions:
       repo_url_shorthand: true
       social_url_shorthand: true
       provider: github
-      user: seekinginfiniteloop
-      repo: PlainLicense
+      user: plainlicense
+      repo: plainlicense
   - pymdownx.progressbar:
       progress_increment: 20
   - pymdownx.smartsymbols
@@ -255,11 +256,11 @@ extra:
     plain_url: >
       "licenses/{{ category.lower() | trim }}/{{ spdx_id.lower() | trim }}/"
     github_base_url: >
-      https://github.com/seekinginfiniteloop/PlainLicense
+      https://github.com/plainlicense/plainlicense
     github_issues_link: >
-      [submit an issue](https://github.com/seekinginfiniteloop/PlainLicense/issues/new/choose "Submit an issue on GitHub")
+      [submit an issue](https://github.com/plainlicense/plainlicense/issues/new/choose "Submit an issue on GitHub")
     github_edit_link: >
-      [edit this page](https://github.com/seekinginfiniteloop/PlainLicense/edit/main/docs/licenses/{{ category.lower() | trim }}/{{ spdx_id.lower() | trim }}/index.md "Edit this license on GitHub")
+      [edit this page](https://github.com/plainlicense/plainlicense/edit/main/docs/licenses/{{ category.lower() | trim }}/{{ spdx_id.lower() | trim }}/index.md "Edit this license on GitHub")
     hide: # list of mkdocs components to hide in licenses; the table of contents is already hidden in the license template.
     official_link: >
       [{{ original_name | trim }}]({{ original_url | trim }} "Official {{ original_name | trim }}")
@@ -298,7 +299,7 @@ extra:
       url: >
         https://squidfunk.github.io/mkdocs-material/reference/tooltips/#adding-abbreviations "Adding abbreviations and acronyms with tooltips"
       description: >
-        Add abbreviations and acronyms with tooltips. You can do this sitewide by adding to [abbreviations.md](https://github.com/seekinginfiniteloop/PlainLicense/edit/main/includes/abbreviations.md "/includes/abbreviations.md") or on a per-page basis.
+        Add abbreviations and acronyms with tooltips. You can do this sitewide by adding to [abbreviations.md](https://github.com/plainlicense/plainlicense/edit/main/includes/abbreviations.md "/includes/abbreviations.md") or on a per-page basis.
     betterem:
       name: better emphasis
       url: >

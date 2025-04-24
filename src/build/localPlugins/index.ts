@@ -29,9 +29,18 @@ export const Manifest = manifestPlugin({
   },
 })
 
+/**
+ * Manages a collection of replacement configurations for string manipulation.
+ * Provides methods to add, retrieve, and apply replacements to content.
+ */
 class ReplacementManager {
   replacerConfigs: ReplacerConfig[] = []
+  /**
+   * Initializes a new instance of the `ReplacementManager` class.
+   * @param replacerConfig - Optional initial replacer configuration(s).
+   */
   constructor(replacerConfig?: ReplacerConfig | ReplacerConfig[]) {
+
     if (replacerConfig) {
       if (Array.isArray(replacerConfig)) {
         replacerConfig.forEach((r) => {
@@ -42,6 +51,10 @@ class ReplacementManager {
       }
     }
   }
+  /**
+   * Adds a new replacer configuration.
+   * @param replacerConfig - The replacer configuration to add.
+   */
   addReplacer(replacerConfig: ReplacerConfig) {
     if (
       replacerConfig.name &&
@@ -57,6 +70,12 @@ class ReplacementManager {
     }
   }
 
+  /**
+   * Applies a specific replacement to the given content.
+   * @param content - The content to apply the replacement to.
+   * @param name - The name of the replacer configuration to use.
+   * @returns A promise that resolves to the modified content.
+   */
   public replace(content: string, name: string): Promise<string> {
     const replacerConfig = this.getReplacer(name)
     if (!replacerConfig) {
@@ -87,6 +106,12 @@ class ReplacementManager {
     return Promise.resolve(content)
   }
 
+  /**
+   * Applies all applicable replacements to the given content based on file path.
+   * @param content - The content to apply replacements to.
+   * @param file - The file path associated with the content.
+   * @returns A promise that resolves to the modified content.
+   */
   public async replaceAll(content: string, file: string): Promise<string> {
     let newContent = content
     for (const replacerConfig of this.replacerConfigs) {
@@ -98,6 +123,12 @@ class ReplacementManager {
     return newContent
   }
 
+  /**
+   * Applies all applicable replacements to a set of files.
+   * Reads each file, applies replacements, and writes the modified content back.
+   * @param files - An array of file paths to process.
+   * @returns A promise that resolves when all files have been processed.
+   */
   public async replaceAllFiles(files: string[]): Promise<void> {
     const filePromises = files.map(async (file) => {
       const content = await fs.readFile(file, "utf8")
@@ -107,18 +138,37 @@ class ReplacementManager {
     await Promise.all(filePromises)
   }
 
+  /**
+   * Performs a simple string replacement.
+   * @param content - The content to perform the replacement on.
+   * @param pattern - The regular expression pattern to match.
+   * @param replacement - The replacement string.
+   * @returns The modified content.
+   */
   public static simpleReplace(content: string, pattern: RegExp, replacement: string): string {
     return content.replace(pattern, replacement)
   }
 
+  /**
+   * Retrieves a replacer configuration by its name.
+   * @param name - The name of the replacer configuration to retrieve.
+   * @returns The replacer configuration if found, otherwise undefined.
+   */
   public getReplacer(name: string): ReplacerConfig | undefined {
     return this.replacerConfigs.find((r) => r.name === name)
   }
 
+  /**
+   * Gets all replacer configurations.
+   * @returns An array of all replacer configurations.
+   */
   public getReplacers(): ReplacerConfig[] {
     return this.replacerConfigs
   }
 
+  /**
+   * Clears all replacer configurations.
+   */
   public clearReplacers(): void {
     this.replacerConfigs = []
   }
@@ -175,6 +225,10 @@ const replacerConfigs: ReplacerConfig[] = [
 
 export const ReplacersPlugin = {
   name: "ReplacementManager",
+  /**
+   * Sets up the plugin.
+   * @param build - The esbuild build object.
+   */
   setup(build: esbuild.PluginBuild) {
     build.onEnd(async (results: esbuild.BuildResult) => {
       buildOutput = results.metafile?.outputs || {}
