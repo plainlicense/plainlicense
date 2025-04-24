@@ -166,7 +166,6 @@
     "vue-html": true,
     "yaml": true
   },
-  "npm.packageManager": "bun",
   "python.languageServer": "Pylance",
   "quokka.automaticRestart": true,
   "quokka.showValueOnMultilineSelection": true,
@@ -175,5 +174,8 @@
   "typescript.tsserver.web.typeAcquisition.enabled": true,
   "javascript.updateImportsOnFileMove.enabled": "always",
   "typescript.updateImportsOnFileMove.enabled": "always",
-  "vsintellicode.typescript.completionsEnabled": true
+  "vsintellicode.typescript.completionsEnabled": true,
+  "npm.packageManager": "bun",
+  "npm.scriptRunner": "bun",
+  "npm.fetchOnlinePackageInfo": true,
 }
