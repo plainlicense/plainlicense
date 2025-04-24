@@ -42,6 +42,7 @@ nav:
       - legal: helping/legal.md
       - translate: helping/translate.md
       - code: helping/code.md
+      - speak: helping/voice.md
       - donate: helping/donate.md
   - blog: blog/index.md
 theme:

@@ -32,7 +32,6 @@ import { Observable, from } from "rxjs"
 import { PROJECTS, backupImage, basePosterObj, baseProject, webConfig } from "./config/"
 import { FileHashes, ImageIndex, Manifest, Project, buildJson, esbuildOutputs } from "./types"
 import * as utils from "./utils"
-import { copyIfChanged } from "./utils/cache"
 
 // TODO: Refactor to use esbuild's transform API and reduce the number of file reads and writes
 
@@ -49,20 +48,6 @@ const projects = PROJECTS
 const remainingProjects = () => projects.length - (projects.indexOf(currentProject) + 1)
 let newFileLocs: FileHashes = {}
 let outputMeta = {}
-
-/**
- * Copy a file if it has changed
- * @param src source file
- * @param dest destination file
- */
-async function copyFileIfChanged(src: string, dest: string): Promise<void> {
-  try {
-    await utils.makeDir(path.dirname(dest)) // Ensure the destination directory exists
-    copyIfChanged(src, dest) // Use the cached version from cache.ts
-  } catch (error) {
-    console.error(`Error copying file from ${src} to ${dest}:`, error)
-  }
-}
 
 /**
  * @param {Project} project - the project to build
