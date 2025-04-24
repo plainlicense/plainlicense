@@ -39,9 +39,7 @@
       "source.organizeImports": "always"
     },
     "editor.codeActions.triggerOnFocusChange": true,
-    "editor.pasteAs.preferences": [
-
-    ]
+    "editor.pasteAs.preferences": []
   },
   "[json]": {
     "editor.codeActionsOnSave": {
@@ -178,4 +176,7 @@
   "npm.packageManager": "bun",
   "npm.scriptRunner": "bun",
   "npm.fetchOnlinePackageInfo": true,
+  "copyrightInserter.license": "user",
+  "copyrightInserter.holder": "",
+  "copyrightInserter.userText": "Unless where explicitly stated, all Plain License materials are dedicated to the public under the [Plain Unlicense](https://plainlicense.org/licenses/public-domain/unlicense/index.html). No rights reserved. Use it any way you want.",
 }
