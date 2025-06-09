@@ -1,7 +1,4 @@
 {
-  "eslint.format.enable": true,
-  "eslint.lintTask.enable": true,
-  "vs-code-prettier-eslint.prettierLast": true,
   "[css]": {
     "editor.defaultFormatter": "stylelint.vscode-stylelint",
     "editor.codeActionsOnSave": {
@@ -74,9 +71,8 @@
     "editor.formatOnSave": true,
     "editor.formatOnType": true,
     "editor.tabSize": 4,
-    "files.eol": "\n",
-    "github.copilot.editor.enableAutoCompletions": true
-  },
+    "files.eol": "\n"
+    },
   "[typescript]": {
     "editor.codeActionsOnSave": {
       "source.fixAll": "always",
@@ -84,7 +80,7 @@
       "source.fixAll.ts": "always",
       "source.organizeImports": "always",
       "source.organizeImports.ts": "always",
-      "source.addMissingImports.ts": "always",
+      "source.addMissingImports.ts": "always"
     },
     "editor.formatOnSaveMode": "file",
     "files.autoSave": "onFocusChange",
@@ -112,21 +108,6 @@
   "editor.fontWeight": "450",
   "editor.formatOnPaste": true,
   "editor.formatOnSave": true,
-  "eslint.codeActionsOnSave.mode": "all",
-  "eslint.codeActionsOnSave.rules": [
-    "!no-unused-vars"
-  ],
-  "eslint.useFlatConfig": true,
-  "eslint.probe": [
-    "javascript",
-    "javascriptreact",
-    "typescript",
-    "typescriptreact",
-    "html",
-    "vue",
-    "markdown",
-    "vue-html"
-  ],
   "git.allowNoVerifyCommit": true,
   "git.autoStash": true,
   "git.autofetch": true,
@@ -178,5 +159,5 @@
   "npm.fetchOnlinePackageInfo": true,
   "copyrightInserter.license": "user",
   "copyrightInserter.holder": "",
-  "copyrightInserter.userText": "Unless where explicitly stated, all Plain License materials are dedicated to the public under the [Plain Unlicense](https://plainlicense.org/licenses/public-domain/unlicense/index.html). No rights reserved. Use it any way you want.",
+  "copyrightInserter.userText": "Unless where explicitly stated, all Plain License materials are dedicated to the public under the [Plain Unlicense](https://plainlicense.org/licenses/public-domain/unlicense/index.html). No rights reserved. Use it any way you want."
 }

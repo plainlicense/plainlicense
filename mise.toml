@@ -1,0 +1,17 @@
+[tools]
+bun = "latest"
+gitsign = "latest"
+"npm:commitizen" = "latest"
+"npm:commitlint" = "latest"
+"npm:eslint" = "latest"
+"npm:markdownlint-cli2" = "latest"
+"npm:prettier" = "latest"
+"npm:semantic-release-cli" = "latest"
+"npm:stylelint" = "latest"
+pre-commit = "latest"
+ruff = "latest"
+typos = "latest"
+uv = "latest"
+
+[env]
+PATH = "~/.local/share/mise/shims:$PATH"
