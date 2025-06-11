@@ -6,13 +6,13 @@
  * @license Plain-Unlicense
  * @author Adam Poulemanos adam<at>plainlicense<dot>org
  */
-import gsap from "gsap"
-import { EmphasisConfig } from "~/hero"
-import type { FadeInConfig, ObserverConfig } from "./types"
+import gsap from 'gsap';
+import type { EmphasisConfig } from '~/hero';
+import type { FadeInConfig, ObserverConfig } from './types';
 
 // tags to exclude from animation
-export const EXCLUDED_TAGS = ["STYLE", "SCRIPT", "NOSCRIPT"] as const
-export const BACKUP_PICTURE = "break_free" as const
+export const EXCLUDED_TAGS = ['STYLE', 'SCRIPT', 'NOSCRIPT'] as const;
+export const BACKUP_PICTURE = 'break_free' as const;
 
 const FADE_IN_CONFIG: FadeInConfig = {
   prefersReducedMotion: {
@@ -35,43 +35,43 @@ const FADE_IN_CONFIG: FadeInConfig = {
     },
   },
   defaults: {
-    ease: "power1.inOut",
+    ease: 'power1.inOut',
     paused: false,
   },
-} as const
+} as const;
 
 /**
  * @type {ObserverConfig} OBSERVER_CONFIG
  * @description Configuration for the observer
  */
 export const OBSERVER_CONFIG: ObserverConfig = {
-  header: "#hero-header, nav.md-tabs",
-  footer: "#hero-footer",
+  header: '#hero-header, nav.md-tabs',
+  footer: '#hero-footer',
   fades: {
-    fadeInSections: gsap.utils.toArray("section"),
+    fadeInSections: gsap.utils.toArray('section'),
     fadeInDuration: 0.5,
     fadeInConfig: FADE_IN_CONFIG,
   },
   slides: {
-    sections: gsap.utils.toArray("section"),
+    sections: gsap.utils.toArray('section'),
     slideDuration: 1.25,
     clickPause: 5,
     scrollPause: 10,
   },
-  clickTargets: ".cta__container--target-selector",
-  ignoreTargets: "a, button, header, navigation, nav.md-tabs",
+  clickTargets: '.cta__container--target-selector',
+  ignoreTargets: 'a, button, header, navigation, nav.md-tabs',
   emphasisTargets: {
-    subtle: "#hero-button",
-    strong: "#arrow-down",
+    subtle: '#hero-button',
+    strong: '#arrow-down',
   },
-} as const
+} as const;
 
 /**
  * @type {string} VIDEO_MANAGER_ELEMENTS
  * @description Elements for observer to ignore when VideoManager is active
  */
 export const VIDEO_MANAGER_ELEMENTS: string =
-  ".hero__video, .hero__poster, .hero__poster--image, .hero__backup, noscript, style, script" as const
+  '.hero__video, .hero__poster, .hero__poster--image, .hero__backup, noscript, style, script' as const;
 
 /**
  * Minimum widths for video source media queries
@@ -79,41 +79,52 @@ export const VIDEO_MANAGER_ELEMENTS: string =
  * Values are the minimum width of the viewport
  */
 export const MAX_WIDTHS = {
-  426: "426",
-  640: "640",
-  854: "854",
-  1280: "1280",
-  1920: "1920",
-  2560: "2560",
-  3840: "3840",
-} as const
+  426: '426',
+  640: '640',
+  854: '854',
+  1280: '1280',
+  1920: '1920',
+  2560: '2560',
+  3840: '3840',
+} as const;
 
 export const SUBTLE_EMPHASIS_CONFIG: EmphasisConfig = {
   blinkConfig: {
-    startAt: { filter: "brightness(1.1)" },
+    startAt: { filter: 'brightness(1.1)' },
     autoAlpha: 0.4,
     duration: 1,
-    ease: "power1.inOut",
+    ease: 'power1.inOut',
     repeat: -1,
     yoyo: true,
     repeatDelay: 0.5,
-    filter: "brightness(1.1)",
+    filter: 'brightness(1.1)',
   },
   jumpConfig: {
     y: -2,
     duration: 0.5,
-    ease: "elastic",
+    ease: 'elastic',
     repeatDelay: 4,
     repeat: -1,
-    yoyoEase: "elastic",
+    yoyoEase: 'elastic',
   },
-  scaleUpConfig: { scale: 1.1, duration: 1, repeatDelay: 4, repeat: -1, ease: "power1.inOut" },
-} as const
+  scaleUpConfig: {
+    scale: 1.1,
+    duration: 1,
+    repeatDelay: 4,
+    repeat: -1,
+    ease: 'power1.inOut',
+  },
+} as const;
 
 export const STRONG_EMPHASIS_CONFIG: EmphasisConfig = {
-  blinkConfig: { yoyoEase: "power1.in", repeat: -1, repeatDelay: 0.5, autoAlpha: 0.4 },
+  blinkConfig: {
+    yoyoEase: 'power1.in',
+    repeat: -1,
+    repeatDelay: 0.5,
+    autoAlpha: 0.4,
+  },
   jumpConfig: {},
   scaleUpConfig: { duration: 1, scale: 1.1 },
-} as const
+} as const;
 
-export const VIDEO_END_BUFFER = 5 as const
+export const VIDEO_END_BUFFER = 5 as const;

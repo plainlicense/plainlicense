@@ -3,64 +3,64 @@
  * @description Animation types for the Hero feature.
  * @type {string}
  */
-export type AnimationType = "video" | "scrollTrigger"
+export type AnimationType = 'video' | 'scrollTrigger';
 
 export enum HeroName {
-  TokyoShuffle = "tokyo_shuffle",
-  BreakFree = "break_free",
+  TokyoShuffle = 'tokyo_shuffle',
+  BreakFree = 'break_free',
 }
 
-export type Animations = Map<symbol, gsap.core.Timeline>
+export type Animations = Map<symbol, gsap.core.Timeline>;
 
-export type VideoWidth = 426 | 640 | 854 | 1280 | 1920 | 2560 | 3840
+export type VideoWidth = 426 | 640 | 854 | 1280 | 1920 | 2560 | 3840;
 
-export type HeroPaths = Record<VideoWidth, URL>
+export type HeroPaths = Record<VideoWidth, URL>;
 
-export type VideoCodec = "av1" | "vp9" | "h264"
+export type VideoCodec = 'av1' | 'vp9' | 'h264';
 
 export interface ImageFormatData {
-  widths: HeroPaths
-  srcset: string
-  parent?: string
+  widths: HeroPaths;
+  srcset: string;
+  parent?: string;
 }
 
-export type ImageType = "avif" | "webp" | "png"
+export type ImageType = 'avif' | 'webp' | 'png';
 
-export type MediaFileExtension = ImageType | "mp4" | "webm"
+export type MediaFileExtension = ImageType | 'mp4' | 'webm';
 
-export type ImageIndex = Record<ImageType, ImageFormatData>
+export type ImageIndex = Record<ImageType, ImageFormatData>;
 
-export type CodecVariants = Record<VideoCodec, HeroPaths>
+export type CodecVariants = Record<VideoCodec, HeroPaths>;
 
-export type TimelinePauseArgs = [atTime?: number | undefined, suppressEvents?: boolean | undefined]
+export type TimelinePauseArgs = [atTime?: number | undefined, suppressEvents?: boolean | undefined];
 
-export type TimelinePlayResumeArgs = [from?: any, suppressEvents?: boolean | undefined]
+export type TimelinePlayResumeArgs = [from?: any, suppressEvents?: boolean | undefined];
 
-export type TimelineSeekArgs = [time: number, suppressEvents?: boolean | undefined]
+export type TimelineSeekArgs = [time: number, suppressEvents?: boolean | undefined];
 
 export type TimelineRestartArgs = [
   includeDelay?: boolean | undefined,
   suppressEvents?: boolean | undefined,
-]
+];
 
 export interface VideoResolution {
-  width: VideoWidth
-  height: number
+  width: VideoWidth;
+  height: number;
 }
 
 export interface HeroVideo {
-  baseName: HeroName
-  parentPath: string // Path to the parent directory of the video
-  variants: CodecVariants
-  poster: ImageIndex
-  message?: string
+  baseName: HeroName;
+  parentPath: string; // Path to the parent directory of the video
+  variants: CodecVariants;
+  poster: ImageIndex;
+  message?: string;
 }
 
 export type VideoStatus =
-  | "not_initialized"
-  | "loading"
-  | "loaded"
-  | "playing"
-  | "paused"
-  | "on_textAnimation"
-  | "on_fallback"
+  | 'not_initialized'
+  | 'loading'
+  | 'loaded'
+  | 'playing'
+  | 'paused'
+  | 'on_textAnimation'
+  | 'on_fallback';

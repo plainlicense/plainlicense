@@ -1,10 +1,12 @@
-import { createHash } from "crypto"
-import esbuild from "esbuild"
-import manifestPlugin from "esbuild-plugin-manifest"
-import { promises as fs } from "fs"
-import { EsbuildOutput, ReplacerConfig } from "../types"
+/** biome-ignore-all lint/correctness/noNodejsModules: because build script */
 
-let buildOutput: EsbuildOutput = {}
+import type esbuild from 'esbuild';
+import manifestPlugin from 'esbuild-plugin-manifest';
+import { createHash } from 'node:crypto';
+import { promises as fs } from 'node:fs';
+import type { EsbuildOutput, ReplacerConfig } from '../types';
+
+let buildOutput: EsbuildOutput = {};
 
 export const Manifest = manifestPlugin({
   hash: false,
@@ -12,42 +14,41 @@ export const Manifest = manifestPlugin({
   // The `entries` object is what the contents of the manifest would normally be without using a custom `generate` function.
   // It is a string to string mapping of the original asset name to the output file name.
   generate: (entries) => {
-    let manifest: Record<string, { file: string; integrity: string }> = {}
+    const manifest: Record<string, { file: string; integrity: string }> = {};
 
     for (const [source, file] of Object.entries(entries)) {
-      const filePath = file.replace("docs/", "")
+      const filePath = file.replace('docs/', '');
       manifest[source] = {
         file: filePath,
         integrity:
-          "sha384-" +
-          createHash("sha384")
+          'sha384-' +
+          createHash('sha384')
             .update(filePath as string)
-            .digest("base64"),
-      }
+            .digest('base64'),
+      };
     }
-    return manifest
+    return manifest;
   },
-})
+});
 
 /**
  * Manages a collection of replacement configurations for string manipulation.
  * Provides methods to add, retrieve, and apply replacements to content.
  */
 class ReplacementManager {
-  replacerConfigs: ReplacerConfig[] = []
+  replacerConfigs: ReplacerConfig[] = [];
   /**
    * Initializes a new instance of the `ReplacementManager` class.
    * @param replacerConfig - Optional initial replacer configuration(s).
    */
   constructor(replacerConfig?: ReplacerConfig | ReplacerConfig[]) {
-
     if (replacerConfig) {
       if (Array.isArray(replacerConfig)) {
         replacerConfig.forEach((r) => {
-          this.addReplacer(r)
-        })
+          this.addReplacer(r);
+        });
       } else {
-        this.addReplacer(replacerConfig)
+        this.addReplacer(replacerConfig);
       }
     }
   }
@@ -62,11 +63,10 @@ class ReplacementManager {
       (replacerConfig.replacer || replacerConfig.simple || replacerConfig.custom) &&
       !this.replacerConfigs.find((r) => r.name === replacerConfig.name)
     ) {
-      const updated =
-        replacerConfig.replacer ?
-          { ...replacerConfig, replacerConfig: replacerConfig.replacer.bind(this) }
-        : replacerConfig
-      this.replacerConfigs.push(updated)
+      const updated = replacerConfig.replacer
+        ? { ...replacerConfig, replacerConfig: replacerConfig.replacer.bind(this) }
+        : replacerConfig;
+      this.replacerConfigs.push(updated);
     }
   }
 
@@ -77,14 +77,14 @@ class ReplacementManager {
    * @returns A promise that resolves to the modified content.
    */
   public replace(content: string, name: string): Promise<string> {
-    const replacerConfig = this.getReplacer(name)
+    const replacerConfig = this.getReplacer(name);
     if (!replacerConfig) {
-      return Promise.resolve(content)
+      return Promise.resolve(content);
     }
-    if (replacerConfig.custom && "custom" in replacerConfig) {
+    if (replacerConfig.custom && 'custom' in replacerConfig) {
       for (const custom of replacerConfig.custom) {
         if (custom in replacerConfig) {
-          return Promise.resolve(replacerConfig[custom](content))
+          return Promise.resolve(replacerConfig[custom](content));
         }
       }
     } else if (replacerConfig.simple && replacerConfig.replacement) {
@@ -94,16 +94,16 @@ class ReplacementManager {
           replacerConfig.pattern,
           replacerConfig.replacement,
         ),
-      )
+      );
     } else if (replacerConfig.replacer instanceof Function) {
-      let newContent = content
-      const contentMatches = content.matchAll(replacerConfig.pattern) || []
+      let newContent = content;
+      const contentMatches = content.matchAll(replacerConfig.pattern) || [];
       for (const match of contentMatches) {
-        newContent = newContent.replace(match[0], replacerConfig.replacer(match))
+        newContent = newContent.replace(match[0], replacerConfig.replacer(match));
       }
-      return Promise.resolve(newContent)
+      return Promise.resolve(newContent);
     }
-    return Promise.resolve(content)
+    return Promise.resolve(content);
   }
 
   /**
@@ -113,14 +113,20 @@ class ReplacementManager {
    * @returns A promise that resolves to the modified content.
    */
   public async replaceAll(content: string, file: string): Promise<string> {
-    let newContent = content
-    for (const replacerConfig of this.replacerConfigs) {
-      if (replacerConfig.pathFilter && !replacerConfig.pathFilter(file)) {
-        continue
-      }
-      newContent = await this.replace(newContent, replacerConfig.name)
+    const newContent = content;
+    const replacerConfigsToApply = this.replacerConfigs.filter(
+      (replacerConfig) => !(replacerConfig.pathFilter && !replacerConfig.pathFilter(file)),
+    );
+    const promiseChain: Promise<string>[] = [];
+    for (const replacerConfig of replacerConfigsToApply) {
+      promiseChain.push(this.replace(newContent, replacerConfig.name));
     }
-    return newContent
+    return await Promise.allSettled(promiseChain).then((results) =>
+      results
+        .filter((result): result is PromiseFulfilledResult<string> => result.status === 'fulfilled')
+        .map((result) => result.value)
+        .join('\n'),
+    );
   }
 
   /**
@@ -131,11 +137,11 @@ class ReplacementManager {
    */
   public async replaceAllFiles(files: string[]): Promise<void> {
     const filePromises = files.map(async (file) => {
-      const content = await fs.readFile(file, "utf8")
-      const newContent = await this.replaceAll(content, file)
-      await fs.writeFile(file, newContent)
-    })
-    await Promise.all(filePromises)
+      const content = await fs.readFile(file, 'utf8');
+      const newContent = await this.replaceAll(content, file);
+      await fs.writeFile(file, newContent);
+    });
+    await Promise.all(filePromises);
   }
 
   /**
@@ -146,7 +152,7 @@ class ReplacementManager {
    * @returns The modified content.
    */
   public static simpleReplace(content: string, pattern: RegExp, replacement: string): string {
-    return content.replace(pattern, replacement)
+    return content.replace(pattern, replacement);
   }
 
   /**
@@ -155,7 +161,7 @@ class ReplacementManager {
    * @returns The replacer configuration if found, otherwise undefined.
    */
   public getReplacer(name: string): ReplacerConfig | undefined {
-    return this.replacerConfigs.find((r) => r.name === name)
+    return this.replacerConfigs.find((r) => r.name === name);
   }
 
   /**
@@ -163,93 +169,95 @@ class ReplacementManager {
    * @returns An array of all replacer configurations.
    */
   public getReplacers(): ReplacerConfig[] {
-    return this.replacerConfigs
+    return this.replacerConfigs;
   }
 
   /**
    * Clears all replacer configurations.
    */
   public clearReplacers(): void {
-    this.replacerConfigs = []
+    this.replacerConfigs = [];
   }
 }
 
-async function getOutputKey(
-  output: EsbuildOutput = buildOutput,
+function getOutputKey(
+  output: EsbuildOutput,
   predicate: (key: string) => boolean,
-): Promise<string | undefined> {
-  const outputs = Object.keys(output)
-  const key = outputs.find(predicate)
+): string | undefined {
+  const outputs = Object.keys(output);
+  const key = outputs.find(predicate);
   if (key) {
-    return key
+    return key;
   }
-  return undefined
+  return undefined;
 }
 
 const replacerConfigs: ReplacerConfig[] = [
   {
-    name: "import",
+    name: 'import',
     pattern: /import (?<variable>\w+)\sfrom\s(?<path>"[a-zA-Z0-9/._-]+");/gi,
     replacer: (match: RegExpExecArray) => {
-      if (match && match.groups) {
+      if (match?.groups) {
         // @ts-ignore - TS doesn't know we're compiling to esm in esbuild
-        return `var ${match.groups.variable} = ${match.groups.path.replace("..", "assets")};`
+        return `var ${match.groups.variable} = ${match.groups.path.replace('..', 'assets')};`;
       }
-      return match[0]
+      return match[0];
     },
     pathFilter: (path: string) => {
-      return path.includes("index") && path.endsWith("js") && !path.includes("map")
+      return path.includes('index') && path.endsWith('js') && !path.includes('map');
     },
   },
   {
-    name: "cacheWorkerImports",
+    // biome-ignore lint/nursery/noSecrets: not a secret, just a variable name
+    name: 'cacheWorkerImports',
     pattern:
       /import (?<variable>\w+)\sfrom\s(?<quote>")\.\/(?<path>assets\/\w+\/[a-zA-Z0-9._-]+");/gi,
     replacer: (match: RegExpExecArray) => {
-      if (match && match.groups) {
-        return `var ${match.groups.variable} = new URL(${match.groups.quote}${match.groups.path}, self.location.origin);`
+      if (match?.groups) {
+        return `var ${match.groups.variable} = new URL(${match.groups.quote}${match.groups.path}, self.location.origin);`;
       }
-      return match[0]
+      return match[0];
     },
     pathFilter: (path: string) => {
-      return path.includes("cacheWorker") && path.endsWith("js") && !path.includes("map")
+      return path.includes('cacheWorker') && path.endsWith('js') && !path.includes('map');
     },
   },
   {
-    name: "cacheWorker",
+    name: 'cacheWorker',
     pattern: /cacheWorker\.ts/g,
     simple: true,
-    replacement: "",
+    replacement: '',
   },
-]
+];
 
 export const ReplacersPlugin = {
-  name: "ReplacementManager",
+  // biome-ignore lint/nursery/noSecrets: definitely not a secret
+  name: 'ReplacementManager',
   /**
    * Sets up the plugin.
    * @param build - The esbuild build object.
    */
   setup(build: esbuild.PluginBuild) {
     build.onEnd(async (results: esbuild.BuildResult) => {
-      buildOutput = results.metafile?.outputs || {}
+      buildOutput = results.metafile?.outputs || {};
       const indexKey = await getOutputKey(
         buildOutput,
-        (key) => key.includes("index") && key.endsWith("js") && !key.includes("map"),
-      )
+        (key) => key.includes('index') && key.endsWith('js') && !key.includes('map'),
+      );
       const workerKey = await getOutputKey(
         buildOutput,
-        (key) => key.includes("cacheWorker") && key.endsWith("js") && !key.includes("map"),
-      )
+        (key) => key.includes('cacheWorker') && key.endsWith('js') && !key.includes('map'),
+      );
       const updatedReplacers = replacerConfigs.map((replacerConfig) => {
-        if (!("replacement" in replacerConfig)) {
-          return replacerConfig
+        if (!('replacement' in replacerConfig)) {
+          return replacerConfig;
         }
-        replacerConfig.replacement = workerKey.replace("docs/", "")
-        return replacerConfig
-      })
-      const replacersInstance = new ReplacementManager(updatedReplacers)
-      const files = [indexKey, workerKey].filter(Boolean)
-      await replacersInstance.replaceAllFiles(files)
-    })
+        replacerConfig.replacement = workerKey.replace('docs/', '');
+        return replacerConfig;
+      });
+      const replacersInstance = new ReplacementManager(updatedReplacers);
+      const files = [indexKey, workerKey].filter(Boolean);
+      await replacersInstance.replaceAllFiles(files);
+    });
   },
-}
+};

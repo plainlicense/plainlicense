@@ -1,98 +1,98 @@
-import { HeroName, HeroVideo } from "./types"
-import svgLogo from "~assets/images/logo_only_color_transp.svg"
-import breakFreeAv11280 from "~assets/videos/hero/break_free/break_free_av1_1280.webm"
-import breakFreeAv11920 from "~assets/videos/hero/break_free/break_free_av1_1920.webm"
-import breakFreeAv12560 from "~assets/videos/hero/break_free/break_free_av1_2560.webm"
-import breakFreeAv13840 from "~assets/videos/hero/break_free/break_free_av1_3840.webm"
-import breakFreeAv1426 from "~assets/videos/hero/break_free/break_free_av1_426.webm"
-import breakFreeAv1640 from "~assets/videos/hero/break_free/break_free_av1_640.webm"
-import breakFreeAv1854 from "~assets/videos/hero/break_free/break_free_av1_854.webm"
-import breakFreeH2641280 from "~assets/videos/hero/break_free/break_free_h264_1280.mp4"
-import breakFreeH2641920 from "~assets/videos/hero/break_free/break_free_h264_1920.mp4"
-import breakFreeH2642560 from "~assets/videos/hero/break_free/break_free_h264_2560.mp4"
-import breakFreeH2643840 from "~assets/videos/hero/break_free/break_free_h264_3840.mp4"
-import breakFreeH264426 from "~assets/videos/hero/break_free/break_free_h264_426.mp4"
-import breakFreeH264640 from "~assets/videos/hero/break_free/break_free_h264_640.mp4"
-import breakFreeH264854 from "~assets/videos/hero/break_free/break_free_h264_854.mp4"
-import breakFreeVp91280 from "~assets/videos/hero/break_free/break_free_vp9_1280.webm"
-import breakFreeVp91920 from "~assets/videos/hero/break_free/break_free_vp9_1920.webm"
-import breakFreeVp92560 from "~assets/videos/hero/break_free/break_free_vp9_2560.webm"
-import breakFreeVp93840 from "~assets/videos/hero/break_free/break_free_vp9_3840.webm"
-import breakFreeVp9426 from "~assets/videos/hero/break_free/break_free_vp9_426.webm"
-import breakFreeVp9640 from "~assets/videos/hero/break_free/break_free_vp9_640.webm"
-import breakFreeVp9854 from "~assets/videos/hero/break_free/break_free_vp9_854.webm"
-import breakFreeAvif1280 from "~assets/videos/hero/break_free/posters/break_free_1280.avif"
-import breakFreePng1280 from "~assets/videos/hero/break_free/posters/break_free_1280.png"
-import breakFreeWebp1280 from "~assets/videos/hero/break_free/posters/break_free_1280.webp"
-import breakFreeAvif1920 from "~assets/videos/hero/break_free/posters/break_free_1920.avif"
-import breakFreePng1920 from "~assets/videos/hero/break_free/posters/break_free_1920.png"
-import breakFreeWebp1920 from "~assets/videos/hero/break_free/posters/break_free_1920.webp"
-import breakFreeAvif2560 from "~assets/videos/hero/break_free/posters/break_free_2560.avif"
-import breakFreePng2560 from "~assets/videos/hero/break_free/posters/break_free_2560.png"
-import breakFreeWebp2560 from "~assets/videos/hero/break_free/posters/break_free_2560.webp"
-import breakFreeAvif3840 from "~assets/videos/hero/break_free/posters/break_free_3840.avif"
-import breakFreePng3840 from "~assets/videos/hero/break_free/posters/break_free_3840.png"
-import breakFreeWebp3840 from "~assets/videos/hero/break_free/posters/break_free_3840.webp"
-import breakFreeAvif426 from "~assets/videos/hero/break_free/posters/break_free_426.avif"
-import breakFreePng426 from "~assets/videos/hero/break_free/posters/break_free_426.png"
-import breakFreeWebp426 from "~assets/videos/hero/break_free/posters/break_free_426.webp"
-import breakFreeAvif640 from "~assets/videos/hero/break_free/posters/break_free_640.avif"
-import breakFreePng640 from "~assets/videos/hero/break_free/posters/break_free_640.png"
-import breakFreeWebp640 from "~assets/videos/hero/break_free/posters/break_free_640.webp"
-import breakFreeAvif854 from "~assets/videos/hero/break_free/posters/break_free_854.avif"
-import breakFreePng854 from "~assets/videos/hero/break_free/posters/break_free_854.png"
-import breakFreeWebp854 from "~assets/videos/hero/break_free/posters/break_free_854.webp"
-import tokyoShuffleAvif1280 from "~assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_1280.avif"
-import tokyoShufflePng1280 from "~assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_1280.png"
-import tokyoShuffleWebp1280 from "~assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_1280.webp"
-import tokyoShuffleAvif1920 from "~assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_1920.avif"
-import tokyoShufflePng1920 from "~assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_1920.png"
-import tokyoShuffleWebp1920 from "~assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_1920.webp"
-import tokyoShuffleAvif2560 from "~assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_2560.avif"
-import tokyoShufflePng2560 from "~assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_2560.png"
-import tokyoShuffleWebp2560 from "~assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_2560.webp"
-import tokyoShuffleAvif3840 from "~assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_3840.avif"
-import tokyoShufflePng3840 from "~assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_3840.png"
-import tokyoShuffleWebp3840 from "~assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_3840.webp"
-import tokyoShuffleAvif426 from "~assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_426.avif"
-import tokyoShufflePng426 from "~assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_426.png"
-import tokyoShuffleWebp426 from "~assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_426.webp"
-import tokyoShuffleAvif640 from "~assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_640.avif"
-import tokyoShufflePng640 from "~assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_640.png"
-import tokyoShuffleWebp640 from "~assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_640.webp"
-import tokyoShuffleAvif854 from "~assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_854.avif"
-import tokyoShufflePng854 from "~assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_854.png"
-import tokyoShuffleWebp854 from "~assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_854.webp"
-import tokyoShuffleAv11280 from "~assets/videos/hero/tokyo_shuffle/tokyo_shuffle_av1_1280.webm"
-import tokyoShuffleAv11920 from "~assets/videos/hero/tokyo_shuffle/tokyo_shuffle_av1_1920.webm"
-import tokyoShuffleAv12560 from "~assets/videos/hero/tokyo_shuffle/tokyo_shuffle_av1_2560.webm"
-import tokyoShuffleAv13840 from "~assets/videos/hero/tokyo_shuffle/tokyo_shuffle_av1_3840.webm"
-import tokyoShuffleAv1426 from "~assets/videos/hero/tokyo_shuffle/tokyo_shuffle_av1_426.webm"
-import tokyoShuffleAv1640 from "~assets/videos/hero/tokyo_shuffle/tokyo_shuffle_av1_640.webm"
-import tokyoShuffleAv1854 from "~assets/videos/hero/tokyo_shuffle/tokyo_shuffle_av1_854.webm"
-import tokyoShuffleH2641280 from "~assets/videos/hero/tokyo_shuffle/tokyo_shuffle_h264_1280.mp4"
-import tokyoShuffleH2641920 from "~assets/videos/hero/tokyo_shuffle/tokyo_shuffle_h264_1920.mp4"
-import tokyoShuffleH2642560 from "~assets/videos/hero/tokyo_shuffle/tokyo_shuffle_h264_2560.mp4"
-import tokyoShuffleH2643840 from "~assets/videos/hero/tokyo_shuffle/tokyo_shuffle_h264_3840.mp4"
-import tokyoShuffleH264426 from "~assets/videos/hero/tokyo_shuffle/tokyo_shuffle_h264_426.mp4"
-import tokyoShuffleH264640 from "~assets/videos/hero/tokyo_shuffle/tokyo_shuffle_h264_640.mp4"
-import tokyoShuffleH264854 from "~assets/videos/hero/tokyo_shuffle/tokyo_shuffle_h264_854.mp4"
-import tokyoShuffleVp91280 from "~assets/videos/hero/tokyo_shuffle/tokyo_shuffle_vp9_1280.webm"
-import tokyoShuffleVp91920 from "~assets/videos/hero/tokyo_shuffle/tokyo_shuffle_vp9_1920.webm"
-import tokyoShuffleVp92560 from "~assets/videos/hero/tokyo_shuffle/tokyo_shuffle_vp9_2560.webm"
-import tokyoShuffleVp93840 from "~assets/videos/hero/tokyo_shuffle/tokyo_shuffle_vp9_3840.webm"
-import tokyoShuffleVp9426 from "~assets/videos/hero/tokyo_shuffle/tokyo_shuffle_vp9_426.webm"
-import tokyoShuffleVp9640 from "~assets/videos/hero/tokyo_shuffle/tokyo_shuffle_vp9_640.webm"
-import tokyoShuffleVp9854 from "~assets/videos/hero/tokyo_shuffle/tokyo_shuffle_vp9_854.webm"
+import { HeroName, type HeroVideo } from './types';
+import svgLogo from '~assets/images/logo_only_color_transp.svg';
+import breakFreeAv11280 from '~assets/videos/hero/break_free/break_free_av1_1280.webm';
+import breakFreeAv11920 from '~assets/videos/hero/break_free/break_free_av1_1920.webm';
+import breakFreeAv12560 from '~assets/videos/hero/break_free/break_free_av1_2560.webm';
+import breakFreeAv13840 from '~assets/videos/hero/break_free/break_free_av1_3840.webm';
+import breakFreeAv1426 from '~assets/videos/hero/break_free/break_free_av1_426.webm';
+import breakFreeAv1640 from '~assets/videos/hero/break_free/break_free_av1_640.webm';
+import breakFreeAv1854 from '~assets/videos/hero/break_free/break_free_av1_854.webm';
+import breakFreeH2641280 from '~assets/videos/hero/break_free/break_free_h264_1280.mp4';
+import breakFreeH2641920 from '~assets/videos/hero/break_free/break_free_h264_1920.mp4';
+import breakFreeH2642560 from '~assets/videos/hero/break_free/break_free_h264_2560.mp4';
+import breakFreeH2643840 from '~assets/videos/hero/break_free/break_free_h264_3840.mp4';
+import breakFreeH264426 from '~assets/videos/hero/break_free/break_free_h264_426.mp4';
+import breakFreeH264640 from '~assets/videos/hero/break_free/break_free_h264_640.mp4';
+import breakFreeH264854 from '~assets/videos/hero/break_free/break_free_h264_854.mp4';
+import breakFreeVp91280 from '~assets/videos/hero/break_free/break_free_vp9_1280.webm';
+import breakFreeVp91920 from '~assets/videos/hero/break_free/break_free_vp9_1920.webm';
+import breakFreeVp92560 from '~assets/videos/hero/break_free/break_free_vp9_2560.webm';
+import breakFreeVp93840 from '~assets/videos/hero/break_free/break_free_vp9_3840.webm';
+import breakFreeVp9426 from '~assets/videos/hero/break_free/break_free_vp9_426.webm';
+import breakFreeVp9640 from '~assets/videos/hero/break_free/break_free_vp9_640.webm';
+import breakFreeVp9854 from '~assets/videos/hero/break_free/break_free_vp9_854.webm';
+import breakFreeAvif1280 from '~assets/videos/hero/break_free/posters/break_free_1280.avif';
+import breakFreePng1280 from '~assets/videos/hero/break_free/posters/break_free_1280.png';
+import breakFreeWebp1280 from '~assets/videos/hero/break_free/posters/break_free_1280.webp';
+import breakFreeAvif1920 from '~assets/videos/hero/break_free/posters/break_free_1920.avif';
+import breakFreePng1920 from '~assets/videos/hero/break_free/posters/break_free_1920.png';
+import breakFreeWebp1920 from '~assets/videos/hero/break_free/posters/break_free_1920.webp';
+import breakFreeAvif2560 from '~assets/videos/hero/break_free/posters/break_free_2560.avif';
+import breakFreePng2560 from '~assets/videos/hero/break_free/posters/break_free_2560.png';
+import breakFreeWebp2560 from '~assets/videos/hero/break_free/posters/break_free_2560.webp';
+import breakFreeAvif3840 from '~assets/videos/hero/break_free/posters/break_free_3840.avif';
+import breakFreePng3840 from '~assets/videos/hero/break_free/posters/break_free_3840.png';
+import breakFreeWebp3840 from '~assets/videos/hero/break_free/posters/break_free_3840.webp';
+import breakFreeAvif426 from '~assets/videos/hero/break_free/posters/break_free_426.avif';
+import breakFreePng426 from '~assets/videos/hero/break_free/posters/break_free_426.png';
+import breakFreeWebp426 from '~assets/videos/hero/break_free/posters/break_free_426.webp';
+import breakFreeAvif640 from '~assets/videos/hero/break_free/posters/break_free_640.avif';
+import breakFreePng640 from '~assets/videos/hero/break_free/posters/break_free_640.png';
+import breakFreeWebp640 from '~assets/videos/hero/break_free/posters/break_free_640.webp';
+import breakFreeAvif854 from '~assets/videos/hero/break_free/posters/break_free_854.avif';
+import breakFreePng854 from '~assets/videos/hero/break_free/posters/break_free_854.png';
+import breakFreeWebp854 from '~assets/videos/hero/break_free/posters/break_free_854.webp';
+import tokyoShuffleAvif1280 from '~assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_1280.avif';
+import tokyoShufflePng1280 from '~assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_1280.png';
+import tokyoShuffleWebp1280 from '~assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_1280.webp';
+import tokyoShuffleAvif1920 from '~assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_1920.avif';
+import tokyoShufflePng1920 from '~assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_1920.png';
+import tokyoShuffleWebp1920 from '~assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_1920.webp';
+import tokyoShuffleAvif2560 from '~assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_2560.avif';
+import tokyoShufflePng2560 from '~assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_2560.png';
+import tokyoShuffleWebp2560 from '~assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_2560.webp';
+import tokyoShuffleAvif3840 from '~assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_3840.avif';
+import tokyoShufflePng3840 from '~assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_3840.png';
+import tokyoShuffleWebp3840 from '~assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_3840.webp';
+import tokyoShuffleAvif426 from '~assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_426.avif';
+import tokyoShufflePng426 from '~assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_426.png';
+import tokyoShuffleWebp426 from '~assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_426.webp';
+import tokyoShuffleAvif640 from '~assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_640.avif';
+import tokyoShufflePng640 from '~assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_640.png';
+import tokyoShuffleWebp640 from '~assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_640.webp';
+import tokyoShuffleAvif854 from '~assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_854.avif';
+import tokyoShufflePng854 from '~assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_854.png';
+import tokyoShuffleWebp854 from '~assets/videos/hero/tokyo_shuffle/posters/tokyo_shuffle_854.webp';
+import tokyoShuffleAv11280 from '~assets/videos/hero/tokyo_shuffle/tokyo_shuffle_av1_1280.webm';
+import tokyoShuffleAv11920 from '~assets/videos/hero/tokyo_shuffle/tokyo_shuffle_av1_1920.webm';
+import tokyoShuffleAv12560 from '~assets/videos/hero/tokyo_shuffle/tokyo_shuffle_av1_2560.webm';
+import tokyoShuffleAv13840 from '~assets/videos/hero/tokyo_shuffle/tokyo_shuffle_av1_3840.webm';
+import tokyoShuffleAv1426 from '~assets/videos/hero/tokyo_shuffle/tokyo_shuffle_av1_426.webm';
+import tokyoShuffleAv1640 from '~assets/videos/hero/tokyo_shuffle/tokyo_shuffle_av1_640.webm';
+import tokyoShuffleAv1854 from '~assets/videos/hero/tokyo_shuffle/tokyo_shuffle_av1_854.webm';
+import tokyoShuffleH2641280 from '~assets/videos/hero/tokyo_shuffle/tokyo_shuffle_h264_1280.mp4';
+import tokyoShuffleH2641920 from '~assets/videos/hero/tokyo_shuffle/tokyo_shuffle_h264_1920.mp4';
+import tokyoShuffleH2642560 from '~assets/videos/hero/tokyo_shuffle/tokyo_shuffle_h264_2560.mp4';
+import tokyoShuffleH2643840 from '~assets/videos/hero/tokyo_shuffle/tokyo_shuffle_h264_3840.mp4';
+import tokyoShuffleH264426 from '~assets/videos/hero/tokyo_shuffle/tokyo_shuffle_h264_426.mp4';
+import tokyoShuffleH264640 from '~assets/videos/hero/tokyo_shuffle/tokyo_shuffle_h264_640.mp4';
+import tokyoShuffleH264854 from '~assets/videos/hero/tokyo_shuffle/tokyo_shuffle_h264_854.mp4';
+import tokyoShuffleVp91280 from '~assets/videos/hero/tokyo_shuffle/tokyo_shuffle_vp9_1280.webm';
+import tokyoShuffleVp91920 from '~assets/videos/hero/tokyo_shuffle/tokyo_shuffle_vp9_1920.webm';
+import tokyoShuffleVp92560 from '~assets/videos/hero/tokyo_shuffle/tokyo_shuffle_vp9_2560.webm';
+import tokyoShuffleVp93840 from '~assets/videos/hero/tokyo_shuffle/tokyo_shuffle_vp9_3840.webm';
+import tokyoShuffleVp9426 from '~assets/videos/hero/tokyo_shuffle/tokyo_shuffle_vp9_426.webm';
+import tokyoShuffleVp9640 from '~assets/videos/hero/tokyo_shuffle/tokyo_shuffle_vp9_640.webm';
+import tokyoShuffleVp9854 from '~assets/videos/hero/tokyo_shuffle/tokyo_shuffle_vp9_854.webm';
 
-const origin = window.location.origin || import.meta.url.replace("docs", "")
+const origin = window.location.origin || import.meta.url.replace('docs', '');
 
 const toUrl = (pathname: string) => {
-  pathname = pathname.replace("~", "").replace("..", "assets")
-  return new URL(pathname, origin)
-}
+  pathname = pathname.replace('~', '').replace('..', 'assets');
+  return new URL(pathname, origin);
+};
 
-export const plainLogo = toUrl(svgLogo)
+export const plainLogo = toUrl(svgLogo);
 
 export const rawHeroVideos = [
   {
@@ -165,7 +165,7 @@ export const rawHeroVideos = [
     },
     parentPath: `${origin}/assets/videos/hero/tokyo_shuffle`,
     baseName: HeroName.TokyoShuffle,
-    message: "STOP FIGHTING LEGAL NONSENSE.",
+    message: 'STOP FIGHTING LEGAL NONSENSE.',
   },
   {
     variants: {
@@ -237,6 +237,6 @@ export const rawHeroVideos = [
     },
     parentPath: `${origin}/assets/videos/hero/break_free`,
     baseName: HeroName.BreakFree,
-    message: "FREE YOUR CREATIONS.",
+    message: 'FREE YOUR CREATIONS.',
   },
-] as HeroVideo[]
+] as HeroVideo[];

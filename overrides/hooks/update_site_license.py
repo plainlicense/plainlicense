@@ -6,12 +6,13 @@ import logging
 
 from pathlib import Path
 
-from _utils import is_license_page, wrap_text
-from hook_logger import get_logger
 from mkdocs.config.defaults import MkDocsConfig
 from mkdocs.structure.nav import Navigation
 from mkdocs.structure.pages import Page
 from mkdocs.utils.templates import TemplateContext
+
+from ._utils import is_license_page, wrap_text
+from .hook_logger import get_logger
 
 
 _site_license_log_level = logging.WARNING
@@ -35,7 +36,7 @@ def on_page_context(
         TemplateContext: The updated template context after processing the page.
     """
     logger = get_logger("SITE_LICENSE", _site_license_log_level)
-    if not (lcnse := is_license_page(page)):
+    if not is_license_page(page):
         return context
     logger.debug("site license checking license %s if it's an unlicense", license)
     meta = page.meta

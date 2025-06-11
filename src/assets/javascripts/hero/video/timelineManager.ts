@@ -1,4 +1,4 @@
-import { logger, logObject } from "~/utils"
+import { logger, logObject } from '~/utils';
 
 /**
  * TimelineManager
@@ -7,201 +7,203 @@ import { logger, logObject } from "~/utils"
  * so we need to daisy chain the timelines together.
  */
 export class TimelineManager {
-  public timelines: GSAPTimeline[]
-  public currentTimeline: GSAPTimeline | null
-  public paused: boolean = true
-  public isTransitioning: boolean = false
-  public timelinesDuration: number = 0
+  public timelines: GSAPTimeline[];
+  public currentTimeline: GSAPTimeline | null;
+  public paused = true;
+  public isTransitioning = false;
+  public timelinesDuration = 0;
 
   get currentTimelineIndex() {
-    return this.currentTimeline ? this.timelines.indexOf(this.currentTimeline) : -1
+    return this.currentTimeline ? this.timelines.indexOf(this.currentTimeline) : -1;
   }
 
-  public wrapper: (index: number) => GSAPTimeline
+  public wrapper: (index: number) => GSAPTimeline;
 
   constructor() {
-    this.timelines = []
-    this.currentTimeline = null
+    this.timelines = [];
+    this.currentTimeline = null;
     this.wrapper = (number: number) => {
-      const nextIndex = this.timelines.length > number ? number : 0
-      return this.timelines[nextIndex]
-    }
+      const nextIndex = this.timelines.length > number ? number : 0;
+      return this.timelines[nextIndex];
+    };
   }
 
   /**
    * Helper to reset a timeline: restart and then pause.
    */
   private resetTimeline(timeline: GSAPTimeline): void {
-    timeline.restart().pause()
+    timeline.restart().pause();
   }
 
   /**
    * Helper to register callbacks into a timeline.
    */
   private registerTimelineCallbacks(timeline: GSAPTimeline) {
-    const currentOnStart = timeline.eventCallback("onStart")
-    const currentOnComplete = timeline.eventCallback("onComplete")
+    const currentOnStart = timeline.eventCallback('onStart');
+    const currentOnComplete = timeline.eventCallback('onComplete');
 
-    timeline.eventCallback("onStart", () => {
-      logger.warn(`Timeline ${this.getTimelineName(timeline)} started`)
-      this.onInit()
+    timeline.eventCallback('onStart', () => {
+      logger.warn(`Timeline ${this.getTimelineName(timeline)} started`);
+      this.onInit();
       if (currentOnStart) {
-        currentOnStart.call(timeline)
+        currentOnStart.call(timeline);
       }
-      this.isTransitioning = false
-    })
+      this.isTransitioning = false;
+    });
 
-    timeline.eventCallback("onComplete", () => {
-      logger.warn(`Timeline ${this.getTimelineName(timeline)} completed`)
+    timeline.eventCallback('onComplete', () => {
+      logger.warn(`Timeline ${this.getTimelineName(timeline)} completed`);
       if (currentOnComplete) {
-        currentOnComplete.call(timeline)
+        currentOnComplete.call(timeline);
       }
-      this.onEnd()
-    })
+      this.onEnd();
+    });
   }
 
   private getSeekLocation(time: number) {
     this.timelines.forEach((timeline) => {
-      this.resetTimeline(timeline)
+      this.resetTimeline(timeline);
       if (time > timeline.duration()) {
-        time -= timeline.duration()
+        time -= timeline.duration();
       } else {
-        timeline.seek(time)
-        time = 0
+        timeline.seek(time);
+        time = 0;
       }
-    })
+    });
   }
 
   transition() {
-    const currentIndex = this.currentTimelineIndex
-    const nextTimeline = this.wrapper(currentIndex + 1)
+    const currentIndex = this.currentTimelineIndex;
+    const nextTimeline = this.wrapper(currentIndex + 1);
     if (!this.isTransitioning && nextTimeline && !nextTimeline.isActive()) {
-      this.isTransitioning = true
-      this.currentTimeline = nextTimeline
-      this.currentTimeline.restart()
-      this.paused = false
-      logger.debug("Moving to timeline: ", this.getTimelineName())
-      this.isTransitioning = false
+      this.isTransitioning = true;
+      this.currentTimeline = nextTimeline;
+      this.currentTimeline.restart();
+      this.paused = false;
+      logger.debug('Moving to timeline: ', this.getTimelineName());
+      this.isTransitioning = false;
     } else {
-      logger.debug("OnEnd: Timeline is transitioning or next timeline is active")
+      logger.debug('OnEnd: Timeline is transitioning or next timeline is active');
     }
   }
 
   onInit() {
-    this.isTransitioning = false
-    logger.debug("TimelineManager.onInit called for timeline", this.getTimelineName())
-    logger.debug("Timeline's duration: ", this.currentTimeline?.duration())
+    this.isTransitioning = false;
+    logger.debug('TimelineManager.onInit called for timeline', this.getTimelineName());
+    logger.debug("Timeline's duration: ", this.currentTimeline?.duration());
     this.currentTimeline =
-      this.currentTimelineIndex === -1 ? this.timelines[0] : this.wrapper(this.currentTimelineIndex)
-    this.paused = false
-    logger.debug("Starting timeline", this.getTimelineName())
+      this.currentTimelineIndex === -1
+        ? this.timelines[0]
+        : this.wrapper(this.currentTimelineIndex);
+    this.paused = false;
+    logger.debug('Starting timeline', this.getTimelineName());
     if (!this.currentTimeline.isActive()) {
-      this.currentTimeline.play()
+      this.currentTimeline.play();
     }
   }
 
   onEnd() {
-    logger.debug("TimelineManager.onEnd called for timeline", this.getTimelineName())
-    logger.debug("Timeline ended at time:", this.currentTimeline?.time())
-    this.transition()
-    logger.debug(`Transition complete to timeline: ${this.getTimelineName(this.currentTimeline)}`)
+    logger.debug('TimelineManager.onEnd called for timeline', this.getTimelineName());
+    logger.debug('Timeline ended at time:', this.currentTimeline?.time());
+    this.transition();
+    logger.debug(`Transition complete to timeline: ${this.getTimelineName(this.currentTimeline)}`);
   }
 
   add(timeline: GSAPTimeline) {
-    timeline.pause().seek(0)
-    logger.debug("Adding timeline: ", this.getTimelineName(timeline))
-    logger.debug("Timeline duration: ", timeline.duration())
-    logger.debug("Timeline total duration: ", this.timelinesDuration)
+    timeline.pause().seek(0);
+    logger.debug('Adding timeline: ', this.getTimelineName(timeline));
+    logger.debug('Timeline duration: ', timeline.duration());
+    logger.debug('Timeline total duration: ', this.timelinesDuration);
 
     // Register callbacks using helper
-    this.registerTimelineCallbacks(timeline)
+    this.registerTimelineCallbacks(timeline);
 
-    this.timelines.push(timeline)
-    this.currentTimeline ??= timeline
-    this.timelinesDuration += timeline.duration()
-    logObject(timeline, `Timeline: ${this.getTimelineName(timeline)}`)
-    return this
+    this.timelines.push(timeline);
+    this.currentTimeline ??= timeline;
+    this.timelinesDuration += timeline.duration();
+    logObject(timeline, `Timeline: ${this.getTimelineName(timeline)}`);
+    return this;
   }
 
   restart() {
     if (this.timelines.length === 0) {
-      logger.warn("No timelines available to restart.")
-      return this
+      logger.warn('No timelines available to restart.');
+      return this;
     }
-    this.timelines.forEach((timeline) => this.resetTimeline(timeline))
-    this.currentTimeline = this.timelines[0]
-    this.paused = false
-    return this.play()
+    this.timelines.forEach((timeline) => this.resetTimeline(timeline));
+    this.currentTimeline = this.timelines[0];
+    this.paused = false;
+    return this.play();
   }
 
   play() {
     if (this.timelines.length === 0) {
-      logger.warn("No timelines to play")
-      return this
+      logger.warn('No timelines to play');
+      return this;
     }
     if (this.isTransitioning) {
-      logger.warn("Timeline is transitioning, cannot play")
-      return this
+      logger.warn('Timeline is transitioning, cannot play');
+      return this;
     }
-    this.resume()
-    return this
+    this.resume();
+    return this;
   }
 
   resume() {
     if (this.currentTimeline && !this.currentTimeline.isActive()) {
-      this.currentTimeline.resume()
+      this.currentTimeline.resume();
     }
-    this.paused = false
-    return this
+    this.paused = false;
+    return this;
   }
 
   pause() {
     if (this.currentTimeline && this.currentTimeline.isActive()) {
-      this.currentTimeline.pause()
+      this.currentTimeline.pause();
     }
-    this.paused = true
-    return this
+    this.paused = true;
+    return this;
   }
 
   seek(time: number) {
-    this.getSeekLocation(time)
-    this.resume()
-    return this
+    this.getSeekLocation(time);
+    this.resume();
+    return this;
   }
 
   isActive() {
-    return this.currentTimeline?.isActive() || false
+    return this.currentTimeline?.isActive() || false;
   }
 
   video() {
     return this.timelines.find(
       (timeline) =>
-        this.getTimelineName(timeline) === "videoTimeline" ||
-        timeline["media"] instanceof HTMLVideoElement,
-    )
+        this.getTimelineName(timeline) === 'videoTimeline' ||
+        timeline['media'] instanceof HTMLVideoElement,
+    );
   }
 
   text() {
-    return this.timelines.find((timeline) => this.getTimelineName(timeline) === "textTimeline")
+    return this.timelines.find((timeline) => this.getTimelineName(timeline) === 'textTimeline');
   }
 
   getActiveTimeline() {
-    return this.currentTimeline
+    return this.currentTimeline;
   }
 
   getTimelineName(timeline: GSAPTimeline | null = this.currentTimeline) {
-    return timeline?.vars[0] ?? "not named"
+    return timeline?.vars[0] ?? 'not named';
   }
 
   kill() {
     this.timelines.forEach((timeline) => {
-      timeline.kill()
-    })
-    this.timelines = []
-    this.currentTimeline = null
-    this.paused = true
-    this.isTransitioning = false
-    this.timelinesDuration = 0
-    return this
+      timeline.kill();
+    });
+    this.timelines = [];
+    this.currentTimeline = null;
+    this.paused = true;
+    this.isTransitioning = false;
+    this.timelinesDuration = 0;
+    return this;
   }
 }

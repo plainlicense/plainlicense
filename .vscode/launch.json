@@ -11,10 +11,7 @@
       "pathMapping": {
         "/": "${workspaceFolder}/docs"
       },
-      "skipFiles": [
-        "${workspaceFolder}/node_modules/**/*",
-        "${workspaceFolder}/external/**/*"
-      ],
+      "skipFiles": ["${workspaceFolder}/node_modules/**/*", "${workspaceFolder}/external/**/*"],
       "preLaunchTask": "mkdocs serve live"
     },
     {
@@ -27,10 +24,7 @@
       "reloadOnAttach": true,
       "port": 6000,
       "preLaunchTask": "mkdocs serve live",
-      "skipFiles": [
-        "${workspaceFolder}/node_modules/**/*",
-        "${workspaceFolder}/external/**/*"
-      ],
+      "skipFiles": ["${workspaceFolder}/node_modules/**/*", "${workspaceFolder}/external/**/*"],
       "pathMappings": [
         {
           "url": "/",
@@ -49,26 +43,16 @@
       "runtimeExecutable": "/usr/bin/flatpak run --branch=stable --arch=x86_64 --command=/app/bin/chromium --enable-features=UseOzonePlatform --ozone-platform=wayland --gtk-version=4 --gpu-testing-vendor-id=0x10de --gpu-testing-device-id=0x25ac",
       "url": "http://localhost:8000",
       "webRoot": "${workspaceFolder}/src",
-      "outFiles": [
-        "${workspaceFolder}/docs/**",
-        "!**/node_modules/**"
-      ],
+      "outFiles": ["${workspaceFolder}/docs/**", "!**/node_modules/**"],
       "smartStep": true,
-      "skipFiles": [
-        "**/node_modules/**",
-        "${workspaceFolder}/external/**"
-      ]
+      "skipFiles": ["**/node_modules/**", "${workspaceFolder}/external/**"]
     },
     {
       "name": "bun debug",
       "type": "bun",
       "request": "launch",
       "runtime": "bun",
-      "runtimeArgs": [
-        "run",
-        "-b",
-        "--inspect-brk"
-      ],
+      "runtimeArgs": ["run", "-b", "--inspect-brk"],
       "program": "${file}",
       "internalConsoleOptions": "openOnSessionStart",
       "cwd": "${workspaceFolder}"
@@ -78,11 +62,7 @@
       "type": "bun",
       "request": "launch",
       "runtime": "bun",
-      "runtimeArgs": [
-        "run",
-        "build",
-        "--inspect-brk"
-      ],
+      "runtimeArgs": ["run", "build", "--inspect-brk"],
       "program": "src/build/index.ts",
       "internalConsoleOptions": "openOnSessionStart",
       "cwd": "${workspaceFolder}"

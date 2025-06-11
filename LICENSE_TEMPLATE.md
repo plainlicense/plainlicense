@@ -20,7 +20,7 @@
 #     You can use find and replace to fill the variables in this template
 #     Variables are: plain_name, original_name, spdx_id, original_url,
 #     original_organization, original_version, category, license_description,
-#     instructions, notes, outro, reader_license_text, official_license_text
+#     instructions, notes, outro, reader_license_text, original_license_text
 #     (all in the format {{ variable }})
 #
 # 2) Remove tags that don't apply to the license for permissions, conditions,
@@ -32,7 +32,7 @@
 #     is empty on most licenses. Use it for unique information about the license.
 #     For an example, see [Plain Elastic License](https://plainlicense.org/licenses/source-available/elastic-2.0/)
 #
-# 5) Fill in the reader_license_text and official_license_text fields with the
+# 5) Fill in the reader_license_text and original_license_text fields with the
 #   appropriate information. These fields are used to generate the license tabs on the
 #   license page. Reader license text is the plain language version of the license.
 #   Official license text is the original license text.
@@ -135,17 +135,17 @@ reader_license_text: |
   {{ reader_license_text }}
 
 # OFFICIAL LICENSE TEXT
-# official_license_text:
+# original_license_text:
 # If applicable, provide the mostly common/official license text for the original license.
 # In MARKDOWN.
 # Include its title and version number, if applicable; exactly as it usually appears.
 # If you can't find the official text in markdown, check if it's at:
 # https://github.com/IQAndreas/markdown-licenses . Otherwise, you might have to
 # manually convert it to markdown (usually just adding header tags and fixing links).
-# Reach out if you need help.cDon't use reference links in the license text; use in-line links instead
+# Reach out if you need help. Don't use reference links in the license text; use in-line links instead
 # if it's a Plain License original, set to null
-official_license_text: |
-  {{ official_license_text }}
+original_license_text: |
+  {{ original_license_text }}
 
 # link_in_original: boolean, if the original license includes a link to the original_url, set to true
 # If not, false. We'll add a link to the license when we generate the page using the original_url

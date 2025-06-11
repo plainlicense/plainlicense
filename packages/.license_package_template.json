@@ -61,9 +61,7 @@
       [
         "@semantic-release/git",
         {
-          "assets": [
-            "../changelogs/{{LICENSE_NAME}}.md"
-          ]
+          "assets": ["../changelogs/{{LICENSE_NAME}}.md"]
         }
       ]
     ]

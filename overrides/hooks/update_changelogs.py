@@ -2,8 +2,8 @@
 
 import logging
 
-from _utils import find_repo_root, is_license_page
-from hook_logger import get_logger
+from ._utils import find_repo_root, is_license_page
+from .hook_logger import get_logger
 from mkdocs.config.defaults import MkDocsConfig
 from mkdocs.plugins import event_priority
 from mkdocs.structure.files import Files

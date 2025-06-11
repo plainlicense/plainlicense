@@ -35,13 +35,13 @@ description: Our plain licenses are easy to understand and use. We divide our li
 
     __[:octicons-arrow-right-24: keep your work open][copyleft]__
 
--   :nounproject-no-commercial:{ .lg .middle } __source-available licenses__
+-   :nounproject-no-commercial:{ .lg .middle } __source-available licenses__ *(Fair Code)*
 
     ---
 
-    Source-available licenses cover a wide range of permissions. The Free Software Foundation and Open Source Initiative don't consider source-available licenses open source because they restrict what you can do with the work. Most often they prevent people from using the work to create a competing product or service. They are different from proprietary licenses because they allow you to see the source code, but they are not as open as open source licenses.
+    Source-available licenses follow the **[Fair Code](https://faircode.io/)** philosophy: they balance openness with sustainability for creators. These licenses let you see and modify the source code, but restrict commercial use to protect the original authors' ability to make a living from their work. __Fair Code licenses let you share your work openly while keeping control over how competitors use it__.
 
-    __[:octicons-arrow-right-24: keep out competition][source-available]__
+    __[:octicons-arrow-right-24: balance openness and sustainability][source-available]__
 
 -   :nounproject-proprietary:{ .lg .middle } __proprietary licenses__
 

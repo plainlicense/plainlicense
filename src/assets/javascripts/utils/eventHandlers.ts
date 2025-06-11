@@ -19,9 +19,9 @@
  * @copyright No rights reserved.
  */
 // @ts-ignore: yes, I know it's not in the project json...
-import * as bundle from "@/bundle"
+import * as bundle from '@/bundle';
 
-import gsap from "gsap"
+import gsap from 'gsap';
 import {
   combineLatest,
   debounceTime,
@@ -34,7 +34,7 @@ import {
   map,
   merge,
   mergeMap,
-  Observable,
+  type Observable,
   of,
   share,
   shareReplay,
@@ -46,25 +46,25 @@ import {
   tap,
   throttleTime,
   toArray,
-} from "rxjs"
-import Tablesort from "tablesort"
-import { feature } from "~/_"
-import { getLocation, watchElementSize, watchViewportAt } from "~/browser"
-import { getComponentElement, Header } from "~/components"
-import { isHome, isLicenseHash, isValidEvent, logger } from "./"
-import { WatchOptions } from "./types"
+} from 'rxjs';
+import Tablesort from 'tablesort';
+import { feature } from '~/_';
+import { getLocation, watchElementSize, watchViewportAt } from '~/browser';
+import { getComponentElement, type Header } from '~/components';
+import { isHome, isLicenseHash, isValidEvent, logger } from './';
+import type { WatchOptions } from './types';
 
-export const NAV_EXIT_DELAY = 60000
-export const PAGE_CLEANUp_DELAY = 20000
+export const NAV_EXIT_DELAY = 60000;
+export const PAGE_CLEANUp_DELAY = 20000;
 
-let customWindow: CustomWindow = window as unknown as CustomWindow
+const customWindow: CustomWindow = window as unknown as CustomWindow;
 
-const { location$, viewport$ } = customWindow
+const { location$, viewport$ } = customWindow;
 
 export const preventDefault = (ev: Event) => {
-  ev.preventDefault()
-  return ev
-}
+  ev.preventDefault();
+  return ev;
+};
 
 /**
  * Watches a media query and emits a boolean indicating if it matches.
@@ -76,36 +76,36 @@ export const preventDefault = (ev: Event) => {
  * @returns An observable emitting the match status.
  */
 export const watchMediaQuery = (query: string): Observable<boolean> => {
-  const mql = customWindow.matchMedia(query)
+  const mql = customWindow.matchMedia(query);
   // @ts-ignore: "addListener" is deprecated -- kept for compatibility
-  const listener = mql.addEventListener || customWindow.matchMedia(query).addListener
+  const listener = mql.addEventListener || customWindow.matchMedia(query).addListener;
   // @ts-ignore: "removeListener" is deprecated -- kept for compatibility
-  const remover = mql.removeEventListener || customWindow.matchMedia(query).removeListener
+  const remover = mql.removeEventListener || customWindow.matchMedia(query).removeListener;
   return merge(
     fromEventPattern<boolean>(
-      (handler) => listener("change", () => handler(mql.matches)),
-      (handler) => remover("change", () => handler(mql.matches)),
+      (handler) => listener('change', () => handler(mql.matches)),
+      (handler) => remover('change', () => handler(mql.matches)),
     ),
     of(mql.matches).pipe(startWith(mql.matches)),
-  ).pipe(debounceTime(150), distinctUntilChanged(), shareReplay(1))
-}
+  ).pipe(debounceTime(150), distinctUntilChanged(), shareReplay(1));
+};
 
 /**
  * Emits a boolean indicating if the page is visible.
  * Applies debouncing to manage rapid visibility changes.
  * @returns An observable emitting the visibility status.
  */
-export const isPageVisible$ = fromEvent(document, "visibilitychange").pipe(
-  map(() => !document.hidden || document.visibilityState === "visible"),
+export const isPageVisible$ = fromEvent(document, 'visibilitychange').pipe(
+  map(() => !document.hidden || document.visibilityState === 'visible'),
   debounceTime(200),
   distinctUntilChanged((prev, curr) => prev === curr),
-  startWith(document.visibilityState === "visible"),
+  startWith(document.visibilityState === 'visible'),
   shareReplay(1),
-)
+);
 
-export const prefersReducedMotion$ = watchMediaQuery("(prefers-reduced-motion: reduce)").pipe(
+export const prefersReducedMotion$ = watchMediaQuery('(prefers-reduced-motion: reduce)').pipe(
   share(),
-)
+);
 
 /**
  * Watches window resize events and emits the latest viewport size.
@@ -113,7 +113,7 @@ export const prefersReducedMotion$ = watchMediaQuery("(prefers-reduced-motion: r
  * @returns An observable emitting the current viewport dimensions.
  */
 export const watchViewportResize = (): Observable<{ width: number; height: number }> => {
-  return fromEvent(customWindow, "resize").pipe(
+  return fromEvent(customWindow, 'resize').pipe(
     debounceTime(200),
     map(() => ({
       width: customWindow.innerWidth,
@@ -124,8 +124,8 @@ export const watchViewportResize = (): Observable<{ width: number; height: numbe
       width: customWindow.innerWidth,
       height: customWindow.innerHeight,
     }),
-  )
-}
+  );
+};
 
 /**
  * Watches scroll events and emits the current scroll position.
@@ -133,7 +133,7 @@ export const watchViewportResize = (): Observable<{ width: number; height: numbe
  * @returns An observable emitting the current scroll position.
  */
 export const watchScroll$ = (): Observable<{ scrollX: number; scrollY: number }> => {
-  return fromEvent(customWindow, "scroll").pipe(
+  return fromEvent(customWindow, 'scroll').pipe(
     throttleTime(100), // Adjust throttle time as needed
     map(() => ({
       scrollX: customWindow.scrollX,
@@ -143,10 +143,10 @@ export const watchScroll$ = (): Observable<{ scrollX: number; scrollY: number }>
       scrollX: customWindow.scrollX,
       scrollY: customWindow.scrollY,
     }),
-  )
-}
+  );
+};
 
-const header$ = watchHeader(getComponentElement("header"), { viewport$ })
+const header$ = watchHeader(getComponentElement('header'), { viewport$ });
 
 /**
  * Emits a boolean indicating if an element is partially in the viewport.
@@ -156,62 +156,65 @@ const header$ = watchHeader(getComponentElement("header"), { viewport$ })
 export function isPartiallyInViewport(el: HTMLElement): Observable<boolean> {
   return watchViewportAt(el, { viewport$, header$ }).pipe(
     map(({ offset: { y }, size: { height } }) => {
-      const elementHeight = el.offsetHeight
-      return y < height && y + elementHeight > 0
+      const elementHeight = el.offsetHeight;
+      return y < height && y + elementHeight > 0;
     }),
     distinctUntilChanged((prev, curr) => prev === curr),
     shareReplay(1),
-  )
+  );
 }
 
 // maps the URL from a legacy event
 const mapLocation = (ev: Event) => {
   const eventMap = {
     beforeunload:
-      ev.target && ev.target instanceof HTMLAnchorElement ?
-        new URL((ev.target as HTMLAnchorElement).href)
+      ev.target && ev.target instanceof HTMLAnchorElement
+        ? new URL((ev.target as HTMLAnchorElement).href)
+        : getLocation(),
+    popstate: (ev as PopStateEvent).state
+      ? new URL((ev as PopStateEvent).state.url)
       : getLocation(),
-    popstate:
-      (ev as PopStateEvent).state ? new URL((ev as PopStateEvent).state.url) : getLocation(),
-    hashchange:
-      (ev as HashChangeEvent).newURL ? new URL((ev as HashChangeEvent).newURL) : getLocation(),
-    pageshow:
-      (ev as PageTransitionEvent).persisted ? getLocation() : new URL(customWindow.location.href),
-  }
-  return eventMap[ev.type as keyof typeof eventMap] || getLocation()
-}
+    hashchange: (ev as HashChangeEvent).newURL
+      ? new URL((ev as HashChangeEvent).newURL)
+      : getLocation(),
+    pageshow: (ev as PageTransitionEvent).persisted
+      ? getLocation()
+      : new URL(customWindow.location.href),
+  };
+  return eventMap[ev.type as keyof typeof eventMap] || getLocation();
+};
 
 export const navigationEvents$ =
-  "navigation" in customWindow ?
-    // If the browser supports the navigation event, we use it
+  'navigation' in customWindow
+    ? // If the browser supports the navigation event, we use it
 
-    fromEventPattern<NavigateEvent>(
-      (handler) => customWindow.navigation.addEventListener("navigate", handler),
-      (handler) => customWindow.navigation.removeEventListener("navigate", handler),
-    ).pipe(
-      filter((event) => event !== null && event instanceof NavigateEvent),
-      map((event) => {
-        return new URL((event as NavigateEvent).destination.url)
-      }),
-      startWith(getLocation()),
-      shareReplay(1),
-      share(),
-    )
-    // otherwise we use the browser's built-in events
-  : merge(
-      merge(
-        fromEvent(customWindow, "popstate"),
-        fromEvent(customWindow, "hashchange"),
-        fromEvent(customWindow, "pageshow"),
-        fromEvent(customWindow, "beforeunload"),
+      fromEventPattern<NavigateEvent>(
+        (handler) => customWindow.navigation.addEventListener('navigate', handler),
+        (handler) => customWindow.navigation.removeEventListener('navigate', handler),
       ).pipe(
-        filter((event) => isValidEvent(event as Event)),
+        filter((event) => event !== null && event instanceof NavigateEvent),
         map((event) => {
-          return mapLocation(event as Event)
+          return new URL((event as NavigateEvent).destination.url);
         }),
-      ),
-      location$.pipe(distinctUntilChanged()),
-    ).pipe(startWith(getLocation()), shareReplay(1), share())
+        startWith(getLocation()),
+        shareReplay(1),
+        share(),
+      )
+    : // otherwise we use the browser's built-in events
+      merge(
+        merge(
+          fromEvent(customWindow, 'popstate'),
+          fromEvent(customWindow, 'hashchange'),
+          fromEvent(customWindow, 'pageshow'),
+          fromEvent(customWindow, 'beforeunload'),
+        ).pipe(
+          filter((event) => isValidEvent(event as Event)),
+          map((event) => {
+            return mapLocation(event as Event);
+          }),
+        ),
+        location$.pipe(distinctUntilChanged()),
+      ).pipe(startWith(getLocation()), shareReplay(1), share());
 
 /**
  * Observes changes to the location pathname.
@@ -225,7 +228,7 @@ export function watchPathnameChange(predicate: (_url: URL) => boolean) {
     startWith(getLocation()),
     shareReplay(1),
     share(),
-  )
+  );
 }
 
 /**
@@ -233,18 +236,18 @@ export function watchPathnameChange(predicate: (_url: URL) => boolean) {
  * @returns an observable that emits when a table is found or null if no tables are found
  */
 export const watchTables = () => {
-  const tables = gsap.utils.toArray("article table:not([class])") as HTMLTableElement[]
+  const tables = gsap.utils.toArray('article table:not([class])') as HTMLTableElement[];
   const observables = () =>
-    tables.length > 0 ?
-      from(tables).pipe(
-        toArray(),
-        mergeMap((table) => table),
-        filter((table) => table instanceof HTMLTableElement),
-        tap((table) => new Tablesort(table)),
-      )
-    : from([])
-  return navigationEvents$.pipe(switchMap(observables), share())
-}
+    tables.length > 0
+      ? from(tables).pipe(
+          toArray(),
+          mergeMap((table) => table),
+          filter((table) => table instanceof HTMLTableElement),
+          tap((table) => new Tablesort(table)),
+        )
+      : from([]);
+  return navigationEvents$.pipe(switchMap(observables), share());
+};
 
 /**
  * A function that checks for presence of missing observables on the global customWindow object. If any are missing, it reloads the material mkdocs entrypoint.
@@ -262,7 +265,7 @@ export async function windowEvents() {
     alert$,
     progress$,
     component$,
-  } = customWindow
+  } = customWindow;
   const observables = {
     document$,
     location$,
@@ -275,15 +278,15 @@ export async function windowEvents() {
     alert$,
     progress$,
     component$,
-  }
-  let observablesMissing = false
+  };
+  let observablesMissing = false;
   for (const key of Object.keys(observables)) {
     if (!(globalThis as any)[key]) {
-      observablesMissing = true
+      observablesMissing = true;
     }
   }
   if (observablesMissing) {
-    bundle // reload material entrypoint
+    bundle; // reload material entrypoint
   }
 }
 
@@ -293,29 +296,29 @@ export async function windowEvents() {
  */
 const handleLicenseHash = (url: URL) => {
   if (url.pathname !== new URL(customWindow.location.href).pathname) {
-    const newUrl = new URL(customWindow.location.href)
-    newUrl.hash = ""
-    customWindow.history.replaceState({}, "", newUrl.toString())
-    customWindow.location.href = newUrl.toString()
+    const newUrl = new URL(customWindow.location.href);
+    newUrl.hash = '';
+    customWindow.history.replaceState({}, '', newUrl.toString());
+    customWindow.location.href = newUrl.toString();
   }
-  const hash = url.hash.slice(1)
-  const input = document.getElementById(hash)
+  const hash = url.hash.slice(1);
+  const input = document.getElementById(hash);
   if (input) {
-    ;(input as HTMLInputElement).checked = true
-    input.dispatchEvent(new Event("change"))
+    (input as HTMLInputElement).checked = true;
+    input.dispatchEvent(new Event('change'));
   }
-}
+};
 
 /**
  * Adds a hash change listener to the window to prevent default behavior on license hash changes
  */
 function addLicenseHashListener() {
-  customWindow.addEventListener("hashchange", (ev) => {
-    const url = new URL(customWindow.location.href)
+  customWindow.addEventListener('hashchange', (ev) => {
+    const url = new URL(customWindow.location.href);
     if (isLicenseHash(url)) {
-      preventDefault(ev)
+      preventDefault(ev);
     }
-  })
+  });
 }
 
 export function watchLicenseHash() {
@@ -342,7 +345,7 @@ export function watchLicenseHash() {
     map(([_, second]) => second),
     filter((url) => isLicenseHash(url)),
     tap(handleLicenseHash),
-  )
+  );
 }
 
 /**
@@ -351,10 +354,10 @@ export function watchLicenseHash() {
  */
 export function postUrlsForWorker(urls: string[]) {
   if (!urls.length) {
-    return
+    return;
   }
-  customWindow.postMessage({ type: "CACHE_URLS", payload: urls })
-  logger.debug(`Cached URLs: ${urls.join(", ")}`)
+  customWindow.postMessage({ type: 'CACHE_URLS', payload: urls });
+  logger.debug(`Cached URLs: ${urls.join(', ')}`);
 }
 
 /**
@@ -365,12 +368,12 @@ export function postUrlsForWorker(urls: string[]) {
  * @returns An observable emitting a boolean indicating if the header is hidden.
  */
 function isHidden({ viewport$ }: WatchOptions): Observable<boolean> {
-  if (!feature("header.autohide")) {
-    return of(false)
+  if (!feature('header.autohide')) {
+    return of(false);
   }
-  const header = getComponentElement("header")
+  const header = getComponentElement('header');
   if (!header || !viewport$) {
-    return of(false)
+    return of(false);
   }
   if (
     header.checkVisibility({
@@ -379,9 +382,9 @@ function isHidden({ viewport$ }: WatchOptions): Observable<boolean> {
       visibilityProperty: true,
     })
   ) {
-    return of(true)
+    return of(true);
   }
-  return of(false)
+  return of(false);
 }
 
 /**
@@ -400,12 +403,12 @@ export function watchHeader(el: HTMLElement, options: WatchOptions): Observable<
     })),
     distinctUntilChanged((a, b) => a.height === b.height && a.hidden === b.hidden),
     shareReplay(1),
-  )
+  );
 }
 
-const header = getComponentElement("header")
-const nav = getComponentElement("tabs")
-const footer = document.querySelector("#hero-footer") as HTMLElement
+const header = getComponentElement('header');
+const nav = getComponentElement('tabs');
+const footer = document.querySelector('#hero-footer') as HTMLElement;
 
 export function handleHomeHeader() {
   return navigationEvents$.pipe(
@@ -413,14 +416,14 @@ export function handleHomeHeader() {
     distinctUntilChanged((prev, curr) => prev.pathname === curr.pathname),
     tap(() => {
       if (header) {
-        header.hidden = true
+        header.hidden = true;
       }
       if (nav) {
-        nav.hidden = true
+        nav.hidden = true;
       }
       if (footer) {
-        footer.hidden = true
+        footer.hidden = true;
       }
     }),
-  )
+  );
 }

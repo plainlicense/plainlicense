@@ -27,15 +27,15 @@ limitations:
   - warranty
 outro: null
 reader_license_text: |
-  <h2 class="license-first-header">We Dedicate This Work to the Public Domain</h2>
+  <h2 class="license-first-header">You are Free to Use This Work - We Dedicate It to the Public Domain</h2>
 
-  **The authors ("we") dedicate this work ("the work") to the public domain.**
+  **We, the authors, dedicate the work to the public domain.**
   You can use it freely for any purpose and in any way you want. We give away all rights and interest in the work to the public domain forever.
 
   ## You Can Do Anything with the Work
 
   - **Use the work for anything** you want, in whole or in part.
-  - **Copy, change, publish, distribute, or sell** the work.
+  - **Copy, change, distribute, or sell** the work.
   - Use the work for any purpose without restrictions.
   - **License anything you create with the work however you want.**
 
@@ -47,8 +47,8 @@ reader_license_text: |
 
   ## We Provide No Warranty and Accept No Liability
 
-  **We provide the work "as is" and offer no warranties.** We are not responsible for any damages or issues from your use of the work.
-official_license_text: |
+  **We offer the work "as is" with no warranties.** We are not responsible for any damages or issues from your use of the work.
+original_license_text: |
   # Unlicense (Public Domain)
 
   This is free and unencumbered software released into the public domain.

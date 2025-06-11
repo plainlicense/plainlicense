@@ -20,32 +20,32 @@
  * @see {@link https://esbuild.github.io/} esbuild Documentation
  */
 
-import path from "path"
+import type path from 'node:path';
 
 // regex separator ("|") or minimatch separator (",")
-export type Separator = "|" | ","
+export type Separator = '|' | ',';
 
-type EmptyString = ""
+type EmptyString = '';
 
-export type VideoWidth = 426 | 640 | 854 | 1280 | 1920 | 2560 | 3840
+export type VideoWidth = 426 | 640 | 854 | 1280 | 1920 | 2560 | 3840;
 
-export type HeroPaths = Record<VideoWidth, string>
+export type HeroPaths = Record<VideoWidth, string>;
 
 /** ============================================
  *               Hero Images
  *=============================================**/
 
 export interface ImageFormatData {
-  widths: HeroPaths
-  srcset: string
-  parent?: string
+  widths: HeroPaths;
+  srcset: string;
+  parent?: string;
 }
 
-export type ImageType = "avif" | "webp" | "png"
+export type ImageType = 'avif' | 'webp' | 'png';
 
-export type MediaFileExtension = ImageType | "mp4" | "webm"
+export type MediaFileExtension = ImageType | 'mp4' | 'webm';
 
-export type ImageIndex = Record<ImageType, ImageFormatData>
+export type ImageIndex = Record<ImageType, ImageFormatData>;
 
 /** ============================================
  *               esbuild Outputs/Meta
@@ -53,119 +53,119 @@ export type ImageIndex = Record<ImageType, ImageFormatData>
 
 export interface PlaceholderMap {
   // template path: { placeholder: replacement }
-  [k: string]: { [k: string]: string }
+  [k: string]: { [k: string]: string };
 }
 
-export interface esbuildOutputs {
+export interface EsBuildOutputs {
   [k: string]: {
-    bytes: number
-    inputs: string[] | []
-    exports: string[] | []
-    entryPoint?: string
-  }
+    bytes: number;
+    inputs: string[] | [];
+    exports: string[] | [];
+    entryPoint?: string;
+  };
 }
 export interface FileHashes {
-  [k: string]: string[]
+  [k: string]: string[];
 }
 export interface MetaFileOutputs {
-  bytes: number
-  inputs: { [path: string]: { bytesInOutput: number } }
-  exports: string[]
-  entryPoint?: string
+  bytes: number;
+  inputs: { [path: string]: { bytesInOutput: number } };
+  exports: string[];
+  entryPoint?: string;
 }
 
 // Output for cache worker's metadata
 export interface CacheConfig {
-  cacheName: string
-  urls: string[]
-  version: string
-  worker: string
+  cacheName: string;
+  urls: string[];
+  version: string;
+  worker: string;
 }
 
-export interface buildJson {
-  noScriptImage: string
-  SCRIPTBUNDLE: string
-  CSSBUNDLE: string
-  LOGONAMED: string
+export interface BuildJson {
+  noScriptImage: string;
+  SCRIPTBUNDLE: string;
+  CSSBUNDLE: string;
+  LOGONAMED: string;
 }
 
 export interface Project {
-  entryPoints: string[]
-  entryNames?: string
-  outdir?: string
-  tsconfig: string
-  platform?: "node" | "browser"
+  entryPoints: string[];
+  entryNames?: string;
+  outdir?: string;
+  tsconfig: string;
+  platform?: 'node' | 'browser';
 }
 
-export interface tsconfigPathsPluginInterface {
-  cwd: string
-  tsconfig: string
-  filter: RegExp
+export interface TsconfigPathsPluginInterface {
+  cwd: string;
+  tsconfig: string;
+  filter: RegExp;
 }
 
 /** ============================================
  *               VIDEO CONFIG
  *=============================================**/
 
-export type VideoCodec = "av1" | "vp9" | "h264"
+export type VideoCodec = 'av1' | 'vp9' | 'h264';
 
-export type CodecVariants = Record<VideoCodec, HeroPaths>
+export type CodecVariants = Record<VideoCodec, HeroPaths>;
 
 export interface VideoResolution {
-  width: VideoWidth
-  height: number
+  width: VideoWidth;
+  height: number;
 }
 
 export interface HeroVideo {
-  baseName: string
-  parentPath: string // Path to the parent directory of the video
-  variants: CodecVariants
-  poster: ImageIndex
-  message?: string
+  baseName: string;
+  parentPath: string; // Path to the parent directory of the video
+  variants: CodecVariants;
+  poster: ImageIndex;
+  message?: string;
 }
 
 export interface VideoConfig {
-  resolutions: VideoResolution[]
-  codecs: VideoCodec[]
-  baseDir: string
+  resolutions: VideoResolution[];
+  codecs: VideoCodec[];
+  baseDir: string;
 }
 
 export interface HeroFiles {
-  images: HeroFile[]
-  videos: HeroFile[]
+  images: HeroFile[];
+  videos: HeroFile[];
 }
 
 export interface HeroFile {
-  baseName: string
-  codec?: VideoCodec
-  extension: MediaFileExtension
-  filename: string
-  srcPath: string
-  parentPath: string
-  parsed: path.ParsedPath
-  type: "image" | "video"
-  width: VideoWidth | EmptyString
+  baseName: string;
+  codec?: VideoCodec;
+  extension: MediaFileExtension;
+  filename: string;
+  srcPath: string;
+  parentPath: string;
+  parsed: path.ParsedPath;
+  type: 'image' | 'video';
+  width: VideoWidth | EmptyString;
 }
 
-export type EsbuildOutput = { [path: string]: MetaFileOutputs }
+export type EsbuildOutput = { [path: string]: MetaFileOutputs };
 
-export type ReplacerFunction = (match: RegExpExecArray) => string
+export type ReplacerFunction = (match: RegExpExecArray) => string;
 
 export interface ReplacerConfig {
-  name: string
-  pattern: RegExp
-  replacer?: ReplacerFunction
-  simple?: boolean
-  description?: string
-  replacement?: string
-  getOutputFile?: () => Promise<string | undefined>
-  pathFilter?: (path: string) => boolean
-  custom?: string[] // name of a custom property function
+  name: string;
+  pattern: RegExp;
+  replacer?: ReplacerFunction;
+  simple?: boolean;
+  description?: string;
+  replacement?: string;
+  getOutputFile?: () => Promise<string | undefined>;
+  pathFilter?: (path: string) => boolean;
+  custom?: string[]; // name of a custom property function
 }
 
 export interface Manifest {
   [filePath: string]: {
-    file: string
-    integrity: string
-  }
+    file: string;
+    integrity: string;
+  };
 }

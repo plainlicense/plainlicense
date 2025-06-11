@@ -1,8 +1,11 @@
-import * as crypto from "crypto"
-import * as fs from "fs/promises"
-import globby from "globby"
-import path, { ParsedPath } from "path"
-import { optimize } from "svgo"
+/** biome-ignore-all lint/style/noNamespaceImport: this is a build script; not watching our bundle */
+/** biome-ignore-all lint/correctness/noNodejsModules: <it's a build script..> */
+
+import { globby, type Options } from 'globby';
+import * as crypto from 'node:crypto';
+import * as fs from 'node:fs/promises';
+import path, { type ParsedPath } from 'node:path';
+import { optimize } from 'svgo';
 import {
   basePath,
   cssLocs,
@@ -14,7 +17,7 @@ import {
   resPattern,
   videoCodecs,
   videoExtensions,
-} from "../config"
+} from '../config';
 import type {
   HeroFile,
   HeroFiles,
@@ -24,18 +27,22 @@ import type {
   MediaFileExtension,
   PlaceholderMap,
   VideoWidth,
-} from "../types"
+} from '../types';
+
+// Regex patterns defined at top level for performance
+const LEADING_UNDERSCORE_REGEX = /^_/;
+const TEMPLATE_SUFFIX_REGEX = /_template/;
 
 /**
  * Calculates the SHA384 integrity hash of a given buffer.
  * Hashes the provided content using SHA384 and returns the result as a base64-encoded string prefixed with "sha384-".
  * @param content - The buffer to calculate the hash from.
- * @returns A promise that resolves to the SHA384 integrity hash string.
+ * @returns The SHA384 integrity hash string.
  */
-export async function calculateIntegrity(content: Buffer): Promise<string> {
-  const hash = crypto.createHash("sha384")
-  hash.update(content)
-  return `sha384-${hash.digest("base64")}`
+export function calculateIntegrity(content: Buffer): string {
+  const hash = crypto.createHash('sha384');
+  hash.update(content);
+  return `sha384-${hash.digest('base64')}`;
 }
 
 /**
@@ -44,7 +51,7 @@ export async function calculateIntegrity(content: Buffer): Promise<string> {
  * @returns {string} The corresponding docs path.
  */
 export function srcToDocs(srcPath: string): string {
-  return srcPath.replace("src", "docs")
+  return srcPath.replace('src', 'docs');
 }
 
 /**
@@ -56,7 +63,7 @@ export async function fileExists(filePath: string): Promise<boolean> {
   return await fs
     .access(filePath)
     .then(() => true)
-    .catch(() => false)
+    .catch(() => false);
 }
 
 /** Checks if a path is a directory */
@@ -64,7 +71,7 @@ export async function isDir(filePath: string): Promise<boolean> {
   return await fs
     .stat(filePath)
     .then((stat) => stat.isDirectory())
-    .catch(() => false)
+    .catch(() => false);
 }
 
 /*
@@ -72,9 +79,9 @@ export async function isDir(filePath: string): Promise<boolean> {
  * Returns an empty string if the hash is not found.
  */
 export function getHash(filePath: string): string {
-  const pattern = new RegExp(hashPattern)
-  const match = filePath.match(pattern)
-  return match ? match[1] : ""
+  const pattern = new RegExp(hashPattern);
+  const match = filePath.match(pattern);
+  return match ? match[1] : '';
 }
 
 /**
@@ -84,9 +91,9 @@ export function getHash(filePath: string): string {
  * @returns {number} A negative number if a's width is greater than b's, positive if b, else 0.
  */
 function sortWidths(a: [string, unknown], b: [string, unknown]): number {
-  const widthA = parseInt(a[0], 10)
-  const widthB = parseInt(b[0], 10)
-  return widthB - widthA
+  const widthA = Number.parseInt(a[0], 10);
+  const widthB = Number.parseInt(b[0], 10);
+  return widthB - widthA;
 }
 
 /**
@@ -97,21 +104,20 @@ function sortWidths(a: [string, unknown], b: [string, unknown]): number {
  */
 export const getBaseName = (parsed: ParsedPath): string => {
   const splitIt = (p: string) => {
-    return p.split("/").pop()
-  }
-  const { name, dir, ext } = parsed
-  if (ext !== "" && ext !== undefined) {
-    if (dir.includes("poster")) {
-      return splitIt(path.parse(dir).dir)
-    } else {
-      return splitIt(dir)
+    return p.split('/').pop();
+  };
+  const { name, dir, ext } = parsed;
+  if (ext !== '' && ext !== undefined) {
+    if (dir.includes('poster')) {
+      return splitIt(path.parse(dir).dir);
     }
-  } else if (name === "poster") {
-    return splitIt(dir)
-  } else {
-    return name
+    return splitIt(dir);
   }
-}
+  if (name === 'poster') {
+    return splitIt(dir);
+  }
+  return name;
+};
 
 /**
  * Validates the input filename and extension.
@@ -122,18 +128,17 @@ export const getBaseName = (parsed: ParsedPath): string => {
  * @returns True if the input is valid, otherwise throws an error.
  */
 const validatePathInput = (filename: string, ext: string): boolean => {
-  const isEmpty = (s: string) => s === "" || s === undefined || s === null
+  const isEmpty = (s: string) => s === '' || s === undefined || s === null;
   const isValid =
-    !isEmpty(filename) &&
-    !isEmpty(ext) &&
+    !(isEmpty(filename) || isEmpty(ext)) &&
     filename.includes(ext) &&
-    new RegExp(mediaExtensionPattern()).test(ext)
+    new RegExp(mediaExtensionPattern()).test(ext);
   if (!isValid) {
-    console.error(`Invalid input: ${filename} or ${ext}`)
-    throw new Error("Invalid input")
+    console.error(`Invalid input: ${filename} or ${ext}`);
+    throw new Error('Invalid input');
   }
-  return isValid
-}
+  return isValid;
+};
 
 /**
  * Deconstructs a file path string into a HeroFile object.
@@ -141,14 +146,18 @@ const validatePathInput = (filename: string, ext: string): boolean => {
  * @param pathStr - The file path string to deconstruct.
  * @returns A Promise that resolves to a HeroFile object containing the extracted information.
  */
-export async function deconstructPath(pathStr: string): Promise<HeroFile> {
-  const { base, ext, dir, name, root } = path.parse(pathStr)
-  const baseName = getBaseName({ base, dir, ext, name, root })
-  const width = parseInt(new RegExp(resPattern).exec(base)[0], 10) as VideoWidth
-  const type = videoExtensions.includes(ext.slice(1)) ? "video" : "image"
-  const codec = type === "video" ? videoCodecs.find((c) => base.includes(c)) : undefined
-  const parentPath = srcToDocs(dir)
-  validatePathInput(base, ext)
+export function deconstructPath(pathStr: string): HeroFile {
+  const { base, ext, dir, name, root } = path.parse(pathStr);
+  const baseName = getBaseName({ base, dir, ext, name, root });
+  const widthMatch = new RegExp(resPattern).exec(base);
+  if (!widthMatch) {
+    throw new Error(`No width pattern found in filename: ${base}`);
+  }
+  const width = Number.parseInt(widthMatch[0], 10) as VideoWidth;
+  const type = videoExtensions.includes(ext.slice(1)) ? 'video' : 'image';
+  const codec = type === 'video' ? videoCodecs.find((c) => base.includes(c)) : undefined;
+  const parentPath = srcToDocs(dir);
+  validatePathInput(base, ext);
   return {
     baseName,
     extension: ext.slice(1) as MediaFileExtension,
@@ -158,29 +167,30 @@ export async function deconstructPath(pathStr: string): Promise<HeroFile> {
     ...(codec && { codec }), // omits codec if type is "image"
     parentPath,
     get parsed(): path.ParsedPath {
-      return path.parse(this.srcPath) // changed from this.destPath to this.srcPath
+      return path.parse(this.srcPath); // changed from this.destPath to this.srcPath
     },
     get filename() {
-      return this.parsed.base
+      return this.parsed.base;
     },
-  }
+  };
 }
 /**
  * @param {string} glob The glob to resolve.
  * @param {globby.GlobbyOptions} fastGlobOptions Options to pass to fast-glob.
  * @returns {Promise<string[]>} A promise that resolves to the first file that matches the glob.
  */
-export async function resolveGlob(glob: string, fastGlobOptions?: {}): Promise<string[]> {
+export async function resolveGlob(glob: string, fastGlobOptions?: Options): Promise<string[]> {
   try {
-    const result = await Promise.resolve(globby(glob, fastGlobOptions)).then((files) => files)
+    const result: string[] = await Promise.resolve(globby(glob, fastGlobOptions)).then(
+      (files) => files,
+    );
     if (result.length === 0) {
-      throw new Error(`Glob "${glob}" did not match any files`)
-    } else {
-      return result
+      throw new Error(`Glob "${glob}" did not match any files`);
     }
+    return result;
   } catch (error) {
-    console.error("Error resolving glob:", error)
-    throw error
+    console.error('Error resolving glob:', error);
+    throw error;
   }
 }
 
@@ -194,14 +204,14 @@ export async function getHeroFiles(): Promise<HeroFiles> {
     onlyFiles: true,
     unique: true,
     expandDirectories: { extensions: [...imageTypes, ...videoExtensions] },
-  })
-  const heroFiles = await Promise.all(files.map((file) => deconstructPath(file)))
-  let images: HeroFile[] = []
-  let videos: HeroFile[] = []
+  });
+  const heroFiles = await Promise.all(files.map((file) => deconstructPath(file)));
+  const images: HeroFile[] = [];
+  const videos: HeroFile[] = [];
   for (const file of heroFiles) {
-    file.codec ? videos.push(file) : images.push(file)
+    file.codec ? videos.push(file) : images.push(file);
   }
-  return { images, videos }
+  return { images, videos };
 }
 
 /**
@@ -213,11 +223,11 @@ export async function generateSrcset(paths: HeroPaths): Promise<string> {
   const entries = await Promise.all(
     Object.entries(paths)
       .sort(sortWidths)
-      .map(async ([width, src]) => {
-        return `${src.replace("src/", "").replace("docs/", "")} ${width}w`
+      .map(([width, src]) => {
+        return `${src.replace('src/', '').replace('docs/', '')} ${width}w`;
       }),
-  )
-  return entries.join(", ")
+  );
+  return entries.join(', ');
 }
 
 /**
@@ -225,14 +235,14 @@ export async function generateSrcset(paths: HeroPaths): Promise<string> {
  * @returns {string} the file hash
  * @description Extracts the hash from a file name
  */
-export async function getFileHash(fullPath: string): Promise<string> {
-  if (!fullPath || typeof fullPath !== "string" || !fullPath.includes(".")) {
-    return ""
+export function getFileHash(fullPath: string): string {
+  if (!fullPath || typeof fullPath !== 'string' || !fullPath.includes('.')) {
+    return '';
   }
-  const parsed = path.parse(fullPath)
-  const fileName = parsed.name
-  const hash = fileName.match(hashPattern)
-  return hash ? hash[1] : ""
+  const parsed = path.parse(fullPath);
+  const fileName = parsed.name;
+  const hash = fileName.match(hashPattern);
+  return hash ? hash[1] : '';
 }
 
 /**
@@ -241,14 +251,14 @@ export async function getFileHash(fullPath: string): Promise<string> {
  * @description Minifies SVG data
  */
 export function minsvg(data: string): string {
-  if (!data.startsWith("<")) {
-    return data
+  if (!data.startsWith('<')) {
+    return data;
   }
 
   const result = optimize(data, {
     plugins: [
       {
-        name: "preset-default",
+        name: 'preset-default',
         params: {
           overrides: {
             removeViewBox: false,
@@ -256,12 +266,12 @@ export function minsvg(data: string): string {
         },
       },
       {
-        name: "removeDimensions",
+        name: 'removeDimensions',
       },
     ],
-  })
+  });
 
-  return result.data
+  return result.data;
 }
 
 /**
@@ -269,13 +279,8 @@ export function minsvg(data: string): string {
  * @returns {string} the title-cased string
  */
 export async function makeDir(dir: string): Promise<void> {
-  if (
-    !(await fs
-      .stat(dir)
-      .then(() => true)
-      .catch(() => false))
-  ) {
-    await fs.mkdir(dir, { recursive: true })
+  if (!(await fileExists(dir))) {
+    await fs.mkdir(dir, { recursive: true });
   }
 }
 
@@ -285,9 +290,9 @@ export async function makeDir(dir: string): Promise<void> {
  * @param dest - the destination file
  */
 export async function copyFile(src: string, dest: string): Promise<void> {
-  await makeDir(path.dirname(dest))
+  await makeDir(path.dirname(dest));
   if (!(await fileExists(dest))) {
-    await fs.copyFile(src, dest)
+    await fs.copyFile(src, dest);
   }
 }
 
@@ -297,30 +302,26 @@ export async function copyFile(src: string, dest: string): Promise<void> {
  * @param className - the class name
  * @returns {string} the picture element
  */
-export const generatePictureElement = (
-  image: ImageIndex,
-  className: string = "hero__poster",
-): string => {
-  console.log("Generating picture element")
-  const { avif, webp, png } = image
-  const sortedImages = { avif, webp, png }
+export const generatePictureElement = (image: ImageIndex, className = 'hero__poster'): string => {
+  console.log('Generating picture element');
+  const { avif, webp, png } = image;
+  const sortedImages = { avif, webp, png };
   const sources = Object.entries(sortedImages)
-    .filter(([ext, _]) => ext !== "png")
+    .filter(([ext, _]) => ext !== 'png')
     .map(([ext, { srcset }]) => `<source type="image/${ext}" srcset="${srcset}">`)
-    .join("\n")
+    .join('\n');
   const sizes = Object.keys(png.widths)
     .map((width) => {
-      if (width !== "3840") {
-        return `(max-width: ${width}px) ${width}px`
-      } else {
-        return `${width}px`
+      if (width !== '3840') {
+        return `(max-width: ${width}px) ${width}px`;
       }
+      return `${width}px`;
     })
-    .join(", ")
-  const img = `<img src="${png.widths[1280]}" class="${className}--image" draggable="false" fetchpriority="high" loading="eager" sizes="${sizes}" srcset="${png.srcset}">`
+    .join(', ');
+  const img = `<img src="${png.widths[1280]}" class="${className}--image" draggable="false" fetchpriority="high" loading="eager" sizes="${sizes}" srcset="${png.srcset}">`;
 
-  return `<picture class="nojs .hero__backup ${className}--active" role="presentation">${sources}\n${img}</picture>`
-}
+  return `<picture class="nojs .hero__backup ${className}--active" role="presentation">${sources}\n${img}</picture>`;
+};
 
 /**
  * Extracts unique parent paths from an array of HeroFile objects.
@@ -329,8 +330,8 @@ export const generatePictureElement = (
  * @returns {string[]} An array of unique parent paths.
  */
 export function getParents(files: HeroFile[]): string[] {
-  const parents = new Set(files.map((file) => file.parentPath))
-  return Array.from(parents)
+  const parents = new Set(files.map((file) => file.parentPath));
+  return Array.from(parents);
 }
 
 /**
@@ -347,19 +348,19 @@ async function resolveCssFiles(): Promise<Partial<PlaceholderMap>> {
             onlyFiles: true,
             unique: true,
             expandDirectories: false,
-          })
-          const newloc = await getFileHash(file[0])
+          });
+          const newloc = await getFileHash(file[0]);
           return {
             [placehold]: newloc,
-          }
+          };
         }),
-      )
+      );
       return {
         [key]: Object.assign({}, ...entries),
-      }
+      };
     }),
-  )
-  return Object.assign({}, ...(await Promise.all(placeholders)))
+  );
+  return Object.assign({}, ...(await Promise.all(placeholders)));
 }
 
 /**
@@ -370,35 +371,41 @@ async function resolveCssFiles(): Promise<Partial<PlaceholderMap>> {
  */
 async function replacePlaceholders(newContent: PlaceholderMap): Promise<void> {
   const mapping = Object.fromEntries(
-    Object.entries(newContent).filter(([k, _v]) => k.includes("bundle")),
-  )
-  for (const [file, placeholders] of Object.entries(mapping)) {
+    Object.entries(newContent).filter(([k, _v]) => k.includes('bundle')),
+  );
+
+  const fileProcessingPromises = Object.entries(mapping).map(async ([file, placeholders]) => {
     try {
-      const parsedPath = path.parse(file)
-      const targetDir = parsedPath.dir
-      await fs.mkdir(targetDir, { recursive: true })
-      let content = await fs.readFile(file, "utf8")
+      const parsedPath = path.parse(file);
+      const targetDir = parsedPath.dir;
+      await fs.mkdir(targetDir, { recursive: true });
+      let content = await fs.readFile(file, 'utf8');
+      const writePromises: Promise<void>[] = [];
       if (placeholders) {
         for (const [placeholder, value] of Object.entries(placeholders)) {
-          const re = new RegExp(placeholder, "g")
-          content = content.replace(re, value)
+          const newFilename = parsedPath.base
+            .replace(LEADING_UNDERSCORE_REGEX, '')
+            .replace(TEMPLATE_SUFFIX_REGEX, '');
+          content = content.replace(new RegExp(placeholder, 'g'), value);
+          const newPath = path.join(targetDir, newFilename);
+          console.log(`Writing CSS bundle to ${newPath}`);
+          writePromises.push(fs.writeFile(newPath, content, 'utf8'));
         }
+        await Promise.all(writePromises);
       }
-      const newFilename = parsedPath.base.replace(/^_/, "").replace(/_template/, "")
-      const newPath = path.join(targetDir, newFilename)
-      console.log(`Writing CSS bundle to ${newPath}`)
-      await fs.writeFile(newPath, content, "utf8")
     } catch (err) {
-      console.error(`Failed to process ${file}:`, err)
-      throw err // Re-throw to handle in main build
+      console.error(`Failed to process ${file}:`, err);
+      throw err; // Re-throw to handle in main build
     }
-  }
+  });
+
+  await Promise.all(fileProcessingPromises);
 }
 
 // verifies that the CSS bundle was created
 export async function verifyBundleCreated(): Promise<void> {
   if (!(await fileExists(cssSrc))) {
-    throw new Error("CSS bundle was not created")
+    throw new Error('CSS bundle was not created');
   }
 }
 
@@ -407,10 +414,10 @@ export async function verifyBundleCreated(): Promise<void> {
  * Retrieves CSS files, calculates their hashes, and creates a map of placeholders to the new filenames.
  */
 export async function generatePlaceholderMap(): Promise<void> {
-  const cssHashMap = await Promise.resolve(resolveCssFiles())
+  const cssHashMap = await resolveCssFiles();
   //const fontHashMap = await resolveFontFiles()
-  const newContent = cssHashMap
-  await replacePlaceholders(newContent)
+  const newContent = cssHashMap;
+  await replacePlaceholders(newContent);
 }
 
 /**
@@ -420,10 +427,10 @@ export async function generatePlaceholderMap(): Promise<void> {
  * @returns {Promise<HeroFile[]>} A promise that resolves to an array of HeroFile objects representing the retrieved image files.
  */
 export async function getImageHeroes(baseName: string): Promise<HeroFile[]> {
-  const files = await Promise.resolve(
-    resolveGlob(`${basePath.replace("src", "docs")}/${baseName}/posters/${baseName}*`),
-  )
-  return (await Promise.all(files.map((file) => deconstructPath(file)))).filter(Boolean)
+  const files = await resolveGlob(
+    `${basePath.replace('src', 'docs')}/${baseName}/posters/${baseName}*`,
+  );
+  return (await Promise.all(files.map((file) => deconstructPath(file)))).filter(Boolean);
 }
 
 /**
@@ -432,36 +439,34 @@ export async function getImageHeroes(baseName: string): Promise<HeroFile[]> {
  * @param {HeroFile[]} images - An array of HeroFile objects representing the images.
  * @returns {Promise<Record<ImageType, HeroPaths>>} A promise that resolves to a record mapping image types to their corresponding paths and widths.
  */
-async function getHeroPaths(images: HeroFile[]): Promise<Record<ImageType, HeroPaths>> {
+function getHeroPaths(images: HeroFile[]): Record<ImageType, HeroPaths> {
   // Initialize objects for each image type
   const pathObjs: Record<ImageType, typeof resKeys> = {
     avif: resKeys,
     webp: resKeys,
     png: resKeys,
-  }
+  };
 
   // Process each image type separately
-  const imageTypes = Object.keys(pathObjs) as ImageType[]
-  const pathsByType = await Promise.all(
-    imageTypes.map(async (type) => {
-      const typeImages = images.filter((img) => img.extension === type)
-      const paths = typeImages.reduce((acc, image) => {
-        const { width, srcPath } = image
-        const src = srcPath.replace("src/", "").replace("docs/", "")
-        const resolution = parseInt(width.toString(), 10)
+  const imageTypes = Object.keys(pathObjs) as ImageType[];
+  const pathsByType = imageTypes.map((type) => {
+    const typeImages = images.filter((img) => img.extension === type);
+    const paths = typeImages.reduce((acc, image) => {
+      const { width, srcPath } = image;
+      const src = srcPath.replace('src/', '').replace('docs/', '');
+      const resolution = Number.parseInt(width.toString(), 10);
 
-        if (resolution in pathObjs[type]) {
-          acc[resolution] = src
-        }
-        return acc
-      }, {} as HeroPaths)
+      if (resolution in pathObjs[type]) {
+        acc[resolution] = src;
+      }
+      return acc;
+    }, {} as HeroPaths);
 
-      return { [type]: paths }
-    }),
-  )
+    return { [type]: paths };
+  });
 
   // Combine results into final object
-  return Object.assign({}, ...pathsByType) as Record<ImageType, HeroPaths>
+  return Object.assign({}, ...pathsByType) as Record<ImageType, HeroPaths>;
 }
 
 /**
@@ -471,9 +476,9 @@ async function getHeroPaths(images: HeroFile[]): Promise<Record<ImageType, HeroP
  * @returns {Promise<ImageIndex>} A promise that resolves to an ImageIndex object containing image information categorized by type.
  */
 export async function constructImageIndex(images: HeroFile[]): Promise<ImageIndex> {
-  const pathRecords = await getHeroPaths(images)
-  const { avif, webp, png } = pathRecords
-  const parent = images[0].parentPath
+  const pathRecords = getHeroPaths(images);
+  const { avif, webp, png } = pathRecords;
+  const parent = images[0].parentPath;
   return {
     avif: {
       widths: avif,
@@ -490,5 +495,5 @@ export async function constructImageIndex(images: HeroFile[]): Promise<ImageInde
       srcset: await generateSrcset(png),
       parent,
     },
-  } as ImageIndex
+  } as ImageIndex;
 }

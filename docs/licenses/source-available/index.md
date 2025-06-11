@@ -1,29 +1,37 @@
 ---
 template: main.html
-title: Plain License Source-Available Licenses
-description: Plain License source-available licenses offer a range of permissions and restrictions for sharing a work. We provide clear, simple terms for sharing software and other works with others while keeping some control over how it's used.
+title: Plain License Fair Code Licenses
+description: Plain License Fair Code licenses balance openness with sustainability. Share your work openly with the community while keeping control over commercial use and competition.
 ---
 
-# Plain License Source-Available Licenses :nounproject-copyright: :nounproject-no-commercial: :nounproject-source-available:
+# Plain License Source-Available Licenses (Fair Code) :nounproject-copyright: :nounproject-no-commercial: :nounproject-source-available:
 
-## What is a Source-Available License?
+## What is a Fair Code License?
 
-Source-available licenses are not open source licenses (as defined by the Open Source Institute or the Free Software Foundation). They allow you to share your software (or other works) with others while keeping some control over how it's used. Source-available licenses can cover a wide range of permissions and restrictions. Some source-available licenses are free to use, but others require payment or have other restrictions. They are sometimes called "shared source" licenses. Source-available licenses are different from proprietary licenses because they allow you to see the source code, but they are not as open as open source licenses.
+**Fair Code licenses follow the [Fair Code](https://faircode.io/) philosophy** of balancing openness with sustainability for creators. These licenses embody four key principles:
 
-## When Should I Use a Source-Available License?
+1. **Free to use** - The work is generally free to use and can be distributed by anybody
+2. **Open source** - The source materials are openly available for inspection and modification  
+3. **Community extensibility** - The work can be extended by anybody in public and private communities
+4. **Commercial restrictions** - The original authors retain commercial rights to monetize their work
 
-You should **use a source-available license if**...
-**You**:
+Fair Code licenses are **not considered "open source"** by the Open Source Initiative or Free Software Foundation because they restrict commercial use. However, they offer more transparency and community collaboration than traditional proprietary licenses.
 
-1. **Want to share your work.** Source-available licenses let you share your work with others while keeping some control over how it's used.
-2. **Want to allow some uses but not others.** Source-available licenses let you set rules for how your work can be used. Most commonly, source-available licenses restrict offering the work as a service to others or prevent commercial use.
-3. **Plan to charge for your work.** Some source-available licenses require payment for certain uses of your work. This can help you make money from your work.
-4. **Want credit for your work.** Source-available licenses often require that users give you credit for your work. This can help you build a reputation as a author and get recognition for your work.
+## When Should I Use a Fair Code License?
 
-## Our Source-AvailableAvailable Licenses
+**Use a Fair Code license if you want to:**
+
+1. **Build an open community** while retaining control over commercial use of your work
+2. **Allow free use for most people** but prevent competitors from building competing services with your work
+3. **Make a living from your creation** by reserving commercial rights while still sharing openly
+4. **Encourage contributions and extensions** from the community without giving up your ability to monetize
+
+Fair Code licenses are ideal for **businesses and independent creators** who want to balance the benefits of open source collaboration with the need to sustain their work financially.
+
+## Our Fair Code Licenses
 
 ### [Plain Elastic License][el2]
 
-The [Plain Elastic License][el2] is a source-available license that allows you to share your work with others, giving them freedom to use, share and change it. They can't offer a competing service based on your work. This license is for people who want to keep their work permanently out of the hands of competitors but still make it free for others to use.
+The [Plain Elastic License][el2] follows Fair Code principles by allowing people to freely use, share, and change your work while preventing them from offering competing services. This license is perfect for creators who want to share their work openly with the community while protecting their commercial interests from direct competitors.
 
 [el2]: elastic-2.0/index.md "Plain Elastic License"

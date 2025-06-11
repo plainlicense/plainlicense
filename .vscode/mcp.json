@@ -1,0 +1,30 @@
+{
+  "servers": {
+    "console-ninja": {
+      "args": ["--bun", "~/.console-ninja/mcp/"],
+      "command": "bunx",
+      "type": "stdio"
+    },
+    "context7": {
+      "args": ["--bun", "@upstash/context7-mcp@latest"],
+      "command": "bunx",
+      "type": "stdio"
+    },
+    "sequential-thinking": {
+      "args": ["--bun", "@modelcontextprotocol/server-sequential-thinking"],
+      "command": "bunx",
+      "type": "stdio"
+    },
+    "memory": {
+      "command": "bunx",
+      "args": ["--bun", "@modelcontextprotocol/server-memory"],
+      "env": {
+        "MEMORY_FILE_PATH": "../.vscode/memory.json"
+      }
+    },
+    "filesystem": {
+      "command": "bunx",
+      "args": ["--bun", "@modelcontextprotocol/server-filesystem", "../"]
+    }
+  }
+}

@@ -4,10 +4,10 @@
  *
  */
 
-import gsap from "gsap"
+import type gsap from 'gsap';
 
 export interface ReducedMotionCondition extends gsap.Conditions {
-  reducedMotion: boolean
+  reducedMotion: boolean;
 }
 
 /** ============================================
@@ -36,37 +36,37 @@ export enum SectionIndex {
  * @description Section element and content for Observer animation.
  */
 export interface Section {
-  index: number | SectionIndex
-  readonly element: Element
-  readonly outerWrapper: Element | null
-  readonly innerWrapper: Element | null
-  readonly bg: Element | null
-  content: Element[]
-  animation?: gsap.core.Timeline
+  index: number | SectionIndex;
+  readonly element: Element;
+  readonly outerWrapper: Element | null;
+  readonly innerWrapper: Element | null;
+  readonly bg: Element | null;
+  content: Element[];
+  animation?: gsap.core.Timeline;
 }
 
 export interface EmphasisConfig extends gsap.TweenVars {
-  blinkConfig: gsap.TweenVars
-  jumpConfig: gsap.TweenVars
-  scaleUpConfig: gsap.TweenVars
+  blinkConfig: gsap.TweenVars;
+  jumpConfig: gsap.TweenVars;
+  scaleUpConfig: gsap.TweenVars;
 }
 
 export interface FadeEffectConfig extends gsap.TweenVars {
-  out?: boolean
-  direction?: Direction
-  fromConfig?: gsap.TweenVars
-  toConfig?: gsap.TweenVars
+  out?: boolean;
+  direction?: Direction;
+  fromConfig?: gsap.TweenVars;
+  toConfig?: gsap.TweenVars;
 }
 
 export interface TransitionConfig extends gsap.TweenVars {
-  direction: Direction
-  section: Section
+  direction: Direction;
+  section: Section;
 }
 
 export interface AnimateMessageConfig extends gsap.TweenVars {
-  message?: string
-  duration?: number
-  sharedVars?: gsap.TweenVars
-  fromVars?: gsap.TweenVars
-  toVars?: gsap.TweenVars
+  message?: string;
+  duration?: number;
+  sharedVars?: gsap.TweenVars;
+  fromVars?: gsap.TweenVars;
+  toVars?: gsap.TweenVars;
 }

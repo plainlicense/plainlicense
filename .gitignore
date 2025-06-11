@@ -16,6 +16,25 @@
 # Leave launch.json public
 !.vscode/launch.json
 
+# Playwright
+logs
+_.log
+report.[0-9]_[0-9]_[0-9]_[0-9]_.json
+out
+dist
+*.tgz
+coverage
+*.lcov
+.env
+.env.development.local
+.env.test.local
+.env.production.local
+.env.local
+.eslintcache
+.cache
+!.cache/uv/
+*.tsbuildinfo
+
 # venv
 **/__pycache__/
 **/.pytest_cache/
@@ -138,6 +157,7 @@ bower_components/
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
+!.vscode/mcp.json
 *.code-workspace
 
 # Local History for Visual Studio Code

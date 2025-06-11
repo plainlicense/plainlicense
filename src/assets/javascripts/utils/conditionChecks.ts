@@ -6,46 +6,46 @@
  * @copyright No rights reserved.
  */
 
-import gsap from "gsap"
-import { EXCLUDED_TAGS, OBSERVER_CONFIG } from "~/config"
-import { NotVisibleReport } from "./types"
+import gsap from 'gsap';
+import { EXCLUDED_TAGS, OBSERVER_CONFIG } from '~/config';
+import type { NotVisibleReport } from './types';
 
-const LICENSE_HASHES = ["#reader", "#html", "#markdown", "#plaintext", "#changelog", "#official"]
+const LICENSE_HASHES = ['#reader', '#html', '#markdown', '#plaintext', '#changelog', '#official'];
 
 const isProd = (url: URL) => {
-  return url.hostname === "plainlicense.org" && url.protocol === "https:"
-}
+  return url.hostname === 'plainlicense.org' && url.protocol === 'https:';
+};
 
 // tests if the site is in a development environment
 export const isDev = (url: URL) => {
   return (
-    (url.hostname === "localhost" && url.port === "8000") ||
-    (url.hostname === "127.0.0.1" && url.port === "8000")
-  )
-}
+    (url.hostname === 'localhost' && url.port === '8000') ||
+    (url.hostname === '127.0.0.1' && url.port === '8000')
+  );
+};
 
 // tests if the URL is on the site
 export const isOnSite = (url: URL) => {
-  return isProd(url) || isDev(url)
-}
+  return isProd(url) || isDev(url);
+};
 
 // tests if the URL is the home page
 export const isHome = (url: URL) => {
-  return url.pathname === "/" || (url.pathname === "/index.html" && isOnSite(url))
-}
+  return url.pathname === '/' || (url.pathname === '/index.html' && isOnSite(url));
+};
 
 const isMainSiteLicensePage = (url: URL) => {
   return (
-    (url.pathname.endsWith("index.html") && url.pathname.split("/").length === 5) ||
-    (url.pathname.endsWith("/") && url.pathname.split("/").length === 4)
-  )
-}
+    (url.pathname.endsWith('index.html') && url.pathname.split('/').length === 5) ||
+    (url.pathname.endsWith('/') && url.pathname.split('/').length === 4)
+  );
+};
 
 // tests if the URL is a license page
 const isEmbeddedLicensePage = (url: URL) => {
-  const path = url.pathname.split("/")
-  return path[1] === "embed" && !path[path.length - 1].includes("index.html")
-}
+  const path = url.pathname.split('/');
+  return path[1] === 'embed' && !path[path.length - 1].includes('index.html');
+};
 
 /**
  * Tests if the URL is a license page
@@ -53,12 +53,12 @@ const isEmbeddedLicensePage = (url: URL) => {
  * @returns boolean true if the URL is a license page
  */
 export const isLicense = (url: URL) => {
-  return isMainSiteLicensePage(url) || isEmbeddedLicensePage(url)
-}
+  return isMainSiteLicensePage(url) || isEmbeddedLicensePage(url);
+};
 
 export const isLicenseHash = (url: URL) => {
-  return url.hash.length > 1 && isLicense(url) && LICENSE_HASHES.includes(url.hash)
-}
+  return url.hash.length > 1 && isLicense(url) && LICENSE_HASHES.includes(url.hash);
+};
 
 /**
  * Tests if the URL is the helping index page
@@ -67,11 +67,11 @@ export const isLicenseHash = (url: URL) => {
  */
 export const isHelpingIndex = (url: URL) => {
   return (
-    url.pathname.includes("helping") &&
-    ((url.pathname.split("/").length === 3 && url.pathname.endsWith("index.html")) ||
-      (url.pathname.split("/").length === 2 && url.pathname.endsWith("/")))
-  )
-}
+    url.pathname.includes('helping') &&
+    ((url.pathname.split('/').length === 3 && url.pathname.endsWith('index.html')) ||
+      (url.pathname.split('/').length === 2 && url.pathname.endsWith('/')))
+  );
+};
 
 /**
  * Tests if the site is in a production environment
@@ -81,8 +81,8 @@ export const isHelpingIndex = (url: URL) => {
 
 // Tests if the event is a valid event (that it isn't null and is an instance of Event)
 export const isValidEvent = (value: Event | null) => {
-  return value !== null && value instanceof Event
-}
+  return value !== null && value instanceof Event;
+};
 
 /**
  * @function elementIsVisible
@@ -104,34 +104,34 @@ export const isValidEvent = (value: Event | null) => {
  *
  * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/checkVisibility|MDN checkVisibility}
  */
-export const elementIsVisible = (el: HTMLElement | null, checkParent: boolean = false): boolean => {
+export const elementIsVisible = (el: HTMLElement | null, checkParent = false): boolean => {
   if (!el || !(el instanceof HTMLElement)) {
-    return false
+    return false;
   }
 
-  const hasCheckVisibility = "checkVisibility" in el && typeof el.checkVisibility === "function"
+  const hasCheckVisibility = 'checkVisibility' in el && typeof el.checkVisibility === 'function';
 
   if (hasCheckVisibility) {
     return el.checkVisibility({
       contentVisibilityAuto: true,
       opacityProperty: true,
       visibilityProperty: true,
-    })
+    });
   }
 
   const isNotHidden =
-    el.style.display !== "none" && el.style.visibility !== "hidden" && el.style.opacity !== "0"
+    el.style.display !== 'none' && el.style.visibility !== 'hidden' && el.style.opacity !== '0';
 
   const parentNotHidden =
-    el.parentElement?.style.contentVisibility !== "hidden" &&
-    el.parentElement?.style.visibility !== "hidden"
+    el.parentElement?.style.contentVisibility !== 'hidden' &&
+    el.parentElement?.style.visibility !== 'hidden';
 
   if (checkParent && el.parentElement) {
-    return isNotHidden && parentNotHidden
+    return isNotHidden && parentNotHidden;
   }
 
-  return isNotHidden
-}
+  return isNotHidden;
+};
 
 /**
  * Checks if an element is valid for animation.
@@ -141,26 +141,26 @@ export const elementIsVisible = (el: HTMLElement | null, checkParent: boolean = 
  */
 export function isValidElement(el: unknown, parent: Element): el is Element {
   if (el === parent) {
-    return false
+    return false;
   }
   if (!(el instanceof Element)) {
-    return false
+    return false;
   }
   if (EXCLUDED_TAGS.includes(el.tagName as (typeof EXCLUDED_TAGS)[number])) {
-    return false
+    return false;
   }
   if (el instanceof SVGElement) {
-    return true
+    return true;
   }
   try {
     // check if the element has computed styles
     if (window.getComputedStyle(el)) {
-      return true
+      return true;
     }
   } catch {
-    return false
+    return false;
   }
-  return el.innerHTML.trim() !== ""
+  return el.innerHTML.trim() !== '';
 }
 
 /**
@@ -170,7 +170,7 @@ export function isValidElement(el: unknown, parent: Element): el is Element {
  * @returns `true` if the element is in the DOM (or container), `false` otherwise.
  */
 export function elementInDom(el: Element, container?: Element): boolean {
-  return container ? container.contains(el) : document.body.contains(el)
+  return container ? container.contains(el) : document.body.contains(el);
 }
 
 /**
@@ -180,10 +180,10 @@ export function elementInDom(el: Element, container?: Element): boolean {
  * @returns An array of elements that are not visible.
  */
 export function elementsNotVisible(parent: Element = document.body): Element[] {
-  const children = gsap.utils.toArray("*", parent)
+  const children = gsap.utils.toArray('*', parent);
   return children
     .filter((el) => isValidElement(el, parent) && !elementIsVisible(el as HTMLElement))
-    .filter(Boolean) as Element[]
+    .filter(Boolean) as Element[];
 }
 
 /**
@@ -194,36 +194,36 @@ export function elementsNotVisible(parent: Element = document.body): Element[] {
 export function generateNonVisibleElementReport(
   parent: Element = document.body,
 ): NotVisibleReport[] {
-  const elements = elementsNotVisible(parent)
+  const elements = elementsNotVisible(parent);
   if (elements.length === 0) {
-    return []
+    return [];
   }
   return elements.map((el) => {
-    const computedStyle = getComputedStyle(el)
-    const parentComputedStyle = getComputedStyle(el.parentElement as Element)
+    const computedStyle = getComputedStyle(el);
+    const parentComputedStyle = getComputedStyle(el.parentElement as Element);
     const report: NotVisibleReport = {
       element: el as HTMLElement,
-      noBox: computedStyle.display === "none" || computedStyle.display === "contents",
+      noBox: computedStyle.display === 'none' || computedStyle.display === 'contents',
       parentHidden:
-        (parentComputedStyle.display === "none" || parentComputedStyle.visibility === "hidden") &&
-        computedStyle.visibility === "inherit",
+        (parentComputedStyle.display === 'none' || parentComputedStyle.visibility === 'hidden') &&
+        computedStyle.visibility === 'inherit',
       contentVisibilityAuto: el.checkVisibility({ contentVisibilityAuto: true }),
-      contentVisibilityHidden: computedStyle.contentVisibility === "hidden",
-      opacityZero: computedStyle.opacity === "0",
-      visibilityHidden: computedStyle.visibility === "hidden",
-    }
+      contentVisibilityHidden: computedStyle.contentVisibility === 'hidden',
+      opacityZero: computedStyle.opacity === '0',
+      visibilityHidden: computedStyle.visibility === 'hidden',
+    };
     if (Object.entries(report).some(([_, value]) => value)) {
       report.reason = Object.entries(report)
         .map(([key, value]) => {
-          if (value === true || value === "true") {
-            return key
+          if (value === true || value === 'true') {
+            return key;
           }
-          return undefined
+          return undefined;
         })
-        .filter(Boolean) as Array<keyof NotVisibleReport>
+        .filter(Boolean) as Array<keyof NotVisibleReport>;
     }
-    return report
-  })
+    return report;
+  });
 }
 
 /**
@@ -235,5 +235,5 @@ export function headerShouldDisplay() {
   return gsap.utils
     .toArray(OBSERVER_CONFIG.header)
     .filter((el) => el instanceof HTMLElement)
-    .some((el) => Array.from(el.classList).includes("active"))
+    .some((el) => Array.from(el.classList).includes('active'));
 }

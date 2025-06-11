@@ -7,9 +7,9 @@
  * @copyright No rights reserved.
  */
 
-import gsap from "gsap"
-import { HeroStore } from "~/state"
-import { isValidElement } from "~/utils"
+import gsap from 'gsap';
+import { HeroStore } from '~/state';
+import { isValidElement } from '~/utils';
 
 /**
  * Randomly selects and removes an item from an array, reshuffling if depleted.
@@ -24,10 +24,10 @@ import { isValidElement } from "~/utils"
  * @see {@link https://greensock.com/docs/v3/GSAP/Utilities/mapRange} GSAP Normalization Utility
  */
 export function normalizeResolution(): number {
-  const viewport = HeroStore.getInstance().getStateValue("viewport")
-  const resolution = Math.max(viewport.offset.y, viewport.offset.x)
-  const clampedResolution = gsap.utils.clamp(320, 3840, resolution)
-  return gsap.utils.mapRange(320, 3840, 0, 1, clampedResolution)
+  const viewport = HeroStore.getInstance().getStateValue('viewport');
+  const resolution = Math.max(viewport.offset.y, viewport.offset.x);
+  const clampedResolution = gsap.utils.clamp(320, 3840, resolution);
+  return gsap.utils.mapRange(320, 3840, 0, 1, clampedResolution);
 }
 
 /**
@@ -42,7 +42,7 @@ export function normalizeResolution(): number {
  * @returns A matchMedia instance.
  */
 export function getMatchMediaInstance(scope?: Element | string | object | null) {
-  return gsap.matchMedia(scope || document.documentElement)
+  return gsap.matchMedia(scope || document.documentElement);
 }
 /**
  * Retrieves the distance from the target element to the viewport.
@@ -52,17 +52,17 @@ export function getMatchMediaInstance(scope?: Element | string | object | null) 
  */
 export function getDistanceToViewport(
   target: Element,
-  edge: "top" | "right" | "bottom" | "left" = "bottom",
+  edge: 'top' | 'right' | 'bottom' | 'left' = 'bottom',
 ) {
-  const rect = target.getBoundingClientRect()
-  const { viewport } = HeroStore.getInstance().state$.getValue()
+  const rect = target.getBoundingClientRect();
+  const { viewport } = HeroStore.getInstance().state$.getValue();
   const distanceMap = {
     top: rect.top,
     right: viewport.offset.x - rect.right,
     bottom: viewport.offset.y - rect.bottom,
     left: rect.left,
-  }
-  return distanceMap[edge]
+  };
+  return distanceMap[edge];
 }
 
 /**
@@ -73,9 +73,9 @@ export function getDistanceToViewport(
  */
 export function hasLabel(tl: gsap.core.Timeline, label: string): boolean {
   try {
-    return tl.labels[label] !== undefined
+    return tl.labels[label] !== undefined;
   } catch {
-    return false
+    return false;
   }
 }
 
@@ -86,20 +86,20 @@ export function hasLabel(tl: gsap.core.Timeline, label: string): boolean {
  */
 export function getContentElements(element: Element): Element[] {
   // Exclude wrapper elements and utility classes
-  const excludedClasses = ["outer", "inner", "hero__bg"]
+  const excludedClasses = ['outer', 'inner', 'hero__bg'];
   const hasExcludedClass = (el: Element) =>
-    excludedClasses.some((cls) => el.classList.contains(cls))
+    excludedClasses.some((cls) => el.classList.contains(cls));
   const hasContent = (el: Element) =>
     (el.textContent?.trim()?.length ?? 0) > 0 ||
-    el.querySelector("img, svg, video, picture") !== null
+    el.querySelector('img, svg, video, picture') !== null;
 
   // First get all child elements
   return gsap.utils
-    .toArray("*", element)
+    .toArray('*', element)
     .filter(
       (el): el is Element => el instanceof Element && el !== element && isValidElement(el, element),
     )
-    .filter((el) => !hasExcludedClass(el) && hasContent(el))
+    .filter((el) => !hasExcludedClass(el) && hasContent(el));
 }
 
 /**
@@ -108,22 +108,22 @@ export function getContentElements(element: Element): Element[] {
  * @returns The object's values as elements.
  */
 function tryObject(obj: any) {
-  if (obj === null || typeof obj !== "object" || obj.length === 0) {
-    return []
+  if (obj === null || typeof obj !== 'object' || obj.length === 0) {
+    return [];
   }
-  const values = Object.values(obj)
-  const newValues = []
+  const values = Object.values(obj);
+  const newValues = [];
   for (const value of values) {
     if (value === null || value === undefined) {
-      newValues.push("null")
+      newValues.push('null');
     } else if (value instanceof Element) {
-      newValues.push(value)
-    } else if (typeof value === "string") {
-      newValues.push(document.querySelector(value))
+      newValues.push(value);
+    } else if (typeof value === 'string') {
+      newValues.push(document.querySelector(value));
     }
-    return newValues
+    return newValues;
   }
-  return null
+  return null;
 }
 
 /**
@@ -134,33 +134,34 @@ function tryObject(obj: any) {
 export function getTargetsArray(targets: gsap.TweenTarget): Element[] {
   return gsap.utils
     .toArray(targets)
-    .map((target) =>
-      target instanceof Element ? target
-      : typeof target === "string" ? document.querySelector(target)
-      : tryObject(target),
+    .flatMap((target) =>
+      target instanceof Element
+        ? target
+        : typeof target === 'string'
+          ? document.querySelector(target)
+          : tryObject(target),
     )
-    .flat()
-    .filter((el): el is Element => el !== null && el !== undefined && el instanceof Element)
+    .filter((el): el is Element => el !== null && el !== undefined && el instanceof Element);
 }
 
 export const hide = (vars: gsap.TweenVars = {}) => {
   return {
     ...vars,
     opacity: 0,
-    visibility: "visible",
+    visibility: 'visible',
     contentVisibility:
-      vars["contentVisibility"] && vars["contentVisibility"] === "visible" ? "visible" : undefined,
-  }
-}
+      vars['contentVisibility'] && vars['contentVisibility'] === 'visible' ? 'visible' : undefined,
+  };
+};
 export const show = (vars: gsap.TweenVars = {}) => {
   return {
     ...vars,
     opacity: 1,
-    visibility: "visible",
+    visibility: 'visible',
     contentVisibility:
-      vars["contentVisibility"] && vars["contentVisibility"] === "visible" ? "visible" : undefined,
-  }
-}
+      vars['contentVisibility'] && vars['contentVisibility'] === 'visible' ? 'visible' : undefined,
+  };
+};
 
 /**
  * Splits text or text within an element into divs for individual letter animations.
@@ -171,64 +172,64 @@ export const show = (vars: gsap.TweenVars = {}) => {
 export function wordsToLetterDivs(
   el: HTMLElement | string | HTMLElement[] | string[],
 ): DocumentFragment {
-  const docFragment = document.createDocumentFragment()
-  const innerContainer = document.createElement("div")
-  innerContainer.classList.add("hero__letter--container--inner")
+  const docFragment = document.createDocumentFragment();
+  const innerContainer = document.createElement('div');
+  innerContainer.classList.add('hero__letter--container--inner');
   const wordDiv = () => {
-    const div = document.createElement("div")
-    div.classList.add("hero__letter--word-container")
-    return div
-  }
+    const div = document.createElement('div');
+    div.classList.add('hero__letter--word-container');
+    return div;
+  };
   const letterDiv = () => {
-    const div = document.createElement("div")
-    div.classList.add("hero__letter")
-    return div
-  }
-  let text = ""
+    const div = document.createElement('div');
+    div.classList.add('hero__letter');
+    return div;
+  };
+  let text = '';
   if (Array.isArray(el)) {
-    if (el.every((item) => typeof item === "string")) {
-      text = el.join(" ")
+    if (el.every((item) => typeof item === 'string')) {
+      text = el.join(' ');
     } else {
       el.forEach((item) => {
-        innerContainer.appendChild(wordsToLetterDivs(item))
-      })
+        innerContainer.appendChild(wordsToLetterDivs(item));
+      });
     }
-  } else if (typeof el === "string") {
-    text = el
+  } else if (typeof el === 'string') {
+    text = el;
   } else {
-    text = el.innerText
-    gsap.set(el, { innerText: "" })
+    text = el.innerText;
+    gsap.set(el, { innerText: '' });
   }
-  const words = text.trim().split(" ")
+  const words = text.trim().split(' ');
   words.forEach((word) => {
-    if (word === "" || word === "\n") {
-      return
+    if (word === '' || word === '\n') {
+      return;
     }
-    const newDiv = wordDiv()
-    innerContainer.appendChild(newDiv)
+    const newDiv = wordDiv();
+    innerContainer.appendChild(newDiv);
 
-    const letters = word.trim().split("")
+    const letters = word.trim().split('');
     letters.forEach((letter, idx) => {
       if (
-        (idx === 0 && (letter === " " || letter === "\n")) ||
-        (idx === letters.length - 1 && letter === " ")
+        (idx === 0 && (letter === ' ' || letter === '\n')) ||
+        (idx === letters.length - 1 && letter === ' ')
       ) {
-        return
+        return;
       }
-      const textNode = document.createTextNode(letter)
-      const newLetter = letterDiv()
-      newLetter.appendChild(textNode)
-      newDiv.appendChild(newLetter)
-      gsap.set(newLetter, hide())
-    })
-  })
-  const fragmentDivs = gsap.utils.toArray(".hero__letter--word-container", innerContainer)
-  gsap.set(fragmentDivs, hide())
-  if (el instanceof HTMLElement && el.tagName === "SPAN") {
-    el.appendChild(innerContainer)
-    docFragment.appendChild(el)
+      const textNode = document.createTextNode(letter);
+      const newLetter = letterDiv();
+      newLetter.appendChild(textNode);
+      newDiv.appendChild(newLetter);
+      gsap.set(newLetter, hide());
+    });
+  });
+  const fragmentDivs = gsap.utils.toArray('.hero__letter--word-container', innerContainer);
+  gsap.set(fragmentDivs, hide());
+  if (el instanceof HTMLElement && el.tagName === 'SPAN') {
+    el.appendChild(innerContainer);
+    docFragment.appendChild(el);
   } else {
-    docFragment.appendChild(innerContainer)
+    docFragment.appendChild(innerContainer);
   }
-  return docFragment
+  return docFragment;
 }

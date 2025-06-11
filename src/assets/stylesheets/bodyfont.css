@@ -5,8 +5,7 @@
   font-weight: 500;
   src:
     local("Inter"),
-    local("inter-regular")
-    local("inter-v"),
+    local("inter-regular") local("inter-v"),
     local("interv"),
     local("inter-regular"),
     local("inter_v"),
@@ -25,11 +24,13 @@
     url("../fonts/bangers-regular.woff2") format("woff2"),
     url("../fonts/bangers-regular.woff") format("woff");
   /* stylelint-disable-next-line @stylistic/max-line-length */
-  unicode-range: U+000D, U+0020-002F, U+003A-0040, U+005B-007E, U+0131, U+0300, U+2013-2014, U+2018-2019, U+201C-201D, U+2026, U+25FC;
+  unicode-range: U+000D, U+0020-002F, U+003A-0040, U+005B-007E, U+0131, U+0300, U+2013-2014,
+    U+2018-2019, U+201C-201D, U+2026, U+25FC;
 }
 
 @font-face {
-  font-family: "Source Code Pro", "Fira Code", Inconsolata, Monaco, Consolas, "Courier New", monospace;
+  font-family: "Source Code Pro", "Fira Code", Inconsolata, Monaco, Consolas, "Courier New",
+    monospace;
   font-style: normal;
   font-weight: 500;
   src:
@@ -44,7 +45,8 @@
 }
 
 @font-face {
-  font-family: Raleway, Montserrat, "Noto Sans", "Open Sans", Lato, Helvetica, Arial, system-ui, sans-serif;
+  font-family: Raleway, Montserrat, "Noto Sans", "Open Sans", Lato, Helvetica, Arial, system-ui,
+    sans-serif;
   src:
     local("Raleway"),
     local("raleway-regular"),

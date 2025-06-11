@@ -8,15 +8,15 @@
  * @copyright No rights reserved.
  */
 
-import { Observable, Subscription, map, tap } from "rxjs"
-import { TabManager } from "./tabManager"
-import { logger } from "~/utils"
+import { type Observable, type Subscription, map, tap } from 'rxjs';
+import { logger } from '~/utils';
+import { TabManager } from './tabManager';
 
-export * from "./types"
-export * from "./tabManager"
+export * from './tabManager';
+export * from './types';
 
-let customWindow = window as any as CustomWindow
-const { document$ } = customWindow
+const customWindow = window as unknown as CustomWindow;
+const { document$ } = customWindow;
 
 /**
  * @exports initLicenseFeature
@@ -24,19 +24,19 @@ const { document$ } = customWindow
  * @description Initializes the license feature.
  */
 export function initLicenseFeature(): Observable<Subscription | undefined> {
-  let tabManager: TabManager | null = null
+  let tabManager: TabManager | null = null;
 
   return document$.pipe(
     tap(() => {
       // Cleanup previous instance if it exists
-      tabManager?.cleanup?.()
+      tabManager?.cleanup?.();
 
       // Initialize new tab manager
-      tabManager = new TabManager()
-      logger.info("License feature initialized")
+      tabManager = new TabManager();
+      logger.info('License feature initialized');
     }),
     map(() => {
-      return tabManager?.subscription
+      return tabManager?.subscription;
     }),
-  )
+  );
 }

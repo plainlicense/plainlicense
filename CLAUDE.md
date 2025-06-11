@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Plain License is a documentation website that provides plain-language versions of popular software licenses. Built as a static site using MkDocs Material with extensive customization, the project aims to make legal licenses accessible to non-lawyers.
+Plain License is a documentation website that provides plain-language versions of popular licenses for creative works. Built as a static site using MkDocs Material with extensive customization, the project aims to make legal licenses accessible to non-lawyers and applicable to all types of creative work, not just software.
 
 ## Development Commands
 
@@ -18,17 +18,28 @@ Plain License is a documentation website that provides plain-language versions o
 
 - `bun run check` - Run all linting and type checking
 - `bun run fix` - Auto-fix all style issues
+- `bun run format` - Format code using Biome
+- `bun run runall` - Run check, fix, and build in sequence
+
+#### Individual Check Commands
+
 - `bun run check:build` - TypeScript compilation check
 - `bun run check:style:ts` - ESLint for TypeScript
 - `bun run check:style:css` - Stylelint for CSS
 - `bun run check:style:python` - Ruff for Python
 - `bun run check:style:markdown` - Markdownlint for documentation
+- `bun run check:style:html` - LintHTML for HTML files
+
+#### Individual Fix Commands
+
+- `bun run fix:style:ts` - Auto-fix TypeScript with Biome
+- `bun run fix:style:css` - Auto-fix CSS with Stylelint
+- `bun run fix:style:python` - Auto-fix Python with Ruff
+- `bun run fix:style:markdown` - Auto-fix Markdown with Markdownlint
 
 ### Package Management
 
-- `bun upgrade && bun update` - Update JavaScript dependencies
-- `uv sync --all-extras --upgrade` - Update Python dependencies
-- `pre-commit autoupdate` - Update pre-commit hooks
+- `bun run upgrade` - Update all dependencies (JS, Python, pre-commit hooks)
 
 ## Architecture
 
@@ -130,8 +141,9 @@ When reviewing or editing documentation, enforce the Plain License voice charact
 **License-Specific Terminology**:
 
 - "you" (not "licensee, recipient")
-- "we, authors" (not "licensor, provider, owner")
-- "the work" (not "licensed work, software, creation, covered work")
+- "we, the authors" (not "licensor, provider, owner, we the work's authors, authors and contributors")
+- "the work" (not "licensed work, software, creation, covered work, this work")
+- "source materials" (not "source code, source form") - universal term for editable creative materials
 - "contributors" vs "authors" distinction when both exist
 
 **Structure and Formatting**:
@@ -164,11 +176,35 @@ Examples:
 - "entity" → "person or organization"
 - "jurisdiction" → "area of law, place where the law applies, court"
 
+### License Language Consistency Standards
+
+**Cross-License Consistency Requirements**:
+
+- **Headers**: Use empowering "You are Free to..." format across all licenses
+- **Permission language**: Standardize to "use, copy, change, distribute, [sell]" with "share" in headers but "distribute" in detailed terms
+- **Warranty language**: Consistent phrasing "We offer the work 'as is' with no warranties. We are not responsible for any damages or issues"
+- **Work applicability**: Ensure licenses clearly apply to all creative works, not just software
+
+**Universal Creative Work Language**:
+
+- Use "source materials" instead of "source code" to make licenses applicable beyond software
+- Include examples for different creative mediums: "For software: source code, For documents: original files, For art: layered/vector files"
+- Avoid software-specific jargon that limits understanding of broader applicability
+- Frame licenses as applying to "creative works" generally, not just "software"
+
+**Fair Code Integration**:
+
+- Source-available licenses should be presented as "Fair Code" licenses following the faircode.io philosophy
+- Emphasize balance between openness and sustainability for creators
+- Link to https://faircode.io/ for additional context and community alignment
+
 ### Documentation Review Process
 
 1. **Readability Check**: Ensure 8th-grade reading level
 2. **Voice Consistency**: Verify adherence to Plain License voice
-3. **Terminology Audit**: Check for consistent use of preferred terms
-4. **Structure Review**: Ensure proper use of headings, bullets, tables
-5. **Shame Words Scan**: Replace complex legal terms with plain alternatives
-6. **Visual Enhancement**: Add formatting, tables, or callouts where helpful
+3. **Terminology Audit**: Check for consistent use of preferred terms across all licenses
+4. **Cross-License Consistency**: Ensure similar concepts use identical language patterns
+5. **Universal Applicability**: Verify language works for all creative works, not just software
+6. **Structure Review**: Ensure proper use of headings, bullets, tables
+7. **Shame Words Scan**: Replace complex legal terms with plain alternatives
+8. **Visual Enhancement**: Add formatting, tables, or callouts where helpful

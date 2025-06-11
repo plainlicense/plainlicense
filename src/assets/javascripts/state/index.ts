@@ -1,5 +1,5 @@
-import "./types"
-import "./store"
+import './types';
+import './store';
 
-export * from "./types"
-export * from "./store"
+export * from './types';
+export * from './store';

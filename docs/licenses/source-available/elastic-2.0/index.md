@@ -16,7 +16,7 @@ also_known_as: null
 category: >
   source-available
 license_description: >
-  The Elastic License 2.0 is a source-available license that allows you to use, copy, distribute, and modify the work. However, you can't offer the work as a service to others. You must keep all copyright notices in the work. The license includes a patent grant, but you lose your patent rights if you claim the work infringes a patent.
+  The Elastic License 2.0 is a source-available, or "fair code," license that allows you to use, copy, distribute, and modify the work. However, you can't offer the work as a service to others. You must keep all copyright notices in the work. The license includes a patent grant, but you lose your patent rights if you claim the work infringes a patent.
 note: null
 permissions:
   - distribution
@@ -49,9 +49,9 @@ outro: |
   ///
 
 reader_license_text: |
-  <h2 class="license-first-header">Summary: What You Can Do with This Work</h2>
+  <h2 class="license-first-header">You are Free to Use, Change, and Share This Work</h2>
 
-  - You can **use, copy, change, and share the work**.
+  - You can **use, copy, change, and distribute the work**.
   - **You can't offer the work's features as a service to others.**
   - You must **keep all copyright notices** in the work.
   - There's no warranty, and the we aren't liable for problems or damages.
@@ -60,9 +60,9 @@ reader_license_text: |
 
   You can use the work if you agree to these terms.
 
-  ## You <u>can</u> use, copy, share, and change the work
+  ## You <u>can</u> use, copy, distribute, and change the work
 
-  We, the authors, give you permission to: **use**, **copy**, **share**, and **change** the work.
+  We, the authors, give you permission to: **use**, **copy**, **distribute**, and **change** the work.
 
   ## You must follow three rules - you can't offer the work as a service, change license controls, or remove notices
 
@@ -93,7 +93,7 @@ reader_license_text: |
 
   ## We Offer No Warranty and Accept No Liability
 
-  **We offer the work "as is" with no warranties, and we accept no liability for any damages or problems from your use of the work.**
+  **We offer the work "as is" with no warranties. We are not responsible for any damages or issues from your use of the work.**
 
   ## Definitions
 
@@ -113,7 +113,7 @@ reader_license_text: |
 
   :    The materials provided under this license
 
-official_license_text: |
+original_license_text: |
   # Elastic License 2.0
 
   ## Acceptance

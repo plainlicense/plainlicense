@@ -4,9 +4,9 @@
  * @license Plain Unlicense(Public Domain)
  * @copyright No rights reserved. Created by and for Plain License www.plainlicense.org
  */
-import { Observable, filter, fromEvent, map, of, tap, throttleTime } from "rxjs"
-import { isValidEvent, preventDefault } from "~/utils"
-import { logger } from "~/utils/log"
+import { type Observable, filter, fromEvent, map, of, tap, throttleTime } from 'rxjs';
+import { isValidEvent, preventDefault } from '~/utils';
+import { logger } from '~/utils/log';
 
 /**
  * @exports feedback
@@ -15,33 +15,33 @@ import { logger } from "~/utils/log"
  * @description Handles feedback form submission
  */
 export const feedback = (): Observable<Event | null> => {
-  const feedbackForm = document.forms?.namedItem("feedback")
+  const feedbackForm = document.forms?.namedItem('feedback');
 
   if (feedbackForm && feedbackForm instanceof HTMLFormElement) {
-    return fromEvent(feedbackForm, "submit").pipe(
+    return fromEvent(feedbackForm, 'submit').pipe(
       filter(isValidEvent),
       map((ev) => {
-        return ev as SubmitEvent
+        return ev as SubmitEvent;
       }),
       tap(() => preventDefault),
       throttleTime<SubmitEvent>(3000),
       tap((ev: SubmitEvent) => {
-        const page = document.location.pathname
-        const data = ev.submitter?.getAttribute("data-md-value")
-        logger.debug(page, data)
+        const page = document.location.pathname;
+        const data = ev.submitter?.getAttribute('data-md-value');
+        logger.debug(page, data);
         if (
           feedbackForm.firstElementChild &&
           feedbackForm.firstElementChild instanceof HTMLButtonElement
         ) {
-          feedbackForm.firstElementChild.disabled = true
+          feedbackForm.firstElementChild.disabled = true;
         }
-        const note = feedbackForm.querySelector(`.md-feedback__note [data-md-value='${data}']`)
+        const note = feedbackForm.querySelector(`.md-feedback__note [data-md-value='${data}']`);
         if (note && note instanceof HTMLElement) {
-          note.hidden = false
+          note.hidden = false;
         }
       }),
-    )
+    );
   } else {
-    return of(null)
+    return of(null);
   }
-}
+};

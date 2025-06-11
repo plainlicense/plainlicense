@@ -5,44 +5,28 @@
       "url": "https://docs.mcp.cloudflare.com/sse"
     },
     "console-ninja": {
-      "args": [
-        "--bun",
-        "~/.console-ninja/mcp/"
-      ],
+      "args": ["--bun", "~/.console-ninja/mcp/"],
       "command": "bunx",
       "type": "stdio"
     },
     "context7": {
-      "args": [
-        "--bun",
-        "@upstash/context7-mcp@latest"
-      ],
+      "args": ["--bun", "@upstash/context7-mcp@latest"],
       "command": "bunx",
       "type": "stdio"
     },
     "filesystem": {
-      "args": [
-        "--bun",
-        "@modelcontextprotocol/server-filesystem",
-        "../"
-      ],
+      "args": ["--bun", "@modelcontextprotocol/server-filesystem", "../"],
       "command": "bunx"
     },
     "memory": {
-      "args": [
-        "--bun",
-        "@modelcontextprotocol/server-memory"
-      ],
+      "args": ["--bun", "@modelcontextprotocol/server-memory"],
       "command": "bunx",
       "env": {
         "MEMORY_FILE_PATH": "../.vscode/memory.json"
       }
     },
     "sequential-thinking": {
-      "args": [
-        "--bun",
-        "@modelcontextprotocol/server-sequential-thinking"
-      ],
+      "args": ["--bun", "@modelcontextprotocol/server-sequential-thinking"],
       "command": "bunx",
       "type": "stdio"
     }

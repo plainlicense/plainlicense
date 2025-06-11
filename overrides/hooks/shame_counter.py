@@ -11,8 +11,8 @@ from collections import Counter
 from functools import cached_property
 from typing import ClassVar, Self
 
-from _utils import is_license_page, strip_markdown
-from hook_logger import get_logger
+from ._utils import is_license_page, strip_markdown
+from .hook_logger import get_logger
 from mkdocs.config.defaults import MkDocsConfig
 from mkdocs.structure.files import Files
 from mkdocs.structure.pages import Page
@@ -290,7 +290,7 @@ def on_page_markdown(markdown: str, page: Page, config: MkDocsConfig, files: Fil
             shamer = ShameCounter(config)
 
         license_name = page.meta.get("original_name")
-        license_text = page.meta.get("official_license_text")
+        license_text = page.meta.get("original_license_text")
         if not license_name or not license_text:
             return markdown
 

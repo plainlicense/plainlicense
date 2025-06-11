@@ -10,7 +10,7 @@ Currently only searches for NaN values in the HTML output and replaces them with
 import logging
 import re
 
-from hook_logger import get_logger
+from .hook_logger import get_logger
 from mkdocs.config.defaults import MkDocsConfig
 from mkdocs.structure.pages import Page
 
@@ -22,7 +22,7 @@ if not hasattr(__name__, "html_logger"):
     html_logger = get_logger("ASSEMBLER", _assembly_log_level)
 
 _nan_pattern = re.compile(r"\"NaN\"")
-_replacement_value = "\"24\""
+_replacement_value = '"24"'
 
 
 def replace_nan(s: str) -> str:

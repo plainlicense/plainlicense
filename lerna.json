@@ -2,7 +2,7 @@
   "packages": ["packages/*/package.json", "package.json"],
   "npmClient": "npm",
   "version": "independent",
-  "command":{
+  "command": {
     "publish": {
       "allowBranch": ["main", "dev"],
       "message": "chore(release): publish",

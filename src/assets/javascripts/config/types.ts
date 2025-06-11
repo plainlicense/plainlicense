@@ -12,14 +12,14 @@
  */
 export interface FadeInConfig {
   prefersReducedMotion: {
-    from: gsap.TweenVars
-    to: gsap.TweenVars
-  }
+    from: gsap.TweenVars;
+    to: gsap.TweenVars;
+  };
   normal: {
-    from: gsap.TweenVars
-    to: gsap.TweenVars
-  }
-  defaults: gsap.TimelineVars
+    from: gsap.TweenVars;
+    to: gsap.TweenVars;
+  };
+  defaults: gsap.TimelineVars;
 }
 
 /**
@@ -28,9 +28,9 @@ export interface FadeInConfig {
  * @property {number} fadeInDuration - duration of fade-in
  */
 export interface FadeConfig {
-  fadeInSections: HTMLElement[]
-  fadeInDuration: number
-  fadeInConfig: FadeInConfig
+  fadeInSections: HTMLElement[];
+  fadeInDuration: number;
+  fadeInConfig: FadeInConfig;
 }
 
 /**
@@ -40,10 +40,10 @@ export interface FadeConfig {
  * @property {number} scrollPause
  */
 export interface SlideConfig {
-  sections: HTMLElement[] // sections to slide
-  slideDuration: number // duration of slide
-  clickPause: number // pause duration on click
-  scrollPause: number // pause duration on scroll
+  sections: HTMLElement[]; // sections to slide
+  slideDuration: number; // duration of slide
+  clickPause: number; // pause duration on click
+  scrollPause: number; // pause duration on scroll
 }
 
 /**
@@ -54,14 +54,14 @@ export interface SlideConfig {
  * @property {string} ignoreTargets - selectors for ignored targets
  */
 export interface ObserverConfig {
-  header: string
-  footer: string
-  fades: FadeConfig
-  slides: SlideConfig
-  clickTargets: string
-  ignoreTargets: string
+  header: string;
+  footer: string;
+  fades: FadeConfig;
+  slides: SlideConfig;
+  clickTargets: string;
+  ignoreTargets: string;
   emphasisTargets: {
-    subtle: string
-    strong: string
-  }
+    subtle: string;
+    strong: string;
+  };
 }

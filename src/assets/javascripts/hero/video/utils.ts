@@ -1,13 +1,13 @@
-import { HeroVideo, VideoCodec, VideoWidth } from "./types"
-import { rawHeroVideos } from "./data"
-import { parsePath } from "~/utils"
+import type { HeroVideo, VideoCodec, VideoWidth } from './types';
+import { rawHeroVideos } from './data';
+import { parsePath } from '~/utils';
 
 /**
  * Gets the hero videos
  * @returns The hero videos
  */
 export function getHeroVideos(): HeroVideo[] {
-  return rawHeroVideos
+  return rawHeroVideos;
 }
 
 /**
@@ -18,35 +18,35 @@ export function getHeroVideos(): HeroVideo[] {
  */
 const getAv1MediaType = (width: VideoWidth) => {
   const seqlevelMap = {
-    426: "16",
-    640: "16",
-    854: "16",
-    1280: "16",
-    1920: "16",
-    2560: "16",
-    3840: "16",
-  } as const
-  const seqlevel = seqlevelMap[width]
+    426: '16',
+    640: '16',
+    854: '16',
+    1280: '16',
+    1920: '16',
+    2560: '16',
+    3840: '16',
+  } as const;
+  const seqlevel = seqlevelMap[width];
 
-  return `video/webm;codecs=av01.0.${seqlevel}M.10.0.110.01.01.01.0`
-}
+  return `video/webm;codecs=av01.0.${seqlevel}M.10.0.110.01.01.01.0`;
+};
 
-const getH264MediaType = () => "video/mp4"
+const getH264MediaType = () => 'video/mp4';
 
 const getVp9MediaType = (width: VideoWidth) => {
   const levelMap = {
-    426: "20",
-    640: "21",
-    854: "30",
-    1280: "31",
-    1920: "40",
-    2560: "50",
-    3840: "51",
-  } as const
+    426: '20',
+    640: '21',
+    854: '30',
+    1280: '31',
+    1920: '40',
+    2560: '50',
+    3840: '51',
+  } as const;
   // @ts-ignore
-  const level = levelMap[width]
-  return `video/webm;codecs=vp09.02.${level}.10.00.01.01.01.01`
-}
+  const level = levelMap[width];
+  return `video/webm;codecs=vp09.02.${level}.10.00.01.01.01.01`;
+};
 
 /**
  * Gets the media type for the codec and width for the source element
@@ -58,14 +58,14 @@ const getVp9MediaType = (width: VideoWidth) => {
  */
 export function getMediaType(type: VideoCodec, width: VideoWidth): string {
   switch (type) {
-    case "av1":
-      return getAv1MediaType(width)
-    case "vp9":
-      return getVp9MediaType(width)
-    case "h264":
-      return getH264MediaType()
+    case 'av1':
+      return getAv1MediaType(width);
+    case 'vp9':
+      return getVp9MediaType(width);
+    case 'h264':
+      return getH264MediaType();
     default:
-      throw new Error(`Unsupported video codec: ${type}`)
+      throw new Error(`Unsupported video codec: ${type}`);
   }
 }
 
@@ -75,11 +75,11 @@ export function getMediaType(type: VideoCodec, width: VideoWidth): string {
  * @returns A tuple with the codec and width of the video
  */
 export function srcToAttributes(src: string): [VideoCodec, VideoWidth] {
-  const splitName = (s: string) => s.split("_")
-  const { name } = parsePath(src)
-  const width = parseInt(splitName(name).slice(-1)[0].split(".")[0], 10) as VideoWidth
-  const codec = splitName(name).slice(-2)[0] as VideoCodec
-  return [codec as VideoCodec, width as VideoWidth]
+  const splitName = (s: string) => s.split('_');
+  const { name } = parsePath(src);
+  const width = Number.parseInt(splitName(name).slice(-1)[0].split('.')[0], 10) as VideoWidth;
+  const codec = splitName(name).slice(-2)[0] as VideoCodec;
+  return [codec as VideoCodec, width as VideoWidth];
 }
 
 /**
@@ -91,7 +91,7 @@ function getActivityClasses(baseClass: string) {
   return {
     active: `${baseClass}--active`,
     inactive: `${baseClass}--inactive`,
-  }
+  };
 }
 
 /**
@@ -103,29 +103,29 @@ function getActivityClasses(baseClass: string) {
 function filterActiveClass(
   classList: DOMTokenList,
   baseClass: string,
-): Record<"active" | "inactive", string | null> {
-  const { active, inactive } = getActivityClasses(baseClass)
-  const classObj = { active: "", inactive: "" }
+): Record<'active' | 'inactive', string | null> {
+  const { active, inactive } = getActivityClasses(baseClass);
+  const classObj = { active: '', inactive: '' };
   Array.from(classList)
     .filter((c) => c in classObj)
     .forEach((c) => {
       if (c === active) {
-        classObj.active = active
+        classObj.active = active;
       } else if (c === inactive) {
-        classObj.inactive = inactive
+        classObj.inactive = inactive;
       }
-    })
+    });
   return Object.fromEntries(
-    Object.entries(classObj).map(([k, v]) => (v !== "" && k ? [k, v] : [k, null])),
-  ) as Record<"active" | "inactive", string | null>
+    Object.entries(classObj).map(([k, v]) => (v !== '' && k ? [k, v] : [k, null])),
+  ) as Record<'active' | 'inactive', string | null>;
 }
 
 function ensureImageClass(el: HTMLPictureElement) {
-  const img = el.querySelector("img")
-  if (img && !img.classList.contains("hero__poster--image")) {
-    img.classList.add("hero__poster--image")
+  const img = el.querySelector('img');
+  if (img && !img.classList.contains('hero__poster--image')) {
+    img.classList.add('hero__poster--image');
   } else if (!img) {
-    throw new Error("Image element not found")
+    throw new Error('Image element not found');
   }
 }
 
@@ -136,25 +136,25 @@ function ensureImageClass(el: HTMLPictureElement) {
  * @param makeActive - Whether to make the element active or inactive (active is true)
  */
 export function toggleActiveClass(el: HTMLElement, classBase: string, makeActive: boolean) {
-  const { active, inactive } = filterActiveClass(el.classList, classBase)
+  const { active, inactive } = filterActiveClass(el.classList, classBase);
   if ((makeActive && active && !inactive) || (!makeActive && !active && inactive)) {
-    return
+    return;
   }
   if (el instanceof HTMLPictureElement && makeActive) {
-    ensureImageClass(el)
+    ensureImageClass(el);
   }
-  const targetNames = getActivityClasses(classBase)
+  const targetNames = getActivityClasses(classBase);
   if (makeActive && inactive) {
-    el.classList.replace(inactive, targetNames.active)
+    el.classList.replace(inactive, targetNames.active);
   } else if (!makeActive && active) {
-    el.classList.replace(active, targetNames.inactive)
+    el.classList.replace(active, targetNames.inactive);
   } else {
-    el.classList.add(makeActive ? targetNames.active : targetNames.inactive)
+    el.classList.add(makeActive ? targetNames.active : targetNames.inactive);
   }
   Array.from(el.classList)
-    .filter((c) => (makeActive ? c.endsWith("inactive") : c.endsWith("active")))
+    .filter((c) => (makeActive ? c.endsWith('inactive') : c.endsWith('active')))
     .filter((c) => c && c.length)
-    .forEach((c) => el.classList.remove(c))
+    .forEach((c) => el.classList.remove(c));
 }
 
 /**
@@ -169,17 +169,17 @@ export function swapActiveClass(
   activateElement: HTMLElement,
   classBase: string,
 ) {
-  toggleActiveClass(inactivateElement, classBase, false)
-  toggleActiveClass(activateElement, classBase, true)
+  toggleActiveClass(inactivateElement, classBase, false);
+  toggleActiveClass(activateElement, classBase, true);
 }
 
 export function isMediaElement(media: string | HTMLMediaElement): media is HTMLMediaElement {
   return (
-    (typeof media === "string" && document.querySelector(media) instanceof HTMLMediaElement) ||
+    (typeof media === 'string' && document.querySelector(media) instanceof HTMLMediaElement) ||
     media instanceof HTMLMediaElement
-  )
+  );
 }
 
 export function relativeTime(time: number, comparisonTime: number): number {
-  return time / (comparisonTime || time)
+  return time / (comparisonTime || time);
 }

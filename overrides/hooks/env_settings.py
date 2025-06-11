@@ -7,9 +7,9 @@ from pathlib import Path
 
 import markdown
 
-from _utils import Status
+from ._utils import Status
 from funcy import rpartial
-from hook_logger import get_logger
+from .hook_logger import get_logger
 from jinja2 import Environment
 from mkdocs.config.defaults import MkDocsConfig
 from mkdocs.plugins import event_priority
@@ -46,7 +46,11 @@ def get_build_meta_values() -> dict[str, str]:
     json_data = json.loads(path.read_text())
     img_element: str = json_data["noScriptImage"]
     json_data["noScriptImage"] = img_element.replace("docs/", f"{server}/")
-    json_data["backup_image"] = img_element.replace("docs/", f"{server}/").replace("hero__backup", "hero__backup--inactive").replace("hero__poster--active", "")
+    json_data["backup_image"] = (
+        img_element.replace("docs/", f"{server}/")
+        .replace("hero__backup", "hero__backup--inactive")
+        .replace("hero__poster--active", "")
+    )
     return json_data
 
 
@@ -73,7 +77,7 @@ def on_env(env: Environment, config: MkDocsConfig, files: Files) -> Environment:
     env.globals["no_script_image"] = str(build_updates["noScriptImage"])  # type: ignore
     env.globals["css_bundle"] = build_updates["CSSBUNDLE"]  # type: ignore
     env.globals["js_bundle"] = build_updates["SCRIPTBUNDLE"]  # type: ignore
-    env.globals["logo_named"] = build_updates["LOGONAMED"]  # type: ignore
+    env.globals["social_logo"] = build_updates["LOGONAMED"]  # type: ignore
     env.globals["simple_logo"] = build_updates["LOGOSIMPLE"]  # type: ignore
     logger = env_logger.getChild("on_env")
     env_logger.info(

@@ -1,9 +1,9 @@
-# sourcery skip: avoid-global-variables, do-not-use-staticmethod, no-complex-if-expressions
+# sourcery skip: avoid-global-variables, do-not-use-staticmethod, no-complex-if-expressions, no-relative-imports
 """
 Assembles license content for all license pages.
 """
 # ===========================================================================
-#  todo                             TODO
+#                              TODO
 #
 # We should:
 # - [ ] Break this monster class up into smaller classes... it's unwieldy and messy... but functional
@@ -25,12 +25,13 @@ from typing import Any, ClassVar, Literal
 
 import ez_yaml
 
-from _utils import Status, find_repo_root, wrap_text
-from hook_logger import get_logger
 from jinja2 import Template, TemplateError
 from mkdocs.config.defaults import MkDocsConfig
 from mkdocs.structure.files import File, Files, InclusionLevel
 from mkdocs.structure.pages import Page
+
+from ._utils import Status, find_repo_root, wrap_text
+from .hook_logger import get_logger
 
 
 # Change logging level here
@@ -108,7 +109,7 @@ def render_mapping(mapping: dict[str, Any], context: dict) -> dict[str, Any]:
     return {key: render_value(value) for key, value in mapping.items()}
 
 
-def assemble_license_page(config: MkDocsConfig, page: Page, file: File) -> Page:
+def assemble_license_page(config: MkDocsConfig, page: Page, _file: File) -> Page:
     """Returns the rendered boilerplate from the config."""
     if not page.meta:
         assembly_logger.error("No metadata found for %s", page.title)
@@ -220,7 +221,7 @@ def on_files(files: Files, config: MkDocsConfig) -> Files:
     license_files = filter_license_files(copy(files))
     if not license_files:
         assembly_logger.error("No license files found. Files: %s", files)
-        raise FileNotFoundError("No license files found.")  # noqa: TRY003
+        raise FileNotFoundError("No license files found.")
     new_license_files = []
     for file in license_files:
         page = Page(None, file, config)
@@ -260,10 +261,10 @@ class LicenseContent:
         r"(`{3}markdown|`{3}plaintext(.*?)`{3})", re.DOTALL
     )
     _definition_pattern = re.compile(
-        r"(?P<term>`[\w\s]+`)\s*?\n{1,2}[:]\s{1,4}(?P<def>[\w\s]+)\n{2}", re.MULTILINE
+        r"(?P<term>`[\w\s]+`)\s*?\n{1,2}:\s{1,4}(?P<def>[\w\s]+)\n{2}", re.MULTILINE
     )
     _annotation_pattern: ClassVar[Pattern[str]] = re.compile(
-        r"(?P<citation>\([123]\)).*?(?P<class>\{\s\.annotate\s\})[\n\s]{1,4}[123]\.\s{1,2}(?P<annotation>.+?)\n",
+        r"(?P<citation>\([123]\)).*?(?P<class>\{\s\.annotate\s\})[\s]{1,4}[123]\.\s{1,2}(?P<annotation>.+?)\n",
         re.MULTILINE | re.DOTALL,
     )
     _reader_header_pattern: ClassVar[Pattern[str]] = re.compile(
@@ -297,11 +298,11 @@ class LicenseContent:
         self.changelog_text = self.meta.get(
             "changelog", "\n## such empty, much void :nounproject-doge:"
         )
-        self.official_license_text = dedent(self.meta.get("official_license_text", ""))
+        self.original_license_text = dedent(self.meta.get("original_license_text", ""))
         self.plain_version = self.get_plain_version()
         self.tags = self.get_tags()
 
-        self.has_official = bool(self.official_license_text)
+        self.has_official = bool(self.original_license_text)
 
         self.embed_url = f"https://plainlicense.org/embed/{self.meta['spdx_id'].lower()}.html"
 
@@ -512,6 +513,62 @@ class LicenseContent:
             return [self.tag_map[tag] for tag in frontmatter_tags if tag in self.tag_map]
         return None
 
+    def _to_plaintext(
+        self,
+        *,
+        content: str | None = None,
+        title: str | None = None,
+        include_header_block: bool = True,
+        include_boilerplate: bool = True,
+        tabify: bool = True,
+    ) -> str:
+        """
+        Converts the given content and title to a plaintext representation.
+        """
+        content = content or self.plaintext_license_text
+        title = title or self.title
+        header_block = (
+            f"\n\n{self.get_header_block('plaintext')}\n\n" if include_header_block else ""
+        )
+        boilerplate = (
+            f"{wrap_text(self.interpretation_block('plaintext'))}\n```\n\n{self.disclaimer_block}\n"
+            if include_boilerplate
+            else "\n```\n"
+        )
+        body = wrap_text(dedent(f"\n{content}\n"))
+        text = f"""\n\n```plaintext title="{self.title} in plain text"{header_block}{body}{boilerplate}"""
+        return (
+            self.tabify(text, "plaintext", 1, self.icon_map["plaintext"])
+            if tabify
+            else text.replace("```plaintext", "").replace("```", "").strip()
+        )
+
+    @property
+    def plaintext_content(self) -> str:
+        """
+        Returns the plaintext content of the Plain License version of the license.
+        This property provides an unformatted version. For the version on the website, use the `plaintext` property.
+        """
+        return self._to_plaintext(include_header_block=False, tabify=False)
+
+    @property
+    def original_plaintext_content(self) -> str:
+        """
+        Returns the original license as an unformatted plaintext string.
+        For the markdown version used on the website, use `original_license_text`.
+        """
+        return self._to_plaintext(
+            content=self.original_license_text,
+            title=self.get_title(original=True),
+            include_header_block=False,
+            include_boilerplate=False,
+            tabify=False,
+        )
+
+    def get_title(self, *, original: bool = False) -> str:
+        """Returns the title of the license."""
+        return self.meta.get("original_name", self.title) if original else self.title
+
     @staticmethod
     def tabify(text: str, title: str, level: int = 1, icon: str = "") -> str:
         """
@@ -585,9 +642,7 @@ class LicenseContent:
                 )
                 title = self.meta.get("interpretation_title", "")
                 title = re.sub(
-                    r"\{\{\s{1,2}plain_name\s\|\strim\s{1,2}\}\}",
-                    self.meta.get("plain_name", "").upper(),
-                    title,
+                    r"\{\{\s{1,2}plain_name\s\|\strim\s{1,2}\}\}", self.title.upper(), title
                 )
                 return f"{title.upper()}\n\n{dedent(as_plaintext)}"
         return ""
@@ -645,7 +700,7 @@ class LicenseContent:
             "license_type": self.license_type,
             "tags": self.tags,
             "changelog": self.changelog,
-            "official_license_text": self.official_license_text,
+            "original_license_text": self.original_license_text,
             "has_official": self.has_official,
             "final_markdown": self.license_content,
             "embed_file_markdown": self.embed_file_markdown,
@@ -740,16 +795,13 @@ class LicenseContent:
         """Returns the markdown block for the license."""
         header_block = self.get_header_block("markdown")
         body = wrap_text(dedent(f"\n{self.markdown_license_text}\n"))
-        text = f"""\n\n```markdown title="{self.meta.get("plain_name", "")} in Github-style markdown"\n\n{header_block}\n\n{body}{wrap_text(self.interpretation_block("markdown"))}\n```\n\n{self.disclaimer_block}\n"""
+        text = f"""\n\n```markdown title="{self.title} in Github-style markdown"\n\n{header_block}\n\n{body}{wrap_text(self.interpretation_block("markdown"))}\n```\n\n{self.disclaimer_block}\n"""
         return self.tabify(text, "markdown", 1, self.icon_map["markdown"])
 
     @property
     def plaintext(self) -> str:
         """Returns the plaintext block for the license."""
-        header_block = self.get_header_block("plaintext")
-        body = wrap_text(dedent(f"\n{self.plaintext_license_text}\n"))
-        text = f"""\n\n```plaintext title="{self.meta.get("plain_name", "")} in plain text"\n\n{header_block}\n\n{body}{wrap_text(self.interpretation_block("plaintext"))}\n```\n\n{self.disclaimer_block}\n"""
-        return self.tabify(text, "plaintext", 1, self.icon_map["plaintext"])
+        return self._to_plaintext()
 
     @property
     def changelog(self) -> str:
@@ -762,9 +814,9 @@ class LicenseContent:
         if not self.has_official:
             return ""
         text = (
-            f"{self.official_license_text}"
+            f"{self.original_license_text}"
             if self.meta.get("link_in_original")
-            else f"{self.official_license_text}\n\n{self.meta.get('official_link')}"
+            else f"{self.original_license_text}\n\n{self.meta.get('official_link')}"
         )
         return self.tabify(text, "official", 1, self.icon_map["official"])
 

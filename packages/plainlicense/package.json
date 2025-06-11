@@ -26,8 +26,7 @@
     "name": "Adam Poulemanos",
     "email": "adam@plainlicense.org"
   },
-  "devDependencies": {
-  },
+  "devDependencies": {},
   "engines": {
     "node": "> 19"
   },
@@ -46,17 +45,51 @@
         "@semantic-release/commit-analyzer",
         {
           "releaseRules": [
-            { "type": "stable", "release": "major" },
-            { "type": "fix", "release": "patch" },
-            { "type": "refactor", "release": "patch" },
-            { "type": "new", "scope": "content", "release": "minor" },
-            { "type": "new", "release": "patch" },
-            { "scope": "scripts", "release": "patch" },
-            { "type": "bot", "release": false },
-            { "type": "chore", "release": false },
-            { "scope": "infra", "release": false },
-            { "scope": "deps", "release": false },
-            { "scope": "blog", "release": false }
+            {
+              "type": "stable",
+              "release": "major"
+            },
+            {
+              "type": "fix",
+              "release": "patch"
+            },
+            {
+              "type": "refactor",
+              "release": "patch"
+            },
+            {
+              "type": "new",
+              "scope": "content",
+              "release": "minor"
+            },
+            {
+              "type": "new",
+              "release": "patch"
+            },
+            {
+              "scope": "scripts",
+              "release": "patch"
+            },
+            {
+              "type": "bot",
+              "release": false
+            },
+            {
+              "type": "chore",
+              "release": false
+            },
+            {
+              "scope": "infra",
+              "release": false
+            },
+            {
+              "scope": "deps",
+              "release": false
+            },
+            {
+              "scope": "blog",
+              "release": false
+            }
           ]
         }
       ],

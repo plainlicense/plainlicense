@@ -6,9 +6,7 @@
     {
       "type": "typescript",
       "tsconfig": "tsconfig.json",
-      "problemMatcher": [
-        "$tsc"
-      ],
+      "problemMatcher": ["$tsc"],
       "group": {
         "kind": "build",
         "isDefault": true
@@ -18,9 +16,7 @@
       "label": "Run Python",
       "type": "shell",
       "command": "${command:python.interpreterPath}",
-      "args": [
-        "${file}"
-      ],
+      "args": ["${file}"],
       "problemMatcher": "$python"
     },
     {
@@ -37,13 +33,10 @@
       "problemMatcher": [],
       "detail": "Serve the documentation with live reload"
     },
-      {
-        "label": "prepare-chrome",
-        "dependsOn": [
-          "bun: build",
-          "mkdocs serve live"
-        ],
-        "dependsOrder": "sequence"
-      }
+    {
+      "label": "prepare-chrome",
+      "dependsOn": ["bun: build", "mkdocs serve live"],
+      "dependsOrder": "sequence"
+    }
   ]
 }

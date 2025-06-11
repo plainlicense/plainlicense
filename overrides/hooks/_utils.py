@@ -109,7 +109,7 @@ class Status:
     _instance: ClassVar["Status | None"] = None
     _initialized: ClassVar[bool] = False
 
-    def __new__(cls: type[Self], cmd: MkDocsCommand) -> "Status":
+    def __new__(cls: type[Self], _cmd: MkDocsCommand) -> "Status":
         if cls._instance is None:
             cls._instance = super().__new__(cls)
         return cls._instance

@@ -72,7 +72,7 @@
     "editor.formatOnType": true,
     "editor.tabSize": 4,
     "files.eol": "\n"
-    },
+  },
   "[typescript]": {
     "editor.codeActionsOnSave": {
       "source.fixAll": "always",
@@ -159,5 +159,7 @@
   "npm.fetchOnlinePackageInfo": true,
   "copyrightInserter.license": "user",
   "copyrightInserter.holder": "",
-  "copyrightInserter.userText": "Unless where explicitly stated, all Plain License materials are dedicated to the public under the [Plain Unlicense](https://plainlicense.org/licenses/public-domain/unlicense/index.html). No rights reserved. Use it any way you want."
+  "copyrightInserter.userText": "Unless where explicitly stated, all Plain License materials are dedicated to the public under the [Plain Unlicense](https://plainlicense.org/licenses/public-domain/unlicense/index.html). No rights reserved. Use it any way you want.",
+  "python-envs.defaultEnvManager": "ms-python.python:venv",
+  "python-envs.pythonProjects": []
 }

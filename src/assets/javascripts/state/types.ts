@@ -3,8 +3,8 @@
  * @description Types for the Hero feature state management.
  */
 
-import { Header } from "~/components"
-import { SectionIndex } from "~/hero"
+import type { Header } from '~/components';
+import type { SectionIndex } from '~/hero';
 
 /**
  * @exports @enum {AnimationState}
@@ -12,11 +12,11 @@ import { SectionIndex } from "~/hero"
  * @enum {string} AnimationState
  */
 export enum AnimationState {
-  Playing = "playing",
-  Error = "error",
-  Idle = "idle",
-  Paused = "paused",
-  Disabled = "disabled",
+  Playing = 'playing',
+  Error = 'error',
+  Idle = 'idle',
+  Paused = 'paused',
+  Disabled = 'disabled',
 }
 
 /**
@@ -25,27 +25,27 @@ export enum AnimationState {
  * @interface TimelineData
  */
 export interface TimelineData extends gsap.TimelineVars {
-  canPlay: boolean
-  video: HTMLVideoElement
+  canPlay: boolean;
+  video: HTMLVideoElement;
 }
 
 export interface HeroState {
-  atHome: boolean
-  canPlay: boolean
-  landingVisible: boolean
-  pageVisible: boolean
-  prefersReducedMotion: boolean
-  viewport: Viewport
-  header: Header
-  parallaxHeight: number
-  isTransitioning: boolean
-  location: URL
-  tearDown: boolean
-  currentSection: SectionIndex
+  atHome: boolean;
+  canPlay: boolean;
+  landingVisible: boolean;
+  pageVisible: boolean;
+  prefersReducedMotion: boolean;
+  viewport: Viewport;
+  header: Header;
+  parallaxHeight: number;
+  isTransitioning: boolean;
+  location: URL;
+  tearDown: boolean;
+  currentSection: SectionIndex;
 }
 
 export enum AnimationComponent {
-  Video = "video",
+  Video = 'video',
 }
 
 /**
@@ -53,21 +53,21 @@ export enum AnimationComponent {
  * @type {StatePredicate}
  * @description State predicate type
  */
-export type StatePredicate = (_state: HeroState) => boolean
+export type StatePredicate = (_state: HeroState) => boolean;
 
 /**
  * @exports VideoState
  * @type {VideoState}
  */
-export type VideoState = { canPlay: boolean }
+export type VideoState = { canPlay: boolean };
 
-export type TransitionState = { isTransitioning: boolean }
+export type TransitionState = { isTransitioning: boolean };
 
-export type StateValue = VideoState | TransitionState
+export type StateValue = VideoState | TransitionState;
 
 /**
  * @exports ComponentUpdateFunction
  * @type {ComponentUpdateFunction}
  * @description Component update function
  */
-export type ComponentStateUpdateFunction = (_state: StateValue) => void // updates the component state but there's no return value
+export type ComponentStateUpdateFunction = (_state: StateValue) => void; // updates the component state but there's no return value

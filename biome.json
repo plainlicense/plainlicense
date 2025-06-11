@@ -1,0 +1,171 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.0.0-beta.2/schema.json",
+  "assist": {
+    "actions": {
+      "source": {
+        "organizeImports": "on"
+      }
+    }
+  },
+  "files": {
+    "ignoreUnknown": true,
+    "includes": [
+      "**/*.astro",
+      "**/*.cjs",
+      "**/*.css",
+      "**/*.cts",
+      "**/*.gql",
+      "**/*.graphql",
+      "**/*.graphqls",
+      "**/*.html",
+      "**/*.js",
+      "**/*.json",
+      "**/*.jsonc",
+      "**/*.jsx",
+      "**/*.mjs",
+      "**/*.mts",
+      "**/*.svelte",
+      "**/*.ts",
+      "**/*.tsx",
+      "**/*.vue",
+      "**/*.yaml",
+      "**/*.yml",
+      "!tools/**",
+      "!**/node_modules/**",
+      "!**/dist/**",
+      "!src/build/**",
+      "!commitlint.config.ts"
+    ]
+  },
+  "formatter": {
+    "enabled": true,
+    "formatWithErrors": true,
+    "indentStyle": "space",
+    "lineEnding": "lf",
+    "lineWidth": 100
+  },
+  "javascript": {
+    "formatter": {
+      "attributePosition": "auto",
+      "bracketSameLine": false,
+      "bracketSpacing": true,
+      "enabled": true,
+      "jsxQuoteStyle": "single",
+      "quoteProperties": "asNeeded",
+      "quoteStyle": "single",
+      "semicolons": "always",
+      "trailingCommas": "all"
+    }
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "complexity": {
+        "noExcessiveCognitiveComplexity": "warn",
+        "noUselessStringConcat": "warn",
+        "useDateNow": "error",
+        "useSimplifiedLogicExpression": "error"
+      },
+      "correctness": {
+        "noConstantMathMinMaxClamp": "error",
+        "noInvalidBuiltinInstantiation": {
+          "level": "error"
+        },
+        "noInvalidNewBuiltin": "error",
+        "noNodejsModules": "warn",
+        "noUndeclaredDependencies": "error",
+        "noUndeclaredVariables": "warn",
+        "noUnusedImports": "warn",
+        "useArrayLiterals": "error"
+      },
+      "nursery": {
+        "noCommonJs": "warn",
+        "noDocumentCookie": "warn",
+        "noDuplicateElseIf": "warn",
+        "noAwaitInLoop": "warn",
+        "noFloatingPromises": "warn",
+        "noMissingVarFunction": "warn",
+        "noSecrets": "warn",
+        "noSubstr": "warn",
+        "noTemplateCurlyInString": "warn",
+        "noUselessEscapeInRegex": "warn",
+        "noUselessStringRaw": "warn",
+        "useAriaPropsSupportedByRole": "warn",
+        "useDeprecatedReason": "warn",
+        "useGuardForIn": "warn"
+      },
+      "performance": {
+        "noBarrelFile": "error",
+        "noReExportAll": "error",
+        "useTopLevelRegex": "error"
+      },
+      "recommended": true,
+      "style": {
+        "noArguments": "error",
+        "noCommaOperator": "error",
+        "noDoneCallback": "error",
+        "noImplicitBoolean": "error",
+        "noInferrableTypes": "error",
+        "noNamespace": "error",
+        "noNamespaceImport": "warn",
+        "noNegationElse": "error",
+        "noNonNullAssertion": "error",
+        "noParameterAssign": "error",
+        "noParameterProperties": "error",
+        "noUnusedTemplateLiteral": "error",
+        "noUselessElse": "error",
+        "useAsConstAssertion": "error",
+        "useBlockStatements": "error",
+        "useConsistentArrayType": {
+          "level": "error",
+          "options": {
+            "syntax": "shorthand"
+          }
+        },
+        "useConsistentBuiltinInstantiation": "error",
+        "useConst": "error",
+        "useDefaultParameterLast": "error",
+        "useDefaultSwitchClause": "error",
+        "useEnumInitializers": "error",
+        "useExponentiationOperator": "error",
+        "useExportType": "error",
+        "useFilenamingConvention": {
+          "level": "error",
+          "options": {
+            "filenameCases": ["camelCase", "export"],
+            "requireAscii": true,
+            "strictCase": true
+          }
+        },
+        "useForOf": "error",
+        "useImportType": "error",
+        "useLiteralEnumMembers": "error",
+        "useNodeAssertStrict": "warn",
+        "useNodejsImportProtocol": "error",
+        "useNumberNamespace": "error",
+        "useNumericLiterals": "error",
+        "useSelfClosingElements": "error",
+        "useShorthandAssign": "error",
+        "useShorthandFunctionType": "error",
+        "useSingleVarDeclarator": "error",
+        "useTemplate": "error",
+        "useThrowNewError": "error",
+        "useThrowOnlyError": "error"
+      },
+      "suspicious": {
+        "noEmptyBlock": "error",
+        "noEmptyBlockStatements": "warn",
+        "noEvolvingTypes": "error",
+        "noExportsInTest": "off",
+        "noReactSpecificProps": "warn",
+        "useAwait": "error",
+        "useErrorMessage": "error"
+      }
+    }
+  },
+  "vcs": {
+    "clientKind": "git",
+    "enabled": false,
+    "useIgnoreFile": true
+  }
+}

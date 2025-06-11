@@ -1,16 +1,13 @@
 :root {
-
   /** font with fallback for body copy */
   --md-text-font: "Inter", "Noto Sans", "Open Sans", Lato, Helvetica, Arial, system-ui, sans-serif;
-  --md-text-font-family:
-    var(--md-text-font, _),
-    -apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif;
+  --md-text-font-family: var(--md-text-font, _), -apple-system, BlinkMacSystemFont, Helvetica, Arial,
+    sans-serif;
 
   /* Font with fallback for code */
   --md-code-font: "Source Code Pro";
-  --md-code-font-family:
-    var(--md-code-font, _),
-    "Fira Code", "Inconsolata", "Monaco", "Consolas", "Courier New", monospace;
+  --md-code-font-family: var(--md-code-font, _), "Fira Code", "Inconsolata", "Monaco", "Consolas",
+    "Courier New", monospace;
 
   /* primary colors */
   --zaffre: rgb(13, 25, 163);

@@ -18,7 +18,7 @@ from typing import ClassVar
 
 import click
 
-from _utils import MkDocsCommand, Status
+from ._utils import MkDocsCommand, Status
 from mkdocs.plugins import event_priority
 
 

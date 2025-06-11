@@ -6,7 +6,7 @@ import urllib.parse
 
 from textwrap import dedent
 
-from hook_logger import get_logger
+from .hook_logger import get_logger
 from mkdocs.config.defaults import MkDocsConfig
 from mkdocs.plugins import event_priority
 from mkdocs.structure.files import Files

@@ -10,33 +10,33 @@
  * @copyright No rights reserved.
  */
 
-declare module "tablesort" {
+declare module 'tablesort' {
   interface TablesortOptions {
-    sortAttribute?: string
-    descending?: boolean
+    sortAttribute?: string;
+    descending?: boolean;
   }
 
   interface SortOption {
-    name: string
-    pattern: (value: string) => boolean
-    sort: (a: string, b: string) => number
+    name: string;
+    pattern: (value: string) => boolean;
+    sort: (a: string, b: string) => number;
   }
 
   class Tablesort {
-    constructor(el: HTMLTableElement, options?: TablesortOptions)
+    constructor(el: HTMLTableElement, options?: TablesortOptions);
 
     static extend(
       name: string,
       pattern: (value: string) => boolean,
       sort: (a: string, b: string) => number,
-    ): void
+    ): void;
 
-    init(el: HTMLTableElement, options: TablesortOptions): void
+    init(el: HTMLTableElement, options: TablesortOptions): void;
 
-    sortTable(header: HTMLTableCellElement, update?: boolean): void
+    sortTable(header: HTMLTableCellElement, update?: boolean): void;
 
-    refresh(): void
+    refresh(): void;
   }
 
-  export = Tablesort
+  export = Tablesort;
 }

@@ -18,26 +18,26 @@
  * @property {HTMLDivElement} tablistElement - The ARIA tablist element for the tabs (parent element)
  */
 export interface TabElement {
-  input: HTMLInputElement
-  label: HTMLLabelElement
-  labelAnchor: HTMLAnchorElement
-  iconAnchor: HTMLAnchorElement
-  iconSVG: SVGElement
-  contentElement: HTMLDivElement
-  tablistElement: HTMLDivElement
+  input: HTMLInputElement;
+  label: HTMLLabelElement;
+  labelAnchor: HTMLAnchorElement;
+  iconAnchor: HTMLAnchorElement;
+  iconSVG: SVGElement;
+  contentElement: HTMLDivElement;
+  tablistElement: HTMLDivElement;
 }
 
 /**
  * @description Tab state type for license tabs. We use this type track the state of each tab: normal, hover, focus, or focus-visible.
  */
-export type TabStateType = "normal" | "hover" | "focus" | "focus-visible"
+export type TabStateType = 'normal' | 'hover' | 'focus' | 'focus-visible';
 
 /**
  * @description Tab state for license tabs. We use this interface for state management.
  */
 export interface TabState {
-  isSelected: boolean
-  state: TabStateType
+  isSelected: boolean;
+  state: TabStateType;
 }
 
 /**
@@ -46,6 +46,6 @@ export interface TabState {
  * @property {HTMLInputElement} input - The hidden input element for the tab
  */
 export interface ChildTabs {
-  labelAnchor: HTMLAnchorElement
-  input: HTMLInputElement
+  labelAnchor: HTMLAnchorElement;
+  input: HTMLInputElement;
 }
