@@ -4,6 +4,7 @@ rule_settings:
     - gpsg
   disable:
     - dont-self-assign-variables
+    - no-relative-imports
   python_version: "3.13"
   rule_types:
     - refactoring

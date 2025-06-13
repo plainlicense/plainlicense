@@ -1,5 +1,5 @@
-import { logger, logObject } from '~/utils';
-
+import { logObject } from '../../utils/helpers';
+import { logger } from '../../utils/log';
 /**
  * TimelineManager
  * @description Manages multiple GSAP timelines in a loop;
@@ -22,9 +22,13 @@ export class TimelineManager {
   constructor() {
     this.timelines = [];
     this.currentTimeline = null;
-    this.wrapper = (number: number) => {
-      const nextIndex = this.timelines.length > number ? number : 0;
-      return this.timelines[nextIndex];
+    this.wrapper = (index: number): GSAPTimeline => {
+      if (this.timelines.length === 0) {
+        throw new Error('No timelines available');
+      }
+      const nextIndex = this.timelines.length > index ? index : 0;
+      // Always return a valid GSAPTimeline, fallback to first timeline if out of range
+      return (this.timelines[nextIndex] as GSAPTimeline) ?? this.timelines[0];
     };
   }
 
@@ -64,10 +68,10 @@ export class TimelineManager {
     this.timelines.forEach((timeline) => {
       this.resetTimeline(timeline);
       if (time > timeline.duration()) {
-        time -= timeline.duration();
+        let newTime = time;
+        newTime -= timeline.duration();
       } else {
         timeline.seek(time);
-        time = 0;
       }
     });
   }
@@ -93,11 +97,11 @@ export class TimelineManager {
     logger.debug("Timeline's duration: ", this.currentTimeline?.duration());
     this.currentTimeline =
       this.currentTimelineIndex === -1
-        ? this.timelines[0]
-        : this.wrapper(this.currentTimelineIndex);
+        ? (this.timelines[0] ?? null)
+        : (this.wrapper(this.currentTimelineIndex) ?? null);
     this.paused = false;
     logger.debug('Starting timeline', this.getTimelineName());
-    if (!this.currentTimeline.isActive()) {
+    if (this.currentTimeline && !this.currentTimeline.isActive()) {
       this.currentTimeline.play();
     }
   }
@@ -131,7 +135,7 @@ export class TimelineManager {
       return this;
     }
     this.timelines.forEach((timeline) => this.resetTimeline(timeline));
-    this.currentTimeline = this.timelines[0];
+    this.currentTimeline = this.timelines[0] ?? null;
     this.paused = false;
     return this.play();
   }
@@ -158,7 +162,7 @@ export class TimelineManager {
   }
 
   pause() {
-    if (this.currentTimeline && this.currentTimeline.isActive()) {
+    if (this.currentTimeline?.isActive()) {
       this.currentTimeline.pause();
     }
     this.paused = true;
@@ -172,14 +176,14 @@ export class TimelineManager {
   }
 
   isActive() {
-    return this.currentTimeline?.isActive() || false;
+    return this.currentTimeline?.isActive();
   }
 
   video() {
     return this.timelines.find(
       (timeline) =>
         this.getTimelineName(timeline) === 'videoTimeline' ||
-        timeline['media'] instanceof HTMLVideoElement,
+        timeline.media instanceof HTMLVideoElement,
     );
   }
 

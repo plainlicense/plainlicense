@@ -4,7 +4,7 @@
  */
 
 import type { Header } from '~/components';
-import type { SectionIndex } from '~/hero';
+import type { SectionIndex } from '../hero/animations/types';
 
 /**
  * @exports @enum {AnimationState}

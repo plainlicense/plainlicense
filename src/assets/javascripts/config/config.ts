@@ -7,7 +7,7 @@
  * @author Adam Poulemanos adam<at>plainlicense<dot>org
  */
 import gsap from 'gsap';
-import type { EmphasisConfig } from '~/hero';
+import type { EmphasisConfig } from '../hero/animations/types';
 import type { FadeInConfig, ObserverConfig } from './types';
 
 // tags to exclude from animation

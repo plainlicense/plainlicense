@@ -7,7 +7,7 @@
  */
 
 import gsap from 'gsap';
-import { EXCLUDED_TAGS, OBSERVER_CONFIG } from '~/config';
+import { EXCLUDED_TAGS, OBSERVER_CONFIG } from '~/config/config';
 import type { NotVisibleReport } from './types';
 
 const LICENSE_HASHES = ['#reader', '#html', '#markdown', '#plaintext', '#changelog', '#official'];
@@ -44,7 +44,13 @@ const isMainSiteLicensePage = (url: URL) => {
 // tests if the URL is a license page
 const isEmbeddedLicensePage = (url: URL) => {
   const path = url.pathname.split('/');
-  return path[1] === 'embed' && !path[path.length - 1].includes('index.html');
+  const lastPath = path[path.length - 1];
+  return (
+    path[1] === 'embed' &&
+    typeof lastPath === 'string' &&
+    lastPath &&
+    !lastPath.includes('index.html')
+  );
 };
 
 /**
@@ -105,7 +111,7 @@ export const isValidEvent = (value: Event | null) => {
  * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/checkVisibility|MDN checkVisibility}
  */
 export const elementIsVisible = (el: HTMLElement | null, checkParent = false): boolean => {
-  if (!el || !(el instanceof HTMLElement)) {
+  if (!(el && el instanceof HTMLElement)) {
     return false;
   }
 

@@ -1,11 +1,11 @@
 /** biome-ignore-all lint/style/noNamespaceImport: this is a build script; not watching our bundle */
 /** biome-ignore-all lint/correctness/noNodejsModules: <it's a build script..> */
 
-import { globby, type Options } from 'globby';
-import * as crypto from 'node:crypto';
-import * as fs from 'node:fs/promises';
-import path, { type ParsedPath } from 'node:path';
-import { optimize } from 'svgo';
+import { globby, type Options } from 'globby'
+import * as crypto from 'node:crypto'
+import * as fs from 'node:fs/promises'
+import path, { type ParsedPath } from 'node:path'
+import { optimize } from 'svgo'
 import {
   basePath,
   cssLocs,
@@ -17,7 +17,7 @@ import {
   resPattern,
   videoCodecs,
   videoExtensions,
-} from '../config';
+} from '../config'
 import type {
   HeroFile,
   HeroFiles,
@@ -27,7 +27,7 @@ import type {
   MediaFileExtension,
   PlaceholderMap,
   VideoWidth,
-} from '../types';
+} from '../types'
 
 // Regex patterns defined at top level for performance
 const LEADING_UNDERSCORE_REGEX = /^_/;
@@ -193,6 +193,7 @@ export async function resolveGlob(glob: string, fastGlobOptions?: Options): Prom
     throw error;
   }
 }
+
 
 /**
  * Retrieves and categorizes hero image and video files.

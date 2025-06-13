@@ -20,9 +20,11 @@
  */
 
 import gsap from 'gsap';
-import { OBSERVER_CONFIG, VIDEO_MANAGER_ELEMENTS } from '~/config';
-import { isValidElement, logObject, logger } from '~/utils';
-import type { VideoManager } from '../video';
+import { OBSERVER_CONFIG, VIDEO_MANAGER_ELEMENTS } from '~/config/config';
+import { isValidElement } from '../../utils/conditionChecks';
+import { logObject } from '../../utils/helpers';
+import { logger } from '../../utils/log';
+import type { VideoManager } from '../video/videoManager';
 import {
   type AnimateMessageConfig,
   Direction,
@@ -118,11 +120,10 @@ const fade = (
   const media = getMatchMediaInstance();
   const tl = gsap.timeline();
   const { out, direction, fromConfig, toConfig } = config;
-  // biome-ignore lint/suspicious/noImplicitAnyLet: we're just initializing out of the conditional
-  let fadeVars;
+  let fadeVars: { from: Record<string, unknown>; to: Record<string, unknown> };
   if (fromConfig && toConfig) {
     fadeVars = getFadeVars(
-      out || false,
+      !!out,
       Number.parseInt(fromConfig.yPercent?.toString() || '50', 10) ||
         Number.parseInt(toConfig?.yPercent?.toString() || '0', 10) ||
         50,
@@ -130,7 +131,7 @@ const fade = (
     );
   } else {
     fadeVars = getFadeVars(
-      out || false,
+      !!out,
       Number.parseInt(
         OBSERVER_CONFIG.fades.fadeInConfig.normal.from.yPercent?.toString() || '50',
         10,
@@ -374,6 +375,14 @@ gsap.registerEffect({
   },
 });
 
+/**
+ * Animates the logo element within the provided VideoManager scope.
+ * This function creates a GSAP timeline that animates the logo in or out, adapting to reduced motion preferences.
+ *
+ * @param scope - The VideoManager instance containing the logo element and animation settings.
+ * @param config - The configuration object for the animation, including shared variables and duration.
+ * @returns A GSAP timeline representing the logo animation.
+ */
 function animateLogo(scope: VideoManager, config: AnimateMessageConfig) {
   const logoTl = gsap.timeline({
     ...(config.sharedVars as gsap.TimelineVars),
@@ -434,42 +443,33 @@ function animateLogo(scope: VideoManager, config: AnimateMessageConfig) {
   return logoTl;
 }
 
-function animateText(scope: VideoManager, targets: gsap.TweenTarget, config: AnimateMessageConfig) {
-  if (Array.isArray(targets) && targets.length > 1) {
-    logger.warn('Multiple targets provided for animateMessage. Only animating the first.');
-  }
-  const message = config.message ?? scope.message;
-  const containerTarget =
+/**
+ * Returns the primary container element for text animation.
+ *
+ * @param targets - The target or array of targets for the animation.
+ * @returns The container element to use for text animation, or null if not found.
+ */
+function getContainerTarget(targets: gsap.TweenTarget): Element | null {
+  return (
     (Array.isArray(targets) ? targets[0] : targets) ||
-    document.querySelector('.text-animation__container');
-  if (!containerTarget || !message) {
-    logger.error(
-      message
-        ? 'No target provided for animateMessage.'
-        : 'No message provided for animateMessage.',
-    );
-    return gsap.timeline();
-  }
-  logger.debug(`Animating message: ${message}`);
-  const msgFrag = wordsToLetterDivs(message);
-  const innerContainer = msgFrag.querySelector('.hero__letter--container--inner');
-  if (!innerContainer || !containerTarget || !msgFrag) {
-    logger.error(
-      `Needed element(s) not found for message animation. \n  msgFrag: ${logObject(msgFrag)}, \n  innerContainer: ${logObject(innerContainer)}, \n  containerTarget: ${logObject(containerTarget)}`,
-    );
-    return gsap.timeline();
-  }
-  const fragDivs = gsap.utils.toArray('.hero__letter--word-container', msgFrag);
-  containerTarget.append(msgFrag);
-  const totalDuration = config.duration || scope.textDuration || 10;
-  const messageTimeline = gsap.timeline({
-    paused: true,
-    repeat: 0,
-    duration: totalDuration,
-    ...(config.sharedVars as gsap.TimelineVars),
-  });
-  logger.debug(`Fragdiv count: ${fragDivs.length}`);
-  const containers = [
+    document.querySelector('.text-animation__container')
+  );
+}
+
+/**
+ * Collects and returns a unique list of container elements related to the animated text.
+ *
+ * @param fragDivs - An array of fragment div elements representing words or letters.
+ * @param innerContainer - The inner container element for the animated text.
+ * @param containerTarget - The main container element for the animation.
+ * @returns An array of unique container elements to be used in the animation.
+ */
+function getContainers(
+  fragDivs: Element[],
+  innerContainer: Element,
+  containerTarget: Element,
+): Element[] {
+  return [
     ...fragDivs,
     innerContainer,
     innerContainer.parentElement,
@@ -477,15 +477,136 @@ function animateText(scope: VideoManager, targets: gsap.TweenTarget, config: Ani
     containerTarget.parentElement,
   ]
     .flat()
-    .reduce((acc, el) => {
+    .reduce((acc: Element[], el) => {
       if (el instanceof Element && !acc.includes(el)) {
         acc.push(el);
       }
       return acc;
-    }, []);
-  logger.debug(`Container count: ${containers.length}`);
-  logObject(containers, 'Containers');
-  gsap.set(containers, hide({ zIndex: -1 }));
+    }, [] as Element[]);
+}
+
+/**
+ * Prepares letter div elements for animation by hiding them initially.
+ *
+ * @param fragDivs - An array of fragment div elements representing words.
+ * @param _fromVars - The initial animation variables (unused).
+ * @param _toVars - The target animation variables (unused).
+ * @param _totalDuration - The total duration for the animation (unused).
+ */
+function setupLetterDivs(
+  fragDivs: Element[],
+  _fromVars: GSAPTweenVars,
+  _toVars: GSAPTweenVars,
+  _totalDuration: number,
+) {
+  for (const div of fragDivs) {
+    if (!(div && div instanceof HTMLDivElement && div.children.length)) {
+      continue;
+    }
+    gsap.set(div, hide());
+    const letters = gsap.utils.toArray('.hero__letter', div);
+    gsap.set(letters, hide());
+  }
+}
+
+/**
+ * Animates the letters within each word fragment by transitioning them from a hidden to a visible state.
+ *
+ * @param fragDivs - An array of fragment div elements representing words.
+ * @param fromVars - The initial animation variables for the letters.
+ * @param toVars - The target animation variables for the letters.
+ * @param totalDuration - The total duration for the animation.
+ */
+function animateLettersInWords(
+  fragDivs: Element[],
+  fromVars: GSAPTweenVars,
+  toVars: GSAPTweenVars,
+  totalDuration: number,
+) {
+  for (const div of fragDivs) {
+    if (div instanceof HTMLDivElement) {
+      logger.debug('Animating letters in word');
+      gsap.set(div, { visibility: 'visible', display: 'flex' });
+      const letters = gsap.utils.toArray('.hero__letter', div);
+      gsap.fromTo(
+        letters,
+        hide({
+          yPercent: () => gsap.utils.random(-150, 150, 10),
+          ...fromVars,
+        }),
+        show({
+          yPercent: 0,
+          stagger: { each: 0.03, from: 'random' },
+          duration: totalDuration,
+          ease: 'power4.out',
+          repeatDelay: totalDuration / 2.5,
+          zIndex: 50,
+          yoyo: true,
+          repeat: 1,
+          ...toVars,
+        }),
+      );
+    }
+  }
+}
+
+/**
+ * Validates and extracts the message and container target for text animation.
+ *
+ * @param scope - The VideoManager instance containing the default message.
+ * @param targets - The target or array of targets for the animation.
+ * @param config - The configuration object for the animation, possibly containing a message.
+ * @returns An object containing the message and the container element, or undefined/null if validation fails.
+ */
+function validateAnimateTextInputs(
+  scope: VideoManager,
+  targets: gsap.TweenTarget,
+  config: AnimateMessageConfig,
+): { message: string | undefined; containerTarget: Element | null } {
+  if (Array.isArray(targets) && targets.length > 1) {
+    logger.warn('Multiple targets provided for animateMessage. Only animating the first.');
+  }
+  const message = config.message ?? scope.message;
+  const containerTarget = getContainerTarget(targets);
+  if (!(containerTarget && message)) {
+    logger.error(
+      message
+        ? 'No target provided for animateMessage.'
+        : 'No message provided for animateMessage.',
+    );
+    return { message: undefined, containerTarget: null };
+  }
+  return { message, containerTarget };
+}
+
+/**
+ * Prepares the message fragment for animation by converting the message into DOM elements and appending them to the container.
+ *
+ * @param message - The message string to be animated.
+ * @param containerTarget - The container element to which the message fragment will be appended.
+ * @returns An object containing the message fragment, inner container, and an array of word container elements.
+ */
+function prepareMessageFragment(message: string, containerTarget: Element) {
+  logger.debug(`Animating message: ${message}`);
+  const msgFrag = wordsToLetterDivs(message);
+  const innerContainer = msgFrag.querySelector('.hero__letter--container--inner');
+  if (!(innerContainer && containerTarget && msgFrag)) {
+    logger.error(
+      `Needed element(s) not found for message animation. \n  msgFrag: ${logObject(msgFrag)}, \n  innerContainer: ${logObject(innerContainer)}, \n  containerTarget: ${logObject(containerTarget)}`,
+    );
+    return { msgFrag: null, innerContainer: null, fragDivs: [] as Element[] };
+  }
+  const fragDivs = gsap.utils.toArray('.hero__letter--word-container', msgFrag) as Element[];
+  containerTarget.append(msgFrag);
+  return { msgFrag, innerContainer, fragDivs };
+}
+
+/**
+ * Applies shared animation variables to the configuration's fromVars and toVars properties.
+ *
+ * @param config - The animation message configuration object to update.
+ */
+function applySharedVars(config: AnimateMessageConfig) {
   if (config.sharedVars && Object.keys(config.sharedVars).length) {
     config.fromVars =
       config.fromVars && Object.keys(config.fromVars).length
@@ -496,9 +617,21 @@ function animateText(scope: VideoManager, targets: gsap.TweenTarget, config: Ani
         ? { ...config.toVars, ...config.sharedVars }
         : config.sharedVars;
   }
-  const fromVars: GSAPTweenVars = config.fromVars || {};
-  const toVars: GSAPTweenVars = config.toVars || {};
-  // Configure for reduced motion
+}
+
+/**
+ * Configures the animation timeline and variables for users who prefer reduced motion.
+ * This function adjusts the timeline speed and modifies animation variables to create a simpler, less dynamic animation experience.
+ *
+ * @param messageTimeline - The GSAP timeline for the message animation.
+ * @param fromVars - The initial animation variables to be adjusted for reduced motion.
+ * @param toVars - The target animation variables to be adjusted for reduced motion.
+ */
+function configureReducedMotion(
+  messageTimeline: gsap.core.Timeline,
+  fromVars: GSAPTweenVars,
+  toVars: GSAPTweenVars,
+) {
   gsap
     .matchMedia()
     .add({ reducedMotion: '(prefers-reduced-motion: reduce)' }, (context: gsap.Context) => {
@@ -510,16 +643,47 @@ function animateText(scope: VideoManager, targets: gsap.TweenTarget, config: Ani
         toVars.stagger = { from: 'start' };
       }
     });
+}
 
-  // Set up individual letters
-  for (const div of fragDivs) {
-    if (!div || !(div instanceof HTMLDivElement) || !div.children.length) {
-      continue;
-    }
-    gsap.set(div, hide());
-    const letters = gsap.utils.toArray('.hero__letter', div);
-    gsap.set(letters, hide());
+/**
+ * Animates a message by revealing its text and logo with coordinated GSAP timeline effects.
+ *
+ * @param scope - The VideoManager instance containing animation settings and elements.
+ * @param targets - The target or array of targets for the animation.
+ * @param config - The configuration object for the animation, including message, duration, and animation variables.
+ * @returns A GSAP timeline representing the complete text and logo animation sequence.
+ */
+function animateText(scope: VideoManager, targets: gsap.TweenTarget, config: AnimateMessageConfig) {
+  const { message, containerTarget } = validateAnimateTextInputs(scope, targets, config);
+  if (!(containerTarget && message)) {
+    return gsap.timeline();
   }
+  const { msgFrag, innerContainer, fragDivs } = prepareMessageFragment(message, containerTarget);
+  if (!(innerContainer && containerTarget && msgFrag)) {
+    return gsap.timeline();
+  }
+  const totalDuration = config.duration || scope.textDuration || 10;
+  const messageTimeline = gsap.timeline({
+    paused: true,
+    repeat: 0,
+    duration: totalDuration,
+    ...(config.sharedVars as gsap.TimelineVars),
+  });
+  logger.debug(`Fragdiv count: ${fragDivs.length}`);
+  const containers = getContainers(fragDivs, innerContainer, containerTarget);
+  logger.debug(`Container count: ${containers.length}`);
+  logObject(containers, 'Containers');
+  gsap.set(containers, hide({ zIndex: -1 }));
+
+  applySharedVars(config);
+
+  const fromVars: GSAPTweenVars = config.fromVars || {};
+  const toVars: GSAPTweenVars = config.toVars || {};
+
+  configureReducedMotion(messageTimeline, fromVars, toVars);
+
+  setupLetterDivs(fragDivs, fromVars, toVars, totalDuration);
+
   return messageTimeline
     .add(() => logger.debug('Starting text animation timeline effect'), 0)
     .add(
@@ -535,7 +699,6 @@ function animateText(scope: VideoManager, targets: gsap.TweenTarget, config: Ani
           {
             onStart: () => {
               logger.debug('Word animation starting');
-              // Force parent container to be visible
               gsap.set(
                 [containerTarget, innerContainer],
                 show({
@@ -543,33 +706,7 @@ function animateText(scope: VideoManager, targets: gsap.TweenTarget, config: Ani
                   zIndex: 10,
                 }),
               );
-
-              for (const div of fragDivs) {
-                if (div instanceof HTMLDivElement) {
-                  logger.debug('Animating letters in word');
-                  // Make div visible
-                  gsap.set(div, { visibility: 'visible', display: 'flex' });
-                  const letters = gsap.utils.toArray('.hero__letter', div);
-                  gsap.fromTo(
-                    letters,
-                    hide({
-                      yPercent: () => gsap.utils.random(-150, 150, 10),
-                      ...fromVars,
-                    }),
-                    show({
-                      yPercent: 0,
-                      stagger: { each: 0.03, from: 'random' },
-                      duration: totalDuration,
-                      ease: 'power4.out',
-                      repeatDelay: totalDuration / 2.5,
-                      zIndex: 50,
-                      yoyo: true,
-                      repeat: 1,
-                      ...toVars,
-                    }),
-                  );
-                }
-              }
+              animateLettersInWords(fragDivs, fromVars, toVars, totalDuration);
             },
             ...show({
               stagger: { each: 0.1, from: 'start' },
@@ -612,7 +749,7 @@ gsap.registerEffect({
       // biome-ignore lint/complexity/useLiteralKeys: This clarifies that these are not standard API properties
       config.sharedVars?.['defaults']['callbackScope'] ||
       config.toVars?.callbackScope;
-    if (!config || !targets || !scope) {
+    if (!(config && targets && scope)) {
       logger.error('No targets or scope provided for animateMessage');
       return gsap.timeline();
     }

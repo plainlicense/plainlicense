@@ -1,6 +1,6 @@
-import type { HeroVideo, VideoCodec, VideoWidth } from './types';
+import { parsePath } from '../../utils/helpers';
 import { rawHeroVideos } from './data';
-import { parsePath } from '~/utils';
+import type { HeroVideo, VideoCodec, VideoWidth } from './types';
 
 /**
  * Gets the hero videos
@@ -77,8 +77,20 @@ export function getMediaType(type: VideoCodec, width: VideoWidth): string {
 export function srcToAttributes(src: string): [VideoCodec, VideoWidth] {
   const splitName = (s: string) => s.split('_');
   const { name } = parsePath(src);
-  const width = Number.parseInt(splitName(name).slice(-1)[0].split('.')[0], 10) as VideoWidth;
-  const codec = splitName(name).slice(-2)[0] as VideoCodec;
+  const nameParts = splitName(name);
+  const widthPart = nameParts.length > 0 ? nameParts[nameParts.length - 1] : undefined;
+  if (!widthPart) {
+    throw new Error('Could not extract width from video source name');
+  }
+  const widthString = widthPart.split('.')[0];
+  if (!widthString) {
+    throw new Error('Could not extract width string from video source name');
+  }
+  const width = Number.parseInt(widthString, 10) as VideoWidth;
+  const codec = nameParts.length > 1 ? (nameParts[nameParts.length - 2] as VideoCodec) : undefined;
+  if (!codec) {
+    throw new Error('Could not extract codec from video source name');
+  }
   return [codec as VideoCodec, width as VideoWidth];
 }
 
@@ -137,7 +149,7 @@ function ensureImageClass(el: HTMLPictureElement) {
  */
 export function toggleActiveClass(el: HTMLElement, classBase: string, makeActive: boolean) {
   const { active, inactive } = filterActiveClass(el.classList, classBase);
-  if ((makeActive && active && !inactive) || (!makeActive && !active && inactive)) {
+  if ((makeActive && active && !inactive) || (!(makeActive || active) && inactive)) {
     return;
   }
   if (el instanceof HTMLPictureElement && makeActive) {
@@ -153,7 +165,7 @@ export function toggleActiveClass(el: HTMLElement, classBase: string, makeActive
   }
   Array.from(el.classList)
     .filter((c) => (makeActive ? c.endsWith('inactive') : c.endsWith('active')))
-    .filter((c) => c && c.length)
+    .filter((c) => c?.length)
     .forEach((c) => el.classList.remove(c));
 }
 

@@ -6,8 +6,8 @@
  * @copyright No rights reserved
  */
 
-import { BACKUP_PICTURE, MAX_WIDTHS } from '~/config';
-import { logger } from '~/utils';
+import { BACKUP_PICTURE, MAX_WIDTHS } from '../../config/config';
+import { logger } from '../../utils/log';
 import { rawHeroVideos } from './data';
 import type { HeroName, HeroVideo, ImageIndex, VideoWidth } from './types';
 import { getMediaType, srcToAttributes } from './utils';
@@ -78,7 +78,7 @@ export class VideoElement {
     this.video.append(...this.sources);
     this.video.muted = true;
     this.video.defaultMuted = true;
-    this.video.dataset['noSnippet'] = 'true';
+    this.video.dataset.noSnippet = 'true';
     logger.debug('video element: %o', this.video);
     logger.debug('sources: %o', this.sources);
     this.picture = this.constructPictureElement();
@@ -162,9 +162,8 @@ export class VideoElement {
           default:
             throw new Error(`Unknown codec: ${aCodec}`);
         }
-      } else {
-        return aWidth - bWidth;
       }
+      return aWidth - bWidth;
     });
   }
 
@@ -206,12 +205,11 @@ export class VideoElement {
       const bType = b.type.split('/')[1];
       if (aType === bType) {
         return 0;
-      } else {
-        if (aType === 'avif') {
-          return -1;
-        }
-        return 1; // webp should always be last
       }
+      if (aType === 'avif') {
+        return -1;
+      }
+      return 1; // webp should always be last
     });
     picture.append(...srcs);
     const img = document.createElement('img');

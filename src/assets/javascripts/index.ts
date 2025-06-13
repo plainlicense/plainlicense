@@ -20,38 +20,33 @@ import gsap from 'gsap';
 import { ScrollToPlugin } from 'gsap/ScrollToPlugin';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import {
-  EMPTY,
-  type Observable,
   catchError,
+  EMPTY,
   filter,
-  from,
   map,
   merge,
+  type Observable,
   of,
   share,
   switchMap,
   tap,
 } from 'rxjs';
-import { feedback } from '~/feedback';
-import { HeroObservation, VideoManager } from '~/hero';
-import { HeroStore } from '~/state';
+import { HeroStore } from '~/state/store';
+import { isHelpingIndex, isHome, isLicense, isOnSite } from '~/utils/conditionChecks';
+import { feedback } from './feedback/feedback';
+import { HeroObservation } from './hero/animations/observer';
+import { VideoManager } from './hero/video/videoManager';
+import { initLicenseFeature } from './licenses/init';
+import type { PageConfig } from './types';
+import { navigationEvents$, watchLicenseHash, windowEvents } from './utils/eventHandlers';
 import {
   createScript,
   fixSvgDimensions,
-  isHelpingIndex,
-  isHome,
-  isLicense,
-  isOnSite,
-  logger,
-  navigationEvents$,
   removeHiddenAttr,
   setNavId,
   supportsHasSelector,
-  watchLicenseHash,
-  windowEvents,
-} from '~/utils';
-import { initLicenseFeature } from './licenses';
-import type { PageConfig } from './types';
+} from './utils/helpers';
+import { logger } from './utils/log';
 
 gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
 
@@ -102,11 +97,12 @@ const observer$ = of(HeroObservation.getInstance());
 const videoManager$ = of(VideoManager.getInstance());
 const licenseHashHandler$ = onDom$(watchLicenseHash());
 const license$ = navigationEvents$.pipe(
-  filter(isLicense),
+  filter((url) => !!isLicense(url)),
   switchMap(() => initLicenseFeature()),
 );
-const fixSvg$ = onDom$(of(() => fixSvgDimensions()));
-const windowEvents$ = from(windowEvents());
+const fixSvg$ = onDom$(of(fixSvgDimensions()));
+// windowEvents$ is now imported directly as an Observable
+const windowEvents$ = onDom$(of(windowEvents()));
 
 // Define page configurations
 const pageConfigs: PageConfig[] = [
@@ -116,7 +112,7 @@ const pageConfigs: PageConfig[] = [
     observables: [nav$, color$, observer$, videoManager$],
   },
   {
-    matcher: isLicense,
+    matcher: (url) => !!isLicense(url),
     location: 'licenses',
     observables: [license$],
   },

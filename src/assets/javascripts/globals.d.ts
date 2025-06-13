@@ -15,7 +15,7 @@ declare global {
 
   type PageLocation = 'all' | 'home' | 'licenses' | 'helpingIndex';
 
-  type Component<T extends {} = {}, U extends HTMLElement = HTMLElement> = T & {
+  type Component<T extends {} = object, U extends HTMLElement = HTMLElement> = T & {
     ref: U /* Component reference */;
   };
   type KeyboardMode = 'global' /* Global */ | 'search'; /* Search is open */

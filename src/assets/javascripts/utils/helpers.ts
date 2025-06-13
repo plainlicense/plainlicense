@@ -29,7 +29,7 @@ export const createScript = (src: string, async = true, defer = true, ignoreDnt 
   script.async = async;
   script.defer = defer;
   if (ignoreDnt) {
-    script.dataset['ignoreDnt'] = 'true';
+    script.dataset.ignoreDnt = 'true';
   }
   document.head.appendChild(script);
 };
@@ -49,8 +49,8 @@ export function setCssVariable(name: string, value: string) {
  * @returns true if the URL is an anchor link target
  */
 export function isAnchorLinkTarget(url: string | URL) {
-  url = typeof url === 'string' ? new URL(url, window.location.origin) : url;
-  return url.origin === window.location.origin && url.hash !== '';
+  const newUrl = typeof url === 'string' ? new URL(url, window.location.origin) : url;
+  return newUrl.origin === window.location.origin && newUrl.hash !== '';
 }
 
 /**
@@ -64,13 +64,13 @@ export function parsePath(path: string): ParsedURLPath {
   const base = parts.pop() || '';
   const dir = parts.join('/') || '/';
   const nameParts = base.split('.');
-  const ext = nameParts.length > 1 ? nameParts.pop()! : '';
+  const ext = nameParts.length > 1 ? (nameParts.pop() ?? '') : '';
   const name = nameParts.join('.');
   const root = parts[0] === '' ? '/' : '';
 
   const basePath = { base, dir, ext, name, root };
 
-  let urlObj: UrlAsObject | {} = {};
+  let urlObj: UrlAsObject | object = {};
   try {
     const url = new URL(path, window.location.origin);
     urlObj = {
@@ -124,7 +124,7 @@ function getCircularReplacer() {
   };
 }
 const piSmasher = getCircularReplacer();
-export const stringify = (obj: any) => JSON.stringify(obj, piSmasher, 2);
+export const stringify = (obj: unknown) => JSON.stringify(obj, piSmasher, 2);
 
 export function fixSvgDimensions(): void {
   const svgs = Array.from(document.getElementsByTagName('svg'));
@@ -146,18 +146,18 @@ export function fixSvgDimensions(): void {
     return;
   }
   requestAnimationFrame(() => {
-    valueMap.forEach((item: any) => {
-      const svg = svgs[item.index];
-      svg.setAttribute('width', item.value);
-      svg.setAttribute('height', item.value);
+    valueMap.forEach((item: unknown) => {
+      const svg = svgs[(item as { index: number }).index];
+      svg?.setAttribute('width', (item as { value: string }).value);
+      svg?.setAttribute('height', (item as { value: string }).value);
     });
   });
 }
 
 // A simple range function
 // from https://stackoverflow.com/a/10050831 by Fuji
-export function range(size: number, startAt = 0): ReadonlyArray<number> {
-  return [...Array(size).keys()].map((i) => i + startAt);
+export function range(size: number, startAt = 0): readonly number[] {
+  return [...new Array(size).keys()].map((i) => i + startAt);
 }
 
 /**
@@ -166,7 +166,7 @@ export function range(size: number, startAt = 0): ReadonlyArray<number> {
  * @param obj - the object to log
  * @param label - an optional label to prepend to the log messages
  */
-export function logObject(obj: any, label = '') {
+export function logObject(obj: unknown, label = '') {
   if (!obj) {
     logger.error(`No object to log for ${label}`);
     return;
@@ -180,9 +180,10 @@ export function logObject(obj: any, label = '') {
       logger.debug(`${label}[${i}]: `, item);
     });
     return;
-  } else if (typeof obj === 'object') {
-    Object.keys(obj).forEach((key) => {
-      logger.debug(`${label}.${key}: `, obj[key]);
+  }
+  if (typeof obj === 'object') {
+    Object.keys(obj as Record<string, unknown>).forEach((key) => {
+      logger.debug(`${label}.${key}: `, (obj as Record<string, unknown>)[key]);
     });
   } else {
     logger.debug(`${label}: `, obj);

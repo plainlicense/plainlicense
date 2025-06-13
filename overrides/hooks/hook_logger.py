@@ -18,8 +18,16 @@ from typing import ClassVar
 
 import click
 
-from ._utils import MkDocsCommand, Status
 from mkdocs.plugins import event_priority
+
+import sys
+from pathlib import Path
+
+# Add the project root to sys.path for imports
+project_root = Path(__file__).parent.parent.parent
+sys.path.insert(0, str(project_root))
+
+from overrides.hooks._utils import MkDocsCommand, Status
 
 
 # Configuration

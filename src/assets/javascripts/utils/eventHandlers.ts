@@ -19,7 +19,6 @@
  * @copyright No rights reserved.
  */
 // @ts-ignore: yes, I know it's not in the project json...
-import * as bundle from '@/bundle';
 
 import gsap from 'gsap';
 import {
@@ -48,10 +47,13 @@ import {
   toArray,
 } from 'rxjs';
 import Tablesort from 'tablesort';
+// biome-ignore lint/style/noNamespaceImport: we need to bring in the whole mkdocs bundle
+import * as bundle from '@/bundle';
 import { feature } from '~/_';
 import { getLocation, watchElementSize, watchViewportAt } from '~/browser';
 import { getComponentElement, type Header } from '~/components';
-import { isHome, isLicenseHash, isValidEvent, logger } from './';
+import { isHome, isLicenseHash, isValidEvent } from './conditionChecks';
+import { logger } from './log';
 import type { WatchOptions } from './types';
 
 export const NAV_EXIT_DELAY = 60000;
@@ -252,7 +254,7 @@ export const watchTables = () => {
 /**
  * A function that checks for presence of missing observables on the global customWindow object. If any are missing, it reloads the material mkdocs entrypoint.
  */
-export async function windowEvents() {
+export function windowEvents() {
   const {
     document$,
     location$,
@@ -281,6 +283,7 @@ export async function windowEvents() {
   };
   let observablesMissing = false;
   for (const key of Object.keys(observables)) {
+    // biome-ignore lint/suspicious/noExplicitAny: we know it's the globalThis object, but good luck getting typescript to understand that
     if (!(globalThis as any)[key]) {
       observablesMissing = true;
     }
@@ -343,7 +346,7 @@ export function watchLicenseHash() {
   ]).pipe(
     filter(([first, second]) => first.pathname === second.pathname),
     map(([_, second]) => second),
-    filter((url) => isLicenseHash(url)),
+    filter((url) => Boolean(isLicenseHash(url))),
     tap(handleLicenseHash),
   );
 }
@@ -372,7 +375,7 @@ function isHidden({ viewport$ }: WatchOptions): Observable<boolean> {
     return of(false);
   }
   const header = getComponentElement('header');
-  if (!header || !viewport$) {
+  if (!(header && viewport$)) {
     return of(false);
   }
   if (

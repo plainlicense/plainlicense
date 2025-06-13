@@ -5,6 +5,7 @@ repo_name: plainlicense
 edit_uri: edit/main/docs/
 copyright: Plain License's authors dedicate all original content to the public domain. No rights reserved.
 hooks:
+  - overrides/hooks/_utils.py # Utility functions for hooks
   - overrides/hooks/hook_logger.py # Central logger for hooks (can also do plugins)
   - overrides/hooks/socialmedia.py # Material hook for social media cards
   - overrides/hooks/update_changelogs.py # Handles changelog updates for individual licenses
@@ -14,7 +15,7 @@ hooks:
   - overrides/hooks/shame_counter.py # Counts the number of 'shame words' in a license
   - overrides/hooks/fix_html.py # simple post-page-rendering fixes
 site_description: >
-  Plain License: Terms for Everyone.
+  Free Your Creations. Plain language. Plain terms. Plain licenses.
 nav:
   - home: index.md
   - about: about/index.md
@@ -143,7 +144,6 @@ plugins:
   - tags:
       tags: true
       enabled: true
-      tags_file: tags.md
   - privacy:
       assets: true
       assets_fetch: true

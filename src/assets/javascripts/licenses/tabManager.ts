@@ -10,17 +10,18 @@
 
 import gsap from 'gsap';
 import {
-  type Observable,
-  Subscription,
   debounceTime,
   filter,
   fromEvent,
   map,
   merge,
+  type Observable,
+  Subscription,
   share,
   tap,
 } from 'rxjs';
-import { logger, preventDefault } from '~/utils';
+import { preventDefault } from '../utils/eventHandlers';
+import { logger } from '../utils/log';
 import type { ChildTabs, TabElement, TabState, TabStateType } from './types';
 
 /**
@@ -44,6 +45,7 @@ export class TabManager {
   private readonly childTabs: ChildTabs[];
 
   private readonly selectors = {
+    // biome-ignore lint/nursery/noSecrets: definitely not a secret
     inputs: '.tabbed-set input[type="radio"]',
     iconPrefix: '#icon-',
   };

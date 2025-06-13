@@ -34,7 +34,7 @@ export type CodecVariants = Record<VideoCodec, HeroPaths>;
 
 export type TimelinePauseArgs = [atTime?: number | undefined, suppressEvents?: boolean | undefined];
 
-export type TimelinePlayResumeArgs = [from?: any, suppressEvents?: boolean | undefined];
+export type TimelinePlayResumeArgs = [from?: unknown, suppressEvents?: boolean | undefined];
 
 export type TimelineSeekArgs = [time: number, suppressEvents?: boolean | undefined];
 

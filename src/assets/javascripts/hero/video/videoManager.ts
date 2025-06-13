@@ -1,14 +1,12 @@
 import gsap from 'gsap';
 import {
-  EMPTY,
-  type Observable,
-  Subscription,
   catchError,
   combineLatest,
   debounceTime,
   defer,
   distinctUntilChanged,
   distinctUntilKeyChanged,
+  EMPTY,
   exhaustMap,
   filter,
   from,
@@ -16,17 +14,27 @@ import {
   map,
   merge,
   mergeAll,
+  type Observable,
   of,
+  Subscription,
   skipUntil,
   skipWhile,
   switchMap,
   take,
   tap,
 } from 'rxjs';
-import { OBSERVER_CONFIG, STRONG_EMPHASIS_CONFIG, SUBTLE_EMPHASIS_CONFIG } from '~/config';
-import { HeroStore, type VideoState } from '~/state';
-import { elementInDom, logger, parsePath, prefersReducedMotion$, setCssVariable } from '~/utils';
-import type { AnimateMessageConfig } from '../animations';
+import {
+  OBSERVER_CONFIG,
+  STRONG_EMPHASIS_CONFIG,
+  SUBTLE_EMPHASIS_CONFIG,
+} from '../../config/config';
+import { HeroStore } from '../../state/store';
+import type { VideoState } from '../../state/types';
+import { elementInDom } from '../../utils/conditionChecks';
+import { prefersReducedMotion$ } from '../../utils/eventHandlers';
+import { parsePath, setCssVariable } from '../../utils/helpers';
+import { logger } from '../../utils/log';
+import type { AnimateMessageConfig } from '../animations/types';
 import { hide, show } from '../animations/utils';
 import { plainLogo } from './data';
 import { TimelineManager } from './timelineManager';
@@ -239,15 +247,14 @@ export class VideoManager {
               if (!elementInDom(this.element)) {
                 this.container.append(this.element);
               }
-              if (!this.timelineManager.isActive() && !this.isPlaying()) {
-                return of(this.play()).pipe(
-                  tap(() => {
-                    logger.info('Playing the video after stalled event');
-                  }),
-                );
-              } else {
+              if (this.timelineManager.isActive() || this.isPlaying()) {
                 return EMPTY;
               }
+              return of(this.play()).pipe(
+                tap(() => {
+                  logger.info('Playing the video after stalled event');
+                }),
+              );
             }),
             catchError((e) => {
               logger.error('Failed to play video', e);
@@ -270,11 +277,12 @@ export class VideoManager {
           logger.debug('Video rect:', target.getBoundingClientRect());
           if (this.onFallback) {
             return;
-          } else if (!target.getBoundingClientRect().height) {
+          }
+          if (!target.getBoundingClientRect().height) {
             return;
           }
           logger.debug(
-            'Setting video dimensions from loadedmetadata event, ' + this.videoDuration(),
+            `Setting video dimensions from loadedmetadata event, ${this.videoDuration()}`,
           );
           this.setVideoDimensionVars();
         }),
@@ -332,7 +340,7 @@ export class VideoManager {
         logger.info('Received new video signal for canPlay: ', videoState.canPlay);
         logger.info('Manager Can play: ', this.canPlay);
         logger.info('Received can play signal');
-        secondaryObservables.forEach((obs: Observable<any>, i: number) => {
+        secondaryObservables.forEach((obs: Observable<unknown>, i: number) => {
           if (i !== secondaryObservables.length - 1) {
             // motionSub$ stays alive when others unsubscribe
             this.subscriptions.add(obs.subscribe());
@@ -343,7 +351,7 @@ export class VideoManager {
         !this.initialized && this.initVideo();
         this.handleCanPlay();
       },
-      error: (err: any) => {
+      error: (err: unknown) => {
         logger.error('Video observer encountered an error:', err);
         this.reinit();
       },
@@ -385,11 +393,11 @@ export class VideoManager {
     gsap.set(this.element, hide());
     this.poster = this.video.picture;
     const img = this.poster.querySelector('img');
-    img && img.setAttribute('loading', 'eager');
+    img?.setAttribute('loading', 'eager');
     this.backupPicture = this.video.backupPicture;
     this.message = this.video.message || '';
-    this.textDefaults['message'] = this.message;
-    if (!VideoManager.instance || !this.initialized) {
+    this.textDefaults.message = this.message;
+    if (!(VideoManager.instance && this.initialized)) {
       logger.info('Initializing VideoManager');
       this.initSubscriptions();
     }
@@ -412,7 +420,7 @@ export class VideoManager {
     });
     gsap.to(this.poster, { ...show(), duration: 0.5 });
 
-    const promises = [];
+    const promises: Promise<void>[] = [];
     promises.push(
       new Promise(() => this.loadVideo())
         .then(() => {
@@ -437,7 +445,10 @@ export class VideoManager {
   }
 
   public static getInstance(): VideoManager {
-    return (this.instance ??= new VideoManager());
+    if (!VideoManager.instance) {
+      VideoManager.instance = new VideoManager();
+    }
+    return VideoManager.instance;
   }
 
   private okToPlay(): boolean {
@@ -469,16 +480,16 @@ export class VideoManager {
     if (activeEl === inactiveElement) {
       toggleActiveClass(activeEl, 'hero__poster', true);
       return;
-    } else if (activeEl === this.poster) {
+    }
+    if (activeEl === this.poster) {
       toggleActiveClass(activeEl, 'hero__poster', true);
       toggleActiveClass(inactiveElement, 'hero__backup', false);
       return;
-    } else {
-      activeEl.classList.replace('hero__backup', 'hero__poster');
-      activeEl.classList.replace('hero__backup--inactive', 'hero__poster--active');
-      inactiveElement.classList.replace('hero__poster', 'hero__backup');
-      inactiveElement.classList.replace('hero__poster--active', 'hero__backup--inactive');
     }
+    activeEl.classList.replace('hero__backup', 'hero__poster');
+    activeEl.classList.replace('hero__backup--inactive', 'hero__poster--active');
+    inactiveElement.classList.replace('hero__poster', 'hero__backup');
+    inactiveElement.classList.replace('hero__poster--active', 'hero__backup--inactive');
   }
 
   private handleCanPlay(): void {
@@ -488,8 +499,7 @@ export class VideoManager {
       return;
     }
     if (
-      !elementInDom(this.element) ||
-      !elementInDom(this.poster) ||
+      !(elementInDom(this.element) && elementInDom(this.poster)) ||
       this.element.readyState === 0
     ) {
       this.initVideo();
@@ -504,7 +514,7 @@ export class VideoManager {
     const tl = gsap.timeline(this.textDefaults.sharedVars as gsap.TimelineVars);
     return tl
       .set('.text-animation__container', show())
-      ['animateMessage']('.text-animation__container', {
+      .animateMessage('.text-animation__container', {
         message: this.message,
         ...overrideVars,
       });
@@ -557,13 +567,10 @@ export class VideoManager {
       },
     ]);
     if (subtleTargets.length) {
-      tl.add(['subtleEmphasis', tl['emphasize'](subtleTargets, SUBTLE_EMPHASIS_CONFIG), '>'], '>');
+      tl.add(['subtleEmphasis', tl.emphasize(subtleTargets, SUBTLE_EMPHASIS_CONFIG), '>'], '>');
     }
     if (strongTargets.length) {
-      tl.add(
-        ['strongEmphasis', tl['emphasize'](strongTargets, STRONG_EMPHASIS_CONFIG), '>'],
-        '>=0.5',
-      );
+      tl.add(['strongEmphasis', tl.emphasize(strongTargets, STRONG_EMPHASIS_CONFIG), '>'], '>=0.5');
     }
     return tl;
   }
@@ -604,7 +611,7 @@ export class VideoManager {
       gsap.set('.cta__container h2', vis ? { ...show(), duration: 0.5 } : { ...hide() });
       gsap.set('.cta__container h1', vis ? { ...show(), duration: 0.5 } : { ...hide() });
     };
-    const existingOnUpdate = config && config.onUpdate;
+    const existingOnUpdate = config?.onUpdate;
 
     const tl = gsap.timeline([
       'videoTimeline',
@@ -612,7 +619,7 @@ export class VideoManager {
         ...config,
         duration: 1,
         onStart: () => {
-          existingOnStart && existingOnStart();
+          existingOnStart?.();
           updateDuration();
 
           this.transitionToVideo();
@@ -626,7 +633,7 @@ export class VideoManager {
           }
         },
         onComplete: () => {
-          existingOnComplete && existingOnComplete();
+          existingOnComplete?.();
           logger.info('Video timeline completed - preparing for text animation');
           // Keep video visible briefly during text animation
           setTimeout(() => {
@@ -651,7 +658,7 @@ export class VideoManager {
           ) {
             this.element.currentTime = tl.time() * this.videoDuration();
           }
-          existingOnUpdate && existingOnUpdate();
+          existingOnUpdate?.();
         },
       },
     ]);
@@ -665,8 +672,8 @@ export class VideoManager {
     const originalSeek = tl.seek.bind(tl);
 
     tl.set({}, {}, 0);
-    tl['media'] = this.element || document.querySelector('.hero__video');
-    tl['foulPlay'] = this.foulPlay.bind(this);
+    tl.media = this.element || document.querySelector('.hero__video');
+    tl.foulPlay = this.foulPlay.bind(this);
 
     // Setup element event listeners
     this.element.addEventListener('durationchange', updateDuration);
@@ -692,7 +699,7 @@ export class VideoManager {
     this.element.onended = () => {
       logger.info('Video ended event triggered');
       logger.debug(
-        `Video ended at ${tl['media'].currentTime} \n Video duration: ${this.videoDuration()} \n Timeline time: ${tl.time()} \n Timeline duration: ${tl.duration()} \n Timeline progress: ${tl.progress()} \n Timeline paused: ${tl.paused()} \n Timeline isActive: ${tl.isActive()}`,
+        `Video ended at ${tl.media.currentTime} \n Video duration: ${this.videoDuration()} \n Timeline time: ${tl.time()} \n Timeline duration: ${tl.duration()} \n Timeline progress: ${tl.progress()} \n Timeline paused: ${tl.paused()} \n Timeline isActive: ${tl.isActive()}`,
       );
       if (tl && tl.progress() !== 1 && !this.timelineManager.isTransitioning) {
         tl.progress(1, true).eventCallback('onComplete')();
@@ -713,32 +720,32 @@ export class VideoManager {
         tl.pause();
       }
     };
-    tl.pause = (...args: any[]) => {
-      tl['media'].pause();
-      originalPause(...args);
+    tl.pause = (atTime?: string | number, suppressEvents?: boolean) => {
+      tl.media.pause();
+      originalPause(atTime, suppressEvents);
       return tl;
     };
-    tl.play = (...args: any[]) => {
-      tl['foulPlay']();
+    tl.play = (...args: [time?: string | number | null | undefined]) => {
+      tl.foulPlay();
       originalPlay(...args);
-      if (args.length) {
-        tl['media'].currentTime = args[0] as number;
+      if (args.length && typeof args[0] === 'number') {
+        tl.media.currentTime = args[0] as number;
       }
       return tl;
     };
-    tl.restart = (...args: any[]) => {
-      originalRestart(...args);
-      if (args.length) {
-        setTimeout(() => tl['media'].play(), args[0] as number);
+    tl.restart = (suppressEvents?: boolean) => {
+      originalRestart(suppressEvents);
+      if (suppressEvents) {
+        setTimeout(() => tl.media.play(), 0);
       }
       return tl;
     };
-    tl.seek = (position: any, suppressEvents?: boolean) => {
-      originalSeek(position, suppressEvents);
+    tl.seek = (position: unknown, suppressEvents?: boolean) => {
+      originalSeek(position as string | number, suppressEvents);
       if (position !== undefined) {
-        tl['media'].currentTime = position * tl['media'].duration;
+        tl.media.currentTime = (position as number) * tl.media.duration;
       }
-      tl.time(position / tl['media'].duration || 0, suppressEvents ?? true);
+      tl.time((position as number) / tl.media.duration || 0, suppressEvents ?? true);
       return tl;
     };
     tl.timeScale(this.timeScale());
@@ -773,8 +780,9 @@ export class VideoManager {
         this.tryNewSource();
       },
     };
-    if (errorActions[error.code]) {
-      errorActions[error.code]();
+    const action = errorActions[error.code];
+    if (typeof action === 'function') {
+      action();
     } else {
       logger.error('Video element encountered an error.', error);
       Promise.resolve(this.tryNewSource()).catch(() => this.initiateFallback());
@@ -792,7 +800,8 @@ export class VideoManager {
       .then(() => this.beginPlay())
       .catch((error) => {
         logger.error('Error occurred during playback:', error);
-        if (!this.timelineManager.isTransitioning && !this.onFallback) {
+        const shouldRestartTimeline = !(this.timelineManager.isTransitioning || this.onFallback);
+        if (shouldRestartTimeline) {
           this.timelineManager.restart().pause();
           this.addPlayOnInteraction();
         }
@@ -819,7 +828,7 @@ export class VideoManager {
         this.debugDump();
       }
       if (
-        this.timelineManager.currentTimeline?.['media'] &&
+        this.timelineManager.currentTimeline?.media &&
         !this.timelineManager.currentTimeline?.duration()
       ) {
         this.timelineManager.currentTimeline.duration(1);

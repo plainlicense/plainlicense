@@ -11,8 +11,16 @@ from mkdocs.structure.nav import Navigation
 from mkdocs.structure.pages import Page
 from mkdocs.utils.templates import TemplateContext
 
-from ._utils import is_license_page, wrap_text
-from .hook_logger import get_logger
+import sys
+from pathlib import Path
+
+# Add the project root to sys.path for imports
+project_root = Path(__file__).parent.parent.parent
+if str(project_root) not in sys.path:
+    sys.path.insert(0, str(project_root))
+
+from overrides.hooks._utils import is_license_page, wrap_text
+from overrides.hooks.hook_logger import get_logger
 
 
 _site_license_log_level = logging.WARNING

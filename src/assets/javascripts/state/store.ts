@@ -6,7 +6,7 @@
  * with advanced state tracking, predicate-based logic, and performance optimizations.
  *
  * Frankly, it's overkill, but it was designed for a complex UI with many moving parts... and then I changed the design to be simpler... so now it's overkill.
- * But it works, so I'm leaving it in place.
+ * But it works, so I'm leaving it in place. (¯\_(ツ)_/¯)
  *
  * @license Plain-Unlicense (Public Domain)
  * @author Adam Poulemanos adam<at>plainlicense<dot>org
@@ -15,15 +15,15 @@
 
 import {
   BehaviorSubject,
-  type Observable,
-  type Observer,
-  Subscription,
   combineLatest,
   debounceTime,
   distinctUntilChanged,
   distinctUntilKeyChanged,
   filter,
   map,
+  type Observable,
+  type Observer,
+  Subscription,
   shareReplay,
   startWith,
   switchMap,
@@ -31,21 +31,18 @@ import {
 } from 'rxjs';
 import { getViewportOffset, getViewportSize } from '~/browser';
 import { getComponentElement, watchTabs } from '~/components';
-import { SectionIndex } from '~/hero';
+import { SectionIndex } from '../hero/animations/types';
+import { isDev, isHome } from '../utils/conditionChecks';
 import {
-  isDev,
-  isHome,
   isPageVisible$,
   isPartiallyInViewport,
-  logObject,
-  logger,
   navigationEvents$,
   prefersReducedMotion$,
-  setCssVariable,
-  stringify,
   watchHeader,
   watchMediaQuery,
-} from '~/utils';
+} from '../utils/eventHandlers';
+import { logObject, setCssVariable, stringify } from '../utils/helpers';
+import { logger } from '../utils/log';
 import {
   AnimationComponent,
   type ComponentStateUpdateFunction,
@@ -265,6 +262,7 @@ export class HeroStore {
 
     const motion$ = prefersReducedMotion$.pipe(
       tap(
+        // biome-ignore lint/nursery/noSecrets: yeah... no.
         this.createObserver('prefersReducedMotion$', (prefersReducedMotion) => ({
           prefersReducedMotion,
         })),

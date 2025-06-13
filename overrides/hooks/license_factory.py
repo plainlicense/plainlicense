@@ -30,8 +30,16 @@ from mkdocs.config.defaults import MkDocsConfig
 from mkdocs.structure.files import File, Files, InclusionLevel
 from mkdocs.structure.pages import Page
 
-from ._utils import Status, find_repo_root, wrap_text
-from .hook_logger import get_logger
+import sys
+from pathlib import Path
+
+# Add the project root to sys.path for imports
+project_root = Path(__file__).parent.parent.parent
+if str(project_root) not in sys.path:
+    sys.path.insert(0, str(project_root))
+
+from overrides.hooks._utils import Status, find_repo_root, wrap_text
+from overrides.hooks.hook_logger import get_logger
 
 
 # Change logging level here
@@ -108,6 +116,14 @@ def render_mapping(mapping: dict[str, Any], context: dict) -> dict[str, Any]:
 
     return {key: render_value(value) for key, value in mapping.items()}
 
+def save_license(page: Page) -> None:
+    """
+    Creates a final license with all finalized information and gives it to `Status` to save.
+    """
+    final_license = LicenseContent(page)
+    if status := Status.status():
+        status.add_license(final_license)
+
 
 def assemble_license_page(config: MkDocsConfig, page: Page, _file: File) -> Page:
     """Returns the rendered boilerplate from the config."""
@@ -135,6 +151,7 @@ def assemble_license_page(config: MkDocsConfig, page: Page, _file: File) -> Page
     markdown = Template(markdown).render(**meta)
     page.meta = meta
     page.markdown = markdown
+    save_license(page)  # we'll generate a new license content with the completed page
     return page
 
 
@@ -305,6 +322,8 @@ class LicenseContent:
         self.has_official = bool(self.original_license_text)
 
         self.embed_url = f"https://plainlicense.org/embed/{self.meta['spdx_id'].lower()}.html"
+
+        self.page_markdown: str | None = None  # added externally after init
 
         assembly_logger.debug("License content: \n\n%s\n", self.license_content)
 

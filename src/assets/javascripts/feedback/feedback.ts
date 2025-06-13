@@ -4,9 +4,10 @@
  * @license Plain Unlicense(Public Domain)
  * @copyright No rights reserved. Created by and for Plain License www.plainlicense.org
  */
-import { type Observable, filter, fromEvent, map, of, tap, throttleTime } from 'rxjs';
-import { isValidEvent, preventDefault } from '~/utils';
+import { filter, fromEvent, map, type Observable, of, tap, throttleTime } from 'rxjs';
 import { logger } from '~/utils/log';
+import { isValidEvent } from '../utils/conditionChecks';
+import { preventDefault } from '../utils/eventHandlers';
 
 /**
  * @exports feedback
@@ -41,7 +42,6 @@ export const feedback = (): Observable<Event | null> => {
         }
       }),
     );
-  } else {
-    return of(null);
   }
+  return of(null);
 };

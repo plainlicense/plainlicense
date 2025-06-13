@@ -1,3 +1,8 @@
+/**
+ * @module utils/types
+ * @description Type definitions for various utilities used in the application.
+ * @license Plain Unlicense (Public Domain)
+ */
 import type { Observable } from 'rxjs';
 
 export interface WatchOptions {

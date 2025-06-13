@@ -1,4 +1,0 @@
----
-template: main.html
----
-# Tags

@@ -7,14 +7,23 @@ from pathlib import Path
 
 import markdown
 
-from ._utils import Status
 from funcy import rpartial
-from .hook_logger import get_logger
 from jinja2 import Environment
 from mkdocs.config.defaults import MkDocsConfig
 from mkdocs.plugins import event_priority
 from mkdocs.structure.files import Files
 from PIL import Image
+
+import sys
+from pathlib import Path
+
+# Add the project root to sys.path for imports
+project_root = Path(__file__).parent.parent.parent
+if str(project_root) not in sys.path:
+    sys.path.insert(0, str(project_root))
+
+from overrides.hooks._utils import Status
+from overrides.hooks.hook_logger import get_logger
 
 
 Image.MAX_IMAGE_PIXELS = 300000000

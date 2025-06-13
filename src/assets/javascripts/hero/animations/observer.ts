@@ -12,21 +12,26 @@ import { gsap } from 'gsap';
 import { Observer } from 'gsap/Observer';
 import {
   BehaviorSubject,
-  Subscription,
   debounceTime,
   distinctUntilChanged,
   distinctUntilKeyChanged,
   filter,
   map,
+  Subscription,
   skipUntil,
 } from 'rxjs';
-import { OBSERVER_CONFIG, type ObserverConfig } from '~/config';
-import { type HeroState, HeroStore } from '~/state';
+// Make sure we have the effects registered
+import { navigationEvents$ } from '~/utils/eventHandlers';
+import { OBSERVER_CONFIG } from '../../config/config';
+import type { ObserverConfig } from '../../config/types';
+import { HeroStore } from '../../state/store';
+import type { HeroState } from '../../state/types';
+import { isHome, isValidElement } from '../../utils/conditionChecks';
+import { range } from '../../utils/helpers';
+import { logger } from '../../utils/log';
+import './effects';
 import { Direction, type Section, SectionIndex } from './types';
 import { getContentElements } from './utils';
-// Make sure we have the effects registered
-import { isHome, isValidElement, logger, navigationEvents$, range } from '~/utils';
-import './effects';
 
 gsap.registerPlugin(Observer);
 
@@ -97,7 +102,10 @@ export class HeroObservation {
    * @returns {HeroObservation}
    */
   public static getInstance(): HeroObservation {
-    return (HeroObservation.instance ??= new HeroObservation());
+    if (!HeroObservation.instance) {
+      HeroObservation.instance = new HeroObservation();
+    }
+    return HeroObservation.instance;
   }
   // Sets up RxJs subscriptions to monitor the atHome state
   private setupSubscriptions() {
@@ -234,12 +242,18 @@ export class HeroObservation {
       // Get content elements, excluding structural wrappers
       const initialContent = getContentElements(el)
         .filter((element) => element !== outerWrapper && element !== innerWrapper && element !== bg)
-        .filter((e) =>
-          isValidElement(
-            e,
-            e.parentElement || this.sections[index].bg || this.sections[index].element,
-          ),
-        );
+        .filter((e) => {
+          const parent =
+            e.parentElement ||
+            (this.sections[index]?.bg instanceof Element ? this.sections[index]?.bg : undefined) ||
+            (this.sections[index]?.element instanceof Element
+              ? this.sections[index]?.element
+              : undefined);
+          if (!parent) {
+            return false;
+          }
+          return isValidElement(e, parent);
+        });
       const content = Array.from(new Set(initialContent));
 
       logger.debug(`Setting up section ${index}`, { outerWrapper, innerWrapper, bg, content });
@@ -278,9 +292,11 @@ export class HeroObservation {
     });
 
     // Filter out ignored elements from first section
-    this.sections[0].content = this.sections[0].content.filter((content) =>
-      this.isValidContentTarget(content),
-    );
+    if (this.sections[0]) {
+      this.sections[0].content = this.sections[0].content.filter((content) =>
+        this.isValidContentTarget(content),
+      );
+    }
 
     this.sectionCount = this.sections.length;
     this.sectionIndexLength = this.sectionCount - 1;
@@ -291,31 +307,35 @@ export class HeroObservation {
    * @param scenicRoute
    * @returns
    */
-  public async transition(direction: Direction, scenicRoute?: boolean) {
+  public transition(direction: Direction, scenicRoute?: boolean) {
     if (this.animating) {
       return;
     }
     this.animating = true;
-    let nextIndex = this.getNextIndex(direction);
+    const nextIndex = this.getNextIndex(direction);
     if (!scenicRoute) {
       this.goToSection(nextIndex, direction);
     } else if (scenicRoute && direction === Direction.Down) {
       this.goToSection(nextIndex, direction);
-      let remainingSections = this.sectionIndexLength - nextIndex;
-
-      while (remainingSections > 0) {
-        await new Promise((resolve) => setTimeout(resolve, 3000));
-        if (this.currentIndex !== this.sectionIndexLength && this.currentIndex === nextIndex) {
-          this.goToSection(nextIndex + Direction.Down, direction);
-          nextIndex++;
-          remainingSections--;
+      const autoAdvance = (currentIdx: number, remaining: number) => {
+        if (remaining > 0) {
+          setTimeout(() => {
+            if (this.currentIndex !== this.sectionIndexLength && this.currentIndex === currentIdx) {
+              this.goToSection(currentIdx + Direction.Down, direction);
+              autoAdvance(currentIdx + 1, remaining - 1);
+            } else {
+              this.animating = false;
+              // Exit recursion if condition fails
+            }
+          }, 3000);
         } else {
           this.animating = false;
-          break; // Exit loop if condition fails
         }
-      }
+      };
+      autoAdvance(nextIndex, this.sectionIndexLength - nextIndex);
+    } else {
+      this.animating = false;
     }
-    this.animating = false;
     return;
   }
 
@@ -327,10 +347,9 @@ export class HeroObservation {
     const nextIndex = this.currentIndex + direction;
     if (nextIndex <= 0) {
       return 0;
-    } else {
-      this.hasTransitioned = true;
-      return this.wrapper(nextIndex) as number;
     }
+    this.hasTransitioned = true;
+    return this.wrapper(nextIndex) as number;
   }
 
   // Construct the transition timeline based on the direction and index
@@ -342,9 +361,14 @@ export class HeroObservation {
     );
     // the first time this runs, currentIndex will be -1
     logger.info(`Setting section ${this.currentIndex} to section ${index}`);
-    tl['setSection'](section.element, { direction, section });
+    if (!section) {
+      logger.error(`Section at index ${index} is undefined. Aborting transition.`);
+      this.animating = false;
+      return tl;
+    }
+    tl.setSection(section.element, { direction, section });
     logger.info(`Animating section ${index} in direction ${direction}`);
-    tl['transitionSection'](section.element, { direction, section });
+    tl.transitionSection(section.element, { direction, section });
     if (section.animation && section.animation.totalDuration() > 0) {
       tl.add(section.animation, '>');
     }
@@ -368,7 +392,7 @@ export class HeroObservation {
     this.updateIndex(clampedIndex);
 
     // Update currentIndex before creating timeline
-    if (!this.sections[clampedIndex].animation) {
+    if (!this.sections[clampedIndex]?.animation) {
       throw new Error(
         `No animation found for section ${clampedIndex} -- failed to setup transition`,
       );
@@ -408,7 +432,7 @@ export class HeroObservation {
    * @returns True if the element is a valid content target, false otherwise.
    */
   private isValidContentTarget(el: unknown): el is Element {
-    if (!el || !(el instanceof Element) || !el.parentElement) {
+    if (!(el && el instanceof Element && el.parentElement)) {
       return false;
     }
     const section = this.sections.find((section) => section.content.includes(el));
