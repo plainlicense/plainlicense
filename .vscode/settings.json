@@ -148,7 +148,7 @@
   "python.languageServer": "Pylance",
   "quokka.automaticRestart": true,
   "quokka.showValueOnMultilineSelection": true,
-  "terminal.integrated.fontFamily": "MesloLGS NF",
+  "terminal.integrated.fontFamily": "monospace",
   "typescript.format.semicolons": "remove",
   "typescript.tsserver.web.typeAcquisition.enabled": true,
   "javascript.updateImportsOnFileMove.enabled": "always",

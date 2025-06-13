@@ -651,14 +651,14 @@ wheels = [
 
 [[package]]
 name = "mkdocs-git-authors-plugin"
-version = "0.9.6"
+version = "0.10.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "mkdocs" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/76/55/d9992870e0d15dccc3de52616452aae33674f17e3b8369a98a3710d174b6/mkdocs_git_authors_plugin-0.9.6.tar.gz", hash = "sha256:180cc80ef78d553676b850fb783e13506d7eadd30b13a070aa085b2d9ad0607d", size = 23192, upload-time = "2025-06-08T18:56:56.681Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/64/f1/b784c631b812aab80030db80127a576b68a84caac5229836fb7fcc00e055/mkdocs_git_authors_plugin-0.10.0.tar.gz", hash = "sha256:29d1973b2835663d79986fb756e02f1f0ff3fe35c278e993206bd3c550c205e4", size = 23432, upload-time = "2025-06-10T05:42:40.94Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/c2/40/580bc5110c704667818e628f28be8fd66e96ac30091764806d6ece8e8f93/mkdocs_git_authors_plugin-0.9.6-py3-none-any.whl", hash = "sha256:c437d33e85b79e39809f9d81d3283267b416312425b6f9728cd60156d59187e8", size = 21491, upload-time = "2025-06-08T18:56:54.685Z" },
+    { url = "https://files.pythonhosted.org/packages/41/bc/a4166201c2789657c4d370bfcd71a5107edec185ae245675c8b9a6719243/mkdocs_git_authors_plugin-0.10.0-py3-none-any.whl", hash = "sha256:28421a99c3e872a8e205674bb80ec48524838243e5f59eaf9bd97df103e38901", size = 21899, upload-time = "2025-06-10T05:42:39.244Z" },
 ]
 
 [[package]]
@@ -1040,7 +1040,7 @@ requires-dist = [
     { name = "markdown", specifier = ">=3.7" },
     { name = "markupsafe", specifier = ">=2.1.5" },
     { name = "mkdocs", extras = ["i18n"], specifier = ">=1.6.0" },
-    { name = "mkdocs-git-authors-plugin", specifier = ">=0.9.1" },
+    { name = "mkdocs-git-authors-plugin", specifier = ">=0.10.0" },
     { name = "mkdocs-git-revision-date-localized-plugin", specifier = ">=1.3.0" },
     { name = "mkdocs-macros-plugin", specifier = ">=1.3.7" },
     { name = "mkdocs-markdown-filter", specifier = ">=0.1.1" },
@@ -1054,7 +1054,7 @@ requires-dist = [
     { name = "pygithub", specifier = ">=2.4.0" },
     { name = "pygments", specifier = ">=2.19.1" },
     { name = "pymdown-extensions", specifier = ">=10.14" },
-    { name = "pyyaml-env-tag", specifier = ">=0.1.0" },
+    { name = "pyyaml-env-tag", specifier = ">=1.1" },
 ]
 
 [package.metadata.requires-dev]
