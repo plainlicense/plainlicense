@@ -1,6 +1,6 @@
-# Adding a New License to the Repository
+# Adding a New License to the Repository - For Maintainers
 
-TODO: Add a lint to the CI to check this all this actually gets done correctly.
+<!-- TODO: Add a lint to the CI to check this all this actually gets done correctly. -->
 
 I strived to avoid hardcoding any license text in the codebase. For the most part, if the license file is properly formatted, it should be automatically detected. There are a few exceptions. This readme is for the exceptions.
 
@@ -50,41 +50,6 @@ I strived to avoid hardcoding any license text in the codebase. For the most par
         // Add your new package here, replace {spdx-id} with the actual spdx-id
         "plain-license-{spdx-id}": "workspace:plain-license-{spdx-id}"
     }
-    ```
-
-7.  **Add to Readability Enum**. Finally, add your license to the `LicenseType` enum in the `bin/readability.py` file. This is a CLI tool for calculating readability scores. Here's how to do it:
-
-    ```python
-    class LicenseType(StrEnum):
-        """Enum for license types."""
-
-        MPL = "mpl"
-        MIT = "mit"
-        ELASTIC = "elastic"
-        UNLICENSE = "unlicense"
-        APACHE = "apache"  # Example for Apache 2.0 license; omit the version number
-
-        @property
-        def spdx_id(self) -> str:                # <---- SPDX-ID property
-            """Return the SPDX ID for the license type."""
-            return {
-                LicenseType.MPL: "mpl-2.0",
-                LicenseType.MIT: "mit",
-                LicenseType.ELASTIC: "elastic-2.0",
-                LicenseType.UNLICENSE: "unlicense",
-                LicenseType.APACHE: "apache-2.0", # Example for Apache 2.0 -- the spdx-id goes here
-            }[self]
-
-        @property
-        def category(self) -> str:              # <---- Category property
-            """Return the category of the license type."""
-            return {
-                LicenseType.MPL: "copyleft",
-                LicenseType.MIT: "permissive",
-                LicenseType.ELASTIC: "source-available",
-                LicenseType.UNLICENSE: "public-domain",
-                LicenseType.APACHE: "permissive",  # Example for Apache 2.0 -- the category goes here
-            }[self]
     ```
 
 8.  **Commit and Push**. After making all the changes, commit your changes in the [commit format](./docs/helping/commit.md) and push them to the repository. For the Apache 2.0 license, the commit message would look like this:
