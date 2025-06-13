@@ -1,6 +1,6 @@
-# Adding a New License to the Repository
+# Adding a New License to the Repository - For Maintainers
 
-TODO: Add a lint to the CI to check this all this actually gets done correctly.
+<!-- TODO: Add a lint to the CI to check this all this actually gets done correctly. -->
 
 I strived to avoid hardcoding any license text in the codebase. For the most part, if the license file is properly formatted, it should be automatically detected. There are a few exceptions. This readme is for the exceptions.
 
