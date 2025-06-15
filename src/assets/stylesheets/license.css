@@ -301,7 +301,7 @@ p.md-nav__description.license {
   min-height: 3rem;
   padding-top: 1.5rem;
   margin-top: 1rem;
-  font-size-rgbust: calc(1rem + 1vw);
+  font-size: calc(1rem + 1vw);
   font-weight: 700;
   vertical-align: bottom;
   color: var(--md-default-fg-color--light);

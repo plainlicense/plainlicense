@@ -1,4 +1,4 @@
-import type { Observable } from 'rxjs'
+import type { Observable } from 'rxjs';
 
 export type PageConfig = {
   matcher: (url: URL) => boolean;

@@ -1,9 +1,14 @@
 {
   "$schema": "https://biomejs.dev/schemas/2.0.0-beta.2/schema.json",
   "assist": {
+    "enabled": true,
     "actions": {
       "source": {
-        "organizeImports": "on"
+        "organizeImports": "on",
+        "recommended": true,
+        "useSortedAttributes": "on",
+        "useSortedKeys": "on",
+        "useSortedProperties": "on"
       }
     }
   },
@@ -35,7 +40,11 @@
       "!**/node_modules/**",
       "!**/dist/**",
       "!src/build/**",
-      "!commitlint.config.ts"
+      "!commitlint.config.ts",
+      "!docs/*.js",
+      "!docs/assets/javascripts/**/*.js",
+      "!docs/assets/stylesheets/**/*.css",
+      "!**/package.json"
     ]
   },
   "formatter": {
@@ -80,10 +89,10 @@
         "useArrayLiterals": "error"
       },
       "nursery": {
+        "noAwaitInLoop": "warn",
         "noCommonJs": "warn",
         "noDocumentCookie": "warn",
         "noDuplicateElseIf": "warn",
-        "noAwaitInLoop": "warn",
         "noFloatingPromises": "warn",
         "noMissingVarFunction": "warn",
         "noSecrets": "warn",
@@ -133,7 +142,10 @@
         "useFilenamingConvention": {
           "level": "error",
           "options": {
-            "filenameCases": ["camelCase", "export"],
+            "filenameCases": [
+              "camelCase",
+              "export"
+            ],
             "requireAscii": true,
             "strictCase": true
           }
@@ -166,7 +178,7 @@
   },
   "vcs": {
     "clientKind": "git",
-    "enabled": false,
+    "enabled": true,
     "useIgnoreFile": true
   }
 }

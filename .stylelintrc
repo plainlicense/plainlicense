@@ -1,38 +1,18 @@
 {
   "extends": [
     "@stylistic/stylelint-config",
-    "stylelint-config-recess-order",
+    "stylelint-config-clean-order",
     "stylelint-config-recommended",
     "stylelint-config-standard-scss"
   ],
   "plugins": [
     "@stylistic/stylelint-plugin",
-    "stylelint-scss"
+    "stylelint-scss",
+    "stylelint-order"
   ],
   "rules": {
     "alpha-value-notation": "number",
     "annotation-no-unknown": null,
-    "at-rule-empty-line-before": [
-      "always",
-      {
-        "except": [
-          "blockless-after-same-name-blockless",
-          "first-nested"
-        ],
-        "ignore": [
-          "after-comment"
-        ],
-        "ignoreAtRules": [
-          "if",
-          "each",
-          "else",
-          "elseif",
-          "for",
-          "import",
-          "return"
-        ]
-      }
-    ],
     "at-rule-no-unknown": null,
     "color-function-notation": null,
     "color-hex-length": "long",
@@ -131,6 +111,14 @@
     "@stylistic/selector-max-empty-lines": 0,
     "@stylistic/string-quotes": "double",
     "@stylistic/unicode-bom": "never",
-    "@stylistic/value-list-comma-newline-after": null
+    "@stylistic/value-list-comma-newline-after": null,
+    "order/order": [
+      "custom-properties",
+      "declarations"
+    ],
+    "order/properties-order": [
+      "width",
+      "height"
+    ]
   }
 }

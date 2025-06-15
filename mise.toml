@@ -1,15 +1,24 @@
 [tools]
+actionlint = "latest"
 bun = "latest"
 gitsign = "latest"
+hk = "latest"
 "npm:commitizen" = "latest"
 "npm:commitlint" = "latest"
-"npm:eslint" = "latest"
+"npm:git-cz" = "latest"
 "npm:markdownlint-cli2" = "latest"
 "npm:prettier" = "latest"
 "npm:semantic-release-cli" = "latest"
+"npm:sort-package-json" = "latest"
 "npm:stylelint" = "latest"
+"pipx:commitizen" = "latest"
 "pipx:mkdocs" = "latest"
-pre-commit = "latest"
+pkl = "latest"
 ruff = "latest"
+shellcheck = "latest"
+shfmt = "latest"
 typos = "latest"
 uv = "latest"
+
+[env]
+HK_MISE = true

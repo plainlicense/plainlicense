@@ -1,0 +1,16 @@
+**/__pycache__/
+**/coverage/
+**/node_modules/
+.cache/
+.history/
+.pytest_cache/
+.ruff_cache/
+.workbench/
+__pycache__/
+build/
+coverage/
+dist/
+external/
+node_modules/
+src/assets/javascripts/
+src/build/

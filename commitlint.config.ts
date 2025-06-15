@@ -1,9 +1,8 @@
-import { RuleConfigSeverity, type UserConfig } from '@commitlint/types'
+import { RuleConfigSeverity, type Plugin, type UserConfig } from '@commitlint/types'
+import selectiveScope from 'commitlint-plugin-selective-scope'
 import { globby } from 'globby'
 import * as fs from 'node:fs'
 import * as path from 'node:path'
-
-// @ts-ignore - selectiveScope is used in the rules (as a string)
 
 interface SpdxLicense {
   reference: URL;
@@ -87,7 +86,7 @@ const allTypedScopes = [...licenseTypedScopes, ...devTypedScopes] as const;
 const Configuration: UserConfig = {
   extends: ['@commitlint/config-conventional'],
   parserPreset: 'conventional-changelog-angular',
-  plugins: ['commitlint-plugin-selective-scope'],
+  plugins: [ selectiveScope as Plugin ],
   formatter: '@commitlint/format',
   rules: {
     'type-case': [RuleConfigSeverity.Error, 'always', 'lower-case'],

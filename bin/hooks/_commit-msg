@@ -8,7 +8,9 @@ function error_exit {
 }
 
 if [[ -z "$REPO_ROOT" || -z "$VIRTUAL_ENV" ]]; then
-    ../set_venv || error_exit "Failed to set the virtual environment."
+    REPO_ROOT=$(git rev-parse --show-toplevel) || error_exit "Failed to set the repository root."
+    VIRTUAL_ENV=$(dirname "$REPO_ROOT")/.venv || error_exit "Failed to set the virtual environment."
+    source "$VIRTUAL_ENV/bin/activate" || error_exit "Failed to activate the virtual environment."
 fi
 
 cd "$REPO_ROOT" || error_exit "Failed to change to the repository root."

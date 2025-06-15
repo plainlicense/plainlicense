@@ -6,11 +6,14 @@
  * @copyright No rights reserved
  */
 
-import { BACKUP_PICTURE, MAX_WIDTHS } from '../../config/config';
-import { logger } from '../../utils/log';
-import { rawHeroVideos } from './data';
-import type { HeroName, HeroVideo, ImageIndex, VideoWidth } from './types';
-import { getMediaType, srcToAttributes } from './utils';
+import { BACKUP_PICTURE, MAX_WIDTHS } from '../../config/config'
+import { logger } from '../../utils/log'
+import { rawHeroVideos } from './data'
+import type { HeroName, HeroVideo, ImageIndex, VideoWidth } from './types'
+import { getMediaType, srcToAttributes } from './utils'
+
+// regex to remove trailing comma at the end of sizes string
+const TRAILING_COMMA_REGEX = /,$/;
 
 /**
  * @class VideoElement
@@ -68,7 +71,8 @@ export class VideoElement {
       const key = typeof prop === 'string' ? prop : `${prop}`;
       try {
         logger.debug(`Setting property ${key} to ${this.properties[key]} for video element`);
-        this.video.setAttribute(prop, this.properties[key]);
+        const value = this.properties[key] ?? '';
+        this.video.setAttribute(prop, value);
       } catch (e) {
         logger.error(`Error setting property ${key} on video element: ${e}`);
       }
@@ -115,7 +119,7 @@ export class VideoElement {
     for (const prop of Object.keys(this.properties)) {
       const key = typeof prop === 'string' ? prop : `${prop}`;
       try {
-        video.setAttribute(prop, this.properties[key]);
+        video.setAttribute(prop, this.properties[key] ?? '');
       } catch (e) {
         logger.error(`Error setting property ${key} on video element: ${e}`);
       }
@@ -126,7 +130,7 @@ export class VideoElement {
   // make the source elements for the video element
   private constructSources() {
     const { heroVideo } = this;
-    const srcs = [];
+    const srcs: HTMLSourceElement[] = [];
     for (const [codec, variant] of Object.entries(heroVideo.variants)) {
       if (codec === 'av1' || codec === 'vp9' || codec === 'h264') {
         for (const [width, url] of Object.entries(variant)) {
@@ -181,7 +185,7 @@ export class VideoElement {
         sizes += w !== 3840 ? `(max-width: ${MAX_WIDTHS[width]}px) ${width}px, ` : `${width}px`;
       }
     }
-    return sizes.trim().replace(/,$/, '');
+    return sizes.trim().replace(TRAILING_COMMA_REGEX, '');
   }
 
   // construct the picture element
@@ -189,7 +193,7 @@ export class VideoElement {
     picture: HTMLPictureElement = this.picture,
     poster: ImageIndex = this.poster,
   ) {
-    let srcs = [];
+    let srcs: HTMLSourceElement[] = [];
     for (const type of Object.keys(poster)) {
       // type guard
       if (type === 'webp' || type === 'avif') {

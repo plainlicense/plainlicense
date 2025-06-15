@@ -2,30 +2,35 @@
 locale = "en-us"
 check-file = true
 check-filename = true
-extend-ignore-re = [
-    "(?s)(#|//)\\s*spellchecker:off.*?\\n\\s*(#|//)\\s*spellchecker:on",
-]
+extend-ignore-re = ["(?s)(#|//)\\s*spellchecker:off.*?\\n\\s*(#|//)\\s*spellchecker:on"]
 extend-ignore-identifiers-re = [
-    "iif", "iife", "i18n", "i18next", "i18n-t", "i18n-tc", "strat", "Inferrable",
+  "iif",
+  "iife",
+  "i18n",
+  "i18next",
+  "i18n-t",
+  "i18n-tc",
+  "strat",
+  "Inferrable",
 ]
 
 [files]
 ignore-hidden = true
 ignore-files = true
 extend-exclude = [
-    "/usr/**/*",
-    "/tmp/**/*",
-    "/**/node_modules/**",
-    "node_modules",
-    "mkdocs-material",
-    "license-list-data",
-    "external",
-    "vendor",
-    ".git",
-    "/usr/share/code/**/*",
-    "eslint.config.mjs",
-    "docs/manifest.json",
-    "src/assets/videos/**/*",
-    "src/assets/fonts/**/*",
-    "src/assets/images/**/*",
+  "/usr/**/*",
+  "/tmp/**/*",
+  "/**/node_modules/**",
+  "node_modules",
+  "mkdocs-material",
+  "license-list-data",
+  "external",
+  "vendor",
+  ".git",
+  "/usr/share/code/**/*",
+  "eslint.config.mjs",
+  "docs/manifest.json",
+  "src/assets/videos/**/*",
+  "src/assets/fonts/**/*",
+  "src/assets/images/**/*",
 ]
