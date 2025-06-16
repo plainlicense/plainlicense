@@ -68,10 +68,10 @@ export function getDistanceToViewport(
   const rect = target.getBoundingClientRect();
   const { viewport } = HeroStore.getInstance().state$.getValue();
   const distanceMap = {
-    top: rect.top,
-    right: viewport.offset.x - rect.right,
     bottom: viewport.offset.y - rect.bottom,
     left: rect.left,
+    right: viewport.offset.x - rect.right,
+    top: rect.top,
   };
   return distanceMap[edge];
 }
@@ -162,19 +162,19 @@ export function getTargetsArray(targets: gsap.TweenTarget): Element[] {
 export const hide = (vars: gsap.TweenVars = {}) => {
   return {
     ...vars,
-    opacity: 0,
-    visibility: 'visible',
     contentVisibility:
       vars.contentVisibility && vars.contentVisibility === 'visible' ? 'visible' : undefined,
+    opacity: 0,
+    visibility: 'visible',
   };
 };
 export const show = (vars: gsap.TweenVars = {}) => {
   return {
     ...vars,
-    opacity: 1,
-    visibility: 'visible',
     contentVisibility:
       vars.contentVisibility && vars.contentVisibility === 'visible' ? 'visible' : undefined,
+    opacity: 1,
+    visibility: 'visible',
   };
 };
 

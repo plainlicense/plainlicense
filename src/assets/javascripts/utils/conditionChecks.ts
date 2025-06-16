@@ -208,14 +208,14 @@ export function generateNonVisibleElementReport(
     const computedStyle = getComputedStyle(el);
     const parentComputedStyle = getComputedStyle(el.parentElement as Element);
     const report: NotVisibleReport = {
+      contentVisibilityAuto: el.checkVisibility({ contentVisibilityAuto: true }),
+      contentVisibilityHidden: computedStyle.contentVisibility === 'hidden',
       element: el as HTMLElement,
       noBox: computedStyle.display === 'none' || computedStyle.display === 'contents',
+      opacityZero: computedStyle.opacity === '0',
       parentHidden:
         (parentComputedStyle.display === 'none' || parentComputedStyle.visibility === 'hidden') &&
         computedStyle.visibility === 'inherit',
-      contentVisibilityAuto: el.checkVisibility({ contentVisibilityAuto: true }),
-      contentVisibilityHidden: computedStyle.contentVisibility === 'hidden',
-      opacityZero: computedStyle.opacity === '0',
       visibilityHidden: computedStyle.visibility === 'hidden',
     };
     if (Object.entries(report).some(([_, value]) => value)) {

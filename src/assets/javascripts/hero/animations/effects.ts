@@ -76,8 +76,6 @@ function getDFactor(direction: Direction) {
  * Sets the specified section up for a transition.
  */
 gsap.registerEffect({
-  name: 'setSection',
-  extendTimeline: true,
   defaults: { extendTimeline: true },
   effect: (targets: gsap.TweenTarget, config: TransitionConfig) => {
     if (Object.entries(config).length === 1) {
@@ -90,7 +88,7 @@ gsap.registerEffect({
     return gsap
       .timeline({ extendTimeline: true, paused: false })
       .add(gsap.set(targets, { zIndex: 0, ...hide() }))
-      .add(gsap.to(section.bg, { yPercent: -15 * dFactor, zIndex: 0, opacity: 0 }))
+      .add(gsap.to(section.bg, { opacity: 0, yPercent: -15 * dFactor, zIndex: 0 }))
       .add(
         gsap.set([section.outerWrapper, section.innerWrapper], {
           zIndex: -1,
@@ -99,6 +97,8 @@ gsap.registerEffect({
       )
       .add(gsap.set(section.content, { ...show(), zIndex: 1 }));
   },
+  extendTimeline: true,
+  name: 'setSection',
 });
 
 /**
@@ -110,9 +110,9 @@ gsap.registerEffect({
 const fade = (
   targets: gsap.TweenTarget,
   config: FadeEffectConfig = {
-    out: false,
     direction: 1,
     fromConfig: {},
+    out: false,
     toConfig: {},
   },
 ) => {
@@ -171,11 +171,9 @@ const fade = (
  * Transitions the specified section.
  */
 gsap.registerEffect({
-  name: 'transitionSection',
-  extendTimeline: true,
   defaults: {
-    extendTimeline: true,
     duration: OBSERVER_CONFIG.slides.slideDuration,
+    extendTimeline: true,
   },
   effect: (targets: gsap.TweenTarget, config: TransitionConfig) => {
     // *note: `targets` is the section element
@@ -208,12 +206,12 @@ gsap.registerEffect({
         .add(
           gsap.to(header, {
             autoAlpha: 1,
-            zIndex: 300,
-            duration: 0.5,
-            yPercent: 0,
-            opacity: 0.8,
             background: 'transparent',
+            duration: 0.5,
+            opacity: 0.8,
             startAt: { background: 'transparent', yPercent: -100 },
+            yPercent: 0,
+            zIndex: 300,
           }),
         );
     } else {
@@ -229,7 +227,7 @@ gsap.registerEffect({
     }
     return gsap
       .timeline({ extendTimeline: true })
-      .set(targets, { zIndex: 1, autoAlpha: 1, z: 1 })
+      .set(targets, { autoAlpha: 1, z: 1, zIndex: 1 })
       .fromTo(
         [section.outerWrapper, section.innerWrapper],
         {
@@ -241,14 +239,14 @@ gsap.registerEffect({
         },
         0,
       )
-      .fromTo(section.bg, { yPercent: 15 * dFactor }, { yPercent: 0, zIndex: -300, opacity: 1 }, 0)
+      .fromTo(section.bg, { yPercent: 15 * dFactor }, { opacity: 1, yPercent: 0, zIndex: -300 }, 0)
       .add(
         [
           'fadeIn',
           fade(fadeInTargets, {
             ...OBSERVER_CONFIG.fades,
-            out: false,
             direction,
+            out: false,
           }),
         ],
         '>',
@@ -256,32 +254,34 @@ gsap.registerEffect({
       .add(gsap.to(section.content, { autoAlpha: 1, zIndex: 1 }), 'fadeIn+=0.3')
       .add(revealHeader, '>');
   },
+  extendTimeline: true,
+  name: 'transitionSection',
 });
 
 // Register the fade effect with GSAP for fadeIn and fadeOut.
 gsap.registerEffect({
-  name: 'fadeIn',
-  extendTimeline: true,
   effect: (targets: gsap.TweenTarget, config: FadeEffectConfig) => {
     const combinedConfig = { ...OBSERVER_CONFIG.fades, ...config };
     const { direction, fromConfig, toConfig } = combinedConfig;
     const checkedTargets = Array.isArray(targets) ? targets : [targets];
     logger.debug(`fading in targets: ${logObject(checkedTargets, 'fadeIn target')}`);
-    return fade(checkedTargets, { out: false, direction, fromConfig, toConfig });
+    return fade(checkedTargets, { direction, fromConfig, out: false, toConfig });
   },
+  extendTimeline: true,
+  name: 'fadeIn',
 });
 
 gsap.registerEffect({
-  name: 'fadeOut',
-  extendTimeline: true,
   defaults: { extendTimeline: true },
   effect: (targets: gsap.TweenTarget, config: FadeEffectConfig) => {
     const combinedConfig = { ...OBSERVER_CONFIG.fades, ...config };
     const checkedTargets = Array.isArray(targets) ? targets : [targets];
     logger.debug(`fadeOut: targets: ${logObject(checkedTargets, 'fadeOut target')}`);
     const { direction, fromConfig, toConfig } = combinedConfig;
-    return fade(checkedTargets, { out: true, direction, fromConfig, toConfig });
+    return fade(checkedTargets, { direction, fromConfig, out: true, toConfig });
   },
+  extendTimeline: true,
+  name: 'fadeOut',
 });
 
 /**
@@ -294,8 +294,8 @@ const blink = (targets: gsap.TweenTarget, config: gsap.TweenVars = {}) => {
   logger.debug(`blink: targets: ${logObject(targets, 'blink target')}`);
   return gsap.to(targets, {
     autoAlpha: 0,
-    ease: 'power4.in',
     duration: 0.5,
+    ease: 'power4.in',
     startAt: { filter: 'brightness(1.3)' },
     ...config,
   });
@@ -312,15 +312,15 @@ const jump = (targets: gsap.TweenTarget, config: gsap.TweenVars = {}) => {
   // biome-ignore lint/complexity/useLiteralKeys: We want to clarify that these are not part of the standard API
   config.y ? config['delete']('y') : null;
   return gsap.to(targets, {
+    duration: 0.5,
+    ease: 'elastic',
+    repeatDelay: 2,
     y: (_index: number, target: Element, _targets: Element[]) => {
       const distance = Math.abs(getDistanceToViewport(target));
       // Note the negative sign to invert the direction of the jump.
       return -(gsap.utils.clamp(distance > 10 ? 10 : distance, distance, 25) as number);
     },
     yoyoEase: 'bounce',
-    ease: 'elastic',
-    repeatDelay: 2,
-    duration: 0.5,
     ...config,
   });
 };
@@ -334,9 +334,9 @@ const jump = (targets: gsap.TweenTarget, config: gsap.TweenVars = {}) => {
 const scaleUp = (targets: gsap.TweenTarget, config: gsap.TweenVars = {}) => {
   logger.debug(`scaleUp: targets: ${logObject(targets, 'scaleUp target')}`);
   return gsap.to(targets, {
-    scale: 1.5,
-    ease: 'elastic',
     duration: 0.5,
+    ease: 'elastic',
+    scale: 1.5,
     ...config,
   });
 };
@@ -348,9 +348,7 @@ const scaleUp = (targets: gsap.TweenTarget, config: gsap.TweenVars = {}) => {
  * @returns The emphasis effect.
  */
 gsap.registerEffect({
-  name: 'emphasize',
-  extendTimeline: true,
-  defaults: { repeat: -1, yoyo: true, extendTimeline: true },
+  defaults: { extendTimeline: true, repeat: -1, yoyo: true },
   effect: (targets: gsap.TweenTarget, config: EmphasisConfig) => {
     if (!targets || (Array.isArray(targets) && !targets.length)) {
       return gsap.timeline();
@@ -373,6 +371,8 @@ gsap.registerEffect({
     );
     return emphasisTimeline;
   },
+  extendTimeline: true,
+  name: 'emphasize',
 });
 
 /**
@@ -407,11 +407,11 @@ function animateLogo(scope: VideoManager, config: AnimateMessageConfig) {
         logoTl.to(
           scope.logo,
           show({
-            yoyo: true,
-            repeat: 1,
-            ease: 'power1.inOut',
             duration: duration / 1.5,
+            ease: 'power1.inOut',
+            repeat: 1,
             scale: 1,
+            yoyo: true,
             z: 10,
           }),
         );
@@ -428,12 +428,12 @@ function animateLogo(scope: VideoManager, config: AnimateMessageConfig) {
         logoTl.to(
           scope.logo,
           show({
-            scale: 1,
             duration: duration / 1.5,
-            yoyo: true,
-            repeat: 1,
             ease: 'power3.inOut',
+            repeat: 1,
+            scale: 1,
             xPercent: 0,
+            yoyo: true,
             yPercent: 0,
             z: 50,
           }),
@@ -526,7 +526,7 @@ function animateLettersInWords(
   for (const div of fragDivs) {
     if (div instanceof HTMLDivElement) {
       logger.debug('Animating letters in word');
-      gsap.set(div, { visibility: 'visible', display: 'flex' });
+      gsap.set(div, { display: 'flex', visibility: 'visible' });
       const letters = gsap.utils.toArray('.hero__letter', div);
       gsap.fromTo(
         letters,
@@ -535,14 +535,14 @@ function animateLettersInWords(
           ...fromVars,
         }),
         show({
-          yPercent: 0,
-          stagger: { each: 0.03, from: 'random' },
           duration: totalDuration,
           ease: 'power4.out',
-          repeatDelay: totalDuration / 2.5,
-          zIndex: 50,
-          yoyo: true,
           repeat: 1,
+          repeatDelay: totalDuration / 2.5,
+          stagger: { each: 0.03, from: 'random' },
+          yoyo: true,
+          yPercent: 0,
+          zIndex: 50,
           ...toVars,
         }),
       );
@@ -574,9 +574,9 @@ function validateAnimateTextInputs(
         ? 'No target provided for animateMessage.'
         : 'No message provided for animateMessage.',
     );
-    return { message: undefined, containerTarget: null };
+    return { containerTarget: null, message: undefined };
   }
-  return { message, containerTarget };
+  return { containerTarget, message };
 }
 
 /**
@@ -594,11 +594,11 @@ function prepareMessageFragment(message: string, containerTarget: Element) {
     logger.error(
       `Needed element(s) not found for message animation. \n  msgFrag: ${logObject(msgFrag)}, \n  innerContainer: ${logObject(innerContainer)}, \n  containerTarget: ${logObject(containerTarget)}`,
     );
-    return { msgFrag: null, innerContainer: null, fragDivs: [] as Element[] };
+    return { fragDivs: [] as Element[], innerContainer: null, msgFrag: null };
   }
   const fragDivs = gsap.utils.toArray('.hero__letter--word-container', msgFrag) as Element[];
   containerTarget.append(msgFrag);
-  return { msgFrag, innerContainer, fragDivs };
+  return { fragDivs, innerContainer, msgFrag };
 }
 
 /**
@@ -664,9 +664,9 @@ function animateText(scope: VideoManager, targets: gsap.TweenTarget, config: Ani
   }
   const totalDuration = config.duration || scope.textDuration || 10;
   const messageTimeline = gsap.timeline({
+    duration: totalDuration,
     paused: true,
     repeat: 0,
-    duration: totalDuration,
     ...(config.sharedVars as gsap.TimelineVars),
   });
   logger.debug(`Fragdiv count: ${fragDivs.length}`);
@@ -709,14 +709,14 @@ function animateText(scope: VideoManager, targets: gsap.TweenTarget, config: Ani
               animateLettersInWords(fragDivs, fromVars, toVars, totalDuration);
             },
             ...show({
-              stagger: { each: 0.1, from: 'start' },
-              zIndex: 15,
-              yPercent: 0,
               duration: totalDuration,
-              yoyo: true,
-              repeatDelay: totalDuration / 2.5,
-              repeat: 1,
               ease: 'power4.out',
+              repeat: 1,
+              repeatDelay: totalDuration / 2.5,
+              stagger: { each: 0.1, from: 'start' },
+              yoyo: true,
+              yPercent: 0,
+              zIndex: 15,
               ...toVars,
             }),
           },
@@ -739,9 +739,6 @@ function animateText(scope: VideoManager, targets: gsap.TweenTarget, config: Ani
  * @param config - The animate message configuration.
  */
 gsap.registerEffect({
-  name: 'animateMessage',
-  extendTimeline: true,
-  paused: true,
   effect: (targets: gsap.TweenTarget, config: AnimateMessageConfig) => {
     const scope =
       config.sharedVars?.callbackScope ||
@@ -755,4 +752,7 @@ gsap.registerEffect({
     }
     return animateText(scope, targets, config);
   },
+  extendTimeline: true,
+  name: 'animateMessage',
+  paused: true,
 });

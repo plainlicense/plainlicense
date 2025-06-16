@@ -15,15 +15,9 @@ export const EXCLUDED_TAGS = ['STYLE', 'SCRIPT', 'NOSCRIPT'] as const;
 export const BACKUP_PICTURE = 'break_free' as const;
 
 const FADE_IN_CONFIG: FadeInConfig = {
-  prefersReducedMotion: {
-    from: {
-      duration: 0.75,
-      y: 0,
-    },
-    to: {
-      duration: 0.75,
-      y: 0,
-    },
+  defaults: {
+    ease: 'power1.inOut',
+    paused: false,
   },
   normal: {
     from: {
@@ -34,9 +28,15 @@ const FADE_IN_CONFIG: FadeInConfig = {
       yPercent: 0,
     },
   },
-  defaults: {
-    ease: 'power1.inOut',
-    paused: false,
+  prefersReducedMotion: {
+    from: {
+      duration: 0.75,
+      y: 0,
+    },
+    to: {
+      duration: 0.75,
+      y: 0,
+    },
   },
 } as const;
 
@@ -45,24 +45,24 @@ const FADE_IN_CONFIG: FadeInConfig = {
  * @description Configuration for the observer
  */
 export const OBSERVER_CONFIG: ObserverConfig = {
-  header: '#hero-header, nav.md-tabs',
-  footer: '#hero-footer',
-  fades: {
-    fadeInSections: gsap.utils.toArray('section'),
-    fadeInDuration: 0.5,
-    fadeInConfig: FADE_IN_CONFIG,
+  clickTargets: '.cta__container--target-selector',
+  emphasisTargets: {
+    strong: '#arrow-down',
+    subtle: '#hero-button',
   },
+  fades: {
+    fadeInConfig: FADE_IN_CONFIG,
+    fadeInDuration: 0.5,
+    fadeInSections: gsap.utils.toArray('section'),
+  },
+  footer: '#hero-footer',
+  header: '#hero-header, nav.md-tabs',
+  ignoreTargets: 'a, button, header, navigation, nav.md-tabs',
   slides: {
-    sections: gsap.utils.toArray('section'),
-    slideDuration: 1.25,
     clickPause: 5,
     scrollPause: 10,
-  },
-  clickTargets: '.cta__container--target-selector',
-  ignoreTargets: 'a, button, header, navigation, nav.md-tabs',
-  emphasisTargets: {
-    subtle: '#hero-button',
-    strong: '#arrow-down',
+    sections: gsap.utils.toArray('section'),
+    slideDuration: 1.25,
   },
 } as const;
 
@@ -90,38 +90,38 @@ export const MAX_WIDTHS = {
 
 export const SUBTLE_EMPHASIS_CONFIG: EmphasisConfig = {
   blinkConfig: {
-    startAt: { filter: 'brightness(1.1)' },
     autoAlpha: 0.4,
     duration: 1,
     ease: 'power1.inOut',
-    repeat: -1,
-    yoyo: true,
-    repeatDelay: 0.5,
     filter: 'brightness(1.1)',
+    repeat: -1,
+    repeatDelay: 0.5,
+    startAt: { filter: 'brightness(1.1)' },
+    yoyo: true,
   },
   jumpConfig: {
-    y: -2,
     duration: 0.5,
     ease: 'elastic',
-    repeatDelay: 4,
     repeat: -1,
+    repeatDelay: 4,
+    y: -2,
     yoyoEase: 'elastic',
   },
   scaleUpConfig: {
-    scale: 1.1,
     duration: 1,
-    repeatDelay: 4,
-    repeat: -1,
     ease: 'power1.inOut',
+    repeat: -1,
+    repeatDelay: 4,
+    scale: 1.1,
   },
 } as const;
 
 export const STRONG_EMPHASIS_CONFIG: EmphasisConfig = {
   blinkConfig: {
-    yoyoEase: 'power1.in',
+    autoAlpha: 0.4,
     repeat: -1,
     repeatDelay: 0.5,
-    autoAlpha: 0.4,
+    yoyoEase: 'power1.in',
   },
   jumpConfig: {},
   scaleUpConfig: { duration: 1, scale: 1.1 },

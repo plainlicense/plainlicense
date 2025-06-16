@@ -1,11 +1,11 @@
 /** biome-ignore-all lint/style/noNamespaceImport: this is a build script; not watching our bundle */
 /** biome-ignore-all lint/correctness/noNodejsModules: <it's a build script..> */
 
-import { globby, type Options } from 'globby'
-import * as crypto from 'node:crypto'
-import * as fs from 'node:fs/promises'
-import path, { type ParsedPath } from 'node:path'
-import { optimize } from 'svgo'
+import * as crypto from 'node:crypto';
+import * as fs from 'node:fs/promises';
+import path, { type ParsedPath } from 'node:path';
+import { globby, type Options } from 'globby';
+import { optimize } from 'svgo';
 import {
   basePath,
   cssLocs,
@@ -17,7 +17,7 @@ import {
   resPattern,
   videoCodecs,
   videoExtensions,
-} from '../config'
+} from '../config';
 import type {
   HeroFile,
   HeroFiles,
@@ -27,7 +27,7 @@ import type {
   MediaFileExtension,
   PlaceholderMap,
   VideoWidth,
-} from '../types'
+} from '../types';
 
 // Regex patterns defined at top level for performance
 const LEADING_UNDERSCORE_REGEX = /^_/;
@@ -161,16 +161,16 @@ export function deconstructPath(pathStr: string): HeroFile {
   return {
     baseName,
     extension: ext.slice(1) as MediaFileExtension,
-    width,
     srcPath: pathStr,
     type,
+    width,
     ...(codec && { codec }), // omits codec if type is "image"
+    get filename() {
+      return this.parsed.base;
+    },
     parentPath,
     get parsed(): path.ParsedPath {
       return path.parse(this.srcPath); // changed from this.destPath to this.srcPath
-    },
-    get filename() {
-      return this.parsed.base;
     },
   };
 }
@@ -194,7 +194,6 @@ export async function resolveGlob(glob: string, fastGlobOptions?: Options): Prom
   }
 }
 
-
 /**
  * Retrieves and categorizes hero image and video files.
  * Orchestrates retrieving all hero files, deconstructing their paths, and categorizing them into image and video files.
@@ -202,9 +201,9 @@ export async function resolveGlob(glob: string, fastGlobOptions?: Options): Prom
  */
 export async function getHeroFiles(): Promise<HeroFiles> {
   const files = await resolveGlob(`${basePath}/**`, {
+    expandDirectories: { extensions: [...imageTypes, ...videoExtensions] },
     onlyFiles: true,
     unique: true,
-    expandDirectories: { extensions: [...imageTypes, ...videoExtensions] },
   });
   const heroFiles = await Promise.all(files.map((file) => deconstructPath(file)));
   const images: HeroFile[] = [];
@@ -306,7 +305,7 @@ export async function copyFile(src: string, dest: string): Promise<void> {
 export const generatePictureElement = (image: ImageIndex, className = 'hero__poster'): string => {
   console.log('Generating picture element');
   const { avif, webp, png } = image;
-  const sortedImages = { avif, webp, png };
+  const sortedImages = { avif, png, webp };
   const sources = Object.entries(sortedImages)
     .filter(([ext, _]) => ext !== 'png')
     .map(([ext, { srcset }]) => `<source type="image/${ext}" srcset="${srcset}">`)
@@ -346,9 +345,9 @@ async function resolveCssFiles(): Promise<Partial<PlaceholderMap>> {
       const entries = await Promise.all(
         Object.entries(value).map(async ([placehold, v]) => {
           const file = await resolveGlob(v, {
+            expandDirectories: false,
             onlyFiles: true,
             unique: true,
-            expandDirectories: false,
           });
           const newloc = await getFileHash(file[0]);
           return {
@@ -444,8 +443,8 @@ function getHeroPaths(images: HeroFile[]): Record<ImageType, HeroPaths> {
   // Initialize objects for each image type
   const pathObjs: Record<ImageType, typeof resKeys> = {
     avif: resKeys,
-    webp: resKeys,
     png: resKeys,
+    webp: resKeys,
   };
 
   // Process each image type separately
@@ -482,19 +481,19 @@ export async function constructImageIndex(images: HeroFile[]): Promise<ImageInde
   const parent = images[0].parentPath;
   return {
     avif: {
-      widths: avif,
+      parent,
       srcset: await generateSrcset(avif),
-      parent,
-    },
-    webp: {
-      widths: webp,
-      srcset: await generateSrcset(webp),
-      parent,
+      widths: avif,
     },
     png: {
-      widths: png,
-      srcset: await generateSrcset(png),
       parent,
+      srcset: await generateSrcset(png),
+      widths: png,
+    },
+    webp: {
+      parent,
+      srcset: await generateSrcset(webp),
+      widths: webp,
     },
   } as ImageIndex;
 }

@@ -161,9 +161,9 @@ export class VideoManager {
 
   private vidDefaults: gsap.TimelineVars = {
     callbackScope: this,
-    repeat: 0,
     duration: 1,
     paused: true,
+    repeat: 0,
   };
 
   private subscriptions: Subscription = new Subscription();
@@ -176,13 +176,13 @@ export class VideoManager {
   public textDuration = 10;
 
   private textDefaults: AnimateMessageConfig = {
+    duration: this.textDuration,
+    fromVars: {},
     sharedVars: {
       callbackScope: this,
       paused: true,
     },
-    duration: this.textDuration,
     toVars: {},
-    fromVars: {},
   };
 
   /**
@@ -336,6 +336,15 @@ export class VideoManager {
     ];
 
     const videoObserver = {
+      complete: () => {
+        logger.info('Video observer completed');
+        this.subscriptions.unsubscribe();
+        this.subscriptions.add(video$.subscribe(videoObserver));
+      },
+      error: (err: unknown) => {
+        logger.error('Video observer encountered an error:', err);
+        this.reinit();
+      },
       next: (videoState: VideoState) => {
         logger.info('Received new video signal for canPlay: ', videoState.canPlay);
         logger.info('Manager Can play: ', this.canPlay);
@@ -350,15 +359,6 @@ export class VideoManager {
         });
         !this.initialized && this.initVideo();
         this.handleCanPlay();
-      },
-      error: (err: unknown) => {
-        logger.error('Video observer encountered an error:', err);
-        this.reinit();
-      },
-      complete: () => {
-        logger.info('Video observer completed');
-        this.subscriptions.unsubscribe();
-        this.subscriptions.add(video$.subscribe(videoObserver));
       },
     };
 
@@ -526,13 +526,13 @@ export class VideoManager {
         'textTimeline',
         {
           ...this.textDefaults.sharedVars,
-          onStart: () => {
-            logger.debug('Text animation timeline started');
-            this.hasPlayed = true;
-          },
           onComplete: () => {
             logger.debug('Text animation timeline completed');
             // Prepare the video for the next cycle
+          },
+          onStart: () => {
+            logger.debug('Text animation timeline started');
+            this.hasPlayed = true;
           },
         },
       ])
@@ -555,15 +555,15 @@ export class VideoManager {
     const tl = gsap.timeline([
       'emphasisTimeline',
       {
-        repeat: -1,
-        paused: false,
-        delay: 2,
-        repeatDelay: 2,
-        defaults: { repeat: -1, paused: false },
         callbackScope: this,
+        defaults: { paused: false, repeat: -1 },
+        delay: 2,
         onStart: () => {
           this.emphasisSet = true;
         },
+        paused: false,
+        repeat: -1,
+        repeatDelay: 2,
       },
     ]);
     if (subtleTargets.length) {
@@ -617,21 +617,8 @@ export class VideoManager {
       'videoTimeline',
       {
         ...config,
+        callbackScope: this,
         duration: 1,
-        onStart: () => {
-          existingOnStart?.();
-          updateDuration();
-
-          this.transitionToVideo();
-          gsap.set([this.element, this.container, this.ctaContainer], {
-            ...show(),
-            duration: 0.3,
-          });
-          toggleHeadings(true);
-          if (!this.isPlaying()) {
-            this.foulPlay();
-          }
-        },
         onComplete: () => {
           existingOnComplete?.();
           logger.info('Video timeline completed - preparing for text animation');
@@ -649,8 +636,20 @@ export class VideoManager {
             textTimeline.restart();
           }
         },
-        callbackScope: this,
-        paused: true,
+        onStart: () => {
+          existingOnStart?.();
+          updateDuration();
+
+          this.transitionToVideo();
+          gsap.set([this.element, this.container, this.ctaContainer], {
+            ...show(),
+            duration: 0.3,
+          });
+          toggleHeadings(true);
+          if (!this.isPlaying()) {
+            this.foulPlay();
+          }
+        },
         onUpdate: () => {
           if (
             tl.paused() ||
@@ -660,6 +659,7 @@ export class VideoManager {
           }
           existingOnUpdate?.();
         },
+        paused: true,
       },
     ]);
     const updateDuration = () => {
@@ -934,7 +934,7 @@ export class VideoManager {
       return;
     }
     this.loadBackup();
-    const newTl = gsap.timeline({ paused: false, defaults: { repeat: 0 } });
+    const newTl = gsap.timeline({ defaults: { repeat: 0 }, paused: false });
     newTl
       .add(['fallback', gsap.set(this.element, { ...hide(), duration: 0.5 })], 0)
       .call(() => {
@@ -965,26 +965,26 @@ export class VideoManager {
     const videoTl = this.timelineManager.video();
     const textTl = this.timelineManager.text();
     logger.debug('Debugging VideoManager State', {
+      canPlay: this.canPlay,
       currentTime: this.element.currentTime,
+      hasPlayed: this.hasPlayed,
       isPlaying: this.isPlaying(),
       okToPlay: this.okToPlay(),
-      canPlay: this.canPlay,
-      hasPlayed: this.hasPlayed,
       onFallback: this.onFallback,
       otherTimelineActive: this.otherTimelineActive(),
     });
     logger.debug('Debugging VideoManager timelines:', {
-      timelineManager: this.timelineManager,
-      textTimeline: textTl || null,
-      videoTimeline: videoTl || null,
-      managerDuration: this.timelineManager.timelinesDuration,
       currentTimescale: this.timelineManager.currentTimeline?.timeScale(),
-      vidDuration: videoTl?.duration(),
-      vidTimeScale: videoTl?.timeScale(),
+      managerDuration: this.timelineManager.timelinesDuration,
       textDuration: textTl?.duration(),
+      textTimeline: textTl || null,
       textTimeScale: textTl?.timeScale(),
+      timelineManager: this.timelineManager,
+      vidDuration: videoTl?.duration(),
       videoElCurrentTime: this.element.currentTime,
       videoElDuration: this.element.duration,
+      videoTimeline: videoTl || null,
+      vidTimeScale: videoTl?.timeScale(),
     });
   }
 

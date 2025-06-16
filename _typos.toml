@@ -15,7 +15,7 @@ extend-ignore-identifiers-re = [
 ]
 
 [files]
-ignore-hidden = true
+ignore-hidden = false
 ignore-files = true
 extend-exclude = [
   "/usr/**/*",

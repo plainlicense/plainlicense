@@ -27,13 +27,13 @@
 /** biome-ignore-all lint/correctness/noNodejsModules: ...build script */
 /** biome-ignore-all lint/style/noNamespaceImport: ..build script */
 
-import * as esbuild from 'esbuild';
-import * as fs from 'node:fs/promises';
-import * as path from 'node:path';
-import { from, type Observable } from 'rxjs';
-import { backupImage, basePosterObj, baseProject, PROJECTS, webConfig } from './config/';
-import type { BuildJson, EsBuildOutputs, FileHashes, ImageIndex, Manifest, Project } from './types';
-import * as utils from './utils';
+import * as esbuild from 'esbuild'
+import * as fs from 'node:fs/promises'
+import * as path from 'node:path'
+import { from, type Observable } from 'rxjs'
+import { backupImage, basePosterObj, baseProject, cssSrc, PROJECTS, webConfig } from './config/'
+import type { BuildJson, EsBuildOutputs, FileHashes, ImageIndex, Manifest, Project } from './types'
+import * as utils from './utils'
 
 // TODO: Refactor to use esbuild's transform API and reduce the number of file reads and writes
 
@@ -86,9 +86,12 @@ async function build(project: Project): Promise<Observable<unknown>> {
  * @description Clears the directories in the docs folder
  */
 async function clearDirs() {
+  const deletionPromises: Promise<void>[] = [];
   try {
+    if (await utils.fileExists(cssSrc)) {
+      deletionPromises.push(fs.rm(cssSrc, { force: true }));
+    }
     // Load the cache directly from the cache module
-    // biome-ignore lint/nursery/noCommonJs: need a relative import here
     const cache = require('./utils/cache').loadCache();
 
     // If manifest doesn't exist yet, just return
@@ -98,7 +101,7 @@ async function clearDirs() {
 
     const manifest = await fs.readFile('docs/manifest.json', 'utf-8');
     const parsedManifest: Manifest = JSON.parse(manifest);
-    const deletionPromises: Promise<void>[] = [];
+
 
     // Prepare srcFiles and their existence checks in parallel
     const manifestEntries = Object.entries(parsedManifest);
@@ -165,9 +168,9 @@ const metaOutput = (result: esbuild.BuildResult): EsBuildOutputs => {
       key,
       {
         bytes: output.bytes,
-        inputs: Object.keys(output.inputs),
-        exports: output.exports,
         entryPoint: output.entryPoint,
+        exports: output.exports,
+        inputs: Object.keys(output.inputs),
       },
     ]),
   );
@@ -206,11 +209,11 @@ const metaOutputMap = async (output: EsBuildOutputs): Promise<BuildJson> => {
   const noScriptImageContent = await buildNoScriptImage(noScriptImage);
 
   const mapping = {
-    noScriptImage: noScriptImageContent,
-    SCRIPTBUNDLE: jsSrcKey?.replace('docs/', '') || '',
     CSSBUNDLE: cssSrcKey?.replace('docs/', '') || '',
     LOGONAMED: (logoKey as string)?.replace('docs/', '') || '',
     LOGOSIMPLE: (simpleLogoKey as string)?.replace('docs/', '') || '',
+    noScriptImage: noScriptImageContent,
+    SCRIPTBUNDLE: jsSrcKey?.replace('docs/', '') || '',
   };
   const outputMetaPath = path.join('overrides', 'buildmeta.json');
   await fs.writeFile(outputMetaPath, JSON.stringify(mapping, null, 2));
@@ -252,15 +255,15 @@ async function buildAll(): Promise<
     const observable = await build(project);
     return new Promise<void>((resolve, reject) => {
       observable.subscribe({
-        next: () => console.log(`Build for ${project.platform} completed successfully`),
-        error: (error) => {
-          console.error(`Error building ${project.platform}:`, error);
-          reject(error instanceof Error ? error : new Error(String(error)));
-        },
         complete: () => {
           console.log(`Build for ${project.platform} completed`);
           resolve();
         },
+        error: (error) => {
+          console.error(`Error building ${project.platform}:`, error);
+          reject(error instanceof Error ? error : new Error(String(error)));
+        },
+        next: () => console.log(`Build for ${project.platform} completed successfully`),
       });
     });
   };

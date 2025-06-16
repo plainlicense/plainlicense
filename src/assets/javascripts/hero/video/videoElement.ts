@@ -6,11 +6,11 @@
  * @copyright No rights reserved
  */
 
-import { BACKUP_PICTURE, MAX_WIDTHS } from '../../config/config'
-import { logger } from '../../utils/log'
-import { rawHeroVideos } from './data'
-import type { HeroName, HeroVideo, ImageIndex, VideoWidth } from './types'
-import { getMediaType, srcToAttributes } from './utils'
+import { BACKUP_PICTURE, MAX_WIDTHS } from '../../config/config';
+import { logger } from '../../utils/log';
+import { rawHeroVideos } from './data';
+import type { HeroName, HeroVideo, ImageIndex, VideoWidth } from './types';
+import { getMediaType, srcToAttributes } from './utils';
 
 // regex to remove trailing comma at the end of sizes string
 const TRAILING_COMMA_REGEX = /,$/;
@@ -103,11 +103,11 @@ export class VideoElement {
   // assign properties to the video element
   private getProperties(properties: { [key: string]: string }) {
     return {
+      autoplay: '',
       disablePictureInPicture: String(true),
+      muted: String(true),
       playsinline: String(true),
       preload: 'metadata',
-      muted: String(true),
-      autoplay: '',
       volume: '0.0',
       ...properties,
     };

@@ -110,19 +110,19 @@ export class HeroStore {
   public state$ = new BehaviorSubject<HeroState>({
     atHome: isHome(initialUrl),
     canPlay: false,
+    currentSection: SectionIndex.NotInitialized,
+    header: { height: 0, hidden: true },
+    isTransitioning: true,
     landingVisible: isHome(initialUrl) && (initialUrl.hash === '' || initialUrl.hash === '#'),
+    location: initialUrl,
     pageVisible: !document.hidden || document.visibilityState === 'visible',
+    parallaxHeight: Number.parseFloat((getViewportOffset().y * 1.4).toFixed(2)),
     prefersReducedMotion: customWindow.matchMedia('(prefers-reduced-motion: reduce)').matches,
+    tearDown: false,
     viewport: {
       offset: getViewportOffset(),
       size: getViewportSize(),
     },
-    header: { height: 0, hidden: true },
-    parallaxHeight: Number.parseFloat((getViewportOffset().y * 1.4).toFixed(2)),
-    location: initialUrl,
-    isTransitioning: true,
-    tearDown: false,
-    currentSection: SectionIndex.NotInitialized,
   });
 
   public videoState$ = new BehaviorSubject<VideoState>({ canPlay: false });
@@ -212,13 +212,13 @@ export class HeroStore {
     component?: AnimationComponent,
   ): Observer<T> {
     return {
+      complete: () => logger.info(`${name} completed`),
+      error: (error: Error) => logger.error(`Error in ${name}:`, error),
       next: (value: T) => {
         logger.debug(`Observer ${name} received:`);
         logger.table(value);
         this.updateState(updateFn(value), component);
       },
-      error: (error: Error) => logger.error(`Error in ${name}:`, error),
-      complete: () => logger.info(`${name} completed`),
     };
   }
 
@@ -282,7 +282,7 @@ export class HeroStore {
 
     const header$ = watchHeader(getComponentElement('header'), { viewport$ });
 
-    const tab$ = watchTabs(getComponentElement('tabs'), { viewport$, header$ });
+    const tab$ = watchTabs(getComponentElement('tabs'), { header$, viewport$ });
 
     const headerWatch$ = combineLatest([header$, tab$]).pipe(
       tap(([header, tabs]) => {
@@ -307,9 +307,9 @@ export class HeroStore {
     ]).pipe(
       map(([viewport, header, portrait]) => {
         return {
-          viewHeight: viewport.offset.y,
           headerHeight: header.height,
           portrait,
+          viewHeight: viewport.offset.y,
         };
       }),
       map(({ viewHeight, headerHeight, portrait }) => {
@@ -409,6 +409,8 @@ export class HeroStore {
    */
   private getComponentObserver<T>(name: string, func?: ComponentStateUpdateFunction): Observer<T> {
     return {
+      complete: () => logger.info(`${name} completed`),
+      error: (error: Error) => logger.error(`Error in ${name}:`, error),
       next: (value: T) => {
         logger.debug(`Observer ${name} received:`);
         logger.table(value);
@@ -416,8 +418,6 @@ export class HeroStore {
           func(value as StateValue);
         }
       },
-      error: (error: Error) => logger.error(`Error in ${name}:`, error),
-      complete: () => logger.info(`${name} completed`),
     };
   }
 

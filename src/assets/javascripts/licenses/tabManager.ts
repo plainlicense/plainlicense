@@ -45,9 +45,9 @@ export class TabManager {
   private readonly childTabs: ChildTabs[];
 
   private readonly selectors = {
+    iconPrefix: '#icon-',
     // biome-ignore lint/nursery/noSecrets: definitely not a secret
     inputs: '.tabbed-set input[type="radio"]',
-    iconPrefix: '#icon-',
   };
 
   private readonly disclaimerTabSelectors = {
@@ -78,16 +78,16 @@ export class TabManager {
         const { id } = input;
         const label = document.querySelector(`label[for="${id}"]`) as HTMLLabelElement;
         const elements = {
-          input: input as HTMLInputElement,
-          label,
-          labelAnchor: label.querySelector('a') as HTMLAnchorElement,
+          contentElement: document.querySelector(`#${id}`) as HTMLDivElement,
           iconAnchor: document.querySelector(
             `${this.selectors.iconPrefix}${id}`,
           ) as HTMLAnchorElement,
           iconSVG: document
             .querySelector(`${this.selectors.iconPrefix}${id}`)
             ?.querySelector('svg') as SVGElement,
-          contentElement: document.querySelector(`#${id}`) as HTMLDivElement,
+          input: input as HTMLInputElement,
+          label,
+          labelAnchor: label.querySelector('a') as HTMLAnchorElement,
           tablistElement: document.querySelector('.tabbed-set') as HTMLDivElement,
         };
 
@@ -112,8 +112,8 @@ export class TabManager {
         }
         const label = labels.find((label) => label.id.includes(idPrefix)) as HTMLAnchorElement;
         const elements = {
-          labelAnchor: label,
           input: input as HTMLInputElement,
+          labelAnchor: label,
         };
 
         return Object.values(elements).every((el) => el) ? elements : null;
@@ -187,10 +187,10 @@ export class TabManager {
     const createEventStream = (elements: TabElement[], eventName: string) => {
       const streams = elements.flatMap(({ label, iconAnchor }) => [
         fromEvent(label, eventName).pipe(
-          map(() => ({ id: label.getAttribute('for') || '', event: eventName })),
+          map(() => ({ event: eventName, id: label.getAttribute('for') || '' })),
         ),
         fromEvent(iconAnchor, eventName).pipe(
-          map(() => ({ id: iconAnchor.id.replace('icon-', ''), event: eventName })),
+          map(() => ({ event: eventName, id: iconAnchor.id.replace('icon-', '') })),
         ),
       ]);
       return merge(...streams).pipe(share());
@@ -198,11 +198,11 @@ export class TabManager {
 
     // Map events to states
     const eventStateMap: Record<string, TabStateType> = {
-      mouseenter: 'hover',
-      mouseleave: 'normal',
+      blur: 'normal',
       focus: 'focus',
       'focus-visible': 'focus-visible',
-      blur: 'normal',
+      mouseenter: 'hover',
+      mouseleave: 'normal',
     };
 
     // Setup event streams
@@ -221,7 +221,7 @@ export class TabManager {
             input.dispatchEvent(new Event('change'));
           }
         }),
-        map(() => ({ id: input.id, event: 'click' })),
+        map(() => ({ event: 'click', id: input.id })),
       ),
     );
 
@@ -235,7 +235,7 @@ export class TabManager {
             input.dispatchEvent(new Event('change'));
           }
         }),
-        map(() => ({ id: input.id, event: 'click' })),
+        map(() => ({ event: 'click', id: input.id })),
       ),
     );
 

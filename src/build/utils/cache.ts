@@ -3,7 +3,7 @@ import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 
-const cacheFilePath = path.join(__dirname, '../../..', '.cache', 'file-hashes.json');
+const cacheFilePath = path.join(__dirname, '../../../', '.cache', 'file-hashes.json');
 
 /**
  * Computes the MD5 hash of a file.
@@ -49,6 +49,13 @@ export function saveCache(cache: Record<string, string>): void {
   fs.writeFileSync(cacheFilePath, JSON.stringify(cache, null, 2));
 }
 
+/**
+ * Copies a file from source to destination if the file has changed since the last copy.
+ * It checks the MD5 hash of the source file against the cached hash.
+ * If the hashes differ or if the destination file does not exist, it copies the file and updates the cache.
+ * @param source - The path to the source file.
+ * @param destination - The path to the destination file.
+ */
 export function copyIfChanged(source: string, destination: string): void {
   const cache = loadCache();
   const sourceHash = getFileHash(source);

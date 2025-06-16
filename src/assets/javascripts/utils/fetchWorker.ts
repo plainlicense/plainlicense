@@ -5,17 +5,17 @@
  * @overview
  * Registers the cache worker.
  */
-import { logger } from '~/utils/log';
+import { logger } from '~/utils/log'
 
 async function locateMissingWorker() {
-  const origin = window.location.origin || import.meta.url.replace('docs', '');
+  const {origin} = window.location;
   const metaFile = new URL('manifest.json', origin);
   const response = await fetch(metaFile);
   if (response.ok) {
     const meta = await response.json();
     const cacheWorker = meta.find(
       ([key, _value]: [string, { file: string; integrity: string }]) =>
-        key.includes('cacheWorker') && !key.includes('.map'),
+        key.match(/^docs\/cacheWorker.js$/)
     );
     if (cacheWorker) {
       logger.debug('Cache worker found in meta data');
@@ -27,7 +27,7 @@ async function locateMissingWorker() {
   logger.error('Failed to fetch build meta data to locate worker');
 }
 
-const cacheWorkerUrl = 'cacheWorker.ts';
+const cacheWorkerUrl = 'cacheWorker.js';
 
 // registers the service worker
 if ('serviceWorker' in navigator && window.isSecureContext) {

@@ -118,13 +118,13 @@ export const watchViewportResize = (): Observable<{ width: number; height: numbe
   return fromEvent(customWindow, 'resize').pipe(
     debounceTime(200),
     map(() => ({
-      width: customWindow.innerWidth,
       height: customWindow.innerHeight,
+      width: customWindow.innerWidth,
     })),
     distinctUntilChanged((prev, curr) => prev.width === curr.width && prev.height === curr.height),
     startWith({
-      width: customWindow.innerWidth,
       height: customWindow.innerHeight,
+      width: customWindow.innerWidth,
     }),
   );
 };
@@ -156,7 +156,7 @@ const header$ = watchHeader(getComponentElement('header'), { viewport$ });
  * @returns An observable emitting the visibility status.
  */
 export function isPartiallyInViewport(el: HTMLElement): Observable<boolean> {
-  return watchViewportAt(el, { viewport$, header$ }).pipe(
+  return watchViewportAt(el, { header$, viewport$ }).pipe(
     map(({ offset: { y }, size: { height } }) => {
       const elementHeight = el.offsetHeight;
       return y < height && y + elementHeight > 0;
@@ -173,15 +173,15 @@ const mapLocation = (ev: Event) => {
       ev.target && ev.target instanceof HTMLAnchorElement
         ? new URL((ev.target as HTMLAnchorElement).href)
         : getLocation(),
-    popstate: (ev as PopStateEvent).state
-      ? new URL((ev as PopStateEvent).state.url)
-      : getLocation(),
     hashchange: (ev as HashChangeEvent).newURL
       ? new URL((ev as HashChangeEvent).newURL)
       : getLocation(),
     pageshow: (ev as PageTransitionEvent).persisted
       ? getLocation()
       : new URL(customWindow.location.href),
+    popstate: (ev as PopStateEvent).state
+      ? new URL((ev as PopStateEvent).state.url)
+      : getLocation(),
   };
   return eventMap[ev.type as keyof typeof eventMap] || getLocation();
 };
@@ -269,17 +269,17 @@ export function windowEvents() {
     component$,
   } = customWindow;
   const observables = {
-    document$,
-    location$,
-    target$,
-    keyboard$,
-    viewport$,
-    tablet$,
-    screen$,
-    print$,
     alert$,
-    progress$,
     component$,
+    document$,
+    keyboard$,
+    location$,
+    print$,
+    progress$,
+    screen$,
+    tablet$,
+    target$,
+    viewport$,
   };
   let observablesMissing = false;
   for (const key of Object.keys(observables)) {
@@ -359,7 +359,7 @@ export function postUrlsForWorker(urls: string[]) {
   if (!urls.length) {
     return;
   }
-  customWindow.postMessage({ type: 'CACHE_URLS', payload: urls });
+  customWindow.postMessage({ payload: urls, type: 'CACHE_URLS' });
   logger.debug(`Cached URLs: ${urls.join(', ')}`);
 }
 

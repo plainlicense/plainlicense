@@ -46,6 +46,8 @@ nav:
       - speak: helping/voice.md
       - donate: helping/donate.md
   - blog: blog/index.md
+not_in_nav: |
+  helping/commit.md
 theme:
   name: material
   custom_dir: overrides

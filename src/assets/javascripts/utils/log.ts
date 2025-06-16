@@ -24,11 +24,6 @@ export const logger = {
       console.error(`%c[ERROR] ${message}`, 'color: magenta', ...args);
     }
   },
-  warn: (message: string, ...args: unknown[]) => {
-    if (isDevelopment) {
-      console.warn(`%c[WARNING] ${message}`, 'color: orange', ...args);
-    }
-  },
   info: (message: string, ...args: unknown[]) => {
     if (isDevelopment) {
       console.info(`%c[INFO] ${message}`, 'color: white', ...args);
@@ -37,6 +32,11 @@ export const logger = {
   table: (data: unknown) => {
     if (isDevelopment) {
       console.table(data);
+    }
+  },
+  warn: (message: string, ...args: unknown[]) => {
+    if (isDevelopment) {
+      console.warn(`%c[WARNING] ${message}`, 'color: orange', ...args);
     }
   },
 };

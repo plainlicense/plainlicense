@@ -6,79 +6,70 @@
  * sources are in: src/assets/javascripts directory
  */
 
-// src/cacheWorker.T55XCAMX.js
-var woff2Bangers = new URL('assets/fonts/bangers-regular.BIV5PPSH.woff2', self.location.origin);
-var woff2Inter = new URL('assets/fonts/inter-v.5HMTI5F7.woff2', self.location.origin);
-var woff2Raleway = new URL('assets/fonts/raleway.FJCY4DUZ.woff2', self.location.origin);
-var woff2SourceCodePro = new URL(
-  'assets/fonts/sourcecodepro-regular.CK7SPIOU.woff2',
-  self.location.origin,
-);
-var svgNamedLogo = new URL('assets/images/logo_named.YIWHC445.svg', self.location.origin);
-var svgLogo = new URL('assets/images/logo_only_color_transp.WJCCEJU7.svg', self.location.origin);
+
+// src/cacheWorker.ts
+import woff2Bangers from "./assets/fonts/bangers-regular.BIV5PPSH.woff2";
+import woff2Inter from "./assets/fonts/inter-v.5HMTI5F7.woff2";
+import woff2Raleway from "./assets/fonts/raleway.FJCY4DUZ.woff2";
+import woff2SourceCodePro from "./assets/fonts/sourcecodepro-regular.CK7SPIOU.woff2";
+import svgNamedLogo from "./assets/images/logo_named.YIWHC445.svg";
+import svgLogo from "./assets/images/logo_only_color_transp.WJCCEJU7.svg";
 var CONFIG = {
-  cacheName: 'plain-license-v1',
+  cacheName: "plain-license-v1",
   preCacheUrls: [woff2Inter, woff2Bangers, woff2SourceCodePro, woff2Raleway, svgNamedLogo, svgLogo],
-  version: Date.now(),
+  version: Date.now()
 };
-var preCacheExts = ['js', 'css', 'html', 'json', 'svg', 'woff', 'woff2'];
+var preCacheExts = ["js", "css", "html", "json", "svg", "woff", "woff2"];
 var isDev = () => {
   const { origin, hostname, port } = self.location;
-  return (
-    hostname === 'localhost' ||
-    hostname === '127.0.0.1' ||
-    port === '8000' ||
-    origin.includes('localhost')
-  );
+  return hostname === "localhost" || hostname === "127.0.0.1" || port === "8000" || origin.includes("localhost");
 };
 var logger = {
   error: (message, error) => {
     if (isDev()) {
       if (error instanceof CacheError) {
-        console.error('%c[ServiceWorker] Cache Error: '.concat(message), 'color: aquamarine');
+        console.error("%c[ServiceWorker] Cache Error: ".concat(message), "color: aquamarine");
         console.error(error.toString());
       } else if (error instanceof NetworkError) {
-        console.error('%c[ServiceWorker] Network Error: '.concat(message), 'color: aquamarine');
-        console.error('Status: '.concat(error.status || 'unknown'));
+        console.error("%c[ServiceWorker] Network Error: ".concat(message), "color: aquamarine");
+        console.error("Status: ".concat(error.status || "unknown"));
         console.error(error.message);
       } else if (error) {
-        console.error('%c[ServiceWorker] '.concat(message), 'color: aquamarine');
+        console.error("%c[ServiceWorker] ".concat(message), "color: aquamarine");
         console.error(error);
       }
     }
   },
   info: (message) => {
     if (isDev()) {
-      console.info('%c[ServiceWorker] '.concat(message), 'color: cyan');
+      console.info("%c[ServiceWorker] ".concat(message), "color: cyan");
     }
-  },
+  }
 };
 var CacheError = class extends Error {
   constructor(message, cause) {
     super(message);
-    this.name = 'CacheError';
+    this.name = "CacheError";
     this.cause = cause;
-    if (cause && 'cause' in Error) {
-      Object.defineProperty(this, 'cause', {
+    if (cause && "cause" in Error) {
+      Object.defineProperty(this, "cause", {
         value: cause,
         configurable: true,
-        writable: true,
+        writable: true
       });
     }
   }
   toString() {
-    return this.cause
-      ? ''.concat(this.message, '\nCaused by: ').concat(this.cause.toString())
-      : this.message;
+    return this.cause ? "".concat(this.message, "\nCaused by: ").concat(this.cause.toString()) : this.message;
   }
 };
 var NetworkError = class extends Error {
   constructor(message, status) {
     super(message);
-    this.name = 'NetworkError';
+    this.name = "NetworkError";
     this.status = status;
     if (status) {
-      this.message = ''.concat(message, ' (HTTP ').concat(status, ')');
+      this.message = "".concat(message, " (HTTP ").concat(status, ")");
     }
   }
 };
@@ -86,31 +77,31 @@ async function loadManifest(url) {
   try {
     const response = await fetch(url);
     if (!response.ok) {
-      throw new NetworkError('Failed to fetch the manifest', response.status);
+      throw new NetworkError("Failed to fetch the manifest", response.status);
     }
     return await response.json();
   } catch (error) {
-    logger.error('Error loading manifest:', error);
+    logger.error("Error loading manifest:", error);
     return void 0;
   }
 }
 var MANIFEST = {};
 (async () => {
   try {
-    const data = await loadManifest(new URL('manifest.json', self.location.origin));
+    const data = await loadManifest(new URL("manifest.json", self.location.origin));
     if (!data) {
-      throw new CacheError('Failed to load manifest file');
+      throw new CacheError("Failed to load manifest file");
     }
-    const editedKeys = Object.keys(data).map((key) => key.replace('docs/', ''));
+    const editedKeys = Object.keys(data).map((key) => key.replace("docs/", ""));
     Object.assign(
       MANIFEST,
-      Object.fromEntries(editedKeys.map((key) => [key, data['docs/'.concat(key)]])),
+      Object.fromEntries(editedKeys.map((key) => [key, data["docs/".concat(key)]]))
     );
   } catch (error) {
-    logger.error('Failed to initialize manifest:', error);
+    logger.error("Failed to initialize manifest:", error);
   }
 })().catch((error) => {
-  logger.error('Unhandled error in manifest initialization:', error);
+  logger.error("Unhandled error in manifest initialization:", error);
 });
 var normalizeUrl = (url) => {
   return url instanceof URL ? url : url instanceof Request ? new URL(url.url) : new URL(url);
@@ -120,28 +111,25 @@ var normalizeRequest = (url) => {
 };
 var hasCryptoHash = (url) => {
   const u = url instanceof URL ? url.pathname : url;
-  const name = u.split('/').pop();
-  return (name == null ? void 0 : name.split('.').length) === 3;
+  const name = u.split("/").pop();
+  return (name == null ? void 0 : name.split(".").length) === 3;
 };
 var getCryptoHashlessBaseName = (url) => {
   var _a;
   const u = url instanceof URL ? url.pathname : url;
   if (!hasCryptoHash(u)) {
-    return u.split('/').pop();
+    return u.split("/").pop();
   }
-  const parts = (_a = u.split('/').pop()) == null ? void 0 : _a.split('.');
-  const hashlessName = [
-    parts == null ? void 0 : parts.slice(0),
-    parts == null ? void 0 : parts.slice(-1),
-  ].filter(Boolean);
+  const parts = (_a = u.split("/").pop()) == null ? void 0 : _a.split(".");
+  const hashlessName = [parts == null ? void 0 : parts.slice(0), parts == null ? void 0 : parts.slice(-1)].filter(Boolean);
   if (hashlessName && hashlessName.length === 2) {
-    return hashlessName.join('.');
+    return hashlessName.join(".");
   }
-  return '';
+  return "";
 };
 var isHTML = (url) => {
   const u = normalizeUrl(url);
-  return u.pathname.endsWith('.html');
+  return u.pathname.endsWith(".html");
 };
 var CacheManager = class {
   constructor() {
@@ -149,7 +137,7 @@ var CacheManager = class {
     this.cache = null;
     this.cacheKeys = [];
     this.init().catch((error) => {
-      logger.error('Failed to initialize cache manager:', error);
+      logger.error("Failed to initialize cache manager:", error);
     });
   }
   // gets the cache configuration
@@ -169,7 +157,7 @@ var CacheManager = class {
     const newKeys = await caches.keys();
     if (newKeys.length && newKeys.some((key) => !this.cacheKeys.includes(key))) {
       this.cacheKeys = newKeys;
-      logger.info('Cache keys updated, keys: '.concat(this.cacheKeys.join(', ')));
+      logger.info("Cache keys updated, keys: ".concat(this.cacheKeys.join(", ")));
     }
     return this.cacheKeys;
   }
@@ -189,14 +177,14 @@ var CacheManager = class {
     const normalizedRequest = normalizeRequest(request);
     const keys = await this.getCacheKeys();
     if (keys.includes(normalizedRequest.toString())) {
-      logger.info('Resource already cached');
+      logger.info("Resource already cached");
       return;
     }
     const cache = await this.getCache();
     if (response == null ? void 0 : response.ok) {
       await cache.put(normalizedRequest, response.clone());
       this.cacheKeys.push(normalizedRequest.toString());
-      logger.info('cache complete');
+      logger.info("cache complete");
       return;
     }
     try {
@@ -205,9 +193,9 @@ var CacheManager = class {
       }
       await cache.add(normalizedRequest);
       this.cacheKeys.push(normalizedRequest.toString());
-      logger.info('cache complete');
+      logger.info("cache complete");
     } catch (error) {
-      throw new CacheError('Failed to cache url', error);
+      throw new CacheError("Failed to cache url", error);
     } finally {
       await this.checkForStaleKey(normalizedRequest);
     }
@@ -217,32 +205,30 @@ var CacheManager = class {
    */
   validateConfig() {
     var _a, _b;
-    if (
-      !(((_a = this.config) == null ? void 0 : _a.cacheName.length) && this.config.cacheName.trim())
-    ) {
-      throw new CacheError('Cache name is required');
+    if (!(((_a = this.config) == null ? void 0 : _a.cacheName.length) && this.config.cacheName.trim())) {
+      throw new CacheError("Cache name is required");
     }
     if (!((_b = this.config.preCacheUrls) == null ? void 0 : _b.length)) {
       throw new CacheError(
-        'At least one url is required. Our poor cache worker has nothing to do.',
+        "At least one url is required. Our poor cache worker has nothing to do."
       );
     }
-    logger.info('Cache configuration validated');
+    logger.info("Cache configuration validated");
   }
   toBaseName(s) {
     var _a;
     try {
       const url = normalizeUrl(s);
-      const file = (_a = url.pathname.split('/')) == null ? void 0 : _a.pop();
-      const parts = file == null ? void 0 : file.split('.');
+      const file = (_a = url.pathname.split("/")) == null ? void 0 : _a.pop();
+      const parts = file == null ? void 0 : file.split(".");
       if (!parts) {
-        logger.error('Failed to get base name: No parts found');
-        return '';
+        logger.error("Failed to get base name: No parts found");
+        return "";
       }
-      return parts.length >= 2 ? parts.slice(0, -2).join('.') : parts[0] || '';
+      return parts.length >= 2 ? parts.slice(0, -2).join(".") : parts[0] || "";
     } catch (error) {
-      logger.error('Failed to get base name:', error);
-      return '';
+      logger.error("Failed to get base name:", error);
+      return "";
     }
   }
   /**
@@ -255,15 +241,15 @@ var CacheManager = class {
       const cache = await this.getCache();
       const baseName = await this.toBaseName(normalizedUrl);
       const staleKeys = this.cacheKeys.filter(
-        (key) => key.includes(baseName) && normalizedUrl.toString() !== key,
+        (key) => key.includes(baseName) && normalizedUrl.toString() !== key
       );
       if (staleKeys.length) {
-        logger.info('Stale keys found: '.concat(staleKeys.join(', ')));
+        logger.info("Stale keys found: ".concat(staleKeys.join(", ")));
         await Promise.all(staleKeys.map((key) => cache.delete(key)));
-        logger.info('Stale keys deleted');
+        logger.info("Stale keys deleted");
       }
     } catch (error) {
-      logger.error('Failed to check for stale keys:', error);
+      logger.error("Failed to check for stale keys:", error);
     }
   }
   /**
@@ -271,13 +257,13 @@ var CacheManager = class {
    */
   async cleanup() {
     try {
-      const deletionPromises = await this.getCacheKeys().then((keys) =>
-        keys.filter((key) => key !== this.config.cacheName).map((key) => caches.delete(key)),
+      const deletionPromises = await this.getCacheKeys().then(
+        (keys) => keys.filter((key) => key !== this.config.cacheName).map((key) => caches.delete(key))
       );
       await Promise.all(deletionPromises);
-      logger.info('Old caches cleaned up');
+      logger.info("Old caches cleaned up");
     } catch (error) {
-      throw new CacheError('Failed to cleanup caches', error);
+      throw new CacheError("Failed to cleanup caches", error);
     }
   }
   /**
@@ -300,7 +286,7 @@ var CacheManager = class {
       }
     });
     await Promise.all(manifestPromises);
-    logger.info('Precaching complete');
+    logger.info("Precaching complete");
   }
   /**
    * Attempt to fetch a resource
@@ -314,19 +300,19 @@ var CacheManager = class {
       const isHTMLRequest = isHTML(normalized);
       const response = await fetch(request, init);
       if (!response.ok) {
-        throw new NetworkError('Network response was not ok', response.status);
+        throw new NetworkError("Network response was not ok", response.status);
       }
       if (isHTMLRequest) {
-        const name = normalized.pathname.split('/').pop();
-        if (name === 'index.html' || name === '/') {
-          response.headers.set('Permissions-Policy', 'autoplay=(self)');
+        const name = normalized.pathname.split("/").pop();
+        if (name === "index.html" || name === "/") {
+          response.headers.set("Permissions-Policy", "autoplay=(self)");
         }
       }
       this.cacheKeys.push(request.toString());
       return response;
     } catch (error) {
-      logger.error('Failed to fetch request for '.concat(request.toString()), error);
-      throw new NetworkError('Failed to fetch request for '.concat(request.toString()), 500);
+      logger.error("Failed to fetch request for ".concat(request.toString()), error);
+      throw new NetworkError("Failed to fetch request for ".concat(request.toString()), 500);
     } finally {
       await this.checkForStaleKey(request);
     }
@@ -344,12 +330,12 @@ var CacheManager = class {
     if (response.ok) {
       return response;
     }
-    const errorMessage = response instanceof Response ? await response.json() : 'No response';
+    const errorMessage = response instanceof Response ? await response.json() : "No response";
     logger.error(
-      'Failed to fetch request for '.concat(normalizedRequest.toString(), ' '),
-      new Error(errorMessage),
+      "Failed to fetch request for ".concat(normalizedRequest.toString(), " "),
+      new Error(errorMessage)
     );
-    logger.error('Attempting fallback fetch');
+    logger.error("Attempting fallback fetch");
     const url = new URL(normalizedRequest.toString());
     const name = getCryptoHashlessBaseName(url);
     if (MANIFEST && name) {
@@ -360,7 +346,7 @@ var CacheManager = class {
       }
     }
     if ((_a = url.hash) == null ? void 0 : _a.length) {
-      url.hash = '';
+      url.hash = "";
       return this.tryFetch(url, init);
     }
     return response;
@@ -368,43 +354,35 @@ var CacheManager = class {
 };
 var cacheManager = new CacheManager();
 var cacheExts = [
-  'avif',
-  'css',
-  'html',
-  'jpeg',
-  'jpg',
-  'js',
-  'json',
-  'mp4',
-  'png',
-  'svg',
-  'webm',
-  'webp',
-  'woff',
-  'woff2',
+  "avif",
+  "css",
+  "html",
+  "jpeg",
+  "jpg",
+  "js",
+  "json",
+  "mp4",
+  "png",
+  "svg",
+  "webm",
+  "webp",
+  "woff",
+  "woff2"
 ];
-var staleWhileRevalidateExts = ['html', 'json', 'css', 'js'];
+var staleWhileRevalidateExts = ["html", "json", "css", "js"];
 async function routeToStrategy(request) {
-  if (request.method !== 'GET') {
+  if (request.method !== "GET") {
     return await fetch(request);
   }
   const url = new URL(request.url);
-  if (
-    url.origin !== self.location.origin ||
-    (url.origin === self.location.origin &&
-      !url.href.includes('assets') &&
-      (url.href.endsWith('.png') ||
-        url.href.endsWith('.ico') ||
-        url.href.endsWith('.jpg') ||
-        url.href === self.location.href))
-  ) {
+  if (url.origin !== self.location.origin || url.origin === self.location.origin && !url.href.includes("assets") && (url.href.endsWith(".png") || url.href.endsWith(".ico") || url.href.endsWith(".jpg") || url.href === self.location.href)) {
     return await fetch(request);
   }
-  const ext = url.pathname.split('.').pop();
+  const ext = url.pathname.split(".").pop();
   if (!(cacheExts.some((ext2) => url.pathname.endsWith(ext2)) && ext)) {
     return await fetch(request).catch((error) => {
-      logger.error('Failed to fetch:', error);
-      throw new NetworkError('Failed to fetch request', 500);
+      logger.error("Failed to fetch:", error);
+      throw new NetworkError("Failed to fetch request", 500);
     });
   }
   if (staleWhileRevalidateExts.includes(ext)) {
@@ -422,100 +400,97 @@ async function cacheFirst(request) {
   try {
     const response = await cacheManager.fallbackFetch(normalizedRequest);
     if (!response.ok) {
-      throw new NetworkError('Network response was not ok', response.status);
+      throw new NetworkError("Network response was not ok", response.status);
     }
     await cacheManager.cacheIt(normalizedRequest, response.clone());
     return response;
   } catch (error) {
-    logger.error('CatchFirst strategy failed for '.concat(normalizedRequest.url), error);
+    logger.error("CatchFirst strategy failed for ".concat(normalizedRequest.url), error);
     throw error;
   }
 }
 async function staleWhileRevalidate(request) {
   const cache = await cacheManager.getCache();
   const cached = await cache.match(request);
-  const networkPromise = cacheManager
-    .fallbackFetch(request)
-    .then(async (response) => {
-      if (!response.ok) {
-        throw new NetworkError('Network response was not ok', response.status);
-      }
-      await cacheManager.cacheIt(request, response.clone());
-      return response;
-    })
-    .catch((error) => {
-      logger.error(
-        'Network fetch in staleWhileRevalidate failed for '.concat(request.url, ' '),
-        error,
-      );
-      throw error;
-    });
+  const networkPromise = cacheManager.fallbackFetch(request).then(async (response) => {
+    if (!response.ok) {
+      throw new NetworkError("Network response was not ok", response.status);
+    }
+    await cacheManager.cacheIt(request, response.clone());
+    return response;
+  }).catch((error) => {
+    logger.error(
+      "Network fetch in staleWhileRevalidate failed for ".concat(request.url, " "),
+      error
+    );
+    throw error;
+  });
   if (cached) {
     networkPromise.catch((error) => {
-      logger.error('Background revalidation failed:', error);
+      logger.error("Background revalidation failed:", error);
     });
-    logger.info('Returning cached response while revalidating');
+    logger.info("Returning cached response while revalidating");
     return cached;
   }
-  logger.info('No cached response, waiting for network');
+  logger.info("No cached response, waiting for network");
   return networkPromise;
 }
-self.addEventListener('install', (event) => {
+self.addEventListener("install", (event) => {
   event.waitUntil(
     (async () => {
       try {
         await cacheManager.precache();
         await self.skipWaiting();
-        logger.info('Service worker installed');
+        logger.info("Service worker installed");
       } catch (error) {
-        logger.error('Install failed:', error);
+        logger.error("Install failed:", error);
         throw error;
       }
-    })(),
+    })()
   );
 });
-self.addEventListener('fetch', (event) => {
+self.addEventListener("fetch", (event) => {
   event.respondWith(
     (async () => {
       try {
         return await routeToStrategy(event.request);
       } catch (error) {
-        logger.error('Failed to fetch request for '.concat(event.request.url), error);
+        logger.error("Failed to fetch request for ".concat(event.request.url), error);
         throw error;
       }
-    })(),
+    })()
   );
 });
-self.addEventListener('activate', (event) => {
+self.addEventListener("activate", (event) => {
   event.waitUntil(
     (async () => {
       try {
         await cacheManager.cleanup();
         await self.clients.claim();
-        logger.info('Service worker activated');
+        logger.info("Service worker activated");
       } catch (error) {
-        logger.error('Activation failed:', error);
+        logger.error("Activation failed:", error);
         throw error;
       }
-    })(),
+    })()
   );
 });
-self.addEventListener('message', (event) => {
+self.addEventListener("message", (event) => {
   const payload = event.data;
-  if (payload.type === 'CACHE_URLS' && payload.payload && payload.payload.preCacheUrls) {
+  if (payload.type === "CACHE_URLS" && payload.payload && payload.payload.preCacheUrls) {
     CONFIG.preCacheUrls.push(...payload.payload.preCacheUrls);
     event.waitUntil(
       (async () => {
         try {
           await cacheManager.precache();
         } catch (error) {
-          logger.error('Precaching failed:', error);
+          logger.error("Precaching failed:", error);
         }
-      })(),
+      })()
     );
   } else {
-    logger.info('Received unsupported message type or missing payload');
+    logger.info("Received unsupported message type or missing payload");
     return;
   }
 });
-//# sourceMappingURL=cacheWorker.T55XCAMX.js.map
+//# sourceMappingURL=cacheWorker.7SFNDGMN.js.map

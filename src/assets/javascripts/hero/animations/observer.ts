@@ -84,13 +84,13 @@ export class HeroObservation {
 
   private constructor() {
     this.defaultTimelineVars = {
+      callbackScope: this,
       defaults: {
         callbackScope: this,
       },
-      repeat: 0,
       duration: this.config.slides.slideDuration,
       ease: 'power2.inOut',
-      callbackScope: this,
+      repeat: 0,
     };
     this.transitionTl = gsap.timeline(this.defaultTimelineVars);
     this.setupSubscriptions();
@@ -256,17 +256,17 @@ export class HeroObservation {
         });
       const content = Array.from(new Set(initialContent));
 
-      logger.debug(`Setting up section ${index}`, { outerWrapper, innerWrapper, bg, content });
+      logger.debug(`Setting up section ${index}`, { bg, content, innerWrapper, outerWrapper });
 
       const animation = gsap
         .timeline({
           ...this.defaultTimelineVars,
+          callbackScope: this,
           defaults: {
-            paused: true,
             callbackScope: this,
             ease: 'power2.inOut',
+            paused: true,
           },
-          paused: true,
           duration:
             index === SectionIndex.Landing
               ? () =>
@@ -274,20 +274,20 @@ export class HeroObservation {
                     ? this.config.slides.slideDuration
                     : this.config.slides.slideDuration / 3
               : this.config.slides.slideDuration,
-          callbackScope: this,
-          onStart: this.onStartFunction(index),
           onComplete: this.onCompleteFunction(index),
+          onStart: this.onStartFunction(index),
+          paused: true,
         })
         .addLabel('start');
 
       return {
-        index,
-        element: el,
-        outerWrapper,
-        innerWrapper,
+        animation,
         bg,
         content,
-        animation,
+        element: el,
+        index,
+        innerWrapper,
+        outerWrapper,
       } as Section;
     });
 
@@ -490,10 +490,10 @@ export class HeroObservation {
 
   private createHoverObserver(element: Element | Element[]): Observer {
     return Observer.create({
-      type: 'hover',
-      target: element,
       onHover: this.onHoverFunction(element),
       onHoverEnd: this.onHoverEndFunction(element),
+      target: element,
+      type: 'hover',
     });
   }
 
@@ -507,22 +507,22 @@ export class HeroObservation {
     const clickTargets = gsap.utils.toArray(this.config.clickTargets);
     const ignoreTargets = gsap.utils.toArray(this.config.ignoreTargets);
     this.transitionObserver = Observer.create({
-      type: 'wheel,touch,pointer',
-      wheelSpeed: 1,
+      ignore: clickTargets as Element[],
       onDown: this.onActionFunction(Direction.Down),
       onUp: this.onActionFunction(Direction.Up),
       preventDefault: true,
       tolerance: 25,
-      ignore: clickTargets as Element[],
+      type: 'wheel,touch,pointer',
+      wheelSpeed: 1,
     });
     this.transitionObserver.enable();
     this.clickObserver = Observer.create({
-      type: 'click',
-      target: clickTargets as Element[],
       ignore: ignoreTargets as Element[],
       onClick: this.onActionFunction(Direction.Down, true),
       onRelease: this.onActionFunction(Direction.Down, true),
       preventDefault: true,
+      target: clickTargets as Element[],
+      type: 'click',
     });
     this.clickObserver.enable();
     if (this.footer) {

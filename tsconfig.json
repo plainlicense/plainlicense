@@ -1,47 +1,48 @@
 {
-  "extends": "@tsconfig/bun/tsconfig.json",
   "compilerOptions": {
+    "allowImportingTsExtensions": false,
+    "allowSyntheticDefaultImports": true,
     "alwaysStrict": true,
     "baseUrl": "./",
-    "outDir": "docs/assets/",
     "esModuleInterop": true,
     "isolatedModules": true,
-    "allowSyntheticDefaultImports": true,
     "jsx": "react",
     "jsxFactory": "h",
     "lib": ["DOM", "DOM.Iterable", "WebWorker", "es2018", "es2020", "esnext"],
     "module": "ESNext",
     "moduleResolution": "Bundler",
+    "noEmit": false,
     "noFallthroughCasesInSwitch": true,
     "noImplicitAny": true,
     "noImplicitReturns": true,
     "noImplicitThis": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "strict": true,
-    "verbatimModuleSyntax": false,
-    "allowImportingTsExtensions": false,
-    "noEmit": false,
+    "outDir": "docs/assets/",
     "paths": {
+      "_/*": ["./external/mkdocs-material/material/overrides/assets/javascripts/*"],
+      "@/*": ["./external/mkdocs-material/src/templates/assets/javascripts/*"],
       "~/*": [
         "./src/assets/javascripts/*",
         "./external/mkdocs-material/src/templates/assets/javascripts/*"
       ],
       "~assets/*": ["./src/assets/*"],
-      "@/*": ["./external/mkdocs-material/src/templates/assets/javascripts/*"],
-      "~external/*": ["./typings"],
-      "_/*": ["./external/mkdocs-material/material/overrides/assets/javascripts/*"]
+      "~external/*": ["./typings"]
     },
     "removeComments": false,
-    "sourceMap": true,
     "skipLibCheck": true,
+    "sourceMap": true,
+    "strict": true,
     "strictBindCallApply": true,
     "strictFunctionTypes": true,
     "strictNullChecks": true,
     "strictPropertyInitialization": true,
     "stripInternal": true,
-    "target": "es2020"
+    "target": "es2020",
+    "verbatimModuleSyntax": false
   },
+  "exclude": ["src/build/*.ts", "./commitlint.config.ts"],
+  "extends": "@tsconfig/bun/tsconfig.json",
   "include": [
     "src/**/*.ts",
     "./external/mkdocs-material/typings",
@@ -50,7 +51,6 @@
     "./external/mkdocs-material/material/src/overrides/assets/javascripts/**/*.ts",
     "src/cacheWorker.ts"
   ],
-  "exclude": ["src/build/*.ts", "./commitlint.config.ts"],
   "references": [
     {
       "path": "./tsconfig.build.json"

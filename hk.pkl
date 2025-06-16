@@ -1,28 +1,34 @@
 amends "package://github.com/jdx/hk/releases/download/v1.2.0/hk@1.2.0#/Config.pkl"
 import "package://github.com/jdx/hk/releases/download/v1.2.0/hk@1.2.0#/Builtins.pkl"
+import "package://github.com/jdx/hk/releases/download/v1.2.0/hk@1.2.0#/builtins/stylelint.pkl"
 
-local isGithub = () -> read("env:CI") == "true" && read("env:GITHUB_ACTIONS") == "true"
-local biomeFileLimiter = if isGithub() "--changed" else "--staged"
+/// Are we in a GitHub Actions environment?
+local function isCi() = (read?("env:CI")?.toBoolean() ?? false) && (read?("env:GITHUB_ACTIONS")?.toBoolean() ?? false)
+
+
+// If running on GitHub Actions, we use `--changed` to limit the files to those changed compared to the default branch.
+local biomeFileLimiter = if (isCi()) "--changed" else "--staged"
 
 local linters = new Mapping<String, Step> {
 
-    ["actionlint"] = Builtins.actionLint
+    ["actionlint"] = (Builtins.actionlint) {
+      depends = List("yamllint")
+    }
 
     ["biome"] = (Builtins.biome) {
         glob = Builtins.biome.glob.add("*.{css,gql,graphql,html,jsonc,json5,jsonl}")
         stage = this.glob
-        workspaceIndicator = "biome.{json,jsonc}"
-        check = "biome --config-path {{ workspaceIndicator }} --max-diagnostics 100 check \(biomeFileLimiter) {{ files }}"
-        fix = "biome --config-path {{ workspaceIndicator }} --max-diagnostics 100 check --write --unsafe --linter-enabled --formatter-enabled --assists-enabled \(biomeFileLimiter) {{ files }}"
-
+        workspace_indicator = "biome.{json,jsonc}"
+        check = "biome --config-path {{ workspace_indicator }} --max-diagnostics 100 check \(biomeFileLimiter) {{ files }}"
+        fix = "biome --config-path {{ workspace_indicator }} --max-diagnostics 100 check --write --unsafe --linter-enabled --formatter-enabled --assists-enabled \(biomeFileLimiter) {{ files }}"
+        depends = List("prettier", "stylelint", "actionlint") // we want to run biome last
     }
 
+    ["markdownlint"] = Builtins.markdown_lint
 
-    ["jsonlint"] = Builtins.jsonlint
-
-    ["markdownlint"] = Builtins.markdownlint
-
-    ["prettier"] = Builtins.prettier
+    ["prettier"] = (Builtins.prettier) {
+      depends = List("stylelint", "shfmt", "yamllint", "actionlint", "markdownlint")
+    }
 
     ["ruff"] = Builtins.ruff
 
@@ -30,18 +36,18 @@ local linters = new Mapping<String, Step> {
 
     ["shfmt"] = Builtins.shfmt
 
-    ["stylelint"] = Builtins.stylelint
-
-    ["yamllint"] = Builtins.yamllint
+    ["stylelint"] = stylelint.style_lint
 
     ["tsc"] = Builtins.tsc
 
+    ["yamllint"] = Builtins.yamllint
+
     // Spellchecker
     ["typos"] = new Step {
-        workspaceIndicator = "_typos.toml"
+        workspace_indicator = "_typos.toml"
         glob = List( "*README", "*.{.login,astro,bash,bash_logout,bashrc,browserlistrc,conf,config,csh,css,cts,fish,gitattributes,gitmodules,html,htmx,ini,j2,jinja,jinja2,json,json5,jsonc,jsonl,ksh,md,mdown,mdtext,mdtxt,mdwn,mdx,mk,mkd,mts,nix,nu,pkl,profile,quokka,sass,scss,sh,sh,shellcheckrc,sql,sqlite,stylelintrc,svelte,tcsh,toml,ts,tsx,txt,yaml,yml,zlogin,zlogout,zprofile,zsh,zshenv,zshrc}", "*Dockerfile*", "*Makefile*", "*makefile*", "CHANGELOG*", "CODE_OF_CONDUCT*", "CONTRIBUTING*", "HACKING*", "LICENSE", "README*", "SECURITY*", "UNLICENSE")
-        check = "typos check -j 8 --config {{ workspaceIndicator }} {{ files }}"
-        fix = "typos fix --config {{ workspaceIndicator }} {{ files }}"
+        check = "typos -j 8 --config {{ workspace_indicator }} {{ files }}"
+        fix = "typos --write-changes --config {{ workspace_indicator }} {{ files }}"
     }
 }
 

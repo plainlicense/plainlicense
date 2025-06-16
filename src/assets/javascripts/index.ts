@@ -107,23 +107,23 @@ const windowEvents$ = onDom$(of(windowEvents()));
 // Define page configurations
 const pageConfigs: PageConfig[] = [
   {
-    matcher: isHome,
     location: 'home',
+    matcher: isHome,
     observables: [nav$, color$, observer$, videoManager$],
   },
   {
-    matcher: (url) => !!isLicense(url),
     location: 'licenses',
+    matcher: (url) => !!isLicense(url),
     observables: [license$],
   },
   {
-    matcher: isHelpingIndex,
     location: 'helpingIndex',
+    matcher: isHelpingIndex,
     observables: [buttonScript$],
   },
   {
-    matcher: isOnSite,
     location: 'all',
+    matcher: isOnSite,
     observables: [analytic$, feedback$, fixSvg$, licenseHashHandler$, windowEvents$],
   },
 ];
