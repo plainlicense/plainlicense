@@ -1,11 +1,13 @@
 === ":material-book-open-variant: reader" 
 
 
-                    <div class="license-header">
-    <h1 class='license-title'>Plain MIT License</h1><div class='version-info'><span class='plain_version'>plain version: 0.1.0</span></div></div>
+                    <div class='license license-header'>
+    # Plain MIT License
+
+    <div class='version-info'><span class='license plain_version'>plain version: 0.1.0</span></div></div>
                     Copyright (c) 2025 `[copyright holders]`
 
-    <h2 class="license-first-header">You are Free to Use, Change, and Share This Work</h2>
+    ## You are Free to Use, Change, and Share the Work
 
     We, the authors, give you a license to **use, copy, change, distribute, and sell the work and all related materials for free.** You can also license the work under different terms. You agree to these terms by using, copying, or sharing the work. Everyone who gets a copy of the work may use the work under these terms.
 
@@ -30,7 +32,7 @@
 
         We are not lawyers. This is not legal advice. If you need legal advice, talk to a lawyer. You use this license at your own risk.
 
-        We are normal people who want to make licenses accessible for everyone. We hope that our plain language helps you and anyone else understand this license  (including lawyers). If you see a mistake or want to suggest a change, please [submit an issue on GitHub]([submit an issue](https://github.com/plainlicense/plainlicense/issues/new/choose "Submit an issue on GitHub") "Submit an issue on GitHub") or [edit this page]([edit this page](https://github.com/plainlicense/plainlicense/edit/main/docs/licenses/permissive/mit/index.md "Edit this license on GitHub") "edit on GitHub").
+        We are normal people making licenses accessible for everyone. We hope that our plain language helps you and anyone else understand this license  (including lawyers). If you see a mistake or want to suggest a change, please [submit an issue on GitHub]([submit an issue](https://github.com/plainlicense/plainlicense/issues/new/choose "Submit an issue on GitHub") "Submit an issue on GitHub") or [edit this page]([edit this page](https://github.com/plainlicense/plainlicense/edit/main/docs/licenses/permissive/mit/index.md "Edit this license on GitHub") "edit on GitHub").
 
     === "the official MIT License" 
 

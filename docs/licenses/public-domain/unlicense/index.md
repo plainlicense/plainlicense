@@ -27,7 +27,7 @@ limitations:
   - warranty
 outro: null
 reader_license_text: |
-  <h2 class="license-first-header">You are Free to Use This Work - We Dedicate It to the Public Domain</h2>
+  ## You are Free to Use The Work - We Dedicate It to the Public Domain
 
   **We, the authors, dedicate the work to the public domain.**
   You can use it freely for any purpose and in any way you want. We give away all rights and interest in the work to the public domain forever.
@@ -41,7 +41,7 @@ reader_license_text: |
 
   **You do not need to do anything to use the work.** You do not need to ask for permission, give credit, or pay us. You can use the work without any restrictions.
 
-  ## We Give You an Unrestricted License
+  ## We Give You a License with No Restrictions
 
   Some courts do not recognize public domain dedications. For such cases, we give you a license to use and change the work worldwide. You and everyone else can use the work forever and never need to pay to use it. No one can take this license from you.
 

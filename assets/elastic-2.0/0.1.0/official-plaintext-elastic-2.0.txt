@@ -1,4 +1,4 @@
-title="The Plain Elastic License in plain text"# Elastic License 2.0
+# Elastic License 2.0
 
 ## Acceptance
 

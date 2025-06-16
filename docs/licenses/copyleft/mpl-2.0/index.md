@@ -34,9 +34,9 @@ limitations:
     - warranty
 outro: null
 extra_how: |
-    The MPL requires you include notices in parts of your work if you can. There are two notices you can include. You can include the [Plain MPL Notice](#the-plain-mpl-notice-default) or the [Same-License Notice](#same-license-notice-optional). The Plain MPL Notice is the default notice. If you use the Same-License Notice, other must use it too, and can *only* use the work under the Plain MPL or the Mozilla Public License 2.0.
+    The MPL requires you include notices in parts of your work if you can. There are two notices you can include. You can include the [Plain MPL Notice](#the-plain-mpl-notice--default) or the [Same-License Notice](#same-license-notice--optional). The Plain MPL Notice is the default notice. If you use the Same-License Notice, other must use it too, and can *only* use the work under the Plain MPL or the Mozilla Public License 2.0.
 reader_license_text: |
-    ## You are Free to Use, Change, and Share This Work
+    ## You are Free to Use, Change, and Share the Work
 
     **We, the authors, give you a free license to use the work anywhere in the world.** Everyone else gets the same license too.
 
@@ -78,10 +78,21 @@ reader_license_text: |
 
     You can include this work in a larger project and license the larger project differently. The parts from this work must stay under this license, but you can license your other parts however you want.
 
-    When you do this:
-    - **Include a copy of this license** with the parts that stay under this license
-    - **Don't change anyone's rights** to the parts covered by the Plain MPL
-    - **People who get your larger project can choose** to use the MPL parts under this license or your other license if your other license doesn't conflict with the MPL and you choose to allow it (see [How to Provide Notices](#How-to-Provide-Notices)).
+    When you include the work as part of something else:
+
+    - **Include a copy of this license** with the parts of the work that stay under the Plain MPL
+    - **Don't change anyone's rights** to the parts covered by the Plain MPL.
+    - **People who get your larger project can choose**
+
+      - To use the parts of the larger work that are covered by the Plain MPL under the Plain MPL or the Mozilla Public License 2.0
+      - To use the parts covered by the Plain MPL, along with the rest of the larger work, under the terms of your other license. If:
+
+        - The authors of the work allow it. If any part of the work is marked with the [Same-License Notice](#same-license-notice--optional), then everyone must *always* share it under the Plain MPL or the Mozilla Public License 2.0 (also see [How to Provide Notices](#how-to-provide-notices)).
+        - The other license does not stop people from getting the source materials for the parts under the Plain MPL [^2].
+
+    You may always choose to share the work under the Mozilla Public License 2.0 or a later version published by the Mozilla Foundation.
+
+    [^2]: Mixing licenses gets legally complicated. Other licenses may add other requirements or restrictions. For example, a larger work using the Lesser GNU Public License (LGPL) must *also* share the work under that license. The Mozilla Foundation keeps a [helpful FAQ](https://www.mozilla.org/en-US/MPL/2.0/FAQ/). It explains how the license works in many different situations.
 
     ## When You Share the Work
 
@@ -120,9 +131,9 @@ reader_license_text: |
 
     [Plain License](https://plainlicense.org) maintains this license based on the Mozilla Public License 2.0.
 
-    You can share the work under any version of this license published by Plain License. If Plain License releases a new version, you may use the newer version. You can also use the work under the [Mozilla Public License 2.0](https://www.mozilla.org/en-US/MPL/2.0/) or a later version published by the [Mozilla Foundation](https://foundation.mozilla.org/) [^2].
+    You can share the work under any version of this license published by Plain License. If Plain License releases a new version, you may use the newer version. You can also use the work under the [Mozilla Public License 2.0](https://www.mozilla.org/en-US/MPL/2.0/) or a later version published by the [Mozilla Foundation](https://foundation.mozilla.org/) [^3].
 
-    [^2]: Plain License isn't affiliated with the Mozilla Foundation. We maintain this license to help people use the Mozilla Public License 2.0 in a more accessible way. You can always choose to use the original Mozilla Public License 2.0 if you prefer, but you **can't** change a work that is already under the Mozilla Public License 2.0 to the Plain MPL. If the Mozilla Foundation ever clarifies that it believes the Plain MPL is fully compatible with the Mozilla Public License 2.0, *then* you could choose to change a work under the Mozilla Public License 2.0 to the Plain MPL. Mozilla has not done that.
+    [^3]: Plain License isn't affiliated with the Mozilla Foundation. We maintain this license to help people use the Mozilla Public License 2.0 in a more accessible way. You can always choose to use the original Mozilla Public License 2.0 if you prefer, but you **can't** change a work that is already under the Mozilla Public License 2.0 to the Plain MPL. If the Mozilla Foundation ever clarifies that it believes the Plain MPL is fully compatible with the Mozilla Public License 2.0, *then* you could choose to change a work under the Mozilla Public License 2.0 to the Plain MPL. Mozilla has not done that.
 
     ## If Your Laws Prevent Following This License
 
@@ -130,7 +141,6 @@ reader_license_text: |
 
     - Follow all other terms as closely as you can.
     - Explain which parts you can’t follow, and why you can't follow them. Your explanation must use clear, plain language, and you must include your explanation with every copy of the work you share.
-
 
     ## If There Are Legal Disputes
 
@@ -146,13 +156,13 @@ reader_license_text: |
 
     You must include one of two notices with any parts of the work you share:
 
-    1. **Plain MPL Notice.** This tells people they can use the work under the Plain MPL or the Mozilla Public License, and where they can read them. See [Plain MPL Notice](#the-plain-mpl-notice-default).
-    2. **Same-License Notice.** If you only want to share the work under the Plain MPL, and **not** allow people to share it under a stronger copyleft license like the GPL, LGPL, or Affero GPL, you must include a notice that says they can’t share it under another license. See [Same-License Notice](same-license-notice-optional). This notice is optional. If you use the Same-License Notice, it replaces the Plain MPL Notice. If the authors use the Same-License Notice, you must use it too.
+    1. **Plain MPL Notice.** This tells people they can use the work under the Plain MPL or the Mozilla Public License, and where they can read them. See [Plain MPL Notice](#the-plain-mpl-notice--default).
+    2. **Same-License Notice.** If you only want to share the work under the Plain MPL, and **not** allow people to share it under a stronger copyleft license like the GPL, LGPL, or Affero GPL, you must include a notice that says they can’t share it under another license. See [Same-License Notice](#same-license-notice--optional). This notice is optional. If you use the Same-License Notice, it replaces the Plain MPL Notice. If the authors use the Same-License Notice, you must use it too.
 
 
     ### The Plain MPL Notice [default]
 
-    Include this notice **or** the [Same-License Notice](#Same-License-Notice-optional]) with any parts of the work you share.
+    Include this notice **or** the [Same-License Notice](#same-license-notice--optional) with any parts of the work you share.
 
     ```markdown
 
@@ -162,7 +172,7 @@ reader_license_text: |
 
     ### Same-License Notice [optional]
 
-    If you want to share the work under the Plain MPL **and** not allow people to share it under a stronger copyleft license like the GPL, LGPL, or Affero GPL, include this notice instead of the [Plain MPL Notice](#The-Plain-MPL-Notice-default).
+    If you want to share the work under the Plain MPL **and** not allow people to share it under a stronger copyleft license like the GPL, LGPL, or Affero GPL, include this notice instead of the [Plain MPL Notice](#the-plain-mpl-notice--default).
 
     ```markdown
 

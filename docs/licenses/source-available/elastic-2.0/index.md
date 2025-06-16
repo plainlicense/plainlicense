@@ -49,7 +49,7 @@ outro: |
   ///
 
 reader_license_text: |
-  <h2 class="license-first-header">You are Free to Use, Change, and Share This Work</h2>
+  ## You are Free to Use, Change, and Share The Work
 
   - You can **use, copy, change, and distribute the work**.
   - **You can't offer the work's features as a service to others.**

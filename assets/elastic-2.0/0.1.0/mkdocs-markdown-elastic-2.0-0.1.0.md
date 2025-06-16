@@ -1,9 +1,11 @@
 === ":material-book-open-variant: reader" 
 
 
-                    <div class="license-header">
-    <h1 class='license-title'>Plain Elastic License</h1><div class='version-info'><span class='original_version'>original version: 2.0</span><br /><span class='plain_version'>plain version: 0.1.0</span></div></div>
-                    <h2 class="license-first-header">You are Free to Use, Change, and Share This Work</h2>
+                    <div class='license license-header'>
+    # Plain Elastic License
+
+    <div class='version-info'><span class='license original_version'>original version: 2.0</span><br /><span class='license plain_version'>plain version: 0.1.0</span></div></div>
+                    ## You are Free to Use, Change, and Share The Work
 
     - You can **use, copy, change, and distribute the work**.
     - **You can't offer the work's features as a service to others.**
@@ -80,7 +82,7 @@
 
         We are not lawyers. This is not legal advice. If you need legal advice, talk to a lawyer. You use this license at your own risk.
 
-        We are normal people who want to make licenses accessible for everyone. We hope that our plain language helps you and anyone else understand this license  (including lawyers). If you see a mistake or want to suggest a change, please [submit an issue on GitHub]([submit an issue](https://github.com/plainlicense/plainlicense/issues/new/choose "Submit an issue on GitHub") "Submit an issue on GitHub") or [edit this page]([edit this page](https://github.com/plainlicense/plainlicense/edit/main/docs/licenses/source-available/elastic-2.0/index.md "Edit this license on GitHub") "edit on GitHub").
+        We are normal people making licenses accessible for everyone. We hope that our plain language helps you and anyone else understand this license  (including lawyers). If you see a mistake or want to suggest a change, please [submit an issue on GitHub]([submit an issue](https://github.com/plainlicense/plainlicense/issues/new/choose "Submit an issue on GitHub") "Submit an issue on GitHub") or [edit this page]([edit this page](https://github.com/plainlicense/plainlicense/edit/main/docs/licenses/source-available/elastic-2.0/index.md "Edit this license on GitHub") "edit on GitHub").
 
     === "the official Elastic License 2.0" 
 

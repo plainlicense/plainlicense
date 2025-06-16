@@ -2,7 +2,7 @@
 
     # Embedding Your License
 
-    ```html title="add this to your site's html"
+    ```html
 
     <iframe src="https://plainlicense.org/embed/unlicense.html"
     style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;
@@ -64,7 +64,7 @@
 
     You can optionally sync the license's light/dark theme to your site's theme. You will need to send the embedded license page a message to tell it what theme your site is currently using. You can include this code in your script bundle or HTML:
 
-    ```javascript title="sync the light/dark theme with your site"
+    ```javascript
 
     const syncTheme = () => {
     const iframe = document.getElementById("license-embed");
@@ -78,7 +78,7 @@
 
     Once your toggle switch is set up to send a `themeChange` event, you need to add a listener to dispatch the same message as before:
 
-    ```javascript title="toggle license theme with site theme"
+    ```javascript
 
     const syncTheme = () => {
     const iframe = document.getElementById("license-embed");

@@ -1,4 +1,4 @@
-title="The Plain MIT License in plain text"# The MIT License (MIT)
+# The MIT License (MIT)
 
 Copyright (c) {{ year }} `<copyright holders>`
 

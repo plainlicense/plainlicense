@@ -1,13 +1,15 @@
 
-////// admonition | <span class='detail-title-highlight'>The Plain Unlicense</span>
+////// admonition | The Plain Unlicense
        type: license
 
 === ":material-book-open-variant: reader" 
 
 
-                    <div class="license-header">
-    <h1 class='license-title'>Plain Unlicense</h1><div class='version-info'><span class='plain_version'>plain version: 0.1.0</span></div></div>
-                    <h2 class="license-first-header">You are Free to Use This Work - We Dedicate It to the Public Domain</h2>
+                    <div class='license license-header'>
+    # Plain Unlicense
+
+    <div class='version-info'><span class='license plain_version'>plain version: 0.1.0</span></div></div>
+                    ## You are Free to Use The Work - We Dedicate It to the Public Domain
 
     **We, the authors, dedicate the work to the public domain.**
     You can use it freely for any purpose and in any way you want. We give away all rights and interest in the work to the public domain forever.
@@ -21,7 +23,7 @@
 
     **You do not need to do anything to use the work.** You do not need to ask for permission, give credit, or pay us. You can use the work without any restrictions.
 
-    ## We Give You an Unrestricted License
+    ## We Give You a License with No Restrictions
 
     Some courts do not recognize public domain dedications. For such cases, we give you a license to use and change the work worldwide. You and everyone else can use the work forever and never need to pay to use it. No one can take this license from you.
 
@@ -42,7 +44,7 @@
 
         We are not lawyers. This is not legal advice. If you need legal advice, talk to a lawyer. You use this license at your own risk.
 
-        We are normal people who want to make licenses accessible for everyone. We hope that our plain language helps you and anyone else understand this license  (including lawyers). If you see a mistake or want to suggest a change, please [submit an issue on GitHub]([submit an issue](https://github.com/plainlicense/plainlicense/issues/new/choose "Submit an issue on GitHub") "Submit an issue on GitHub") or [edit this page]([edit this page](https://github.com/plainlicense/plainlicense/edit/main/docs/licenses/public-domain/unlicense/index.md "Edit this license on GitHub") "edit on GitHub").
+        We are normal people making licenses accessible for everyone. We hope that our plain language helps you and anyone else understand this license  (including lawyers). If you see a mistake or want to suggest a change, please [submit an issue on GitHub]([submit an issue](https://github.com/plainlicense/plainlicense/issues/new/choose "Submit an issue on GitHub") "Submit an issue on GitHub") or [edit this page]([edit this page](https://github.com/plainlicense/plainlicense/edit/main/docs/licenses/public-domain/unlicense/index.md "Edit this license on GitHub") "edit on GitHub").
 
     === "the official Unlicense" 
 
@@ -57,7 +59,7 @@
 
     # Embedding Your License
 
-    ```html title="add this to your site's html"
+    ```html
 
     <iframe src="https://plainlicense.org/embed/unlicense.html"
     style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;
@@ -119,7 +121,7 @@
 
     You can optionally sync the license's light/dark theme to your site's theme. You will need to send the embedded license page a message to tell it what theme your site is currently using. You can include this code in your script bundle or HTML:
 
-    ```javascript title="sync the light/dark theme with your site"
+    ```javascript
 
     const syncTheme = () => {
     const iframe = document.getElementById("license-embed");
@@ -133,7 +135,7 @@
 
     Once your toggle switch is set up to send a `themeChange` event, you need to add a listener to dispatch the same message as before:
 
-    ```javascript title="toggle license theme with site theme"
+    ```javascript
 
     const syncTheme = () => {
     const iframe = document.getElementById("license-embed");
@@ -153,13 +155,15 @@
 
 
 
-    ```markdown title="The Plain Unlicense in Github-style markdown"
+    ```markdown 
 
     > plain version: 0.1.0
 
     # Plain Unlicense
 
-    ## You are Free to Use This Work - We Dedicate It to the Public Domain
+
+
+    ## You are Free to Use The Work - We Dedicate It to the Public Domain
 
     **We, the authors, dedicate the work to the public domain.**
     You can use it freely for any purpose and in any way you want. We give
@@ -176,7 +180,7 @@
     ask for permission, give credit, or pay us. You can use the work
     without any restrictions.
 
-    ## We Give You an Unrestricted License
+    ## We Give You a License with No Restrictions
 
     Some courts do not recognize public domain dedications. For such
     cases, we give you a license to use and change the work worldwide. You
@@ -187,6 +191,7 @@
 
     **We offer the work "as is" with no warranties.** We are not
     responsible for any damages or issues from your use of the work.
+
 
     ### Legally Interpreting the Plain Unlicense
 
@@ -207,7 +212,7 @@
 
         We are not lawyers. This is not legal advice. If you need legal advice, talk to a lawyer. You use this license at your own risk.
 
-        We are normal people who want to make licenses accessible for everyone. We hope that our plain language helps you and anyone else understand this license  (including lawyers). If you see a mistake or want to suggest a change, please [submit an issue on GitHub]([submit an issue](https://github.com/plainlicense/plainlicense/issues/new/choose "Submit an issue on GitHub") "Submit an issue on GitHub") or [edit this page]([edit this page](https://github.com/plainlicense/plainlicense/edit/main/docs/licenses/public-domain/unlicense/index.md "Edit this license on GitHub") "edit on GitHub").
+        We are normal people making licenses accessible for everyone. We hope that our plain language helps you and anyone else understand this license  (including lawyers). If you see a mistake or want to suggest a change, please [submit an issue on GitHub]([submit an issue](https://github.com/plainlicense/plainlicense/issues/new/choose "Submit an issue on GitHub") "Submit an issue on GitHub") or [edit this page]([edit this page](https://github.com/plainlicense/plainlicense/edit/main/docs/licenses/public-domain/unlicense/index.md "Edit this license on GitHub") "edit on GitHub").
 
     === "the official Unlicense" 
 
@@ -222,13 +227,15 @@
 
 
 
-    ```plaintext title="The Plain Unlicense in plain text"
+    ```plaintext
 
     plain version: 0.1.0
 
     PLAIN UNLICENSE
 
-    You are Free to Use This Work - We Dedicate It to the Public Domain
+
+
+    You are Free to Use The Work - We Dedicate It to the Public Domain
 
     We, the authors, dedicate the work to the public domain.
     You can use it freely for any purpose and in any way you want. We give
@@ -245,7 +252,7 @@
     for permission, give credit, or pay us. You can use the work without
     any restrictions.
 
-    We Give You an Unrestricted License
+    We Give You a License with No Restrictions
 
     Some courts do not recognize public domain dedications. For such
     cases, we give you a license to use and change the work worldwide. You
@@ -276,7 +283,7 @@
 
         We are not lawyers. This is not legal advice. If you need legal advice, talk to a lawyer. You use this license at your own risk.
 
-        We are normal people who want to make licenses accessible for everyone. We hope that our plain language helps you and anyone else understand this license  (including lawyers). If you see a mistake or want to suggest a change, please [submit an issue on GitHub]([submit an issue](https://github.com/plainlicense/plainlicense/issues/new/choose "Submit an issue on GitHub") "Submit an issue on GitHub") or [edit this page]([edit this page](https://github.com/plainlicense/plainlicense/edit/main/docs/licenses/public-domain/unlicense/index.md "Edit this license on GitHub") "edit on GitHub").
+        We are normal people making licenses accessible for everyone. We hope that our plain language helps you and anyone else understand this license  (including lawyers). If you see a mistake or want to suggest a change, please [submit an issue on GitHub]([submit an issue](https://github.com/plainlicense/plainlicense/issues/new/choose "Submit an issue on GitHub") "Submit an issue on GitHub") or [edit this page]([edit this page](https://github.com/plainlicense/plainlicense/edit/main/docs/licenses/public-domain/unlicense/index.md "Edit this license on GitHub") "edit on GitHub").
 
     === "the official Unlicense" 
 

@@ -26,7 +26,7 @@ outro:
 reader_license_text: |
   Copyright (c) {{ year }} `[copyright holders]`
 
-  <h2 class="license-first-header">You are Free to Use, Change, and Share This Work</h2>
+  ## You are Free to Use, Change, and Share the Work
 
   We, the authors, give you a license to **use, copy, change, distribute, and sell the work and all related materials for free.** You can also license the work under different terms. You agree to these terms by using, copying, or sharing the work. Everyone who gets a copy of the work may use the work under these terms.
 
