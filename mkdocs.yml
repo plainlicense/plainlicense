@@ -48,6 +48,10 @@ nav:
   - blog: blog/index.md
 not_in_nav: |
   helping/commit.md
+  index*
+  CHANGELOG*
+  tags
+  shame*
 theme:
   name: material
   custom_dir: overrides
@@ -233,11 +237,6 @@ watch:
   - includes
   - overrides
   - mkdocs.yml
-not_in_nav: |
-  index*
-  CHANGELOG*
-  tags
-  shame*
 extra:
   tags: # maps the tags in the license front matter to the names above in theme.icon.tag. This allows us to replace the tag with an icon in the license template.
     can-share: canshare

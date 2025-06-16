@@ -8,17 +8,15 @@
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
 <link rel="manifest" href="/site.webmanifest">
 {% endblock %}
-{% block fonts %}{% endblock %}
 {% block styles %}
 <!-- Extra color palette -->
+{{  super() }}
+{% if config.extra.palette %}
+{% set palette = config.extra.palette %}
 {% if config.theme.palette %}
 {% set palette = config.theme.palette %}
-<link rel="stylesheet" href="{{ css_bundle | url }}" />
+<link rel="stylesheet" href="assets/stylesheets/bodyfont.css" />
+<link rel="stylesheet" href="assets/stylesheets/palette.css" />
 {% endif %}
-<!-- Custom icons -->
-{% include "partials/icons.html" %}
-{% endblock %}
-<!-- Theme-related JavaScript and site JavaScript bundle -->
-{% block scripts %}
-<script async fetch-priority="high" type="module" src="{{ js_bundle | url }}"></script>
+{% endif %}
 {% endblock %}

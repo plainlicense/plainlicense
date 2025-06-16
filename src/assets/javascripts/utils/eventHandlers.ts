@@ -20,7 +20,7 @@
  */
 // @ts-ignore: yes, I know it's not in the project json...
 
-import gsap from 'gsap';
+import gsap from 'gsap'
 import {
   combineLatest,
   debounceTime,
@@ -45,19 +45,19 @@ import {
   tap,
   throttleTime,
   toArray,
-} from 'rxjs';
-import Tablesort from 'tablesort';
+} from 'rxjs'
+import Tablesort from 'tablesort'
 // biome-ignore lint/style/noNamespaceImport: we need to bring in the whole mkdocs bundle
-import * as bundle from '@/bundle';
-import { feature } from '~/_';
-import { getLocation, watchElementSize, watchViewportAt } from '~/browser';
-import { getComponentElement, type Header } from '~/components';
-import { isHome, isLicenseHash, isValidEvent } from './conditionChecks';
-import { logger } from './log';
-import type { WatchOptions } from './types';
+import * as bundle from '@/bundle'
+import { feature } from '~/_'
+import { getLocation, watchElementSize, watchViewportAt } from '~/browser'
+import { getComponentElement, type Header } from '~/components'
+import { isHome, isLicenseHash, isValidEvent } from './conditionChecks'
+import { logger } from './log'
+import type { WatchOptions } from './types'
 
 export const NAV_EXIT_DELAY = 60000;
-export const PAGE_CLEANUp_DELAY = 20000;
+export const PAGE_CLEANUP_DELAY = 20000;
 
 const customWindow: CustomWindow = window as unknown as CustomWindow;
 

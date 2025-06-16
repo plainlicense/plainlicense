@@ -6,9 +6,8 @@
  * @copyright No rights reserved.
  */
 
-import gsap from 'gsap';
-import { EXCLUDED_TAGS, OBSERVER_CONFIG } from '~/config/config';
-import type { NotVisibleReport } from './types';
+import gsap from 'gsap'
+import type { NotVisibleReport } from './types'
 
 const LICENSE_HASHES = ['#reader', '#html', '#markdown', '#plaintext', '#changelog', '#official'];
 
@@ -140,36 +139,6 @@ export const elementIsVisible = (el: HTMLElement | null, checkParent = false): b
 };
 
 /**
- * Checks if an element is valid for animation.
- * @param el - The element to check.
- * @param parent - The parent element.
- * @returns Whether the element is valid for animation.
- */
-export function isValidElement(el: unknown, parent: Element): el is Element {
-  if (el === parent) {
-    return false;
-  }
-  if (!(el instanceof Element)) {
-    return false;
-  }
-  if (EXCLUDED_TAGS.includes(el.tagName as (typeof EXCLUDED_TAGS)[number])) {
-    return false;
-  }
-  if (el instanceof SVGElement) {
-    return true;
-  }
-  try {
-    // check if the element has computed styles
-    if (window.getComputedStyle(el)) {
-      return true;
-    }
-  } catch {
-    return false;
-  }
-  return el.innerHTML.trim() !== '';
-}
-
-/**
  * Checks if an element exists within the DOM or a specific container.
  * @param el - The element to check.
  * @param container - Optional container element. If provided, checks if the element is within this container. Otherwise, checks if the element is within the document body.
@@ -188,7 +157,7 @@ export function elementInDom(el: Element, container?: Element): boolean {
 export function elementsNotVisible(parent: Element = document.body): Element[] {
   const children = gsap.utils.toArray('*', parent);
   return children
-    .filter((el) => isValidElement(el, parent) && !elementIsVisible(el as HTMLElement))
+    .filter((el) => !elementIsVisible(el as HTMLElement))
     .filter(Boolean) as Element[];
 }
 
@@ -230,16 +199,4 @@ export function generateNonVisibleElementReport(
     }
     return report;
   });
-}
-
-/**
- * Checks if an element is visible within the viewport.
- * @param el - The element to check.
- * @returns Whether the element is visible.
- */
-export function headerShouldDisplay() {
-  return gsap.utils
-    .toArray(OBSERVER_CONFIG.header)
-    .filter((el) => el instanceof HTMLElement)
-    .some((el) => Array.from(el.classList).includes('active'));
 }

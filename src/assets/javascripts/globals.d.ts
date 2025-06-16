@@ -3,7 +3,7 @@
  * @license Plain Unlicense (Public Domain)
  */
 
-import type { Observable, Subject } from 'rxjs';
+import type { Observable, Subject } from 'rxjs'
 
 declare global {
   /* ----------------------------------------------------------------------------
@@ -12,8 +12,6 @@ declare global {
 
   type T = Type['T'];
   type R = Type['R'];
-
-  type PageLocation = 'all' | 'home' | 'licenses' | 'helpingIndex';
 
   type Component<T extends {} = object, U extends HTMLElement = HTMLElement> = T & {
     ref: U /* Component reference */;
@@ -33,7 +31,6 @@ declare global {
   /**
    * ======================
    ** FUN WITH POINT
-   ** ...or, how to make a
    ** ...or, how to make a
    **       `point`
    *========================*
@@ -82,7 +79,6 @@ declare global {
     alert$: Subject<string>; // clipboard.js integration
     progress$: Subject<number>; // progress indicator
     component$: Observable<CustomEvent>;
-    particlePool?: HTMLDivElement[];
   }
 
   /**
