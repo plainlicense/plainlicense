@@ -28,7 +28,7 @@
       "command": "uvx"
     },
     "filesystem": {
-      "args": ["--bun", "@modelcontextprotocol/server-filesystem", "~/knitli/plainlicense"],
+      "args": ["--bun", "@modelcontextprotocol/server-filesystem", "${workspaceFolder}"],
       "command": "bunx"
     },
     "github-remote": {

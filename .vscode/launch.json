@@ -1,79 +1,88 @@
 {
-  "version": "0.2.0",
   "configurations": [
     {
       "name": "Attach to Chrome",
-      "port": 9222,
-      "request": "attach",
-      "type": "chrome",
-      "webRoot": "${workspaceFolder}/src",
-      "url": "http://localhost:8000",
       "pathMapping": {
         "/": "${workspaceFolder}/docs"
       },
+      "port": 9222,
+      "preLaunchTask": "mkdocs serve live",
+      "request": "attach",
       "skipFiles": ["${workspaceFolder}/node_modules/**/*", "${workspaceFolder}/external/**/*"],
-      "preLaunchTask": "mkdocs serve live"
+      "type": "chrome",
+      "url": "http://localhost:8000",
+      "webRoot": "${workspaceFolder}/src"
     },
     {
-      "name": "Attach Firefox Debug",
-      "type": "firefox",
       "clearConsoleOnReload": true,
-      "request": "attach",
-      "url": "http://localhost:8000",
-      "webRoot": "${workspaceFolder}/src",
-      "reloadOnAttach": true,
-      "port": 6000,
-      "preLaunchTask": "mkdocs serve live",
-      "skipFiles": ["${workspaceFolder}/node_modules/**/*", "${workspaceFolder}/external/**/*"],
+      "name": "Attach Firefox Debug",
       "pathMappings": [
         {
-          "url": "/",
-          "path": "${workspaceFolder}/docs"
+          "path": "${workspaceFolder}/docs",
+          "url": "/"
         }
-      ]
+      ],
+      "port": 6000,
+      "preLaunchTask": "mkdocs serve live",
+      "reloadOnAttach": true,
+      "request": "attach",
+      "skipFiles": ["${workspaceFolder}/node_modules/**/*", "${workspaceFolder}/external/**/*"],
+      "type": "firefox",
+      "url": "http://localhost:8000",
+      "webRoot": "${workspaceFolder}/src"
     },
     {
       "name": "Launch Chrome",
-      "request": "launch",
-      "type": "chrome",
-      "preLaunchTask": "prepare-chrome",
+      "outFiles": ["${workspaceFolder}/docs/**", "!**/node_modules/**"],
       "pathMapping": {
         "/": "${workspaceFolder}/docs"
       },
-      "runtimeExecutable": "/usr/bin/flatpak run --branch=stable --arch=x86_64 --command=/app/bin/chromium --enable-features=UseOzonePlatform --ozone-platform=wayland --gtk-version=4 --gpu-testing-vendor-id=0x10de --gpu-testing-device-id=0x25ac",
-      "url": "http://localhost:8000",
-      "webRoot": "${workspaceFolder}/src",
-      "outFiles": ["${workspaceFolder}/docs/**", "!**/node_modules/**"],
+      "preLaunchTask": "prepare-chrome",
+      "request": "launch",
+      "runtimeExecutable": "${env:BROWSER}",
+      "skipFiles": ["**/node_modules/**", "${workspaceFolder}/external/**"],
       "smartStep": true,
-      "skipFiles": ["**/node_modules/**", "${workspaceFolder}/external/**"]
+      "type": "chrome",
+      "url": "http://localhost:8000",
+      "webRoot": "${workspaceFolder}/src"
     },
     {
+      "cwd": "${workspaceFolder}",
+      "internalConsoleOptions": "openOnSessionStart",
       "name": "bun debug",
-      "type": "bun",
+      "program": "${file}",
       "request": "launch",
       "runtime": "bun",
       "runtimeArgs": ["run", "-b", "--inspect-brk"],
-      "program": "${file}",
-      "internalConsoleOptions": "openOnSessionStart",
-      "cwd": "${workspaceFolder}"
+      "type": "bun"
     },
     {
+      "cwd": "${workspaceFolder}",
+      "internalConsoleOptions": "openOnSessionStart",
       "name": "bun build debug",
-      "type": "bun",
+      "program": "src/build/index.ts",
       "request": "launch",
       "runtime": "bun",
       "runtimeArgs": ["run", "build", "--inspect-brk"],
-      "program": "src/build/index.ts",
-      "internalConsoleOptions": "openOnSessionStart",
-      "cwd": "${workspaceFolder}"
+      "type": "bun"
     },
     {
-      "name": "Python Debugger: Current File",
-      "type": "debugpy",
-      "request": "launch",
-      "program": "${file}",
       "console": "integratedTerminal",
-      "cwd": "${workspaceFolder}"
+      "cwd": "${workspaceFolder}",
+      "name": "Python Debugger: Current File",
+      "program": "${file}",
+      "request": "launch",
+      "type": "debugpy"
+    },
+    {
+      "args": ["${workspaceFolder}"],
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}",
+      "name": "Python Debugger: Debug Analyzer",
+      "program": "${file}",
+      "request": "launch",
+      "type": "debugpy"
     }
-  ]
+  ],
+  "version": "0.2.0"
 }
