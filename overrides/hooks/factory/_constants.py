@@ -19,10 +19,12 @@ PATTERNS: dict[str, Pattern[str]] = {
         re.MULTILINE | re.DOTALL,
     ),
     "format_class": re.compile(r"\{\s?\.\w+\s?\}"),
-    "header": re.compile(r"#+ (\w+?)\n"),
+    "header": re.compile(r"#+ (?P<header>\w+?)\n"),
     "markdown": re.compile(r"#+ |(\*\*|\*|`)(.*?)\1", re.MULTILINE),
-    "link": re.compile(r"\[(.*?)\]\((.*?)\)", re.MULTILINE),
-    "image": re.compile(r"!\[(.*?)\]\((.*?)\)", re.MULTILINE),
+    "link": re.compile(r"\[(?P<text>.*?)\]\((?P<url>.*?)\)", re.MULTILINE),
+    "image": re.compile(r"!\[(?P<alt_text>.*?)\]\((?P<url>.*?)\)", re.MULTILINE),
+    "initial_footnote": re.compile(r".*\[\^(?P<citation>\d+)\](!?:)"),
+    "footnote": re.compile(r"^\s*\[\^(?P<citation>\d+)\]:\s*(?P<content>.+)\n", re.MULTILINE),
 }
 
 ICON_MAP = {
@@ -51,9 +53,23 @@ TAG_MAP = {
 EMBED_STYLE = dedent("""position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             border: 1px solid #E4C580; border-radius: 8px; overflow: hidden auto;""")
 
+#================================================
+# *           FORMATTING LITERALS
+#================================================
+"""
+Constants for formatting and layout in the license factory.
+I found that without them, it was easy for phantom formatting issues to creep in.
+"""
+
+SNIPPET = "--8<--"
+
 SPACE = " " # Single space for readability
 
+TAB = SPACE * 4  # Four spaces for indentation
+
 LINEBREAK = "\n"  # Line break for readability
+
+PARAGRAPH_BREAK = LINEBREAK * 2  # Two line breaks for paragraph separation
 
 # Divider for page sections in plaintext, also a yaml divider
 PAGE_DIVIDER = dedent("---").strip()
