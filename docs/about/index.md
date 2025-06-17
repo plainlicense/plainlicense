@@ -30,6 +30,6 @@ We aren't the first people to try to fix this problem. Many others have made imp
 4. **Spread the word about plain writing.** We've seen the benefits of plain writing in other areas, and we believe it can help with licensing too. We want to spread the word about plain writing and encourage others to write licenses that are simple and clear.
 5. **Drive innovation on licensing.** We have some big ideas for how to make licensing simpler, clearer, and tailored to different needs. We want to drive innovation in licensing and help people use licenses to share their work in new and exciting ways. Innovation is risky, and we believe making licensing easier to understand can help people take more risks and try new things.
 
-[cc]: https://creativecommons.org "Creative Commons"
-[cc-licenses]: https://creativecommons.org/share-your-work/cclicenses/ "Creative Commons Licenses"
+[cc]: <https://creativecommons.org> "Creative Commons"
+[cc-licenses]: <https://creativecommons.org/share-your-work/cclicenses/> "Creative Commons Licenses"
 [cc-by-nc-4.0]: https://creativecommons.org/licenses/by-nc/4.0/legalcode.en "CC BY-NC 4.0 Legal Code"

@@ -90,7 +90,7 @@ We use something similar to [semantic versioning][semantic versioning], but we d
 
 [center for plain language]: https://centerforplainlanguage.org/ "Center for Plain Language"
 [five-step guide]: https://centerforplainlanguage.org/learning-training/five-steps-plain-language/ "Center for Plain Language five-step guide"
-[gpl-faq]: https://www.gnu.org/licenses/gpl-faq.html "GPL FAQ"
+[gpl-faq]: <https://www.gnu.org/licenses/gpl-faq.html> "GPL FAQ"
 [plain unlicense]: ../licenses/public-domain/unlicense/index.md "Plain Unlicense"
 [plain language]: #what-is-plain-language "What is plain language?"
 [plain language standard]: https://www.iso.org/standard/71632.html "ISO standard for plain language"

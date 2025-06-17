@@ -2,31 +2,140 @@
 import re
 
 from datetime import UTC, datetime
+from functools import cache, cached_property
 from re import Pattern
 from textwrap import dedent
+
+from markdown.extensions.attr_list import AttrListTreeprocessor
+from markdown.extensions.def_list import DefListProcessor
+from markdown.extensions.footnotes import FootnoteBlockProcessor
+from pymdownx.blocks import FENCED_BLOCK_RE as FENCED_BLOCK_PATTERN
+from pymdownx.blocks import RE_END as BLOCK_END_PATTERN
+from pymdownx.blocks import RE_INDENT_YAML_LINE as INDENT_YAML_LINE_PATTERN
+from pymdownx.blocks import RE_START as BLOCK_START_PATTERN
+from pymdownx.blocks import RE_YAML_END as YAML_END_PATTERN
+from pymdownx.blocks import RE_YAML_START as YAML_START_PATTERN
+from pymdownx.critic import RE_BLOCK_SEP as BLOCK_SEP_PATTERN
+from pymdownx.critic import RE_CRITIC as CRITIC_PATTERN
+from pymdownx.critic import RE_CRITIC_BLOCK as CRITIC_BLOCK_PATTERN
+from pymdownx.critic import RE_CRITIC_PLACEHOLDER as CRITIC_PLACEHOLDER_PATTERN
+from pymdownx.critic import RE_CRITIC_SUB_PLACEHOLDER as CRITIC_SUB_PLACEHOLDER_PATTERN
+from pymdownx.mark import MARK as MARK_PATTERN
+from pymdownx.snippets import SnippetPreprocessor
+
+
+_PATTERN_MAP = {
+    "attr_list": {
+        "base": AttrListTreeprocessor.BASE_RE,
+        "block": AttrListTreeprocessor.BLOCK_RE,
+        "header": AttrListTreeprocessor.HEADER_RE,
+        "inline": AttrListTreeprocessor.INLINE_RE,
+        "name": AttrListTreeprocessor.NAME_RE,
+    },
+    "block": {
+        "end": BLOCK_END_PATTERN,
+        "sep": BLOCK_SEP_PATTERN,
+        "start": BLOCK_START_PATTERN,
+        "fenced": FENCED_BLOCK_PATTERN,
+        "yaml_end": YAML_END_PATTERN,
+        "yaml_start": YAML_START_PATTERN,
+        "indent_yaml_line": INDENT_YAML_LINE_PATTERN,
+    },
+    "critic": {
+        "block_sep": BLOCK_SEP_PATTERN,
+        "block": CRITIC_BLOCK_PATTERN,
+        "critic": CRITIC_PATTERN,
+        "placeholder": CRITIC_PLACEHOLDER_PATTERN,
+        "sub_placeholder": CRITIC_SUB_PLACEHOLDER_PATTERN,
+    },
+    "def_list": {
+        "base": DefListProcessor.RE,
+        "no_indent": DefListProcessor.NO_INDENT_RE,
+    },
+    "footnote": {
+        "block": FootnoteBlockProcessor.RE,
+    },
+    "mark": {
+        "mark": MARK_PATTERN,
+    },
+    "snippet": {
+        "snippet": SnippetPreprocessor.RE_SNIPPET,
+        "snippet_all": SnippetPreprocessor.RE_ALL_SNIPPETS,
+        "snippet_file": SnippetPreprocessor.RE_SNIPPET_FILE,
+        "snippet_section": SnippetPreprocessor.RE_SNIPPET_SECTION,
+    },
+    "year": re.compile(r"\{\{\s*year\s*\}\}", re.VERBOSE),
+}
+
+class Patterns:
+    """A class to hold the regex patterns used in the license factory."""
+
+    _attr_list =
+    def __init__(self):
+        self._patterns = _PATTERN_MAP
+
+
+def get_pattern(keys: str | tuple[str, str]) -> Pattern[str]:
+    """Retrieve a regex pattern from the pattern map."""
+    pattern = _PATTERN_MAP
+    match keys:
+        case str():
+            return pattern[keys]
+        case (first, second):
+            return pattern[first][second]
+
+
+PATTERN_MAP = {
+    "attr_list": {
+        "base": AttrListTreeprocessor.BASE_RE,
+        "block": AttrListTreeprocessor.BLOCK_RE,
+        "header": AttrListTreeprocessor.HEADER_RE,
+        "inline": AttrListTreeprocessor.INLINE_RE,
+        "name": AttrListTreeprocessor.NAME_RE,
+    },
+    "block": {
+        "end": BLOCK_END_PATTERN,
+        "sep": BLOCK_SEP_PATTERN,
+        "start": BLOCK_START_PATTERN,
+        "fenced": FENCED_BLOCK_PATTERN,
+        "yaml_end": YAML_END_PATTERN,
+        "yaml_start": YAML_START_PATTERN,
+        "indent_yaml_line": INDENT_YAML_LINE_PATTERN,
+    },
+    "critic": {
+        "block_sep": BLOCK_SEP_PATTERN,
+        "block": CRITIC_BLOCK_PATTERN,
+        "critic": CRITIC_PATTERN,
+        "placeholder": CRITIC_PLACEHOLDER_PATTERN,
+        "sub_placeholder": CRITIC_SUB_PLACEHOLDER_PATTERN,
+    },
+    "def_list": {
+        "base": DefListProcessor.RE,
+        "no_indent": DefListProcessor.NO_INDENT_RE,
+    },
+    "footnote": {
+        "block": FootnoteBlockProcessor.RE,
+    },
+    "mark": {
+        "mark": MARK_PATTERN,
+    },
+    "snippet": {
+        "snippet": SnippetPreprocessor.RE_SNIPPET,
+        "snippet_all": SnippetPreprocessor.RE_ALL_SNIPPETS,
+        "snippet_file": SnippetPreprocessor.RE_SNIPPET_FILE,
+        "snippet_section": SnippetPreprocessor.RE_SNIPPET_SECTION,
+    },
+    "year": re.compile(r"\{\{\s*year\s*\}\}", re.VERBOSE),
+}
 
 
 YEAR = datetime.now(UTC).strftime("%Y")
 
-PATTERNS: dict[str, Pattern[str]] = {
-    "year": re.compile(r"\{\{\s{1,2}year\s{1,2}\}\}"),
-    "code": re.compile(r"(`{3}markdown|`{3}plaintext(.*?)`{3})", re.DOTALL),
-    "definition": re.compile(
-        r"(?P<term>`[\w\s]+`)\s*?\n{1,2}:\s{1,4}(?P<def>[\w\s]+)\n{2}", re.MULTILINE
-    ),
-    "annotation": re.compile(
-        r"(?P<citation>\([123]\)).*?(?P<class>\{\s\.annotate\s\})[\s]{1,4}[123]\.\s{1,2}(?P<annotation>.+?)\n",
-        re.MULTILINE | re.DOTALL,
-    ),
-    "format_class": re.compile(r"\{\s?\.\w+\s?\}"),
-    "header": re.compile(r"#+ (?P<header>\w+?)\n"),
-    "markdown": re.compile(r"#+ |(\*\*|\*|`)(.*?)\1", re.MULTILINE),
-    "link": re.compile(r"\[(?P<text>.*?)\]\((?P<url>.*?)\)", re.MULTILINE),
-    "image": re.compile(r"!\[(?P<alt_text>.*?)\]\((?P<url>.*?)\)", re.MULTILINE),
-    "initial_footnote": re.compile(r".*\[\^(?P<citation>\d+)\](!?:)"),
-    "footnote": re.compile(r"^\s*\[\^(?P<citation>\d+)\]:\s*(?P<content>.+)\n", re.MULTILINE),
-}
+# ================================================
+# *           ICON AND TAG MAPPINGS
+# ================================================
 
+"""Maps license tabs to their respective icons."""
 ICON_MAP = {
     "reader": ":material-book-open-variant:",
     "markdown": ":octicons-markdown-24:",
@@ -36,26 +145,40 @@ ICON_MAP = {
     "official": ":material-license:",
 }
 
+"""Maps [choosealicense.com](https://choosealicense.com/) tags to Plain License tags."""
 TAG_MAP = {
-            "distribution": "can-share",  # allowances
-            "commercial-use": "can-sell",
-            "modifications": "can-change",
-            "revokable": "can-revoke",
-            "relicense": "relicense",
-            "disclose-source": "share-source",  # requirements
-            "document-changes": "describe-changes",
-            "include-copyright": "give-credit",
-            "same-license": "share-alike (strict)",
-            "same-license--file": "share-alike (relaxed)",
-            "same-license--library": "share-alike (relaxed)",
+    "distribution": "can-share",  # allowances
+    "commercial-use": "can-sell",
+    "modifications": "can-change",
+    "revokable": "can-revoke",
+    "relicense": "relicense",
+    "disclose-source": "share-source",  # requirements
+    "document-changes": "describe-changes",
+    "include-copyright": "give-credit",
+    "same-license": "share-alike (strict)",
+    "same-license--file": "share-alike (relaxed)",
+    "same-license--library": "share-alike (relaxed)",
 }
 
-EMBED_STYLE = dedent("""position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            border: 1px solid #E4C580; border-radius: 8px; overflow: hidden auto;""")
+"""The style parameter values for the embed iframe in the license factory."""
+EMBED_STYLE = dedent("""
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border: 1px solid #E4C580;
+        border-radius: 8px;
+        overflow: hidden auto;
+        """  # minify
+        .strip()
+        .replace("\n", "")
+        .replace(" ", "")
+    )
 
-#================================================
+# ================================================
 # *           FORMATTING LITERALS
-#================================================
+# ================================================
 """
 Constants for formatting and layout in the license factory.
 I found that without them, it was easy for phantom formatting issues to creep in.
@@ -63,7 +186,7 @@ I found that without them, it was easy for phantom formatting issues to creep in
 
 SNIPPET = "--8<--"
 
-SPACE = " " # Single space for readability
+SPACE = " "  # Single space for readability
 
 TAB = SPACE * 4  # Four spaces for indentation
 
@@ -73,3 +196,74 @@ PARAGRAPH_BREAK = LINEBREAK * 2  # Two line breaks for paragraph separation
 
 # Divider for page sections in plaintext, also a yaml divider
 PAGE_DIVIDER = dedent("---").strip()
+
+
+"""
+Regular expression patterns used in the license factory.
+
+Used to match various markdown, mkdocs markdown, and other text patterns.
+
+All patterns are compiled for efficiency and clarity. They also all use named groups for easier access.
+
+**You can safely use `.groupdict()` on the match objects to retrieve the named groups.**
+"""
+PATTERNS: dict[str, Pattern[str]] = {
+
+    """Year placeholder for templates, e.g., {{ year }}"""
+    "year": re.compile(r"""
+    (?P<year> \{\{ \s{1,2} year \s{1,2} \}\} )
+    """, re.VERBOSE),
+
+    """Codeblock patterns"""
+    "code": re.compile(r"""
+    (
+    (?P<first_line>  # The first line of a code block
+        (?P<fence_start>```)  # Start of code block
+            \s?
+        (?P<language> \w+ )?  # Optional language specifier
+            \s?
+        (?P<title> \"\w+\" | '\w+' )?  # Optional title in quotes
+    )
+        \n
+        (?P<content>.+?)  # Content of the code block
+        (?P<fence_end>```) # End of code block
+        )
+    """,
+        re.DOTALL | re.VERBOSE
+    ),
+
+    "code_inline": re.compile(r"(?P<fence_start>`)(?P<bang>[#][!])?(?P<lang>\w+)? ?(?P<content>.+?)(?P<fence_end>`)(?!``)"),
+
+    "definition": re.compile(r"\s*(?P<term>`.+`)\n\n\s+(?P<def>.+)\n\n", re.MULTILINE),
+    "annotation_inline": re.compile(r"(?<!\n|  )(?P<citation>\((?P<num>[1-9])\))"),
+    "annotation_block": re.compile(
+        r"(?P<citation>(?P<num>[1-9])\.)\s", re.MULTILINE | re.DOTALL
+    ),
+    "annotation_class": re.compile(r"(?P<class>\{\s{0,2}\.annotate\s{0,2}\})"),
+    "annotation": re.compile(
+        r"(?P<citation>\([1-4]\)).*?(?P<class>\{\s\.annotate\s\})[\s]{1,4}[1-4]\.\s{1,2}(?P<annotation>.+?)\n",
+        re.MULTILINE | re.DOTALL,
+    ),
+    "format_class": re.compile(r"\{\s?\.\w+\s?\}"),
+    "header": re.compile(r"#+ (?P<header>\w+?)\n"),
+    "markdown": re.compile(r"#+ |(\*\*|\*|`)(.*?)\1", re.MULTILINE),
+    "link": re.compile(
+        r"\[(?P<text>.*?)\]\((?P<url>.*?)\s?(?P<title>.*?)?\)", re.MULTILINE
+    ),
+    "link_reference": re.compile(r"\[(?P<text>.*?)\]\[(?P<ref>.*?)\]", re.MULTILINE),
+    "link_reference_def": re.compile(
+        r"^\[(?P<ref>.*?)\]:\s+(?P<url>.*?)\s?(?P<title>.*?)?\n", re.MULTILINE
+    ),
+    "image": re.compile(r"!\[(?P<alt_text>.*?)\]\((?P<url>.*?)\)", re.MULTILINE),
+    "initial_footnote": re.compile(r".*\[\^(?P<citation>\d+)\](?!:)"),
+    "footnote": re.compile(
+        r"^\s*\[\^(?P<citation>\d+)\]:\s+?(?P<content>.+)\n", re.MULTILINE
+    ),
+    # footnote including the inline citation, like
+    # This is some text[^1]. And some more.. *Arbitrary # of lines later*:
+    # [^1]: I'm a footnote.
+    "full_footnote": re.compile(
+        r"(?P<inline>\[\^\d+\])(!?:).+(?P<citation_pair>\1)(?=:)\s+?(?P<content>.+)\n",
+        re.MULTILINE | re.DOTALL,
+    ),
+}

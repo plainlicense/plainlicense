@@ -79,9 +79,9 @@ If you're unsure about any part of the process, don't hesitate to open an issue 
 
 Thank you for helping to improve Plain License for everyone!
 
-[code]: code.md "Developer Guidelines"
+[code]: <code.md> "Developer Guidelines"
 [commits]: commit.md#commit-message-format "Commit Message Guidelines"
-[spdx]: https://spdx.org/licenses/ "SPDX License List"
-[option1]: #option-1-using-git-and-github "Using Git and GitHub"
-[option2]: #option-2-using-github-issues "Using GitHub Issues"
-[writing]: write.md "Writing Guidelines"
+[spdx]: <https://spdx.org/licenses/> "SPDX License List"
+[option1]: <#option-1-using-git-and-github> "Using Git and GitHub"
+[option2]: <#option-2-using-github-issues> "Using GitHub Issues"
+[writing]: <write.md> "Writing Guidelines"

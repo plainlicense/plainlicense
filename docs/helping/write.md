@@ -148,5 +148,5 @@ Plain License uses [MKDocs][mkdocshome] to generate our site. We write all site 
 {% endif %}
 {% endfor %}
 
-[mkdocshome]: https://www.mkdocs.org/ "MKDocs Home"
-[mdown]: https://www.markdownguide.org/ "Markdown Guide"
+[mkdocshome]: <https://www.mkdocs.org/> "MKDocs Home"
+[mdown]: <https://www.markdownguide.org/> "Markdown Guide"

@@ -68,8 +68,8 @@ Thank you for considering a donation to Plain License. Your support makes our wo
 
 [^1]: The sponsorship is through the founder of Plain License, Adam. Plain License is not yet an official non-profit organization, but your contributions will help us become one.
 
-[sponsors]: https://github.com/sponsors/seekinginfiniteloop "Sponsor seekinginfiniteloop for Plain License"
+[sponsors]: <https://github.com/sponsors/seekinginfiniteloop> "Sponsor seekinginfiniteloop for Plain License"
 [contact]: mailto:adam@plainlicense.org "Email Adam for more information"
-[code]: code.md "Developer Contributions"
-[translate]: translate.md "Translation Contributions"
-[legal]: legal.md "Legal Contributions"
+[code]: <code.md> "Developer Contributions"
+[translate]: <translate.md> "Translation Contributions"
+[legal]: <legal.md> "Legal Contributions"

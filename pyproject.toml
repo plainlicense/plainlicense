@@ -52,6 +52,7 @@ dev-dependencies = [
     "rich>=13.9.3",
     "tqdm>=4.66.5",
     "ruff>=0.11.6",
+    "markdown>=3.8",
 ]
 python-downloads = "automatic"
 managed = true

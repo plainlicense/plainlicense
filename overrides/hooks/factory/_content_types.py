@@ -1,15 +1,28 @@
 """Defines content types for markdown, including admonitions and code blocks."""
+import re
+
 from dataclasses import dataclass, field
 from enum import StrEnum
 from functools import cached_property
 from os import PathLike
-import re
 from textwrap import dedent
 from typing import Annotated, ClassVar, Literal, LiteralString, NamedTuple, Self, cast
 from unittest import mock
 
-from overrides.hooks.factory._constants import LINEBREAK, PARAGRAPH_BREAK, PATTERNS, SPACE
+from overrides.hooks.factory._constants import (
+    LINEBREAK,
+    PARAGRAPH_BREAK,
+    PATTERNS,
+    SPACE,
+)
 from overrides.hooks.factory._content_interface import ContentBase
+from overrides.hooks.factory._paragraph import (
+    Citation,
+    Citations,
+    Footnote,
+    Footnotes,
+    Paragraph,
+)
 
 
 type EmptyString = Literal[""]
@@ -49,124 +62,44 @@ class Admonition(SelfEnum):
     TIP = "tip"
     WARNING = "warning"
 
-class Footnote(NamedTuple):
+class GithubAlertName(SelfEnum):
     """
-    Represents a footnote with full (not inline) footnote.
+    Enum representing different types of GitHub alerts.
     """
-    citation: int
-    content: str
-
-    def __str__(self) -> str:
-        """Returns the string representation of the footnote."""
-        return f"[^{self.citation}]:{SPACE}{self.content}"
+    CAUTION = "[!CAUTION]"
+    IMPORTANT = "[!IMPORTANT]"
+    NOTE = "[!NOTE]"
+    TIP = "[!TIP]"
+    WARNING = "[!WARNING]"
 
     @classmethod
-    def from_footnote_match(cls, match: re.Match[str]) -> "Footnote":
+    def from_admonition(cls, admonition: Admonition) -> "GithubAlertName":
         """
-        Creates a Footnote instance from a regex match object produced by `PATTERNS["footnote"]`.
-
-        Args:
-            match (re.Match[str]): The regex match object containing footnote data.
-
-        Returns:
-            Footnote: An instance of Footnote with citation and content.
+        Converts an Admonition to a GithubAlertName.
         """
-        citation = int(match.group(1))
-        content = match.group(2).strip()
-        return cls(citation, content)
+        match admonition:
+            case Admonition.ABSTRACT | Admonition.INFO | Admonition.NOTE | Admonition.QUOTE | Admonition.QUESTION | Admonition.SUCCESS:
+                return cls.NOTE
+            case Admonition.TIP | Admonition.EXAMPLE:
+                return cls.TIP
+            case Admonition.CAUTION | Admonition.DANGER | Admonition.FAILURE:
+                return cls.CAUTION
+            case Admonition.BUG | Admonition.WARNING:
+                return cls.WARNING
+
+    @property
+    def alert_line(self) -> str:
+        """
+        Returns the alert line for the GitHub alert.
+        """
+        return f">{SPACE}{self}"
 
     @classmethod
-    def from_annotation_match(cls, match: re.Match[str]) -> "Footnote":
+    def to_full_string(cls, admonition: Admonition, content: str) -> str:
         """
-        Creates a Footnote instance from a regex match object produced by `PATTERNS["annotation"]`.
-
-        Args:
-            match (re.Match[str]): The regex match object containing annotation data.
-
-        Returns:
-            Footnote: An instance of Footnote with citation and content.
+        Converts an Admonition to its full string representation.
         """
-        citation = int(match.group("citation").replace("(", "").replace(")", ""))
-        content = match.group("annotation").strip()
-        return cls(citation, content)
-
-type Footnotes = tuple[Footnote, ...] | None
-
-class Paragraph(str):
-    """
-    Represents a single paragraph of text, ensuring it is non-empty and stripped of leading/trailing whitespace.
-    Added text should be in rich markdown (i.e. mkdocs markdown), as it will be deconstructed into other content types.
-    """
-    __slots__ = ()
-    annotations: tuple[re.Match, ...] | None = None  # Holds any annotations found in the paragraph
-
-    footnote_citations: tuple[re.Match, ...] | None = None  # Footnote citations
-
-    _footnotes: Footnotes | None = None  # Holds annotation references converted to footnotes that are extracted from the paragraph
-
-    def __new__(cls, s: str, annotations: tuple[re.Match[str], ...] | None = None, footnote_citations: tuple[re.Match[str], ...] | None = None) -> "Paragraph":
-        """
-        Makes a new instance of Paragraph from a string.
-
-        Note: Footnote *citations* are not Footnotes. They're the in-text references to footnotes, which are defined at the end of the document.
-        """
-        if not s or not s.strip() or not isinstance(s, str):
-            raise ValueError("Paragraph cannot be empty.")
-        instance = super().__new__(cls, dedent(s.strip()))
-        found_annotations = tuple(PATTERNS["annotation"].finditer(instance))
-        annotations = annotations or found_annotations if found_annotations else None
-        instance.annotations = annotations
-        found_footnotes = tuple(PATTERNS["footnote"].finditer(instance))
-        instance.footnote_citations = footnote_citations or found_footnotes if found_footnotes else None # type: ignore  # pylance has no idea
-        return instance
-
-    def rich_markdown(self) -> str:
-        """Returns the rich markdown representation of the paragraph."""
-        return self
-
-    def _realign_footnotes(self) -> Self:
-        """
-        Realigns footnotes to their correct positions based on the annotations.
-        """
-        if not self.annotations:
-            return self
-        mock_self = self
-        # Replace annotations with footnote references
-        # but we may have repeat numbers after this
-        annotation_indexes: list[tuple[int, str, range]] = []
-        for annotation in self.annotations:
-            citation = int(annotation.group("citation").replace("(", "").replace(")", ""))
-            # we save the citation, annotation text, and its approximate position
-            # text indexes will shift a bit but we just need to know about where it is
-            annotation_indexes.append(((citation), annotation.group("annotation").strip(), range(annotation.start(1) - 3, annotation.end(1) + 4)))
-            mock_self = mock_self.replace(annotation.group("citation"), f"[^{citation}]").replace(annotation.group("class"), "").replace(annotation.group("annotation"), "")
-        # Now we need to realign the footnotes to ensure they are in order
-        replace_annotations = []
-        for index, match in enumerate(PATTERNS["initial_footnote"].finditer(mock_self), start=1):
-            if index == 1 and int(match.group(1)) > 1:
-                index = int(match.group(1))
-            location = match.start(1)
-            mock_self = f"{mock_self[:location]}[^{index}]{mock_self[location + len(match.group(1)):]}"
-            if location in [start for _, _, start in annotation_indexes]:
-                # if the location is in the annotation indexes, we know it's one of our annotations, and we need to save it as a footnote
-                replace_annotations.append(
-                    Footnote(
-                        citation=index,
-                        content=next(annotation[1] for annotation in annotation_indexes if location in annotation[2])
-                    )
-                )
-        self._footnotes = tuple(replace_annotations) if replace_annotations else None
-        # Now we can return a new Paragraph instance with the realigned footnotes
-        # But we need to keep the annotations for the actual annotations
-        return type(self)(mock_self, annotations=None, footnote_citations=tuple(PATTERNS["initial_footnote"].finditer(mock_self)))
-
-    @cached_property
-    def markdown(self) -> str:
-        """Returns the markdown representation of the paragraph."""
-        mock_self = self
-        if self.annotations:
-            mock_self = self._realign_footnotes()
-        return dedent(mock_self.strip())
+        return f">{SPACE}{cls.from_admonition(admonition)}{LINEBREAK}>{SPACE}{dedent(content.strip())}"
 
 
 class Paragraphs(tuple):

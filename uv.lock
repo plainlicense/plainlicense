@@ -1020,6 +1020,7 @@ dependencies = [
 dev = [
     { name = "glom" },
     { name = "ipython" },
+    { name = "markdown" },
     { name = "pillow" },
     { name = "pillow-avif-plugin" },
     { name = "pylance" },
@@ -1059,6 +1060,7 @@ requires-dist = [
 dev = [
     { name = "glom", specifier = ">=23.5.0" },
     { name = "ipython", specifier = ">=8.31.0" },
+    { name = "markdown", specifier = ">=3.8" },
     { name = "pillow", specifier = ">=10.4.0" },
     { name = "pillow-avif-plugin", specifier = ">=1.4.6" },
     { name = "pylance", specifier = ">=0.22.0" },

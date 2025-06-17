@@ -62,7 +62,6 @@ theme:
     - content.code.annotate
     - content.code.copy
     - content.code.select
-    - content.tabs.link
     - content.tooltips
     - content.footnote.tooltips
     - navigation.footer
@@ -158,6 +157,14 @@ plugins:
       type: date
   - git-authors
 markdown_extensions:
+  - pymdownx.superfences:
+      disable_indented_code_blocks: true
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.saneheaders
+  - sane_lists
   - abbr
   - def_list
   - footnotes
@@ -168,8 +175,9 @@ markdown_extensions:
   - pymdownx.blocks.definition
   - pymdownx.blocks.details
   - pymdownx.blocks.html
-  - pymdownx.tabbed:
+  - pymdownx.blocks.tab:
       alternate_style: true
+      combine_header_slug: true
       slugify: !!python/object/apply:pymdownx.slugs.slugify
         kwds:
           case: lower
@@ -188,7 +196,6 @@ markdown_extensions:
       use_pygments: true
   - pymdownx.betterem
   - pymdownx.critic
-  - pymdownx.caret
   - pymdownx.inlinehilite
   - pymdownx.keys:
       separator: +
@@ -212,26 +219,18 @@ markdown_extensions:
         - includes/abbreviations.md
       base_path:
         - /
-  - pymdownx.saneheaders
-  - pymdownx.superfences:
-      disable_indented_code_blocks: true
-      custom_fences:
-        - name: mermaid
-          class: mermaid
-          format: !!python/name:pymdownx.superfences.fence_code_format
-  - pymdownx.striphtml:
-      strip_comments: true
   - pymdownx.tilde
-  - sane_lists
   - tables
   - toc:
       toc_depth: 3
-      permalink_title: Use this anchor link to share this section
+      permalink_title: You can link to this section
       permalink: true
       slugify: !!python/object/apply:pymdownx.slugs.slugify
         kwds:
           case: lower
           percent_encode: true
+  - pymdownx.striphtml:
+      strip_comments: true
 watch:
   - includes
   - overrides
@@ -379,8 +378,6 @@ extra:
     conveyance: sharing
     detriment: harm
     display: show
-    distribute: share
-    distributes: shares
     effectuate: carry out
     enforce: make sure the rules are followed
     enforcement: making sure the rules are followed

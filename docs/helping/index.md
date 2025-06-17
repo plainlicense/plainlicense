@@ -71,13 +71,13 @@ Plain License is a community-driven project, and we need your help to make it a 
 
 </div>
 
-[commitformat]: commit.md "Commit Message Format"
-[crafting]: craft.md "License Crafting Guide"
-[writing]: write.md "Writing Guidelines"
-[translating]: translate.md "Translation Guide"
-[legal]: legal.md "Legal Contributions to Plain License"
-[donate]: donate.md "Donate to Plain License"
-[discussions]: {{ config.repo_url | trim }}/discussions "Join the discussion on GitHub"
-[submit-issue]: {{ config.repo_url | trim }}/issues "Submit a GitHub issue"
-[coding]: code.md "Contributing to Plain License"
+[commitformat]: <commit.md> "Commit Message Format"
+[crafting]: <craft.md> "License Crafting Guide"
+[writing]: <write.md> "Writing Guidelines"
+[translating]: <translate.md> "Translation Guide"
+[legal]: <legal.md> "Legal Contributions to Plain License"
+[donate]: <donate.md> "Donate to Plain License"
+[discussions]: <{{ config.repo_url | trim }}/discussions> "Join the discussion on GitHub"
+[submit-issue]: <{{ config.repo_url | trim }}/issues> "Submit a GitHub issue"
+[coding]: <code.md> "Contributing to Plain License"
 [contact-us]: mailto:adam@plainlicense.org "Contact Plain License"
