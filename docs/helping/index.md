@@ -1,7 +1,7 @@
 ---
 template: main.html
 title: Helping Plain License -- How to Contribute
-description: How to help Plain License and contribute to our mission of making licenses easier to understand.
+description: How to help improve Plain License.
 ---
 
 # We Need Your Help!
@@ -50,7 +50,7 @@ Plain License is a community-driven project, and we need your help to make it a 
 -   __Site Contributions__
 
     ---
-    If you have ideas for improving our site, we would love to hear them. You can submit an issue on our GitHub page: [submit an issue][submit-issue], or join our [discussions][discussions] on GitHub. Or, you can jump right in. For many parts of our site, you don't need to know how to code to make changes. We use a simple markdown format that anyone can learn. [jump in][coding]
+    If you have ideas for improving our site, we would love to hear them. You can submit an issue on our GitHub page: [open an issue][submit-issue], or join our [discussions][discussions] on GitHub. Or, you can jump right in. For many parts of our site, you don't need to know how to code to make changes. We use a simple markdown format that anyone can learn. [jump in][coding]
 
     __[:octicons-arrow-right-24: contribute to the site][coding]__
 
@@ -66,7 +66,7 @@ Plain License is a community-driven project, and we need your help to make it a 
     ---
     We want to reach as many people as possible with our mission to make licenses accessible. You can help by telling your friends, family, and colleagues about Plain License. You can also share our site on social media or write about us on your blog.
 
-    Start by staring us on Github:
+    Start by starring us on Github:
 <a class="github-button" href="https://github.com/plainlicense/plainlicense" data-color-scheme="no-preference: light; light: light; dark: dark;" data-icon="octicon-star" data-size="large" aria-label="Star plainlicense on GitHub">Star</a>
 
 </div>

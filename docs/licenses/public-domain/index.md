@@ -30,4 +30,4 @@ The [Plain Unlicense][unlicense] is currently our only public domain dedication.
 
 1. Some licenses we recraft aren't in the public domain and require you give credit to the author, so we cannot release these under the Plain Unlicense.
 
-[unlicense]: unlicense/index.md "Plain Unlicense"
+[unlicense]: <unlicense/index.md> "Plain Unlicense"

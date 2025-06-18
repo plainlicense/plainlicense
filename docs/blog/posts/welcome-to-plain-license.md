@@ -84,4 +84,4 @@ We focus on licenses for software and creative works for now. But we want to do 
 When people understand licenses, they share and create more. With Plain License, we're making hard-to-read legal words into clear, simple terms.
 Do you want to make your terms easy for everyone to understand? [Look at our licenses][licenses] and join us. **Let's make "terms for everyone" real.**
 
-[licenses]: ../../licenses/index.md "Our Licenses"
+[licenses]: <../../licenses/index.md> "Our Licenses"

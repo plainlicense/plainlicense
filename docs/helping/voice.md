@@ -57,7 +57,7 @@ When sharing or talking about Plain License with others:
 
 Plain License *is* an open source project, but we are not an open source *advocacy* project.
 
-People often think of creative licenses as the same as 'open source' or 'free software'. The open source community led important innovations with [permissive][permissive] and [copyleft][copyleft] creative licenses that make people assume that relationship. Most creative licenses are open source.
+People often think of creative licenses as the same as 'open source' or 'free software'. There are good reasons for that. The open source community led important innovations with [permissive][permissive] and [copyleft][copyleft] creative licenses that make people assume that relationship. Most creative licenses *are* open source.
 
 Plain License supports *any* creative work, and we want to support creators *any way they choose to share their work*. Our goal is *not sharing*, it's *creation* -- we think all people deserve to understand the creator's intent. Unfortunately, creators sometimes share work without understanding the terms, and we want to help them choose a license that works for them and their goals.
 
@@ -88,7 +88,7 @@ When describing your use of Plain License, here are some ways to talk about it:
 
 ## Visual Identity
 
--   **Logo**. Our logo is a simple abstract design that represents clarity and accessibility, and speaks to reducing complexity. Use it consistently across all platforms. Never change the logo or use it in a way that misrepresents our mission, and it should always appear alone with enough space around it. If it's crowded by other logos or graphics, it loses its core message of clarity and simplicity.
+-   **Logo**. Our logo is a simple abstract design that represents clarity and accessibility. It speaks to reducing complexity. Use it consistently across all platforms. Never change the logo or use it in a way that misrepresents our mission. It should always appear alone with enough space around it. If it's crowded by other logos or graphics, it loses its core message of clarity and simplicity.
 -   **Color Palette**. Use our color palette to create a consistent look across all communications. Use the colors in the same way in all places and in a way that reflects our community 'brand' identity.
     - Primary/Logo Color: #15db95 A vibrant teal green that represents clarity and rebellion
     - Secondary Colors: #0d19a3 a vibrant blue, and #e4c580 a muted gold
@@ -111,6 +111,6 @@ Plain language isn't about making things simple. It's about making them clear. O
 
 These guidelines belong to the community. Use them, improve them, and help us build a world where everyone can understand their rights.
 
-[plain_unlicense]: ../licenses/plain-unlicense/index.md "more about the Plain Unlicense"
-[permissive]: ../licenses/permissive/index.md "more about permissive licenses"
-[copyleft]: ../licenses/copyleft/index.md "more about copyleft licenses"
+[plain_unlicense]: <../licenses/plain-unlicense/index.md> "more about the Plain Unlicense"
+[permissive]: <../licenses/permissive/index.md> "more about permissive licenses"
+[copyleft]: <../licenses/copyleft/index.md> "more about copyleft licenses"

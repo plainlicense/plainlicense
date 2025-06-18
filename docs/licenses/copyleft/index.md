@@ -28,11 +28,13 @@ The [Plain MPL][mpl] is a simple, clear adaptation of the Mozilla Public License
 /// admonition | Our copyleft licenses may not be compatible with their original versions
     type: warning
 
-We designed our copyleft licenses to be simple and easy to understand. We try to capture the intent of the original licenses while making them easier to read, but **our licenses are not official or endorsed by the original authors**. Because copyleft licenses can be incompatible with each other, **we can't garauntee that our licenses are compatible with the original licenses or that people will recognize them as compatible.** If you have questions about how to use our licenses, we recommend you talk to a lawyer. If you choose to use one of our licenses, you use it at your own risk. We are not affiliated with the Free Software Foundation or the Mozilla Foundation, and neither organization has endorsed our licenses.  We are just people who care about plain language and open source licensing.
+We designed our copyleft licenses to be simple and easy to understand. We try to capture the intent of the original licenses and make them easier to read. **Our licenses are not official or endorsed by the original authors**. Because copyleft licenses can be incompatible with each other, **we can't guarantee that our licenses are compatible with the original licenses or that people will see them as compatible.**
+
+If you have questions about how to use our licenses, we recommend you talk to a lawyer. If you choose to use one of our licenses, you use it at your own risk. We are not affiliated with the Free Software Foundation or the Mozilla Foundation, and neither organization has endorsed our licenses.  We are just people who care about plain language and open source licensing.
 
 **If your work is for a specific community, you may want to use the original license instead of our version.** Our licenses are designed to be general purpose, and may not be suitable for all projects. You could also consider letting that community know about our licenses, so they can decide if they want to accept them. **We include a statement in our copyleft licenses that our license can be relicensed under the original license**, which should make it easier for people to switch to the original license if they want to or if they have compatibility concerns.
 
 ///
 
-[mpl]: mpl-2.0/index.md "Plain MPL License"
-[source-available]: ../source-available/index.md "Plain License Source-Available Licenses"
+[mpl]: <mpl-2.0/index.md> "Plain MPL License"
+[source-available]: <../source-available/index.md> "Plain License Source-Available Licenses"

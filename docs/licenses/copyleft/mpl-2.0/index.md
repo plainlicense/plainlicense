@@ -140,7 +140,8 @@ reader_license_text: |
     If your local laws or regulations stop you from following any term of this license, you must:
 
     - Follow all other terms as closely as you can.
-    - Explain which parts you can’t follow, and why you can't follow them. Your explanation must use clear, plain language, and you must include your explanation with every copy of the work you share.
+    - Explain which parts you can’t follow, and why you can't follow them. Your explanation must use clear, plain language.
+    - Include your explanation with every copy of the work you share.
 
     ## If There Are Legal Disputes
 
@@ -150,15 +151,17 @@ reader_license_text: |
 
     - This license is our entire agreement. We aren’t giving you any other rights or promises.
     - If a court can’t enforce part of this agreement, it may change that part only enough to make it enforceable, leaving the rest of the license as is.
-    - Some courts interpret contracts in favor of the person who didn’t write them. Those laws don’t apply. The authors chose this standard publicly available license to help everyone, not just themselves. The Plain MPL is a standard license agreement that the authors chose for the work to be fair to everyone, including the authors, contributors, and users. It is not a contract that favors one party over another.
+    - Some courts interpret contracts in favor of the person who didn’t write them. Those laws don’t apply.
+      - The authors chose this standard publicly available license to help everyone, not just themselves.
+      - The Plain MPL is a standard license agreement that the authors chose for the work to be fair to everyone, including the authors, contributors, and users.
+      - It is not a contract that favors one party over another.
 
     ## How to Provide Notices
 
-    You must include one of two notices with any parts of the work you share:
+    You must include *one* of two notices with any parts of the work you share:
 
     1. **Plain MPL Notice.** This tells people they can use the work under the Plain MPL or the Mozilla Public License, and where they can read them. See [Plain MPL Notice](#the-plain-mpl-notice--default).
-    2. **Same-License Notice.** If you only want to share the work under the Plain MPL, and **not** allow people to share it under a stronger copyleft license like the GPL, LGPL, or Affero GPL, you must include a notice that says they can’t share it under another license. See [Same-License Notice](#same-license-notice--optional). This notice is optional. If you use the Same-License Notice, it replaces the Plain MPL Notice. If the authors use the Same-License Notice, you must use it too.
-
+    2. **Same-License Notice.** If you only want to share the work under the Plain MPL, and **not** allow people to share it under a stronger copyleft license like the GPL, LGPL, or Affero GPL, you must include a notice that says they can’t share it under another license. See [Same-License Notice](#same-license-notice--optional). This notice is optional, and only the original authors can decide to include it. If you use the Same-License Notice, it replaces the Plain MPL Notice. If the authors use the Same-License Notice, you must use it too.
 
     ### The Plain MPL Notice [default]
 
@@ -183,7 +186,6 @@ reader_license_text: |
     ## Definitions
 
     `we` and `the authors`
-
     :    The people or organizations that created the work
 
     `you`

@@ -1,7 +1,7 @@
 ---
 template: main.html
 title: Contributing Translations to Plain License
-description: Learn how to contribute translations to Plain License, including licenses and site content.
+description: How to help with multi-language support for Plain License.
 ---
 # Contributing Translations to Plain License
 

@@ -1,9 +1,9 @@
 ---
 template: main.html
-title: "Contributing to Plain License: A Beginner's Guide"
-description: "Committing to Plain License: A Beginner's Guide"
+title: "Helping Plain License: A Beginner's Guide"
+description: How to help improve Plain license.
 ---
-# Contributing to Plain License: A Beginner's Guide
+# Helping Plain License: A Beginner's Guide
 
 We're excited that you want to contribute to Plain License! This guide will help you get started, whether you're new to open source or an experienced developer.
 

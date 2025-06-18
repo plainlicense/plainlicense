@@ -40,9 +40,10 @@ Once we are an official non-profit, we will be able to do a lot more. Your contr
 <div class="candystripe" markdown>
 [={{ percentage }} "{{ percentage }}"]
 </div>
-## Volunteer Expertise Needed
 
-In addition to financial support, we're seeking volunteers with experience in chartering 501&lpar;c&rpar;(3) organizations. If you have knowledge in this area and are willing to contribute your time and expertise, we'd love to hear from you!
+## We Need Some Non-Profit Smarts
+
+In addition to financial support, we're seeking volunteers with experience in chartering 501&lpar;c&rpar;(3) organizations. If you have experience with this and are willing to contribute your time and expertise, we'd love to hear from you!
 
 ### How You Can Help
 
@@ -51,11 +52,11 @@ In addition to financial support, we're seeking volunteers with experience in ch
 - Offer insights on best practices for nonprofit governance
 - Assist with structuring our organization for {% raw %}501&lpar;c&rpar;(3){% endraw %} eligibility
 
-If you're interested in volunteering your expertise, please [email us][contact] with the subject line "{% raw %}501&lpar;c&rpar;(3){% endraw %} Chartering Assistance". In your email, please briefly describe your experience with nonprofit organizations and how you believe you can help.
+If you're interested in volunteering your expertise, please [email us][contact] with the subject line "{% raw %}501&lpar;c&rpar;(3){% endraw %} Chartering Assistance". In your email, please briefly describe your experience with nonprofit organizations and how you can help.
 
 ## Other Ways to Support
 
-Remember, financial contributions aren't the only way to support Plain License. You can also contribute by:
+Remember, financial contributions aren't the only way to support Plain License. You can also help by:
 
 - [Contributing to our codebase][code]
 - [Helping with translations][translate]

@@ -57,7 +57,7 @@ description: Our plain licenses are easy to understand and use. We divide our li
 
 </div>
 
-[copyleft]: copyleft/index.md "Plain License Copyleft Licenses"
-[permissive]: permissive/index.md "Plain License Permissive Licenses"
-[public-domain]: public-domain/index.md "Plain License Public Domain Dedications"
-[source-available]: source-available/index.md "Plain License Source-Available Licenses"
+[copyleft]: <copyleft/index.md> "Plain License Copyleft Licenses"
+[permissive]: <permissive/index.md> "Plain License Permissive Licenses"
+[public-domain]: <public-domain/index.md> "Plain License Public Domain Dedications"
+[source-available]: <source-available/index.md> "Plain License Source-Available Licenses"

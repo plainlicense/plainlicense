@@ -11,7 +11,7 @@ description: Plain License Fair Code licenses balance openness with sustainabili
 **Fair Code licenses follow the [Fair Code](https://faircode.io/) philosophy** of balancing openness with sustainability for creators. These licenses embody four key principles:
 
 1. **Free to use** - The work is generally free to use and can be distributed by anybody
-2. **Open source** - The source materials are openly available for inspection and modification  
+2. **Open source** - The source materials are openly available for inspection and modification
 3. **Community extensibility** - The work can be extended by anybody in public and private communities
 4. **Commercial restrictions** - The original authors retain commercial rights to monetize their work
 
@@ -34,4 +34,4 @@ Fair Code licenses are ideal for **businesses and independent creators** who wan
 
 The [Plain Elastic License][el2] follows Fair Code principles by allowing people to freely use, share, and change your work while preventing them from offering competing services. This license is perfect for creators who want to share their work openly with the community while protecting their commercial interests from direct competitors.
 
-[el2]: elastic-2.0/index.md "Plain Elastic License"
+[el2]: <elastic-2.0/index.md> "Plain Elastic License"

@@ -27,4 +27,6 @@ def get_embed_link(
     embed_url: str,
     title: str,
     page_url: str,
-) -> tuple
+) -> tuple:
+    # TODO: Add embed link
+    pass

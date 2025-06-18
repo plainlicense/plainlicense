@@ -34,7 +34,7 @@ reader_license_text: |
 
   ## You Can Do Anything with the Work
 
-  - **Use the work for anything** you want, in whole or in part.
+  - **Use the work for anything** you want. Use some or all of it.
   - **Copy, change, distribute, or sell** the work.
   - Use the work for any purpose without restrictions.
   - **License anything you create with the work however you want.**
@@ -43,7 +43,7 @@ reader_license_text: |
 
   ## We Give You a License with No Restrictions
 
-  Some courts do not recognize public domain dedications. For such cases, we give you a license to use and change the work worldwide. You and everyone else can use the work forever and never need to pay to use it. No one can take this license from you.
+  Some courts do not recognize public domain dedications. For such cases, we give you a license to use, change, and share the work worldwide. You and everyone else can use the work forever and never need to pay for it. No one can take this license from you.
 
   ## We Provide No Warranty and Accept No Liability
 

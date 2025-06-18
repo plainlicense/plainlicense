@@ -2,9 +2,9 @@
 import re
 
 from datetime import UTC, datetime
-from functools import cache, cached_property
 from re import Pattern
 from textwrap import dedent
+from typing import ClassVar
 
 from markdown.extensions.attr_list import AttrListTreeprocessor
 from markdown.extensions.def_list import DefListProcessor
@@ -24,76 +24,19 @@ from pymdownx.mark import MARK as MARK_PATTERN
 from pymdownx.snippets import SnippetPreprocessor
 
 
-_PATTERN_MAP = {
-    "attr_list": {
-        "base": AttrListTreeprocessor.BASE_RE,
-        "block": AttrListTreeprocessor.BLOCK_RE,
-        "header": AttrListTreeprocessor.HEADER_RE,
-        "inline": AttrListTreeprocessor.INLINE_RE,
-        "name": AttrListTreeprocessor.NAME_RE,
-    },
-    "block": {
-        "end": BLOCK_END_PATTERN,
-        "sep": BLOCK_SEP_PATTERN,
-        "start": BLOCK_START_PATTERN,
-        "fenced": FENCED_BLOCK_PATTERN,
-        "yaml_end": YAML_END_PATTERN,
-        "yaml_start": YAML_START_PATTERN,
-        "indent_yaml_line": INDENT_YAML_LINE_PATTERN,
-    },
-    "critic": {
-        "block_sep": BLOCK_SEP_PATTERN,
-        "block": CRITIC_BLOCK_PATTERN,
-        "critic": CRITIC_PATTERN,
-        "placeholder": CRITIC_PLACEHOLDER_PATTERN,
-        "sub_placeholder": CRITIC_SUB_PLACEHOLDER_PATTERN,
-    },
-    "def_list": {
-        "base": DefListProcessor.RE,
-        "no_indent": DefListProcessor.NO_INDENT_RE,
-    },
-    "footnote": {
-        "block": FootnoteBlockProcessor.RE,
-    },
-    "mark": {
-        "mark": MARK_PATTERN,
-    },
-    "snippet": {
-        "snippet": SnippetPreprocessor.RE_SNIPPET,
-        "snippet_all": SnippetPreprocessor.RE_ALL_SNIPPETS,
-        "snippet_file": SnippetPreprocessor.RE_SNIPPET_FILE,
-        "snippet_section": SnippetPreprocessor.RE_SNIPPET_SECTION,
-    },
-    "year": re.compile(r"\{\{\s*year\s*\}\}", re.VERBOSE),
-}
+type PatternMap = dict[str, Pattern[str]]
 
 class Patterns:
     """A class to hold the regex patterns used in the license factory."""
 
-    _attr_list =
-    def __init__(self):
-        self._patterns = _PATTERN_MAP
-
-
-def get_pattern(keys: str | tuple[str, str]) -> Pattern[str]:
-    """Retrieve a regex pattern from the pattern map."""
-    pattern = _PATTERN_MAP
-    match keys:
-        case str():
-            return pattern[keys]
-        case (first, second):
-            return pattern[first][second]
-
-
-PATTERN_MAP = {
-    "attr_list": {
-        "base": AttrListTreeprocessor.BASE_RE,
+    _attr_list: ClassVar[PatternMap] = {
         "block": AttrListTreeprocessor.BLOCK_RE,
         "header": AttrListTreeprocessor.HEADER_RE,
         "inline": AttrListTreeprocessor.INLINE_RE,
         "name": AttrListTreeprocessor.NAME_RE,
-    },
-    "block": {
+    }
+
+    _block: ClassVar[PatternMap] = {
         "end": BLOCK_END_PATTERN,
         "sep": BLOCK_SEP_PATTERN,
         "start": BLOCK_START_PATTERN,
@@ -101,32 +44,43 @@ PATTERN_MAP = {
         "yaml_end": YAML_END_PATTERN,
         "yaml_start": YAML_START_PATTERN,
         "indent_yaml_line": INDENT_YAML_LINE_PATTERN,
-    },
-    "critic": {
+    }
+    _critic: ClassVar[PatternMap] = {
         "block_sep": BLOCK_SEP_PATTERN,
         "block": CRITIC_BLOCK_PATTERN,
         "critic": CRITIC_PATTERN,
         "placeholder": CRITIC_PLACEHOLDER_PATTERN,
         "sub_placeholder": CRITIC_SUB_PLACEHOLDER_PATTERN,
-    },
-    "def_list": {
+    }
+    _def_list: ClassVar[PatternMap] = {
         "base": DefListProcessor.RE,
         "no_indent": DefListProcessor.NO_INDENT_RE,
-    },
-    "footnote": {
+    }
+    _footnote: ClassVar[PatternMap] = {
         "block": FootnoteBlockProcessor.RE,
-    },
-    "mark": {
-        "mark": MARK_PATTERN,
-    },
-    "snippet": {
+    }
+    _mark: ClassVar[PatternMap] = {
+        "mark": re.compile(MARK_PATTERN, re.DOTALL | re.MULTILINE),
+    }
+    _snippet: ClassVar[PatternMap] = {
         "snippet": SnippetPreprocessor.RE_SNIPPET,
         "snippet_all": SnippetPreprocessor.RE_ALL_SNIPPETS,
         "snippet_file": SnippetPreprocessor.RE_SNIPPET_FILE,
         "snippet_section": SnippetPreprocessor.RE_SNIPPET_SECTION,
-    },
-    "year": re.compile(r"\{\{\s*year\s*\}\}", re.VERBOSE),
-}
+    }
+    _year: ClassVar[Pattern] = re.compile(r"\{\{\s*year\s*\}\}")
+
+    def __init__(self):
+        """Initialize the Patterns class."""
+        self.attr_list = type(self)._attr_list  # noqa: SLF001
+        self.block = type(self)._block  # noqa: SLF001
+        self.critic = type(self)._critic  # noqa: SLF001
+        self.def_list = type(self)._def_list  # noqa: SLF001
+        self.footnote = type(self)._footnote  # noqa: SLF001
+        self.mark = type(self)._mark  # noqa: SLF001
+        self.snippet = type(self)._snippet  # noqa: SLF001
+        self.year = type(self)._year  # noqa: SLF001
+
 
 
 YEAR = datetime.now(UTC).strftime("%Y")

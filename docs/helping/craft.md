@@ -1,7 +1,7 @@
 ---
 template: main.html
 title: License Crafting Guide
-description: Learn how to contribute to Plain License by crafting new licenses or improving existing ones.
+description: How to improve or add Plain License licenses.
 ---
 # Contributing Licenses to Plain License
 
@@ -21,16 +21,16 @@ To contribute a new license, you'll use our `LICENSE_TEMPLATE.md` file. This tem
 2.  Fork the Plain License repository on GitHub.
 3.  Clone your fork to your local machine.
 4.  Copy the `LICENSE_TEMPLATE.md` file and rename it to match your new license (e.g., `NEW-LICENSE.md`).
-5.  Fill out the front matter in your new file. This includes:
+5.  Fill out the front matter in your new file. Each part of the template includes detailed instructions. It will walk you through things like:
 
      - License metadata (name, SPDX identifier, etc.)
      - The full text of the license
      - Any additional notes or explanations
 
-6.  Commit your changes with a message following [our commit format][commits], `SPDX-ID` should be the [SPDX identifier][spdx] of the license you're adding:
+6.  Commit your changes with a message following [our commit format][commits], where you see `apache-2.0` below, you should use the [SPDX identifier][spdx] of the license you're adding:
 
       ```git
-      subs(spdx-id): Add SPDX-ID to Plain License
+      subs(apache-2.0): Add Apache-2.0 to Plain License
       ```
 
 7.  Push your changes to your fork on GitHub.
@@ -62,7 +62,7 @@ From here, you have the same two options for contributing a new license: you can
 If your change is minor, your commit message should be something like:
 
 ```git
-admin(spdx-id): Fixed a typo in the 'sharing' section
+admin(mpl-2.0): Fixed a typo in the 'sharing' section
 ```
 
 ## Understanding the License Template
@@ -70,8 +70,8 @@ admin(spdx-id): Fixed a typo in the 'sharing' section
 The `LICENSE_TEMPLATE.md` file is the heart of our license system. It helps us maintain consistency across all licenses. There are detailed instructions for each field in the template, but here are a few key points:
 
 - The content between the `---` markers is called "front matter".
-- This front matter is used to generate different versions and views of the license.
-- Anything below the `---` markers will appear at the top of the license page.
+- We use the frontmatter to generate different versions and views of the license.
+- Anything below the `---` markers will appear at the top of the license page. This is usually blank, but you can add additional information if needed.
 
 ## Need Help?
 

@@ -23,7 +23,7 @@ You should **use a permissive license if**...
 
 ### [Plain MIT][MIT]
 
-The [MIT license][MIT] is one of the most popular permissive licenses. It is a simple, clear license that allows you to do almost anything with a work as long as you give credit to the original author.
+The [MIT license][MIT] is one of the most popular permissive licenses. In 2024, almost half of all projects on GitHub used the MIT license. It is a simple, clear license that allows you to do almost anything with a work as long as you give credit to the original author.
 <!--
 ### [Plain Apache License][apache]
 
@@ -35,4 +35,4 @@ The Apache license is another popular permissive license. It is a simple, clear 
 - **Notice Requirement:** It requires that anyone using the work must include a copy of the license, a notice, and a list of changes made to the work.
 -->
 
-[MIT]: mit/index.md "Plain MIT License"
+[MIT]: <mit/index.md> "Plain MIT License"
