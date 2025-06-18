@@ -4,6 +4,8 @@ from functools import cached_property
 from textwrap import dedent
 from typing import Literal, NamedTuple, Self
 
+from dataclasses import dataclass
+
 from overrides.hooks.factory._constants import PATTERNS, SPACE
 
 class Footnote(NamedTuple):
@@ -104,6 +106,11 @@ class Citation(NamedTuple):
 
 type Citations = tuple[Citation, ...]
 
+class Reference(NamedTuple):
+    """Represents a Citation and its corresponding Footnote."""
+    citation: Citation
+    footnote: Footnote
+
 class Paragraph(str):
     """
     A string subclass that tracks footnotes and provides text manipulation.
@@ -172,7 +179,6 @@ class Paragraph(str):
             footnotes = (c.to_footnote() for c in self.annotations)
             new_text = self.text
             for annotation.match in self.annotations:
-                temp_text =
 
 
     @cached_property

@@ -27,7 +27,11 @@ from pymdownx.snippets import SnippetPreprocessor
 type PatternMap = dict[str, Pattern[str]]
 
 class Patterns:
-    """A class to hold the regex patterns used in the license factory."""
+    """
+    A class to hold the regex patterns used in the license factory.
+
+    Imported (external) regex patterns *do not* have named groups. All organic patterns do.
+    """
 
     _attr_list: ClassVar[PatternMap] = {
         "block": AttrListTreeprocessor.BLOCK_RE,
@@ -59,6 +63,39 @@ class Patterns:
     _footnote: ClassVar[PatternMap] = {
         "block": FootnoteBlockProcessor.RE,
     }
+    _html: ClassVar[PatternMap] = {
+        # consumes the entire comment, including the closing tag
+        "comment": re.compile(
+            r"""
+                              (?P<start_tag><!--)
+                              (?P<content>.*?)
+                              (?P<end_tag>-->)""",
+            re.VERBOSE | re.DOTALL | re.MULTILINE,
+        ),
+        # consumes the entire tag, including the closing tag
+        "tag": re.compile(
+            r"""
+                        # first a single self-closed (sc) tag
+                        (?P<sc_start_tag>
+                            <
+                                (?P<sc_tag_name>\w+)
+                                (?P<sc_tag_attrs>.*?)
+                            \s*/>
+                        ) |
+                        # normal tag with attributes
+                        (?P<start_tag>
+                            <
+                                (?P<tag_name>\w+)
+                                (?P<tag_attrs>.*?)>
+                                    (?P<content>.*?)
+                            </
+                        (?P<end_tag>?P=tag_name)
+                            >
+                        )
+                    """,
+            re.VERBOSE | re.DOTALL | re.MULTILINE,
+        ),
+    }
     _mark: ClassVar[PatternMap] = {
         "mark": re.compile(MARK_PATTERN, re.DOTALL | re.MULTILINE),
     }
@@ -76,11 +113,11 @@ class Patterns:
         self.block = type(self)._block  # noqa: SLF001
         self.critic = type(self)._critic  # noqa: SLF001
         self.def_list = type(self)._def_list  # noqa: SLF001
+        self.html = type(self)._html  # noqa: SLF001
         self.footnote = type(self)._footnote  # noqa: SLF001
         self.mark = type(self)._mark  # noqa: SLF001
         self.snippet = type(self)._snippet  # noqa: SLF001
         self.year = type(self)._year  # noqa: SLF001
-
 
 
 YEAR = datetime.now(UTC).strftime("%Y")
@@ -172,7 +209,7 @@ PATTERNS: dict[str, Pattern[str]] = {
     "code": re.compile(r"""
     (
     (?P<first_line>  # The first line of a code block
-        (?P<fence_start>```)  # Start of code block
+        (?P<fence_start>```*)  # Start of code block, 3+ backticks
             \s?
         (?P<language> \w+ )?  # Optional language specifier
             \s?
@@ -180,13 +217,13 @@ PATTERNS: dict[str, Pattern[str]] = {
     )
         \n
         (?P<content>.+?)  # Content of the code block
-        (?P<fence_end>```) # End of code block
+        (?P<fence_end>?P=fence_start) # End of code block
         )
     """,
         re.DOTALL | re.VERBOSE
     ),
 
-    "code_inline": re.compile(r"(?P<fence_start>`)(?P<bang>[#][!])?(?P<lang>\w+)? ?(?P<content>.+?)(?P<fence_end>`)(?!``)"),
+    "code_inline": re.compile(r"(?P<fence_start>`)(?P<bang>[#][!])?(?P<lang>\w+)? ?(?P<content>.+?)(?P<fence_end>`)(?!`)"),
 
     "definition": re.compile(r"\s*(?P<term>`.+`)\n\n\s+(?P<def>.+)\n\n", re.MULTILINE),
     "annotation_inline": re.compile(r"(?<!\n|  )(?P<citation>\((?P<num>[1-9])\))"),

@@ -252,7 +252,7 @@ extra:
     # boilerplate for licenses; you don't need to change this
     # The placeholders (e.g. {{ original_name | trim }}) are jinja2 placeholders and are replaced with the values in the license frontmatter when the license is built.
     description: >
-      Plain License: {{ plain_name | trim }}. Terms for everyone. The {{ original_name | trim }}, but now in plain language for everyone to understand.
+      Plain License: {{ plain_name | trim }}. Freedom to create. The {{ original_name | trim }}, but now in plain language for everyone to understand.
     plain_url: >
       "licenses/{{ category.lower() | trim }}/{{ spdx_id.lower() | trim }}/"
     github_base_url: >
@@ -262,14 +262,26 @@ extra:
     github_edit_link: >
       [edit this page](https://github.com/plainlicense/plainlicense/edit/main/docs/licenses/{{ category.lower() | trim }}/{{ spdx_id.lower() | trim }}/index.md "Edit this license on GitHub")
     hide: # list of mkdocs components to hide in licenses; the table of contents is already hidden in the license template.
-    official_link: >
+    official_link: |
+      {%- if original_name and original_url -%}
       [{{ original_name | trim }}]({{ original_url | trim }} "Official {{ original_name | trim }}")
-    interpretation_title: >
+      {%- else -%}
+      null
+      {%- endif -%}
+    interpretation_title: |
+      {%- if original_name -%}
       Legally Interpreting the {{ plain_name | trim }}
+      {%- else -%}
+      null
+      {%- endif -%}
     interpretation_text: |
+      {%- if original_name -%}
       The {{ plain_name | trim }} is a plain language version of the {{ original_name | trim }}. We wrote it to make the {{ original_name | trim }} more accessible and understandable. We tried to match the {{ original_name | trim }}'s legal intent. We didn't intend any differences in meaning. **If you are using the {{ plain_name | trim }} in a legal context, you should refer to the official {{ original_name | trim }} for clarification.**
 
       If a court finds that any part of this {{ license_type | trim }} can't be enforced, the rest of the {{ license_type | trim }} terms still apply.
+      {%- else -%}
+      null
+      {%- endif -%}
     how: |
       <p>Create a LICENSE or LICENSE.md file in the base of your project. If your project is on Github or another platform that uses markdown, copy the <a class="how_link" href=#markdown>markdown version</a> using the copy icon. If your platform doesn't support markddown, use the <a class="how_link" href="#plaintext">plaintext version</a>, or provide a link to our <a class="how_link" href="#reader">reader version</a>.</p> <p><strong>Notices</strong>: the licensing community usually recommends adding a short notice to each part of your project telling readers how the work is licensed and how they can use it. For software projects, this is at the top of each module or file.</p>
     tag_text: # These values map to each of the tags in the license frontmatter, and are used for tooltips.
@@ -395,8 +407,9 @@ extra:
     furnished: given
     grant: give
     hereby: now
-    hereof: this
-    hereunder: in this
+    hereof: of this
+    herein: in this
+    hereunder: under this
     implied: suggested
     impossible: can't
     incompatible: not able to work together

@@ -6,8 +6,10 @@ original_name: MIT License
 original_url: https://opensource.org/licenses/MIT
 original_organization: Massachusetts Institute of Technology
 original_version: null
-also_known_as: >
-  Expat License, X11 License, MIT X11 License
+also_known_as:
+  - Expat License
+  - X11 License
+  - MIT X11 License
 no_official: true
 category: permissive
 license_description: The MIT License is a permissive license that allows you to do whatever you want with the work <strong>as long as you include the original copyright and license notice</strong> in any copy of the software/source.
