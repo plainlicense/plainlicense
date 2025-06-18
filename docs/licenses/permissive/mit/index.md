@@ -12,8 +12,8 @@ also_known_as:
   - MIT X11 License
 no_official: true
 category: permissive
-license_description: The MIT License is a permissive license that allows you to do whatever you want with the work <strong>as long as you include the original copyright and license notice</strong> in any copy of the software/source.
-note: The MIT License is one of the most popular permissive licenses. It is a simple, clear license that allows you to do almost anything with a work as long as you give credit to the original author.
+license_description: The MIT License is a [permissive license][category]. You can do almost anything with a work as long as you keep the notices with it.
+note: null
 permissions:
   - commercial-use
   - modifications
@@ -26,19 +26,43 @@ limitations:
   - warranty
 outro:
 reader_license_text: |
-  Copyright (c) {{ year }} `[copyright holders]`
+    Copyright Notice: (c) {{ year }} `[copyright holders]`
 
-  ## You are Free to Use, Change, and Share the Work
+    ## You Can Do Anything with The Work
 
-  We, the authors, give you a license to **use, copy, change, distribute, and sell the work and all related materials for free.** You can also license the work under different terms. You agree to these terms by using, copying, or sharing the work. Everyone who gets a copy of the work may use the work under these terms.
+    We give you permission to:
+    - Use it
+    - Copy it
+    - Change it
+    - Share it
+    - Sell it
+    - Mix or put it together with other works
 
-  ### You Must Give Us Credit
+    You can do all of these things **for free**. You can do them for any reason.
+    Everyone else can do these things too, as long as they follow the rules below.
 
-  You **must include our original copyright notice and this license in all copies or substantial portions of the work.**
+    ## **If** You Give Us Credit and Keep This Notice
 
-  ## If You Use the Work, You Accept It "As Is"
+    You can do any of these things with the work, **if you follow these two rules**:
+    <div class="annotate" markdown>
+    1.   **You must keep our copyright notice**.(1) This tells people who created the work. { .annotate }
+    2.   **You must *also* keep this notice with all versions of the work**. You can do that a few ways:
+         1.  Include this complete notice in the work (the Plain MIT License).
+         2.  Include this notice in materials that come with the work.
+         3.  [Link to this notice][selflink] from the work.
+         4.  Use an accepted standard for linking to licenses, like the [SPDX Identifier][spdx-guide]: `SPDX-LICENSE-IDENTIFIER: MIT`.
+    </div>
 
-  We offer the work as-is with **no warranties. We are not responsible for any damages or issues** from your use of the work.
+    1. That's the part at the top that says who created the work and when.
+
+    ## We Give No Promises or Guarantees
+
+    We give the work to you as it is, without any promises or guarantees. This means:
+
+    - **"As is"**: You get the work exactly how it is, including anything broken.
+    - **No Guarantees**: We are not promising that it will work well for any specific tasks, or that it will not break any rules. It may not work at all.
+
+    We are not responsible for any problems or damages that happen because of the work. You use it at your own risk.
 original_license_text: |
   # The MIT License (MIT)
 
@@ -66,7 +90,22 @@ original_license_text: |
 original_gunning_fog: 21.94
 plain_gunning_fog: 9.74
 link_in_original: false
-reference_links: null
+reference_links:
+  - name: selflink
+    url: https://plainlicense.org/licenses/permissive/mit/
+    title: Plain License MIT License page
+  - name: plainlicense
+    url: https://plainlicense.org/
+    title: Plain License home page
+  - name: plainlicense-github
+    url: https://github.com/plainlicense/plainlicense
+    title: Plain License GitHub repository
+  - name: category
+    url: https://plainlicense.org/licenses/permissive/
+    title: learn more about permissive licenses
+  - name: spdx-guide
+    url: https://spdx.dev/learn/handling-license-info/
+    title: SPDX Guide to Handling License Information
 ---
 
 *[official]: There isn't an "official" MIT license, but we call the most common version the "official" version. The Free Software Foundation calls the MIT license the "Expat License."
