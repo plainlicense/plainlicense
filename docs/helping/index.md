@@ -66,7 +66,7 @@ Plain License is a community-driven project, and we need your help to make it a 
     ---
     We want to reach as many people as possible with our mission to make licenses accessible. You can help by telling your friends, family, and colleagues about Plain License. You can also share our site on social media or write about us on your blog.
 
-    Start by staring us on Github:
+    Start by starring us on Github:
 <a class="github-button" href="https://github.com/plainlicense/plainlicense" data-color-scheme="no-preference: light; light: light; dark: dark;" data-icon="octicon-star" data-size="large" aria-label="Star plainlicense on GitHub">Star</a>
 
 </div>

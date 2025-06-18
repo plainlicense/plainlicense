@@ -1,6 +1,6 @@
 
 ////// admonition | <span class='detail-title-highlight'>The Plain MPL</span>
-       type: license
+    type: license
 
 === ":material-book-open-variant: reader" 
 
@@ -166,9 +166,9 @@
     If a court finds that any part of this license can't be enforced, the rest of the license terms still apply.
     ////
 
-                    <div class='admonition warning'><p class='admonition-title'>The Plain MPL isn't...</p>
+                    <div class='admonition warning' markdown><p class='admonition-title'>The Plain MPL isn't...</p>
 
-    === "legal advice" 
+    <p><strong>tl;dr:</strong> We aren't lawyers. This isn't legal advice. We have no relationship with Mozilla Foundation</p>=== "is not legal advice" 
 
         We are not lawyers. This is not legal advice. If you need legal advice, talk to a lawyer. You use this license at your own risk.
 
@@ -176,7 +176,9 @@
 
     === "the official Mozilla Public License Version 2.0" 
 
-        Plain License is not affiliated with the original Mozilla Public License Version 2.0 authors or Mozilla Foundation. **Our plain language versions are not official** and are not endorsed by the original authors. Our licenses may also include different terms or additional information. We try to capture the *legal meaning* of the original license, but we can't guarantee our license provides the same legal protections.
+        Plain License is not affiliated with the original Mozilla Public License Version 2.0 authors or Mozilla Foundation. **Our plain language versions are not official**. The original authors didn't endorse them.
+
+        We use different words, organization, and phrases to make our licenses easier to understand. We try to keep the *legal meaning* of the original license. We might not get it right. We can't garauntee our licenses have the same legal meaning as the original. It may not have the same protections.
 
         If you want to use the Plain MPL, start by reading the official Mozilla Public License Version 2.0 license text. You can find the official Mozilla Public License Version 2.0 [here](https://www.mozilla.org/en-US/MPL/2.0/ "check out the official Mozilla Public License Version 2.0"). If you have questions about the Mozilla Public License Version 2.0, you should talk to a lawyer.
 
@@ -544,9 +546,9 @@
     rest of the license terms still apply.
     ```
 
-    <div class='admonition warning'><p class='admonition-title'>The Plain MPL isn't...</p>
+    <div class='admonition warning' markdown><p class='admonition-title'>The Plain MPL isn't...</p>
 
-    === "legal advice" 
+    <p><strong>tl;dr:</strong> We aren't lawyers. This isn't legal advice. We have no relationship with Mozilla Foundation</p>=== "is not legal advice" 
 
         We are not lawyers. This is not legal advice. If you need legal advice, talk to a lawyer. You use this license at your own risk.
 
@@ -554,7 +556,9 @@
 
     === "the official Mozilla Public License Version 2.0" 
 
-        Plain License is not affiliated with the original Mozilla Public License Version 2.0 authors or Mozilla Foundation. **Our plain language versions are not official** and are not endorsed by the original authors. Our licenses may also include different terms or additional information. We try to capture the *legal meaning* of the original license, but we can't guarantee our license provides the same legal protections.
+        Plain License is not affiliated with the original Mozilla Public License Version 2.0 authors or Mozilla Foundation. **Our plain language versions are not official**. The original authors didn't endorse them.
+
+        We use different words, organization, and phrases to make our licenses easier to understand. We try to keep the *legal meaning* of the original license. We might not get it right. We can't garauntee our licenses have the same legal meaning as the original. It may not have the same protections.
 
         If you want to use the Plain MPL, start by reading the official Mozilla Public License Version 2.0 license text. You can find the official Mozilla Public License Version 2.0 [here](https://www.mozilla.org/en-US/MPL/2.0/ "check out the official Mozilla Public License Version 2.0"). If you have questions about the Mozilla Public License Version 2.0, you should talk to a lawyer.
 
@@ -820,9 +824,9 @@
     rest of the license terms still apply.
     ```
 
-    <div class='admonition warning'><p class='admonition-title'>The Plain MPL isn't...</p>
+    <div class='admonition warning' markdown><p class='admonition-title'>The Plain MPL isn't...</p>
 
-    === "legal advice" 
+    <p><strong>tl;dr:</strong> We aren't lawyers. This isn't legal advice. We have no relationship with Mozilla Foundation</p>=== "is not legal advice" 
 
         We are not lawyers. This is not legal advice. If you need legal advice, talk to a lawyer. You use this license at your own risk.
 
@@ -830,7 +834,9 @@
 
     === "the official Mozilla Public License Version 2.0" 
 
-        Plain License is not affiliated with the original Mozilla Public License Version 2.0 authors or Mozilla Foundation. **Our plain language versions are not official** and are not endorsed by the original authors. Our licenses may also include different terms or additional information. We try to capture the *legal meaning* of the original license, but we can't guarantee our license provides the same legal protections.
+        Plain License is not affiliated with the original Mozilla Public License Version 2.0 authors or Mozilla Foundation. **Our plain language versions are not official**. The original authors didn't endorse them.
+
+        We use different words, organization, and phrases to make our licenses easier to understand. We try to keep the *legal meaning* of the original license. We might not get it right. We can't garauntee our licenses have the same legal meaning as the original. It may not have the same protections.
 
         If you want to use the Plain MPL, start by reading the official Mozilla Public License Version 2.0 license text. You can find the official Mozilla Public License Version 2.0 [here](https://www.mozilla.org/en-US/MPL/2.0/ "check out the official Mozilla Public License Version 2.0"). If you have questions about the Mozilla Public License Version 2.0, you should talk to a lawyer.
 

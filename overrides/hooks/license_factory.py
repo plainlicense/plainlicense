@@ -14,6 +14,7 @@ Assembles license content for all license pages.
 import json
 import logging
 import re
+import sys
 
 from copy import copy
 from datetime import UTC, datetime
@@ -30,8 +31,6 @@ from mkdocs.config.defaults import MkDocsConfig
 from mkdocs.structure.files import File, Files, InclusionLevel
 from mkdocs.structure.pages import Page
 
-import sys
-from pathlib import Path
 
 # Add the project root to sys.path for imports
 project_root = Path(__file__).parent.parent.parent
@@ -43,7 +42,7 @@ from overrides.hooks.hook_logger import get_logger
 
 
 # Change logging level here
-_assembly_log_level = logging.WARNING
+_assembly_log_level = logging.DEBUG
 
 if not hasattr(__name__, "assembly_logger"):
     assembly_logger = get_logger("ASSEMBLER", _assembly_log_level)
@@ -633,9 +632,9 @@ class LicenseContent:
             for k, v in options.items():
                 if isinstance(v, dict):
                     dict_block = "{ " + ", ".join([f"{kk}: {vv}" for kk, vv in v.items()]) + " }"
-                    option_block += f"{' ' * (separator_count + 1)} {k}: {dict_block}\n"
+                    option_block += f"{' ' * 4} {k}: {dict_block}\n"
                 elif v:
-                    option_block += f"{' ' * (separator_count + 1)}{k}: {v}\n"
+                    option_block += f"{' ' * 4}{k}: {v}\n"
 
         return f"""\n{separator} {kind} | {title}\n{option_block}\n{text}\n{separator}\n"""
 
@@ -768,25 +767,27 @@ class LicenseContent:
         """Returns the not official text for the license."""
         if self.has_official:
             return dedent(f"""\
-            Plain License is not affiliated with the original {self.meta["original_name"].strip()} authors or {self.meta["original_organization"].strip()}. **Our plain language versions are not official** and are not endorsed by the original authors. Our licenses may also include different terms or additional information. We try to capture the *legal meaning* of the original license, but we can't guarantee our license provides the same legal protections.
+            Plain License is not affiliated with the original {self.meta["original_name"].strip()} authors or {self.meta["original_organization"].strip()}. **Our plain language versions are not official**. The original authors didn't endorse them.
 
-            If you want to use the {self.meta["plain_name"].strip()}, start by reading the official {self.meta["original_name"].strip()} license text. You can find the official {self.meta["original_name"].strip()} [here]({self.meta["original_url"].strip()} "check out the official {self.meta["original_name"].strip()}"). If you have questions about the {self.meta["original_name"].strip()}, you should talk to a lawyer.
+            We use different words, organization, and phrases to make our licenses easier to understand. We try to keep the *legal meaning* of the original {self.license_type}. We might not get it right. We can't garauntee our licenses have the same legal meaning as the original. It may not have the same protections.
+
+            If you want to use the {self.meta["plain_name"].strip()}, start by reading the official {self.meta["original_name"].strip()} {self.license_type} text. You can find the official {self.meta["original_name"].strip()} [here]({self.meta["original_url"].strip()} "check out the official {self.meta["original_name"].strip()}"). If you have questions about the {self.meta["original_name"].strip()}, you should talk to a lawyer.
             """)
         return ""
 
     @property
     def disclaimer_block(self) -> str:
         """Returns the disclaimer block for the license."""
-        not_advice_title = "legal advice"
+        not_advice_title = "is not legal advice"
         if not self.has_official:
             return self.blockify(
                 self.not_advice_text, "tab" if self.has_official else "warning", not_advice_title, 3
             )
         not_advice = self.tabify(self.not_advice_text, not_advice_title, 1)
         not_official_title = f"the official {self.meta.get('original_name')}"
-        not_official = self.tabify(self.not_official_text, not_official_title, 1)
+        not_official: str = self.tabify(self.not_official_text, not_official_title, 1)
         return (
-            f"<div class='admonition warning'><p class='admonition-title'>The {self.meta.get('plain_name', '')} isn't...</p>\n\n"
+            f"<div class='admonition warning' markdown><p class='admonition-title'>The {self.meta.get('plain_name', '')} isn't...</p>\n\n<p><strong>tl;dr:</strong> We aren't lawyers. This isn't legal advice. We have no relationship with {self.meta.get('original_organization')}</p>"
             f"{not_advice}{not_official}</div>"
         )
 

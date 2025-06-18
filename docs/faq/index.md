@@ -70,7 +70,7 @@ Take it from us, **it's hard to write clearly.** Taking complex ideas and making
 **There are a lot of licenses out there, and that can be confusing.** We think that's a problem, especially when the licenses are hard to understand. For example, the Free Software Foundation's GPL 3 requires [a very long faq][gpl-faq] just to explain how to use the license. (1)
 { .annotate }
 
- 1. The GPL 3 is a great license, but it's very hard to understand. We applaud the FSF for their work providing clear answers to questions about the license. We think that's a great step in the right direction. :thumbsup:
+1. The GPL 3 is a great license, but it's very hard to understand. We applaud the FSF for their work providing clear answers to questions about the license. We think that's a great step in the right direction. :thumbsup:
 
 We think our licenses stand out because they're clear and easy to read. We hope that by making licenses easier to understand, we can help people make better decisions about how to license their work. We can't fix the problem of too many licenses. We can only offer our licenses to compliment and clarify the licenses people use. Maybe one day we'll see a world where all licenses are written in plain language.
 

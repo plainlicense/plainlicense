@@ -40,7 +40,7 @@ Once we are an official non-profit, we will be able to do a lot more. Your contr
 <div class="candystripe" markdown>
 [={{ percentage }} "{{ percentage }}"]
 </div>
-## Volunteer Expertise Needed
+## We Also Need Non-Profit Chartering Assistance
 
 In addition to financial support, we're seeking volunteers with experience in chartering 501&lpar;c&rpar;(3) organizations. If you have knowledge in this area and are willing to contribute your time and expertise, we'd love to hear from you!
 
