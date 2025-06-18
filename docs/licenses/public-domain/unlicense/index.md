@@ -27,27 +27,32 @@ limitations:
   - warranty
 outro: null
 reader_license_text: |
-  ## You are Free to Use The Work - We Dedicate It to the Public Domain
+   # The Work is Everyone's Work - Use it Freely
 
-  **We, the authors, dedicate the work to the public domain.**
-  You can use it freely for any purpose and in any way you want. We give away all rights and interest in the work to the public domain forever.
+    The authors ("we") dedicate the work to the public domain. Everyone can use it however they want. Everyone can do anything with it:
+    - Use it.
+    - Copy it.
+    - Change it.
+    - Share it.
+    - Sell it.
+    - Mix or put it together with other works.
 
-  ## You Can Do Anything with the Work
+    Everyone can do these things **for free** and for **any reason**.
 
-  - **Use the work for anything** you want. Use some or all of it.
-  - **Copy, change, distribute, or sell** the work.
-  - Use the work for any purpose without restrictions.
-  - **License anything you create with the work however you want.**
+    **You or anyone else don't have to do anything** to use the work. You don't need to ask for permission, give us credit, or pay us. It is everyone's work.
 
-  **You do not need to do anything to use the work.** You do not need to ask for permission, give credit, or pay us. You can use the work without any restrictions.
+    ## We Also Give Everyone a License Without Restrictions
 
-  ## We Give You a License with No Restrictions
+    In places that follow copyright laws, we give up all our rights to the work. Everyone can use it freely, and with no benefit to us or our children. We give up all rights permanently. We want everyone to know that we give up our rights to the work now and forever.
 
-  Some courts do not recognize public domain dedications. For such cases, we give you a license to use, change, and share the work worldwide. You and everyone else can use the work forever and never need to pay for it. No one can take this license from you.
+    ## With No Promises or Guarantees
 
-  ## We Provide No Warranty and Accept No Liability
+    We give the work to you and everyone as it is, without any promises or guarantees. This means:
 
-  **We offer the work "as is" with no warranties.** We are not responsible for any damages or issues from your use of the work.
+    - **"As is"**: You get the work exactly how it is, including anything broken.
+    - **No Guarantees**: We are not promising that it will work well for any specific tasks, or that it will not break any rules. It may not work at all.
+
+    We are not responsible for any problems or damages that happen because of the work. You use it at your own risk.
 original_license_text: |
   # Unlicense (Public Domain)
 
