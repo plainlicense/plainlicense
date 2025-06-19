@@ -1,7 +1,8 @@
 ---
 template: main.html
 title: Donate to Plain License
-description: Support Plain License's mission to make licensing more accessible and understandable for everyone.
+description: Support Plain License's mission to make licensing more accessible and
+   understandable for everyone.
 funding_progress: 0
 funding_goal: 5000
 ---
