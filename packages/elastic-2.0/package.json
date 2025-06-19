@@ -1,26 +1,22 @@
 {
-  "name": "plain-license-elastic-2.0",
-  "version": "0.1.0",
-  "private": true,
   "description": "Plain language version of Elastic License 2.0",
-  "scripts": {
-    "release": "semantic-release"
-  },
-  "main": "../../docs/licenses/source-available/elastic-2.0/index.md",
   "devDependencies": {
     "@commitlint/cli": "^19.8.1",
     "@semantic-release/changelog": "^6.0.3",
     "@semantic-release/commit-analyzer": "^13.0.1",
     "@semantic-release/git": "^10.0.1"
   },
+  "main": "../../docs/licenses/source-available/elastic-2.0/index.md",
+  "name": "plain-license-elastic-2.0",
+  "private": true,
   "release": {
     "branches": [
       "+([0-9])?(.{+([0-9]),x}).x",
       "main",
       {
+        "channel": "pre/rc",
         "name": "dev",
-        "prerelease": true,
-        "channel": "pre/rc"
+        "prerelease": true
       }
     ],
     "plugins": [
@@ -29,24 +25,24 @@
         {
           "releaseRules": [
             {
-              "type": "stable",
-              "release": "major"
+              "release": "major",
+              "type": "stable"
             },
             {
-              "type": "new",
-              "release": "minor"
+              "release": "minor",
+              "type": "new"
             },
             {
-              "type": "subs",
-              "release": "minor"
+              "release": "minor",
+              "type": "subs"
             },
             {
-              "type": "admin",
-              "release": "patch"
+              "release": "patch",
+              "type": "admin"
             },
             {
-              "type": "bot",
-              "release": false
+              "release": false,
+              "type": "bot"
             }
           ]
         }
@@ -61,11 +57,25 @@
       [
         "@semantic-release/git",
         {
+          "assets": ["../changelogs/elastic-2.0.md"]
+        }
+      ],
+      ["@semantic-release/release-notes-generator"],
+      [
+        "@semantic-release/github",
+        {
           "assets": [
-            "../changelogs/elastic-2.0.md"
+            {
+              "label": "Plain Elastic License 2.0",
+              "path": "../../docs/licenses/source-available/elastic-2.0/index.md"
+            }
           ]
         }
       ]
     ]
-  }
+  },
+  "scripts": {
+    "release": "semantic-release"
+  },
+  "version": "0.1.0"
 }

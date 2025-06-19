@@ -65,6 +65,20 @@
             "../changelogs/mpl-2.0.md"
           ]
         }
+      ],
+      [
+        "@semantic-release/release-notes-generator"
+      ],
+      [
+        "@semantic-release/github",
+        {
+          "assets": [
+            {
+              "path": "../../docs/licenses/copyleft/mpl-2.0/index.md",
+              "label": "Plain MPL 2.0 License"
+            }
+          ]
+        }
       ]
     ]
   }

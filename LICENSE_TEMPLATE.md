@@ -219,13 +219,23 @@ reference_links:
   # in the text this: `[visit us][plainlicense]` will link to the URL below
   # users would just see a link that says "visit us".
   # Links can also reference template variables (see above)
+  - name: selflink
+  - url: >
+        {{ plain_url }}
+    # title is the tooltip that appears when you hover over the link
+    title: >
+        The {{ page.meta['plain_name'] }}
   - name: plainlicense
     url: https://plainlicense.org/
-    # title is the tooltip that appears when you hover over the link
     title: Plain License home page
   - name: plainlicense-github
     url: https://github.com/plainlicense/plainlicense
     title: Plain License GitHub repository
+  - name: category
+  - url: >
+        https://plainlicense.org/licenses/{{ page.meta['category'] }}/
+  - title: >
+      learn more about {{ page.meta['category'] }} licenses on Plain License
 
 # Readability scores:
 # We generate these automatically. They will be added to the page.

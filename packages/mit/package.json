@@ -1,6 +1,6 @@
 {
   "name": "plain-license-mit",
-  "version": "0.1.0",
+  "version": "0.2.1",
   "private": true,
   "description": "Plain language version of the MIT License",
   "scripts": {
@@ -61,8 +61,18 @@
       [
         "@semantic-release/git",
         {
+          "assets": ["../changelogs/mit.md"]
+        }
+      ],
+      ["@semantic-release/release-notes-generator"],
+      ["@semantic-release/github"
+        ,
+        {
           "assets": [
-            "../changelogs/mit.md"
+            {
+              "path": "../../docs/licenses/permissive/mit/index.md",
+              "label": "Plain MIT License"
+            }
           ]
         }
       ]

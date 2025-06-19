@@ -31,15 +31,15 @@ reader_license_text: |
     ## You Can Do Anything with The Work
 
     We give you permission to:
-    - Use it
-    - Copy it
-    - Change it
-    - Share it
-    - Sell it
-    - Mix or put it together with other works
+    - **Use** it
+    - **Copy** it
+    - **Change** it
+    - **Share** it
+    - **Sell** it
+    - **Mix** or put it together with other works
 
     You can do all of these things **for free**. You can do them for any reason.
-    Everyone else can do these things too, as long as they follow the rules below.
+    Everyone else can do these things too, as long as they follow these rules.
 
     ## **If** You Give Us Credit and Keep This Notice
 
@@ -53,7 +53,7 @@ reader_license_text: |
          4.  Use an accepted standard for linking to licenses, like the [SPDX Identifier][spdx-guide]: `SPDX-LICENSE-IDENTIFIER: MIT`.
     </div>
 
-    1. That's the part at the top that says who created the work and when.
+    3. That's the part at the top that says who created the work and when.
 
     ## We Give No Promises or Guarantees
 

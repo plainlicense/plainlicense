@@ -1,4 +1,5 @@
 """Defines content types for markdown, including admonitions and code blocks."""
+from pathlib import Path
 import re
 
 from dataclasses import dataclass, field
@@ -126,6 +127,7 @@ class Paragraphs(tuple):
 
     def markdown(self) -> str:
         """Returns the markdown representation of the paragraphs."""
+        pass
 
 
 
@@ -183,6 +185,14 @@ class Codeblock(ContentBase):
         """
         if self.content is None and self.snippet is None:
             raise ValueError("Content or snippet must be provided for a code block.")
+        if self.snippet:
+            file = Path(self.snippet)
+            if not file.exists():
+                raise FileNotFoundError(f"Snippet file '{self.snippet}' does not exist.")
+            snippet_content = file.read_text(encoding="utf-8")
+            # Ensure the content is a Paragraphs instance
+            # we also have to cheat a little around the frozen=True dataclass
+            object.__setattr__(self, "content", Paragraphs(snippet_content))
 
     @property
     def rich_markdown_header(self) -> str:
@@ -190,6 +200,14 @@ class Codeblock(ContentBase):
         Returns the header for the code block.
         """
         return f"""{self._delimiter}{self.language}{SPACE}"title={self.title}" """.strip()
+
+    @property
+    def markdown(self) -> str:
+        """
+        Returns the markdown representation of the code block.
+        """
+        content = self.content.rich_markdown() if isinstance(self.content, Paragraphs) else self.content
+        return f"{self.rich_markdown_header}{LINEBREAK}{content}{LINEBREAK}{self._delimiter}"
 
     @property
     def plaintext_header(self) -> str:
@@ -207,7 +225,10 @@ class Codeblock(ContentBase):
         """
         Returns the plaintext representation of the code block.
         """
-        return f"{self.plaintext_header}{LINEBREAK}{self.content.plaintext}{LINEBREAK}{type(self).plaintext_delimiter}"
+        content = self.content.split('\n')
+        lines = [f"> {line}" for line in content]
+
+        return f"{self.plaintext_header}{LINEBREAK}{self.content.split()}{LINEBREAK}{type(self).plaintext_delimiter}"
 
 @dataclass(frozen=True, order=True, kw_only=True, slots=True)
 class Definition(ContentBase):

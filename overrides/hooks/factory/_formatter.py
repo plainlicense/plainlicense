@@ -12,6 +12,31 @@ from typing import Literal
 
 from overrides.hooks._utils import wrap_text
 
+type BlockType = Literal["admonition", "caption", "definition", "details", "html"]
+
+class Block:
+    """Represents a pymdownx blocks API block"""
+
+    def __init__(self, blocktype: BlockType, type_: str, title: str, text: str, count: int = 5, options: dict[str, str | dict[str, str]] | None = None):
+        """
+        Initialize a Block instance.
+
+        Args:
+
+            type_ (str): The type of block (e.g., 'note', 'warning').
+            title (str): The title of the block.
+            text (str): The content of the block.
+            options (dict, optional): Additional options for the block.
+        """
+        self.blocktype
+        self.type_ = type_
+        self.title = title
+        self.text = text
+        self.options = options or {}
+        self.separator = "/"
+
+        self.children = []
+
 
 class Formatter:
     """Handles all formatting and structure creation operations."""

@@ -1,7 +1,7 @@
 ---
 template: main.html
 title: Legal Contributions to Plain License
-description: How legal professionals can contribute to Plain License.
+description: How legal ninjas can help Plain License.
 ---
 # Legal Contributions to Plain License
 
@@ -46,13 +46,28 @@ We welcome legal professionals to critically examine our licenses. If you see po
 3. Analyze how the license might interact with different jurisdictions' laws.
 4. Share your findings through either the [Issues][legalissue] (for clear flaws) or [Discussions][discussions] (for general concerns or suggestions) as outlined above.
 
-Your efforts to "rip apart" our licenses contribute significantly to their robustness and reliability.
+Your efforts to "rip apart" our licenses contribute significantly to their robustness and reliability. We need your creative and critical thinking to help us identify potential weaknesses and improve our licenses.
+
+### "But this word has a specific legal meaning!"
+
+Most words in legal documents have specific meanings, and we understand that. We have to balance clarity with legal precision. It isn't easy. When you find a word that seems too vague or unclear in a legal context, please:
+
+-   Explain why the word is problematic.
+-   Suggest a clearer alternative that maintains the legal meaning, or provide suggestions for how to clarify its use in the context of the license.
+-   **Consider the risk**. Is the risk of legal misinterpretation *greater than the risk of people not understanding* the license? If so, we may need to adjust the language. (1)
+{.annotate}
+
+1.  Most lawyers are trained to focus on the *risk of **legal** misinterpretation*. This risk assessment usually focuses on "what has worked" before. There's two problems with this approach:
+    1. It drives lawyers to use complex language and jargon that has been used before. It also assumes that judges and attorneys will interpret the language the same way they have in the past. But you also know that isn't true. Judges and attorneys are human, and they can have different interpretations of the same words. We think plain language is more likely to be interpreted the way we intend, because it reflects what an average person would understand.
+    2. It doesn't consider the risk of people *not understanding* the license, which is a significant risk for most licenses.
+
+- We assume good faith. We think most judges and attorneys will understand our plain language the same way we do. If you disagree, please explain why and suggest a clearer alternative.
 
 ## 501&lpar;c&rpar;(3) Chartering Assistance
 
-Plain License is seeking to become a chartered 501&lpar;c&rpar;(3) non-profit organization. We're looking for legal professionals with experience in this area to contribute their expertise.
+Plain License wants to become a chartered 501&lpar;c&rpar;(3) non-profit organization. We're looking for people with experience in this area to contribute their expertise.
 
-If you have experience with chartering 501&lpar;c&rpar;(3) organizations and are interested in helping, please visit our [Helping Plain License page][helping] for more details on how you can contribute to this crucial step in our organization's development.
+If you have experience with chartering 501&lpar;c&rpar;(3) organizations and are interested in helping, please visit our [Helping Plain License page][helping] for more details on how you can contribute to this important step in our organization's development.
 
 ## Professional Conduct and Nature of Contributions
 
@@ -62,12 +77,12 @@ Any contributions, opinions, or suggestions you provide to Plain License are not
 
 ### Ethical Considerations
 
-We understand that legal advice has specific ethical rules and professional responsibilities. By contributing to Plain License:
+We understand legal advice has specific ethical rules and professional responsibilities. By contributing to Plain License:
 
-1. You acknowledge that your contributions are *not* legal advice.
+1. You understand your contributions are *not* legal advice.
 2. You are not entering into an attorney-client relationship with Plain License or its users.
 3. Your contributions are voluntary and for the benefit of the creative community.
-4. You are not providing confidential information or creating conflicts of interest. Your contributions should be general knowledge among attorneys or publicly available information.
+4. You are not providing confidential information or creating conflicts of interest. Your contributions come from general knowledge among attorneys or publicly available information.
 
 ### Disclaimers
 

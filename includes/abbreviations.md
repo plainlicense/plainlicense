@@ -1,8 +1,13 @@
 <!-- Abbreviations and help text -->
-<!-- Most of these are what we call "shame words", or words that could be replaced
-with simpler words. All of those words are found in original licenses that we adapted.
+<!--
+Most of these are what we call "shame words". Words that could be replaced
+with simpler words or could be made easier to understand.
+We collect these words from licenses that we adapt to plain language.
 
-These references or definitions are automatically added as tooltips to any use of the word on the site. The more difficult licenses may be filled with these tooltips.
+These references or definitions are automatically added as tooltips to any use of the word on the site. The more difficult original licenses may be filled with these tooltips.
+
+The only 'shame word' we intentionally use in our licenses is "distribute".
+It has a specific legal meaning and is well understood by most people. (let's call it, a "lesser shame" word)
 -->
 *[EL]: Elastic License
 *[FSL]: Functional Source License (by Sentry)

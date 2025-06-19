@@ -32,6 +32,17 @@ class Patterns:
 
     Imported (external) regex patterns *do not* have named groups. All organic patterns do.
     """
+    _annotation: ClassVar[PatternMap] = {
+        "inline": re.compile(r"(?<!\n|  )(?P<citation>\((?P<num>[1-9])\))"),
+        "block": re.compile(
+            r"(?P<citation>(?P<num>[1-9])\.)\s", re.MULTILINE | re.DOTALL
+        ),
+        "class": re.compile(r"(?P<class>\{\s{0,2}\.annotate\s{0,2}\})"),
+        "full": re.compile(
+            r"(?P<citation>\([1-4]\)).*?(?P<class>\{\s\.annotate\s\})[\s]{1,4}[1-4]\.\s{1,2}(?P<annotation>.+?)\n",
+            re.MULTILINE | re.DOTALL,
+        ),
+    }
 
     _attr_list: ClassVar[PatternMap] = {
         "block": AttrListTreeprocessor.BLOCK_RE,
@@ -49,6 +60,28 @@ class Patterns:
         "yaml_start": YAML_START_PATTERN,
         "indent_yaml_line": INDENT_YAML_LINE_PATTERN,
     }
+    _codeblock: ClassVar[PatternMap] = {
+        "block": re.compile(
+            r"""
+    (
+    (?P<first_line>  # The first line of a code block
+        (?P<fence_start>```*)  # Start of code block, 3+ backticks
+            \s?
+        (?P<language> \w+ )?  # Optional language specifier
+            \s?
+        (?P<title> \"\w+\" | '\w+' )?  # Optional title in quotes
+    )
+        \n
+        (?P<content>.+?)  # Content of the code block
+        (?P<fence_end>?P=fence_start) # End of code block
+        )
+    """,
+            re.DOTALL | re.VERBOSE,
+        ),
+        "inline": re.compile(
+            r"(?P<fence_start>`)(?P<bang>[#][!])?(?P<lang>\w+)? ?(?P<content>.+?)(?P<fence_end>`)(?!`)"
+        ),
+    }
     _critic: ClassVar[PatternMap] = {
         "block_sep": BLOCK_SEP_PATTERN,
         "block": CRITIC_BLOCK_PATTERN,
@@ -62,6 +95,17 @@ class Patterns:
     }
     _footnote: ClassVar[PatternMap] = {
         "block": FootnoteBlockProcessor.RE,
+        "initial": re.compile(r".*\[\^(?P<citation>\d+)\](?!:)"),
+        "cite": re.compile(
+            r"^\s*\[\^(?P<citation>\d+)\]:\s+?(?P<content>.+)\n", re.MULTILINE
+        ),
+        # footnote including the inline citation, like
+        # This is some text[^1]. And some more.. *Arbitrary # of lines later*:
+        # [^1]: I'm a footnote.
+        "full": re.compile(
+            r"(?P<inline>\[\^\d+\])(!?:).+(?P<citation_pair>\1)(?=:)\s+?(?P<content>.+)\n",
+            re.MULTILINE | re.DOTALL,
+        ),
     }
     _html: ClassVar[PatternMap] = {
         # consumes the entire comment, including the closing tag
@@ -99,6 +143,13 @@ class Patterns:
     _mark: ClassVar[PatternMap] = {
         "mark": re.compile(MARK_PATTERN, re.DOTALL | re.MULTILINE),
     }
+    _markdown: ClassVar[PatternMap] = {
+        "format_class": re.compile(r"\{\s?\.\w+\s?\}"),
+        "header": re.compile(r"#+ (?P<header>\w+?)\n"),
+        # for replacing markdown syntax like **bold**, *italic*, `inline code`
+        "image": re.compile(r"!\[(?P<alt_text>.*?)\]\((?P<url>.*?)\)", re.MULTILINE),
+        "markdown": re.compile(r"#+ |(\*\*|\*|`)(.*?)\1", re.MULTILINE),
+    }
     _snippet: ClassVar[PatternMap] = {
         "snippet": SnippetPreprocessor.RE_SNIPPET,
         "snippet_all": SnippetPreprocessor.RE_ALL_SNIPPETS,
@@ -109,8 +160,10 @@ class Patterns:
 
     def __init__(self):
         """Initialize the Patterns class."""
+        self.annotation = type(self)._annotation  # noqa: SLF001
         self.attr_list = type(self)._attr_list  # noqa: SLF001
         self.block = type(self)._block  # noqa: SLF001
+        self.codeblock = type(self)._codeblock  # noqa: SLF001
         self.critic = type(self)._critic  # noqa: SLF001
         self.def_list = type(self)._def_list  # noqa: SLF001
         self.html = type(self)._html  # noqa: SLF001

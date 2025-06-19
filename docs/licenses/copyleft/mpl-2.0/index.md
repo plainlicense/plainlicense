@@ -550,5 +550,20 @@ original_license_text: |
 original_gunning_fog: 17.02
 plain_gunning_fog: 11.61 # we can do better
 link_in_original: true
-reference_links: null
+reference_links:
+  - name: selflink
+    url: https://plainlicense.org/licenses/copyleft/mpl-2.0/
+    title: Plain MPL License page
+  - name: plainlicense
+    url: https://plainlicense.org/
+    title: Plain License home page
+  - name: plainlicense-github
+    url: https://github.com/plainlicense/plainlicense
+    title: Plain License GitHub repository
+  - name: category
+    url: https://plainlicense.org/licenses/copyleft/
+    title: learn more about copyleft licenses
+  - name: official-mpl
+    url: https://www.mozilla.org/MPL/2.0/
+    title: Mozilla Public License Version 2.0
 ---
