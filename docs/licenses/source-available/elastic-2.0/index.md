@@ -16,7 +16,11 @@ also_known_as: null
 category: >
   source-available
 license_description: >
-  The Elastic License 2.0 is a source-available, or "fair code," license that allows you to use, copy, distribute, and change the work. However, you can't offer the work as a service to others. You must keep all copyright and license notices in the work. The license includes a patent grant, but you lose your patent rights if you claim the work infringes a patent.
+  The Elastic License 2.0 is a source-available, or "fair code," license that
+  allows you to use, copy, distribute, and change the work. However, you can't
+  offer the work as a service to others. You must keep all copyright and license
+  notices in the work. The license includes a patent grant, but you lose your
+  patent rights if you claim the work infringes a patent.
 note: null
 permissions:
   - distribution
@@ -32,86 +36,107 @@ limitations:
   - warranty
 
 outro: |
-  /// details |  Elastic: We think you're pretty special! :heart:
+  /// details | Why we chose the Elastic License
       type: note
 
-  **We commend the folks at [Elastic](https://www.elastic.co/)** for creating a license that's pretty clear. We can tell you worked hard to make your license terms accessible, and we appreciate it. We've just made it clearer. **Thanks for leading by example.**
+  **The Elastic License 2.0 is clearer than most source-available licenses**, though it still uses complex legal language. [Elastic][elastic] made an effort to write accessible terms, and we've built on that work to make it even clearer.
 
-  We know the Elastic License isn't widely used (besides by Elastic...), but our research found **the Elastic License offers unique terms among source-available licenses**. Most source-available licenses fall into two groups:
+  **The Elastic License offers unique terms among source-available licenses**. Most fall into two groups:
 
-  1. *Copyleft-style* licenses like the Server Side Public License (SSPL) that require competitors to open source their entire stack (not just the changes they made to the original work). The copyleft-style licenses basically force competitors to compete on the same terms as the original work.
-  2. *Delayed permissive* licenses like the Functional Source License (FSL), which forbid competitors from offering the work as a service for a 2-4 year period (2 years for FSL). After that period, the work becomes permissively licensed (e.g., MIT, Apache 2.0). For everyone else, the work is permissively licensed from the start. These licenses work on the assumption that older versions of the work will be less useful to competitors. It also prevents works from being "trapped" in restrictive licenses forever.
+  1. *Copyleft-style* licenses (like SSPL) that require competitors to open source their entire stack
+  2. *Delayed permissive* licenses (like FSL) that forbid commercial competition for 2-4 years, then become permissive
 
-  The Elastic License 2.0 falls between those two approaches. It resembles a permissive license, but with restrictions on competition. Non-competitors can use the work permissively, but **direct competitors can never use it**. **We created this Plain Elastic License to help more people understand and use it because we think it's a good option for some projects. It lets you share without compromising protection from competitors.**
+  The Elastic License falls between these approaches. **Non-competitors can use the work freely, but direct competitors can never use it.** This lets creators share openly while maintaining permanent protection from competitors.
 
-  We found other licenses with similar terms to the Elastic License, such as the Redis Source Available License 2.0. The Elastic License's terms were the clearest, so we thought it was the best candidate for a plain language license. We hope this helps more people understand and use the Elastic License.
+  We chose the Elastic License because its terms were the clearest among similar licenses (like the Redis Source Available License). **This plain language version helps more people understand a balanced approach to source-available licensing.**
 
   ///
 
 reader_license_text: |
-  ## You are Free to Use, Change, and Share The Work
+  ## You Can Do Many Things with the Work for Free
 
-  - You can **use, copy, change, and distribute the work**.
-  - **You can't offer the work's features as a service to others.**
-  - You must **keep all copyright notices** in the work.
-  - There's no warranty, and the we aren't liable for problems or damages.
+  You are free to:
 
-  ## If you use the work, you agree to this license
+  - **Use** it
+  - **Copy** it
+  - **Change** it
+  - **Share** it
 
-  You can use the work if you agree to these terms.
+  You can do all of these things **for free** and for *most* tasks or reasons. Everyone else can do these things too, as long as they follow these rules.
 
-  ## You <u>can</u> use, copy, distribute, and change the work
+  We give you this permission, but *you* can't give it to anyone else. If you want to let others use the work, you must give them a copy of this license (these rules).
 
-  We, the authors, give you permission to: **use**, **copy**, **distribute**, and **change** the work.
+  ## You Must Follow These Rules
 
-  ## You must follow three rules - you can't offer the work as a service, change license controls, or remove notices
+  You can do any of these things with the work, **if you follow these five rules**:
 
-  1) **You can't** offer the work or its substantial features as a service to others.
-      - You can build a product or service using the work, including a product or service for your company or customers.
-      - **You can't offer the work's features as a service to others**
-  2) **You can't** change, disable, or remove any license controls in the work (e.g., license keys).
-  3) **Never change or remove our license, copyright, trademark, or other notices.** You also can't use our trademarks without our permission.
+  1. You **can't offer the work or its features as a service to others**. You can't let others use the work's main features in a way that you manage.[^1]
+  2. You **can't change, turn off, or avoid any license controls in the work** (like license keys). This means you can't mess with the controls or remove any protections on the work.
+  3. You **can't change, take away, or hide any notices about licenses, copyrights, or trademarks** that come with the work. They tell you who created the work, when, and what rules you need to follow to use it.
+  4. You must follow the law if you want to use our brand name, logo, or other branding. In many cases, this means you need to get our permission first.
+  5. You must **clearly say if you change the work**. You must clearly tell people you changed the work and how you changed it. This helps others know what parts of the work are original and what parts are your changes.
 
-  ## Patent Rights
+  ## We Give You Rights to Our Patented Ideas
 
-  We give you rights to any patents we can license that you need to use the work. If you change the work, and your changes infringe a patent, your patent rights from this license don't cover that.
+  We give you rights to any patents we can license that you need to use, copy, share, change, or bring into the country to use the work.
 
-  ### You lose your patent rights if you claim the work infringes a patent
+  If you change or add to the work in a way that breaks someone else's patent rights, our permission to use the work and our patent rights do not protect you from any problems caused by those changes.
 
-  You lose your patent rights immediately if you or your company claim the work infringes a patent.
+  ## You Lose All Rights if You Claim the Work Breaks a Patent
 
-  If your company claims the work infringes a patent, you only lose your patent rights for work you do for the company. You don't lose your rights for other work (e.g. work you do for other companies or as a hobby).
+  If you or your company *say in writing* that **the work breaks any patent rules or rights**, your right to use the work ends right away. This means you or your company claims the work copies or uses someone else's patented idea without permission.
 
-  ## Your Responsibilities
+  - If you **say** the work breaks a patent, you lose your rights to the work for everything you do.
+  - If your **company** says the work breaks a patent, you lose your rights to the work for everything you do for the company. You don't lose your rights for other work (like work you do for other companies or as a hobby).
 
-  - **You must give these license terms to anyone you share any part of the work with.**
-  - If you change the work, you must tell people you changed it.
+  ## You Can Also Lose Your Rights by Breaking These Rules
 
-  ## Losing Your Rights - "Two strikes, you're out"
+  If you use the work in a way that breaks these rules, you lose your rights to use the work:
 
-  You keep your rights under this license until you break its terms. Once you learn you broke our terms, you get your rights back if you fix the problem within 30 days. Your rights end permanently if you break the terms a second time or you fail to fix fhe problem in 30 days. We don't have to warn you before you lose your rights.
+  - First time. If we tell you that you broke the rules, and **you fix the problem within 30 days** of our notice, you can get your rights back.
+  - Second time. **If you break the rules again**, or take longer than 30 days to fix the problem, you lose your rights permanently. *We don't have to warn you* before you lose your rights.
 
-  ## We Offer No Warranty and Accept No Liability
+  ## We Offer No Promises or Guarantees
 
-  **We offer the work "as is" with no warranties. We are not responsible for any damages or issues from your use of the work.**
+  We give the work to you **as it is**. This means:
+
+  - You get the work *exactly how it is*, including anything broken.
+  - We don't promise that it will work well for any specific tasks, or that it will not break any rules. It may not work at all.
+  - We are not responsible for any problems or damages that happen because of the work. You use it at your own risk.
+
+  ## You Must Give This License to Others
+
+  If you share any part of the work with anyone else, you must give them a copy of this license (these rules). You can do that a few ways:
+      1.  Include this complete notice in the work (the Plain Elastic License).
+      2.  Include this notice in materials that come with the work.
+      3.  [Link to this notice][selflink] from the work.
+      4.  Use an accepted standard for linking to licenses, like the [SPDX Identifier][spdx-guide]: `SPDX-LICENSE-IDENTIFIER: Elastic-2.0`.
+
+   You must also include our copyright notice in the work. This tells people who created the work and when.
+
+  ## Accepting these Rules
+
+  When you use the work in any way, you agree to follow these rules. **If you don't agree to these rules, you can't use the work.** These rules are the *only rules* that apply to your use of the work -- you have no other rights to use it.
 
   ## Definitions
 
   `we`
 
-  :    The people or organizations that own the work
+  :    The person, people, or company that owns the work and gives you permission to use it.
 
   `you`
 
-  :    The person or organization receiving the work
+  :    The person or group agreeing to these rules.
 
   `your company`
 
-  :    The organization you work for and its related organizations
+  :    The organization you work for and any related organizations. This includes any other businesses that have control over it, are controlled by it, or share control with it.
 
   `the work`
 
-  :    The materials provided under this license
+  :    The materials provided under this license.
+
+  [^1]: You *can* build a product or service using the work, including a product or service for your company or customers. It just can't be a service where others use the work's features directly.
 
 original_license_text: |
   # Elastic License 2.0
@@ -173,5 +198,23 @@ plain_gunning_fog: 11.58
 
 link_in_original: false
 
-reference_links: null
+reference_links:
+  - name: selflink
+    url: https://plainlicense.org/licenses/source-available/elastic-2.0/
+    title: Plain Elastic License page
+  - name: plainlicense
+    url: https://plainlicense.org/
+    title: Plain License home page
+  - name: plainlicense-github
+    url: https://github.com/plainlicense/plainlicense
+    title: Plain License GitHub repository
+  - name: category
+    url: https://plainlicense.org/licenses/source-available/
+    title: learn more about source-available licenses
+  - name: spdx-guide
+    url: https://spdx.dev/learn/handling-license-info/
+    title: SPDX Guide to Handling License Information
+  - name: elastic
+    url: https://www.elastic.co/
+    title: Elastic website
 ---
