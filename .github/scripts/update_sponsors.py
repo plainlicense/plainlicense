@@ -1,8 +1,11 @@
+#!/usr/bin/env python3
+# sourcery skip: avoid-global-variables
 """
 Update the sponsors' donation markdown file.
 """
 import os
 import re
+import sys
 
 from pathlib import Path
 from typing import Any, TypedDict, TypeGuard
@@ -98,6 +101,18 @@ def fetch_total_amount(token: str) -> int:
     return 0
 
 
+def get_frontmatter(content: str) -> tuple[Any, str]:
+    """
+    Extract the front matter from the donation markdown file content.
+    """
+    if not (front_matter_match := re.match(
+        r"^---\s*\n(.*?)\n---\s*\n", content, re.DOTALL | re.MULTILINE
+    )):
+        return {}, content
+    front_matter = yaml.to_object(front_matter_match[1])
+    return (front_matter, content[front_matter_match.end() :])
+
+
 def update_front_matter(content: str, amount: int) -> str:
     """
     Update the front matter of the donation markdown file with the new funding progress amount. Also sets the funding goal.
@@ -109,21 +124,25 @@ def update_front_matter(content: str, amount: int) -> str:
     Returns:
         str: The updated markdown content with the modified front matter.
     """
-    if front_matter_match := re.match(
-        r"^---\s*\n(.*?)\n---\s*\n", content, re.DOTALL | re.MULTILINE
-    ):
-        front_matter = yaml.to_object(front_matter_match[1])
-        rest_of_document = content[front_matter_match.end() :]
-    else:
-        front_matter = {}
-        rest_of_document = content
+    front_matter, rest_of_document = get_frontmatter(content)
 
     if not frontmatter_guard(front_matter):
         raise ValueError("Invalid front matter format.")
+    changes = False
+    if (progress := front_matter["funding_progress"]) != amount:
+        print(
+            f"Updating funding progress from {progress} to {amount} in {DONATE_FILE.name}"
+        )
+        front_matter["funding_progress"] = amount
+    if (goal := front_matter["funding_goal"]) != GOAL:
+        print(f"Updating funding goal from {goal} to {GOAL} in {DONATE_FILE.name}")
+        front_matter["funding_goal"] = GOAL
 
-    front_matter["funding_progress"] = amount
-    front_matter["funding_goal"] = GOAL
-
+    if not changes:
+        print(
+            f"No changes made to {DONATE_FILE.name}. Current funding progress: {progress}, goal: {goal}"
+        )
+        sys.exit(0)
     # Convert the updated front matter back to YAML
     updated_front_matter = yaml.to_string(front_matter)
 

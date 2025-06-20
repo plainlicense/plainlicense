@@ -12,7 +12,9 @@ also_known_as:
   - MIT X11 License
 no_official: true
 category: permissive
-license_description: The MIT License is a [permissive license][category]. You can do almost anything with a work as long as you keep the notices with it.
+license_description:
+  The MIT License is a [permissive license][category]. You can do almost
+  anything with a work as long as you keep the notices with it.
 note: null
 permissions:
   - commercial-use
@@ -26,43 +28,43 @@ limitations:
   - warranty
 outro:
 reader_license_text: |
-    Copyright Notice: (c) {{ year }} `[copyright holders]`
+  Copyright Notice: (c) {{ year }} `[copyright holders]`
 
-    ## You Can Do Anything with The Work
+  ## You Can Do Anything with The Work
 
-    We give you permission to:
-    - **Use** it
-    - **Copy** it
-    - **Change** it
-    - **Share** it
-    - **Sell** it
-    - **Mix** or put it together with other works
+  We give you permission to:
+  - **Use** it
+  - **Copy** it
+  - **Change** it
+  - **Share** it
+  - **Sell** it
+  - **Mix** or put it together with other works
 
-    You can do all of these things **for free**. You can do them for any reason.
-    Everyone else can do these things too, as long as they follow these rules.
+  You can do all of these things **for free**. You can do them for any reason.
+  Everyone else can do these things too, as long as they follow these rules.
 
-    ## **If** You Give Us Credit and Keep This Notice
+  ## **If** You Give Us Credit and Keep This Notice
 
-    You can do any of these things with the work, **if you follow these two rules**:
-    <div class="annotate" markdown>
-    1.   **You must keep our copyright notice**.(1) This tells people who created the work. { .annotate }
-    2.   **You must *also* keep this notice with all versions of the work**. You can do that a few ways:
-         1.  Include this complete notice in the work (the Plain MIT License).
-         2.  Include this notice in materials that come with the work.
-         3.  [Link to this notice][selflink] from the work.
-         4.  Use an accepted standard for linking to licenses, like the [SPDX Identifier][spdx-guide]: `SPDX-LICENSE-IDENTIFIER: MIT`.
-    </div>
+  You can do any of these things with the work, **if you follow these two rules**:
+  <div class="annotate" markdown>
+  1.   **You must keep our copyright notice**.(1) This tells people who created the work. { .annotate }
+  2.   **You must *also* keep this notice with all versions of the work**. You can give this notice a few ways:
+       1.  Include this complete notice in the work (the Plain MIT License).
+       2.  Include this notice in materials that come with the work.
+       3.  [Link to this notice][selflink] from the work.
+       4.  Use an accepted standard for linking to licenses, like the [SPDX Identifier][spdx-guide]: `SPDX-LICENSE-IDENTIFIER: MIT`.
+  </div>
 
-    3. That's the part at the top that says who created the work and when.
+  1. That's the part at the top that says who created the work and when.
 
-    ## We Give No Promises or Guarantees
+  ## We Give No Promises or Guarantees
 
-    We give the work to you as it is, without any promises or guarantees. This means:
+  We give the work to you as it is, without any promises or guarantees. This means:
 
-    - **"As is"**: You get the work exactly how it is, including anything broken.
-    - **No Guarantees**: We are not promising that it will work well for any specific tasks, or that it will not break any rules. It may not work at all.
+  - **"As is"**: You get the work exactly how it is, including anything broken.
+  - **No Guarantees**: We are not promising it will work well for any specific tasks, or that it will not break any rules. It may not work at all.
 
-    We are not responsible for any problems or damages that happen because of the work. You use it at your own risk.
+  We are not responsible for any problems or damages that happen because of the work. You use it at your own risk.
 original_license_text: |
   # The MIT License (MIT)
 
@@ -108,4 +110,6 @@ reference_links:
     title: SPDX Guide to Handling License Information
 ---
 
-*[official]: There isn't an "official" MIT license, but we call the most common version the "official" version. The Free Software Foundation calls the MIT license the "Expat License."
+\*[official]: There isn't an "official" MIT license, but we call the most common
+version the "official" version. The Free Software Foundation calls the MIT
+license the "Expat License."

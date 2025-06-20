@@ -85,6 +85,7 @@ theme:
       canshare: octicons/share-24
       cansell: fontawesome/solid/money-bill-1
       canchange: material/file-edit
+      canmix: material/merge
       canrevoke: nounproject/revoke
       required: nounproject/required
       allowed: nounproject/allowed
@@ -278,7 +279,7 @@ extra:
       {%- if original_name -%}
       The {{ plain_name | trim }} is a plain language version of the {{ original_name | trim }}. We wrote it to make the {{ original_name | trim }} more accessible and understandable. We tried to match the {{ original_name | trim }}'s legal intent. We didn't intend any differences in meaning. **If you are using the {{ plain_name | trim }} in a legal context, you should refer to the official {{ original_name | trim }} for clarification.**
 
-      If a court finds that any part of this {{ license_type | trim }} can't be enforced, the rest of the {{ license_type | trim }} terms still apply.
+      If a court finds it can't enforce any part of this {{ license_type | trim }}, the rest of the {{ license_type | trim }} terms still apply.
       {%- else -%}
       null
       {%- endif -%}
@@ -291,12 +292,14 @@ extra:
         Use Commercially: You can sell any work that uses this {{ license_type }}, and you don't have to pay the authors anything or share your changes with them.
       can-change: >
         Change freely: You can change any work that uses this {{ license_type }} however you want.
+      can-mix: >
+        Mix Freely: You can mix any work that uses this {{ license_type }} with other works, including works with different licenses.
       can-revoke: >
         Take-backs: You can revoke this license from any work that uses it at any time if you hold the copyright.
       relicense: >
         Relicense: You can change the {{ license_type }} to a different license if you want. You may need to follow certain rules, like giving credit to the original author.
       share-alike (strict): >
-        Share-Alike (strict): You must share your changes under the same license if you change or modify any work that uses this license.
+        Share-Alike (strict): You must share your changes under the same license if you change any work that uses this license.
       share-alike (relaxed): >
         Share-Alike (relaxed): You must share your changes under the same license or a similar one if you change or modify any work that uses this license.
       give-credit: >
@@ -327,12 +330,17 @@ extra:
       url: >
         https://facelessuser.github.io/pymdown-extensions/extensions/blocks/plugins/details/ "Adding collapsible detail blocks with the blocks API"
       description: Add collapsible detail blocks. By default, they start collapsed.
+    caret:
+      name: caret (inline code)
+      url: >
+        https://facelessuser.github.io/pymdown-extensions/extensions/caret/ "Adding underline with carets"
+      description: Add underline with double carets `^^like this^^`. Use this to indicate emphasis or to highlight text.
     critic:
       name: critic markup
       url: >
         https://facelessuser.github.io/pymdown-extensions/extensions/critic/ "Adding critic markup to markdown"
       description: >
-        Add [critic markup](http://criticmarkup.com/). Use this to suggest changes or make comments.
+        Add [critic markup](http://criticmarkup.com/). Use this to suggest changes or make comments. Or draw attention to changes in a document.
     def_list:
       name: definition lists
       url: >
@@ -368,9 +376,10 @@ extra:
       name: tilde strikethrough
       url: >
         https://facelessuser.github.io/pymdown-extensions/extensions/tilde/ "Adding strikethrough text with tildes"
-      description: Use strikethrough text with tildes. Use this to show deleted text or to indicate changes.
+      description: Add strikethrough text with double tildes, like `~~`. Use this to show deleted text or to indicate changes.
   shame_words: # These are 'shame words' for calculating the wall of shame (forthcoming). We use this list to determine how many 'shame words' are in the original license. The values are plain language alternatives to the more complex terms.
     # TODO: Change implementation to use the stem or lexxer of the word as the key, and the plain language alternative as the value so we don't have to list every form of the word.
+    # Plain language alternatives need some work in cases
     absence: lack
     additional: more
     alter: change
@@ -417,9 +426,11 @@ extra:
     infringed: violated
     infringements: violations
     interest: share in
+    in the event of: if
+    in the event that: if
     invalid: not valid
     irrevocable: permanent
-    jurisdiction: area of law, place where the law applies, court
+    jurisdiction: place, court, area [of law]
     licenseable: can license
     licensee: user
     licensees: users

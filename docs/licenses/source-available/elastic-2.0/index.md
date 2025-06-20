@@ -43,8 +43,8 @@ outro: |
 
   **The Elastic License offers unique terms among source-available licenses**. Most fall into two groups:
 
-  1. *Copyleft-style* licenses (like SSPL) that require competitors to open source their entire stack
-  2. *Delayed permissive* licenses (like FSL) that forbid commercial competition for 2-4 years, then become permissive
+  1. *Copyleft-style* licenses (like the [Server Side Public License][sspl]) that require competitors to open source their entire stack
+  2. *Delayed permissive* licenses (like the [Functional Source License][fsl]) that forbid commercial competition for 2-4 years, then become permissive
 
   The Elastic License falls between these approaches. **Non-competitors can use the work freely, but direct competitors can never use it.** This lets creators share openly while maintaining permanent protection from competitors.
 
@@ -84,24 +84,24 @@ reader_license_text: |
 
   ## You Lose All Rights if You Claim the Work Breaks a Patent
 
-  If you or your company *say in writing* that **the work breaks any patent rules or rights**, your right to use the work ends right away. This means you or your company claims the work copies or uses someone else's patented idea without permission.
+  If you or your company *say in writing* that **the work breaks ^^any^^ patent rules or rights**, your right to use the work ends right away. This means you or your company claim the work copies or uses someone else's patented idea without permission.
 
-  - If you **say** the work breaks a patent, you lose your rights to the work for everything you do.
-  - If your **company** says the work breaks a patent, you lose your rights to the work for everything you do for the company. You don't lose your rights for other work (like work you do for other companies or as a hobby).
+  - If ^^you^^ **say** the work breaks a patent, you lose your rights to the work for everything you do.
+  - If ^^your **company**^^ says the work breaks a patent, you lose your rights to the work for everything you do *for the company*. You don't lose your rights for other work (like work you do for other companies or as a hobby).
 
   ## You Can Also Lose Your Rights by Breaking These Rules
 
   If you use the work in a way that breaks these rules, you lose your rights to use the work:
 
-  - First time. If we tell you that you broke the rules, and **you fix the problem within 30 days** of our notice, you can get your rights back.
-  - Second time. **If you break the rules again**, or take longer than 30 days to fix the problem, you lose your rights permanently. *We don't have to warn you* before you lose your rights.
+  - **First time**. If we tell you that you broke the rules, and **you fix the problem within 30 days** of our notice, you can get your rights back.
+  - **Second time**. If you break the rules again, or take longer than 30 days to fix the problem, you lose your rights permanently. *We don't have to warn you* before you lose your rights.
 
   ## We Offer No Promises or Guarantees
 
   We give the work to you **as it is**. This means:
 
   - You get the work *exactly how it is*, including anything broken.
-  - We don't promise that it will work well for any specific tasks, or that it will not break any rules. It may not work at all.
+  - We don't promise it will work well for any specific tasks, or that it will not break any rules. It may not work at all.
   - We are not responsible for any problems or damages that happen because of the work. You use it at your own risk.
 
   ## You Must Give This License to Others
@@ -122,7 +122,7 @@ reader_license_text: |
 
   `we`
 
-  :    The person, people, or company that owns the work and gives you permission to use it.
+  :    The person, people, or company who own the work and give you permission to use it.
 
   `you`
 
@@ -130,7 +130,7 @@ reader_license_text: |
 
   `your company`
 
-  :    The organization you work for and any related organizations. This includes any other businesses that have control over it, are controlled by it, or share control with it.
+  :    The organization you work for and any related organizations. This includes any other businesses that have control over it, are controlled by the organization, or share control with it.
 
   `the work`
 
@@ -217,4 +217,10 @@ reference_links:
   - name: elastic
     url: https://www.elastic.co/
     title: Elastic website
+  - name: sspl
+    url: https://www.mongodb.com/legal/licensing/server-side-public-license
+    title: Server Side Public License
+  - name: fsl
+    url: https://fsl.software/
+    title: Functional Source License
 ---

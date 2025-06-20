@@ -225,10 +225,9 @@ class Codeblock(ContentBase):
         """
         Returns the plaintext representation of the code block.
         """
-        content = self.content.split('\n')
+        content = self.content.split('\n') # type: ignore  # string subclass
         lines = [f"> {line}" for line in content]
-
-        return f"{self.plaintext_header}{LINEBREAK}{self.content.split()}{LINEBREAK}{type(self).plaintext_delimiter}"
+        return f"{self.plaintext_header}{LINEBREAK}{LINEBREAK.join(lines)}{LINEBREAK}{type(self).plaintext_delimiter}"
 
 @dataclass(frozen=True, order=True, kw_only=True, slots=True)
 class Definition(ContentBase):

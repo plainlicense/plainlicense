@@ -1,5 +1,6 @@
 from textwrap import dedent
 
+
 def get_not_advice_text(issues_link: str, edit_link: str) -> tuple[str, str]:
     """Returns the "not advice" disclaimer text for the license."""
     return (

@@ -3,6 +3,7 @@ Hook that updates the site license to match the current version of the Plain Unl
 """
 
 import logging
+import sys
 
 from pathlib import Path
 
@@ -11,8 +12,6 @@ from mkdocs.structure.nav import Navigation
 from mkdocs.structure.pages import Page
 from mkdocs.utils.templates import TemplateContext
 
-import sys
-from pathlib import Path
 
 # Add the project root to sys.path for imports
 project_root = Path(__file__).parent.parent.parent

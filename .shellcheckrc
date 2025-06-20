@@ -1,7 +1,7 @@
 # .shellcheckrc
 
 external-sources=true
-# Disable anything that requires external reference checks...
+# Disable anything requiring external reference checks...
 # shellcheck doesn't handle these well in a repo environment
 disable=SC1090
 disable=SC1091

@@ -1,5 +1,6 @@
 {
   "configurations": [
+
     {
       "name": "Attach to Chrome",
       "pathMapping": {
@@ -10,24 +11,6 @@
       "request": "attach",
       "skipFiles": ["${workspaceFolder}/node_modules/**/*", "${workspaceFolder}/external/**/*"],
       "type": "chrome",
-      "url": "http://localhost:8000",
-      "webRoot": "${workspaceFolder}/src"
-    },
-    {
-      "clearConsoleOnReload": true,
-      "name": "Attach Firefox Debug",
-      "pathMappings": [
-        {
-          "path": "${workspaceFolder}/docs",
-          "url": "/"
-        }
-      ],
-      "port": 6000,
-      "preLaunchTask": "mkdocs serve live",
-      "reloadOnAttach": true,
-      "request": "attach",
-      "skipFiles": ["${workspaceFolder}/node_modules/**/*", "${workspaceFolder}/external/**/*"],
-      "type": "firefox",
       "url": "http://localhost:8000",
       "webRoot": "${workspaceFolder}/src"
     },
@@ -67,19 +50,12 @@
       "type": "bun"
     },
     {
+      "args": "${command:pickArgs}",
       "console": "integratedTerminal",
       "cwd": "${workspaceFolder}",
-      "name": "Python Debugger: Current File",
+      "name": "Python Debugger: Debug file",
       "program": "${file}",
-      "request": "launch",
-      "type": "debugpy"
-    },
-    {
-      "args": ["${workspaceFolder}"],
-      "console": "integratedTerminal",
-      "cwd": "${workspaceFolder}",
-      "name": "Python Debugger: Debug Analyzer",
-      "program": "${file}",
+
       "request": "launch",
       "type": "debugpy"
     }

@@ -124,7 +124,7 @@ When reviewing or editing documentation, enforce the Plain License voice charact
 - **Approachable**: Avoid legal jargon and complex terms
 - **Supportive**: Encourage questions and help-seeking
 - **Confident**: Present information clearly with authority
-- **Empathetic**: Understand that legal documents are hard for everyone
+- **Empathetic**: Understand legal documents are hard for everyone
 - **Transparent**: Open about processes and decisions
 
 ### Writing Standards Checklist

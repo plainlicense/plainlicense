@@ -38,7 +38,7 @@ I strived to avoid hardcoding any license text in the codebase. For the most par
 
 6.  **Add a Package to the Workspace**. After adding the license, you should add a package to the workspace. Steps:
 
-    1. Create a new directory in `./packages/` that is the same name that you used for the license file's directory (based on the spdx-id).
+    1. Create a new directory in `./packages/` that is the same name as you used for the license file's directory (based on the spdx-id).
     2. Copy the `.license_package_template.json` file from the `./packages/` directory to the new directory you created. (copy it, don't move it). Like so: `cp ./packages/.license_package_template.json ./packages/{spdx-id}/package.json`.
     3. The new name should be `package.json` (not `.license_package_template.json`).
     4. Update the `package.json` file. Literally just find and replace the `{{ SPDX_ID }}` placeholders with the actual SPDX ID for the license you added (or the plain license original approximation), or run: `sed -i 's/{{ SPDX_ID }}/{spdx-id}/g' ./packages/{spdx-id}/package.json` (replace `{spdx-id}` with the actual spdx-id without the curly brackets). So for the MIT license, it would be `sed -i 's/{{ SPDX_ID }}/mit/g' ./packages/mit/package.json`.
@@ -52,12 +52,12 @@ I strived to avoid hardcoding any license text in the codebase. For the most par
     }
     ```
 
-8.  **Commit and Push**. After making all the changes, commit your changes in the [commit format](./docs/helping/commit.md) and push them to the repository. For the Apache 2.0 license, the commit message would look like this:
+7.  **Commit and Push**. After making all the changes, commit your changes in the [commit format](./docs/helping/commit.md) and push them to the repository. For the Apache 2.0 license, the commit message would look like this:
 
     ```git
     new(apache-2.0): add Plain Apache 2.0 license
     ```
 
-    This indicates that you are adding a new license (Apache 2.0) to the repository. The `new` type indicates a new license, and the `apache-2.0` scope indicates the specific license being added. This allows our automated release system to version each license separately (that was the part where you added the workspace package in step 6).
+    This indicates you are adding a new license (Apache 2.0) to the repository. The `new` type indicates a new license, and the `apache-2.0` scope indicates the specific license being added. This allows our automated release system to version each license separately (the part where you added the workspace package in step 6).
 
-9.  **Create a Pull Request**. After pushing your changes, create a pull request to merge your changes into the main branch of the repository. Use the [`new-license`](.github/PULL_REQUEST_TEMPLATE/2-new-license.md) PR template.
+8.  **Create a Pull Request**. After pushing your changes, create a pull request to merge your changes into the main branch of the repository. Use the [`new-license`](.github/PULL_REQUEST_TEMPLATE/2-new-license.md) PR template.

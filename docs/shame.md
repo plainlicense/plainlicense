@@ -1,6 +1,6 @@
 ---
 title: Hall of Shame
-description: A comparison of frequency and usage of complex words in the original versions of licenses that we recrafted in plain language.
+description: Plain License Hall of Shame -- how hard words and phrases in old licenses make them hard to read.
 draft: true
 ---
 

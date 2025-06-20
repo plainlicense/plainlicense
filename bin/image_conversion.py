@@ -1,3 +1,7 @@
+#!/usr/bin/env python3
+# /// script
+# dependencies=["pillow_avif", "Pillow"]
+# ///
 """
 Converts images to different formats and sizes.
 """

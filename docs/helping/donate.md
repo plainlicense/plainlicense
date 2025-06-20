@@ -1,8 +1,8 @@
 ---
 template: main.html
 title: Donate to Plain License
-description: Support Plain License's mission to make licensing more accessible and
-   understandable for everyone.
+description: >
+    Donate to Plain License and help us make licensing more accessible and understandable for everyone.
 funding_progress: 0
 funding_goal: 5000
 ---
@@ -44,7 +44,7 @@ Once we are an official non-profit, we will be able to do a lot more. Your contr
 
 ## We Need Some Non-Profit Smarts
 
-In addition to financial support, we're seeking volunteers with experience in chartering 501&lpar;c&rpar;(3) organizations. If you have experience with this and are willing to contribute your time and expertise, we'd love to hear from you!
+In addition to financial support, we're seeking volunteers with experience in chartering 501&lpar;c&rpar;(3) organizations. If you have experience with this and are willing to contribute your time and expertise, we'd love to hear from you! With your help we can start strong and likely reduce our funding goal significantly by avoiding lawyer fees.
 
 ### How You Can Help
 

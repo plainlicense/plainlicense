@@ -102,12 +102,12 @@ original_url: >
 # original_organization: organization that created the license. If the license is a Plain License original, set to null
 original_organization: >
   {{ original_organization }}
-# original_version: version of the original license (e.g. '2.0' for Apache 2.0. 'null' if there is no versioning)
 
+# original_version: version of the original license (e.g. '2.0' for Apache 2.0. 'null' if there is no versioning)
 original_version: >
   {{ original_version }}
-# category: permissive, copyleft, public-domain, source-available, proprietary (choose one)
 
+# category: permissive, copyleft, public-domain, source-available, proprietary (choose one)
 category: >
   {{ category }}
 # license_description: A brief (1-3 sentences) description of the license and its defining characteristics
@@ -140,7 +140,6 @@ permissions:
 conditions:
   - disclose-source
   - document-changes
-  - include-copyright
   - include-copyright
   - network-use-disclose
   - same-license # must use the same license for the entire project (full stack)

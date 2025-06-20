@@ -53,6 +53,7 @@ dev-dependencies = [
     "tqdm>=4.66.5",
     "ruff>=0.11.6",
     "markdown>=3.8",
+    "gitignore-parser>=0.1.12",
 ]
 python-downloads = "automatic"
 managed = true

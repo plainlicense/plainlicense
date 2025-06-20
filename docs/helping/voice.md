@@ -48,7 +48,7 @@ The motto captures our mission to empower creators by making legal documents cle
 When sharing or talking about Plain License with others:
 
 1. Focus on empowerment through understanding
-2. Emphasize that we're making licenses clearer, not replacing them
+2. Emphasize we're making licenses clearer, not replacing them
 3. Highlight the practical benefits: confidence, creativity, sharing
 4. Emphasize our community and collaborative spirit
 5. Use inclusive language that welcomes everyone
@@ -88,12 +88,12 @@ When describing your use of Plain License, here are some ways to talk about it:
 
 ## Visual Identity
 
--   **Logo**. Our logo is a simple abstract design that represents clarity and accessibility. It speaks to reducing complexity. Use it consistently across all platforms. Never change the logo or use it in a way that misrepresents our mission. It should always appear alone with enough space around it. If it's crowded by other logos or graphics, it loses its core message of clarity and simplicity.
+-   **Logo**. Our logo is a simple abstract design representing clarity and accessibility. It speaks to reducing complexity. Use it consistently across all platforms. Never change the logo or use it in a way that misrepresents our mission. It should always appear alone with enough space around it. If it's crowded by other logos or graphics, it loses its core message of clarity and simplicity.
 -   **Color Palette**. Use our color palette to create a consistent look across all communications. Use the colors in the same way in all places and in a way that reflects our community 'brand' identity.
     - Primary/Logo Color: #15db95 A vibrant teal green that represents clarity and rebellion
     - Secondary Colors: #0d19a3 a vibrant blue, and #e4c580 a muted gold
     - Supporting Colors: #f4e4c1 a lighter gold, and #6ca6c1 a grayish sky blue
--   **Typography**. Always use clean, sans-serif fonts for readability. Our preferred fonts (all free Google fonts):
+-   **Typography**. Always use clean, sans-serif fonts for readability. Our preferred fonts (all free [Google fonts][googlefonts]) are:
     - 'Plain License' wordmark: Raleway.
     - Headings and Body Text: Inter
     - Monospace and Code: Source Code Pro
@@ -114,3 +114,4 @@ These guidelines belong to the community. Use them, improve them, and help us bu
 [plain_unlicense]: <../licenses/plain-unlicense/index.md> "more about the Plain Unlicense"
 [permissive]: <../licenses/permissive/index.md> "more about permissive licenses"
 [copyleft]: <../licenses/copyleft/index.md> "more about copyleft licenses"
+[googlefonts]: <https://fonts.google.com/> "Google Fonts"

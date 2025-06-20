@@ -29,4 +29,4 @@
 
 ## **Use at your own risk!**
 
-We provide our licenses **as-is**. Consult with an attorney before using any license for a project (and let us know how that goes). [The author, @bashandbone](https://github.com/bashandbone/), is not an attorney. He's just a human who wants to make licenses more accessible for everyone.
+We provide our licenses **as-is**. Consult with a lawyer before using any license for a project (and let us know how that goes). [The author, @bashandbone](https://github.com/bashandbone/), is not an lawyer. He's just a human who wants to make licenses more accessible for everyone.

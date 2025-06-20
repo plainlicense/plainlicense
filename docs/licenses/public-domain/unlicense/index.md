@@ -43,14 +43,14 @@ reader_license_text: |
 
   ## We Also Give Everyone a License Without Restrictions
 
-  In places that follow copyright laws, we give up all our rights to the work. Everyone can use it freely, and with no benefit to us or our children. We give up all rights permanently. We want everyone to know that we give up our rights to the work now and forever.
+  In places that follow copyright laws, we give up all our rights to the work. Everyone can use it freely, and with no benefit to us or our children. We give up all rights permanently. We want everyone to know we give up our rights to the work now and forever.
 
   ## With No Promises or Guarantees
 
   We give the work to you and everyone as it is, without any promises or guarantees. This means:
 
   - **"As is"**: You get the work exactly how it is, including anything broken.
-  - **No Guarantees**: We are not promising that it will work well for any specific tasks, or that it will not break any rules. It may not work at all.
+  - **No Guarantees**: We are not promising it will work well for any specific tasks, or that it will not break any rules. It may not work at all.
 
   We are not responsible for any problems or damages that happen because of the work. You use it at your own risk.
 original_license_text: |

@@ -5,7 +5,7 @@ description: How legal ninjas can help Plain License.
 ---
 # Legal Contributions to Plain License
 
-We highly value the expertise of legal professionals in ensuring the quality and reliability of Plain License. This guide outlines how attorneys and law-ninjas can contribute their knowledge and skills to our project.
+We highly value the expertise of legal professionals in ensuring the quality and reliability of Plain License. This guide outlines how lawyers and law-ninjas can contribute their knowledge and skills to our project.
 
 ## License Contributions and Reviews
 
@@ -30,7 +30,7 @@ We take these reports seriously and will review them promptly.
 
 For general legal opinions or discussions about our licenses:
 
-1. Visit our [GitHub "Attorney Talk" Discussions page][discussions].
+1. Visit our [GitHub "Lawyer Talk" Discussions page][discussions].
 2. Start a new discussion.
 3. Clearly state the license you're discussing and your thoughts and opinions.
 4. Encourage dialogue by asking questions or suggesting areas for further review.
@@ -58,10 +58,10 @@ Most words in legal documents have specific meanings, and we understand that. We
 {.annotate}
 
 1.  Most lawyers are trained to focus on the *risk of **legal** misinterpretation*. This risk assessment usually focuses on "what has worked" before. There's two problems with this approach:
-    1. It drives lawyers to use complex language and jargon that has been used before. It also assumes that judges and attorneys will interpret the language the same way they have in the past. But you also know that isn't true. Judges and attorneys are human, and they can have different interpretations of the same words. We think plain language is more likely to be interpreted the way we intend, because it reflects what an average person would understand.
+    1. It drives lawyers to use complex language and jargon that has been used before. It also assumes that judges and lawyers will interpret the language the same way they have in the past. But you also know that isn't true. Judges and lawyers are human, and they can have different interpretations of the same words. We think plain language is more likely to be interpreted the way we intend, because it reflects what an average person would understand.
     2. It doesn't consider the risk of people *not understanding* the license, which is a significant risk for most licenses.
 
-- We assume good faith. We think most judges and attorneys will understand our plain language the same way we do. If you disagree, please explain why and suggest a clearer alternative.
+- We assume good faith. We think most judges and lawyers will understand our plain language the same way we do. If you disagree, please explain why and suggest a clearer alternative.
 
 ## 501&lpar;c&rpar;(3) Chartering Assistance
 
@@ -73,16 +73,16 @@ If you have experience with chartering 501&lpar;c&rpar;(3) organizations and are
 
 ### Not Legal Advice
 
-Any contributions, opinions, or suggestions you provide to Plain License are not legal advice and don't create an attorney-client relationship. Your contributions are voluntary, informational, and for the benefit of the creative community.
+Any contributions, opinions, or suggestions you provide to Plain License are not legal advice and don't create an lawyer-client relationship. Your contributions are voluntary, informational, and for the benefit of the creative community.
 
 ### Ethical Considerations
 
 We understand legal advice has specific ethical rules and professional responsibilities. By contributing to Plain License:
 
 1. You understand your contributions are *not* legal advice.
-2. You are not entering into an attorney-client relationship with Plain License or its users.
+2. You are not entering into an lawyer-client relationship with Plain License or its users.
 3. Your contributions are voluntary and for the benefit of the creative community.
-4. You are not providing confidential information or creating conflicts of interest. Your contributions come from general knowledge among attorneys or publicly available information.
+4. You are not providing confidential information or creating conflicts of interest. Your contributions come from general knowledge among lawyers or publicly available information.
 
 ### Disclaimers
 
@@ -98,7 +98,7 @@ Let's work together to improve Plain License.
 
 If your contributions are more focused on writing or editing, please see our [Crafting Licenses][crafting] guide for more information on how you can help. We are always looking for clear, concise, and legally accurate language in our licenses.
 
-[discussions]: <https://github.com/plainlicense/plainlicense/discussions/categories/attorney-talk> "Attorney Talk Discussions"
+[discussions]: <https://github.com/plainlicense/plainlicense/discussions/categories/lawyer-talk> "Lawyer Talk Discussions"
 [legalissue]: https://github.com/plainlicense/plainlicense/issues/new?assignees=plainlicense&labels=bug%2Ctriage&projects=&template=legal_issue.yml&title=%5BLegalFlaw%5D%3A+ "Create a new issue"
 [helping]: <index.md> "Helping Plain License"
 [crafting]: <craft.md> "Crafting Licenses"

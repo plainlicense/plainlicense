@@ -6,9 +6,11 @@ We haven't implemented the template changes to display the shame counts, but we 
 
 import logging
 import re
+import sys
 
 from collections import Counter
 from functools import cached_property
+from pathlib import Path
 from typing import ClassVar, Self
 
 from _utils import is_license_page, strip_markdown
@@ -16,8 +18,6 @@ from mkdocs.config.defaults import MkDocsConfig
 from mkdocs.structure.files import Files
 from mkdocs.structure.pages import Page
 
-import sys
-from pathlib import Path
 
 # Add the project root to sys.path for imports
 project_root = Path(__file__).parent.parent.parent

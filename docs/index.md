@@ -41,7 +41,7 @@ hide:
     ---
 
     :nounproject-lighthouse:{ .xl .ecru }
-    We want to unlock creativity and innovation by making licenses easy to understand. We believe that everyone should be able to understand the terms of a license, not just lawyers. We want to make it easy for you to share your work with the world.
+    We want to unlock creativity and innovation by making licenses easy to understand. We believe everyone should be able to understand the terms of a license, not just lawyers. We want to make it easy for you to share your work with the world.
 
     __[:octicons-arrow-right-24: free to understand](about/index.md "Our Mission")__
 

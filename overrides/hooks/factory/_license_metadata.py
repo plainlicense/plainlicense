@@ -138,7 +138,7 @@ class LicenseMetadata:
         return dedent(f"""\
             We are not lawyers. This is not legal advice. If you need legal advice, talk to a lawyer. You use this license at your own risk.
 
-            We are normal people making licenses accessible for everyone. We hope that our plain language helps you and anyone else understand this license  (including lawyers). If you see a mistake or want to suggest a change, please [submit an issue on GitHub]({self.meta.get("github_issues_link")} "Submit an issue on GitHub") or [edit this page]({self.meta.get("github_edit_link")} "edit on GitHub").
+            We are normal people making licenses accessible for everyone. We hope our plain language helps you and anyone else understand this license  (including lawyers). If you see a mistake or want to suggest a change, please [submit an issue on GitHub]({self.meta.get("github_issues_link")} "Submit an issue on GitHub") or [edit this page]({self.meta.get("github_edit_link")} "edit on GitHub").
             """)
 
     def get_not_official_text(self) -> str:

@@ -394,6 +394,12 @@ wheels = [
 ]
 
 [[package]]
+name = "gitignore-parser"
+version = "0.1.12"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/86/a8/faf07759672973362e3f1f9742281a90aec7846e8a4043c4df5652990054/gitignore_parser-0.1.12.tar.gz", hash = "sha256:78b22243adc0f02102c56c5e8c9a1d9121394142ca6143a90daa7f8d7a07a17e", size = 5407, upload-time = "2025-04-14T04:21:11.009Z" }
+
+[[package]]
 name = "gitpython"
 version = "3.1.44"
 source = { registry = "https://pypi.org/simple" }
@@ -1018,6 +1024,7 @@ dependencies = [
 
 [package.dev-dependencies]
 dev = [
+    { name = "gitignore-parser" },
     { name = "glom" },
     { name = "ipython" },
     { name = "markdown" },
@@ -1058,6 +1065,7 @@ requires-dist = [
 
 [package.metadata.requires-dev]
 dev = [
+    { name = "gitignore-parser", specifier = ">=0.1.12" },
     { name = "glom", specifier = ">=23.5.0" },
     { name = "ipython", specifier = ">=8.31.0" },
     { name = "markdown", specifier = ">=3.8" },

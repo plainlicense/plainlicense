@@ -2,6 +2,7 @@
 
 import json
 import logging
+import sys
 
 from pathlib import Path
 
@@ -14,8 +15,6 @@ from mkdocs.plugins import event_priority
 from mkdocs.structure.files import Files
 from PIL import Image
 
-import sys
-from pathlib import Path
 
 # Add the project root to sys.path for imports
 project_root = Path(__file__).parent.parent.parent

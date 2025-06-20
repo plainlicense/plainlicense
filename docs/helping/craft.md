@@ -9,7 +9,7 @@ We welcome contributions to Plain License, whether you're proposing a new licens
 
 ## Before You Start
 
-You should read our writing guidelines to help you craft a license that is clear, concise, and easy to understand. You can find these guidelines on our [Writing Guidelines page][writing].
+You should read our writing guidelines to help you craft a clear, concise, and easy to understand license. You can find these guidelines on our [Writing Guidelines page][writing].
 
 ## Contributing a New License
 
