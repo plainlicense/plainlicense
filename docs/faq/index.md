@@ -94,6 +94,11 @@ We use something similar to [semantic versioning][semantic versioning], but we d
 
 **We will update our version of the license to match the new version of the original license.** We will also update our interpretation of the license to reflect any changes in the original license. We will make it clear in the changelog what changes we made to the license and why we made them. If the new license has a new version number, we will update our license to match. Let's say the Mozilla Foundation releases version 3.0 of the Mozilla Public License. We will release a `Plain MPL` version that reflects the changes. If both licenses are still used regularly, we will make it clear which version of the original license our plain language version is based on. For example, if we release a `Plain MPL 3.0`, we will make it clear it's based on the `Mozilla Public License 3.0` and not the `Mozilla Public License 2.0`.
 
+## What will you do if they change a major license to use plain language?  :material-chat-question-outline:
+
+**Celebrate!** :champagne: :partying_face: Our goal is to make licenses easier to understand, and if a major license changes to use plain language, we think that's a great thing. We might update our version. If they do a *really* good job, we might just link to their version and say "look how great this is!" :sparkles: We will always make it clear which version of the original license our plain language version is based on, so you can see how it compares to the original.
+
+We're not doing this to make money, get attention, or make a name for ourselves. We just want to make licenses that people can read and understand. If we get  organizations (ok, maybe, shame them) to change their licenses to use plain language, that's even better. We want to see plain language become the norm for licenses and any legal document, not just a niche thing. We think that's good for everyone.
 
 [center for plain language]: <https://centerforplainlanguage.org/> "Center for Plain Language"
 [five-step guide]: <https://centerforplainlanguage.org/learning-training/five-steps-plain-language/> "Center for Plain Language five-step guide"

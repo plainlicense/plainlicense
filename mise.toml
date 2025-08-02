@@ -1,6 +1,7 @@
 [tools]
 actionlint = "latest"
 bun = "latest"
+delta = "latest"
 gitsign = "latest"
 hk = "latest"
 "npm:@smithery/cli" = "latest"

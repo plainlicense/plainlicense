@@ -112,6 +112,7 @@ It has a specific legal meaning and is well understood by most people. (let's ca
 *[stewarded]: managed or cared for the work
 *[stewards]: caretakers or managers of the work
 *[stewardship]: managing or caring for the work
+*[sublicense]: give a license to someone else
 *[sub-license]: give a license to someone else
 *[subject to]: under the rules of
 *[subject]: under the rules of
@@ -127,4 +128,4 @@ It has a specific legal meaning and is well understood by most people. (let's ca
 *[unmodified]: not changed
 *[user]: someone who uses the work
 *[with respect to]: about
-*[work]: the material that is under the license, such as code, text, or other creative works
+*[work]: the materials covered by the license, such as code, text, or other creative works

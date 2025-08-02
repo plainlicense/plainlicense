@@ -22,7 +22,7 @@ theme:
     edit: material/pencil
     view: material/eye
     tag: # These are the icons for the tags in the license frontmatter. They map to the tag name in the license frontmatter.
-      canshare: octicons/share-24
+      shareit: octicons/share-24
       cansell: fontawesome/solid/money-bill-1
       canchange: material/file-edit
       canrevoke: nounproject/revoke
@@ -134,7 +134,7 @@ not_in_nav: |
   shame*
 extra:
   tags: # maps the tags in the license front matter to the names above in theme.icon.tag. This allows us to replace the tag with an icon in the license template.
-    can-share: canshare
+    can-share: shareit
     can-sell: cansell
     can-change: canchange
     can-revoke: canrevoke

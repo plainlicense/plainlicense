@@ -1,19 +1,20 @@
 """Defines content types for markdown, including admonitions and code blocks."""
-from pathlib import Path
 import re
 
 from dataclasses import dataclass, field
 from enum import StrEnum
 from functools import cached_property
 from os import PathLike
-from textwrap import dedent
+from pathlib import Path
+from textwrap import dedent, indent
 from typing import Annotated, ClassVar, Literal, LiteralString, NamedTuple, Self, cast
 from unittest import mock
 
 from overrides.hooks.factory._constants import (
     LINEBREAK,
     PARAGRAPH_BREAK,
-    PATTERNS,
+    TAB,
+    Patterns,
     SPACE,
 )
 from overrides.hooks.factory._content_interface import ContentBase
@@ -237,9 +238,27 @@ class Definition(ContentBase):
     term: Annotated[str, field(hash=True)]
     definition: Annotated[str, field(hash=True)]
 
+    def __post_init__(self) -> None:
+        """
+        Post-initialization to ensure term and definition are stripped of leading/trailing whitespace.
+        """
+        object.__setattr__(self, "term", dedent(self.term.strip()))
+        object.__setattr__(self, "definition", dedent(self.definition.strip()))
+
     @property
     def header(self) -> str:
         """
         Returns the header for the definition.
         """
-        return f"{self.term}:\n{SPACE * 4}{self.definition}"
+        return dedent(f"`{self.term.strip()}`")
+
+    @property
+    def body(self) -> str:
+        """
+        Returns the body for the definition.
+        """
+        start_prefix = f":{SPACE}{SPACE}{SPACE}"
+        prefix = SPACE * 4
+
+        definition
+        return dedent(f"{self.definition.strip()}")

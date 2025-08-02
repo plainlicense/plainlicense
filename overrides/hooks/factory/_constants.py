@@ -28,10 +28,13 @@ type PatternMap = dict[str, Pattern[str]]
 
 class Patterns:
     """
-    A class to hold the regex patterns used in the license factory.
+    An arsenal of markdown related regex patterns, ready to deconstruct.
 
     Imported (external) regex patterns *do not* have named groups. All organic patterns do.
     """
+    _abbreviation: ClassVar[Pattern[str]] = re.compile(
+        r"""\s*(?P<abbrev_block>\*\[(?P<abbrev>.+?)\]:)\s*(?P<definition>.+?)\n""",
+    )
     _annotation: ClassVar[PatternMap] = {
         "inline": re.compile(r"(?<!\n|  )(?P<citation>\((?P<num>[1-9])\))"),
         "block": re.compile(
@@ -140,6 +143,15 @@ class Patterns:
             re.VERBOSE | re.DOTALL | re.MULTILINE,
         ),
     }
+    _links: ClassVar[PatternMap] = {
+        "cited_ref": re.compile(
+            r"""\s*(?P<ref>\[(?P<name>.*?)\])\s*<?(?P<url>.*?)>?\s*(?P<title>["']?.*?["']?)?\s*""", re.MULTILINE
+        ),
+        "inline_ref": re.compile(r"\s*(?P<text_block>\[?(?P<text>.*?)\])(?P<ref>\[(?P<name>.*?)\])", re.MULTILINE),
+        "inline": re.compile(
+            r"(?P<text_tag>\[(?P<text>.*?)\]\((?P<url>.*?)\s?(?P<title>.*?)?\))", re.MULTILINE
+        ),
+    }
     _mark: ClassVar[PatternMap] = {
         "mark": re.compile(MARK_PATTERN, re.DOTALL | re.MULTILINE),
     }
@@ -191,12 +203,12 @@ ICON_MAP = {
 
 """Maps [choosealicense.com](https://choosealicense.com/) tags to Plain License tags."""
 TAG_MAP = {
-    "distribution": "can-share",  # allowances
-    "commercial-use": "can-sell",
-    "modifications": "can-change",
-    "revokable": "can-revoke",
-    "relicense": "relicense",
-    "disclose-source": "share-source",  # requirements
+    "distribution": "share-it",  # allowances
+    "commercial-use": "sell-it",
+    "modifications": "change-it",
+    "revokable": "revoke-it",
+    "relicense": "relicense-it",
+    "disclose-source": "share-your-work",  # requirements
     "document-changes": "describe-changes",
     "include-copyright": "give-credit",
     "same-license": "share-alike (strict)",
@@ -225,7 +237,7 @@ EMBED_STYLE = dedent("""
 # ================================================
 """
 Constants for formatting and layout in the license factory.
-I found that without them, it was easy for phantom formatting issues to creep in.
+I found that without them, it was easy for phantom formatting issues to creep in. This paranoia is what also drives the excessive use of `dedent` in the codebase.
 """
 
 SNIPPET = "--8<--"
@@ -240,74 +252,3 @@ PARAGRAPH_BREAK = LINEBREAK * 2  # Two line breaks for paragraph separation
 
 # Divider for page sections in plaintext, also a yaml divider
 PAGE_DIVIDER = dedent("---").strip()
-
-
-"""
-Regular expression patterns used in the license factory.
-
-Used to match various markdown, mkdocs markdown, and other text patterns.
-
-All patterns are compiled for efficiency and clarity. They also all use named groups for easier access.
-
-**You can safely use `.groupdict()` on the match objects to retrieve the named groups.**
-"""
-PATTERNS: dict[str, Pattern[str]] = {
-
-    """Year placeholder for templates, e.g., {{ year }}"""
-    "year": re.compile(r"""
-    (?P<year> \{\{ \s{1,2} year \s{1,2} \}\} )
-    """, re.VERBOSE),
-
-    """Codeblock patterns"""
-    "code": re.compile(r"""
-    (
-    (?P<first_line>  # The first line of a code block
-        (?P<fence_start>```*)  # Start of code block, 3+ backticks
-            \s?
-        (?P<language> \w+ )?  # Optional language specifier
-            \s?
-        (?P<title> \"\w+\" | '\w+' )?  # Optional title in quotes
-    )
-        \n
-        (?P<content>.+?)  # Content of the code block
-        (?P<fence_end>?P=fence_start) # End of code block
-        )
-    """,
-        re.DOTALL | re.VERBOSE
-    ),
-
-    "code_inline": re.compile(r"(?P<fence_start>`)(?P<bang>[#][!])?(?P<lang>\w+)? ?(?P<content>.+?)(?P<fence_end>`)(?!`)"),
-
-    "definition": re.compile(r"\s*(?P<term>`.+`)\n\n\s+(?P<def>.+)\n\n", re.MULTILINE),
-    "annotation_inline": re.compile(r"(?<!\n|  )(?P<citation>\((?P<num>[1-9])\))"),
-    "annotation_block": re.compile(
-        r"(?P<citation>(?P<num>[1-9])\.)\s", re.MULTILINE | re.DOTALL
-    ),
-    "annotation_class": re.compile(r"(?P<class>\{\s{0,2}\.annotate\s{0,2}\})"),
-    "annotation": re.compile(
-        r"(?P<citation>\([1-4]\)).*?(?P<class>\{\s\.annotate\s\})[\s]{1,4}[1-4]\.\s{1,2}(?P<annotation>.+?)\n",
-        re.MULTILINE | re.DOTALL,
-    ),
-    "format_class": re.compile(r"\{\s?\.\w+\s?\}"),
-    "header": re.compile(r"#+ (?P<header>\w+?)\n"),
-    "markdown": re.compile(r"#+ |(\*\*|\*|`)(.*?)\1", re.MULTILINE),
-    "link": re.compile(
-        r"\[(?P<text>.*?)\]\((?P<url>.*?)\s?(?P<title>.*?)?\)", re.MULTILINE
-    ),
-    "link_reference": re.compile(r"\[(?P<text>.*?)\]\[(?P<ref>.*?)\]", re.MULTILINE),
-    "link_reference_def": re.compile(
-        r"^\[(?P<ref>.*?)\]:\s+(?P<url>.*?)\s?(?P<title>.*?)?\n", re.MULTILINE
-    ),
-    "image": re.compile(r"!\[(?P<alt_text>.*?)\]\((?P<url>.*?)\)", re.MULTILINE),
-    "initial_footnote": re.compile(r".*\[\^(?P<citation>\d+)\](?!:)"),
-    "footnote": re.compile(
-        r"^\s*\[\^(?P<citation>\d+)\]:\s+?(?P<content>.+)\n", re.MULTILINE
-    ),
-    # footnote including the inline citation, like
-    # This is some text[^1]. And some more.. *Arbitrary # of lines later*:
-    # [^1]: I'm a footnote.
-    "full_footnote": re.compile(
-        r"(?P<inline>\[\^\d+\])(!?:).+(?P<citation_pair>\1)(?=:)\s+?(?P<content>.+)\n",
-        re.MULTILINE | re.DOTALL,
-    ),
-}

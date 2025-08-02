@@ -3,7 +3,7 @@ site_url: https://plainlicense.org
 repo_url: https://github.com/plainlicense/plainlicense
 repo_name: plainlicense
 edit_uri: edit/main/docs/
-copyright: Plain License's authors dedicate all original content to the public domain. No rights reserved.
+copyright: Plain License's authors dedicate all original content to the public domain. We reserve NO rights.
 hooks:
   - overrides/hooks/_utils.py # Utility functions for hooks
   - overrides/hooks/hook_logger.py # Central logger for hooks (can also do plugins)
@@ -82,18 +82,18 @@ theme:
     edit: material/pencil
     view: material/eye
     tag: # These are the icons for the tags in the license frontmatter. They map to the tag name in the license frontmatter.
-      canshare: octicons/share-24
-      cansell: fontawesome/solid/money-bill-1
-      canchange: material/file-edit
-      canmix: material/merge
-      canrevoke: nounproject/revoke
+      shareit: octicons/share-24
+      sellit: fontawesome/solid/money-bill-1
+      changeit: material/file-edit
+      mixit: material/merge
+      revokeit: nounproject/revoke
       required: nounproject/required
       allowed: nounproject/allowed
-      relicense: nounproject/relicense
+      relicenseit: nounproject/relicense
       copyleft: nounproject/copyleft
       givecredit: nounproject/copyright
       describechanges: octicons/file-diff-24
-      sharesource: octicons/book-24
+      shareyourwork: octicons/book-24
   palette:
     # Palette toggle for system automatic mode; chooses the color scheme based on the user's system preference, but allows the user to override it.
     - media: "(prefers-color-scheme)"
@@ -239,16 +239,16 @@ watch:
   - mkdocs.yml
 extra:
   tags: # maps the tags in the license front matter to the names above in theme.icon.tag. This allows us to replace the tag with an icon in the license template.
-    can-share: canshare
-    can-sell: cansell
-    can-change: canchange
-    can-revoke: canrevoke
-    relicense: relicense
+    share-it: shareit
+    sell-it: cansell
+    change-it: canchange
+    revoke-it: canrevoke
+    relicense-it: relicense
     share-alike (strict): copyleft
     share-alike (relaxed): copyleft
     give-credit: givecredit
     describe-changes: describechanges
-    share-source: sharesource
+    share-your-work: shareyourwork
   boilerplate:
     # boilerplate for licenses; you don't need to change this
     # The placeholders (e.g. {{ original_name | trim }}) are jinja2 placeholders and are replaced with the values in the license frontmatter when the license is built.
@@ -277,7 +277,7 @@ extra:
       {%- endif -%}
     interpretation_text: |
       {%- if original_name -%}
-      The {{ plain_name | trim }} is a plain language version of the {{ original_name | trim }}. We wrote it to make the {{ original_name | trim }} more accessible and understandable. We tried to match the {{ original_name | trim }}'s legal intent. We didn't intend any differences in meaning. **If you are using the {{ plain_name | trim }} in a legal context, you should refer to the official {{ original_name | trim }} for clarification.**
+      The {{ plain_name | trim }} is a plain language version of the {{ original_name | trim }}. We wrote it to make the {{ original_name | trim }} more accessible and understandable. We tried to match the {{ original_name | trim }}'s legal intent. We didn't intend any differences in meaning. **If you are using the {{ plain_name | trim }} in a legal context, you should also refer to the official {{ original_name | trim }} for clarification.**
 
       If a court finds it can't enforce any part of this {{ license_type | trim }}, the rest of the {{ license_type | trim }} terms still apply.
       {%- else -%}

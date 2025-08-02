@@ -30,7 +30,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 # Add submodules and their properties
-submodule_names=("license-list-data" "mkdocs-material" "choosealicense")
+submodule_names=("license-list-data" "mkdocs-material" "choosealicense" "license-list-XML")
 
 submodule_url["license-list-data"]="https://github.com/spdx/license-list-data.git"
 submodule_branch["license-list-data"]="main"
@@ -45,6 +45,12 @@ submodule_url["choosealicense"]="https://github.com/github/choosealicense.com.gi
 submodule_branch["choosealicense"]="gh-pages"
 # shellcheck disable=SC2034
 submodule_sparse_paths["choosealicense"]="/_data /_licenses"
+
+# shellcheck disable=SC2034
+submodule_url["license-list-XML"]="https://github.com/spdx/license-list-XML.git"
+submodule_branch["license-list-XML"]="main"
+# shellcheck disable=SC2034
+submodule_sparse_paths["license-list-XML"]="/validate_schema.py /package.json /schema /src"
 
 REPO_ROOT_ABS_PATH="$(git rev-parse --show-toplevel)"
 SUBMODULE_PATH_PREFIX='external'
