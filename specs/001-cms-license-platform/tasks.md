@@ -21,6 +21,10 @@
 
 - [ ] T001 Create directory structure per data-model.md (content/, public/, exports/, workers/)
 - [ ] T002 Initialize Astro project with Starlight theme and Content Collections API
+- [ ] T002a [P] Configure Starlight component overrides in astro.config.mjs (Header, Footer, Sidebar)
+- [ ] T002b [P] Create custom Header component in src/components/overrides/Header.astro with Plain License branding
+- [ ] T002c [P] Create custom Footer component in src/components/overrides/Footer.astro with attribution
+- [ ] T002d [P] Create custom Sidebar component in src/components/overrides/Sidebar.astro for license navigation
 - [ ] T003 [P] Install Sveltia CMS dependencies and configure public/admin/ directory
 - [ ] T004 [P] Configure Bun build tooling and TypeScript compilation
 - [ ] T005 [P] Setup Biome for code formatting and linting
@@ -501,11 +505,13 @@ With multiple developers after Foundational phase completes:
 
 ## Summary
 
-**Total Tasks**: 198
+**Total Tasks**: 202
 **MVP Tasks** (US1 + US2): T001-T057 (59 tasks including expanded clipboard tasks)
+**Starlight Override Tasks**: 4 tasks (T002a-T002d in Phase 1)
 **Critical Path**: Setup → Foundational → US1 → US2 → Deploy MVP
 
 **Task Distribution by User Story**:
+- **Setup + Starlight Overrides** (Phase 1): 12 tasks (T001-T008, including T002a-T002d)
 - **US1 - Content Editor** (P1): 17 tasks (T021-T037)
 - **US2 - Visitor Downloads** (P1): 22 tasks (T038-T057, including T052a-T052b)
 - **US3 - Editor Maps** (P2): 18 tasks (T058-T075)
@@ -518,7 +524,7 @@ With multiple developers after Foundational phase completes:
 - **Migration**: 12 tasks (T158-T169)
 - **Polish + Validation + Edge Cases**: 29 tasks (T170-T198)
 
-**Parallel Opportunities**: 90+ tasks marked [P] can run in parallel within their phases
+**Parallel Opportunities**: 94+ tasks marked [P] can run in parallel within their phases
 
 **Estimated MVP Timeline** (single developer):
 - Setup: 1-2 days
@@ -534,8 +540,8 @@ With multiple developers after Foundational phase completes:
 ## Format Validation
 
 ✅ **All tasks follow required format**: `- [ ] [ID] [P?] [Story?] Description with file path`
-✅ **Task IDs**: Sequential T001-T198
-✅ **[P] markers**: 90+ tasks marked for parallel execution
+✅ **Task IDs**: Sequential T001-T198 + T002a-T002d (Starlight overrides)
+✅ **[P] markers**: 94+ tasks marked for parallel execution
 ✅ **[Story] labels**: US1-US7 applied correctly to user story tasks
 ✅ **File paths**: Included in all implementation tasks
 ✅ **Organization**: Grouped by user story for independent delivery

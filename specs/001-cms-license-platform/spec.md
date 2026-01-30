@@ -153,36 +153,43 @@ A visitor needs to read blog posts about Plain License updates, license guides, 
 - Q: Export formats need to be available for download. When should these formats be generated? → A: Build-time static generation during Astro build process
 - Q: Section mappings connect plain language to original license text. How should sections be technically identified for mapping? → A: SHA-256 hash-based identification with whitespace normalization. Each content section generates a stable hash from normalized text (lowercase, trimmed, collapsed whitespace) enabling reliable mapping even when formatting changes. Details in data-model.md mapping-data-contract.md.
 
-### Session 2026-01-30 (Architecture Decisions)
+### Session 2026-01-30 (Architecture Decisions - RESOLVED)
 
-- Q: Which static site generator and theme will be used? → A: Astro static site generator with Starlight documentation theme as starting point. **⚠️ ARCHITECTURAL CONCERN**: Starlight is optimized for documentation sites; may require significant customization or replacement with custom layouts for license platform features (comparison UI, download center, blog). Needs validation during Phase 0 research.
+- Q: Which static site generator and theme will be used? → A: **Astro static site generator with Starlight theme using strategic component overrides (hybrid approach)**. 
 
-### Session 2026-01-30 (Architectural Concerns - Requires Resolution)
+**Architecture Decision**: After evaluating Starlight's capabilities, the hybrid approach is selected:
 
-**⚠️ CRITICAL ARCHITECTURAL DECISION REQUIRED**:
+**Starlight Strengths to Leverage**:
+- Excellent WCAG 2.1 AA accessibility out of box
+- Fast performance with built-in optimizations  
+- Robust component override system (can replace ANY component: Header, Footer, Sidebar, etc.)
+- Supports custom pages via `<StarlightPage>` wrapper component
+- Works seamlessly with multiple Astro content collections (licenses, blog, docs, template-blocks)
+- Built-in dark mode, search, i18n capabilities
+- Great developer experience and documentation
 
-**Issue**: Tasks.md T002 initializes "Astro project with Starlight theme" but Starlight is a **documentation theme** optimized for:
-- API references
-- Guides and tutorials  
-- Technical documentation hierarchies
+**Plain License Customizations**:
+- **Keep**: Base layout, design system, accessibility features, typography, navigation structure
+- **Override**: Header (Plain License branding), Footer (custom attribution), Sidebar (license navigation)
+- **Custom Pages**: License detail pages (`src/pages/licenses/[slug].astro`), blog pages (`src/pages/blog/`), homepage
+- **Custom Components**: License comparison UI, download center, reactive components (FAQ, tables, decision trees)
 
-Plain License Platform requires:
-- License comparison UI with interactive highlighting
-- Multi-format download center
-- Blog with chronological listing
-- Social media card generation
-- At-a-glance permission/condition summaries
-- Reactive components (FAQ, decision trees, tables)
+**Technical Approach**: 
+1. Initialize Astro + Starlight (T002)
+2. Configure component overrides in `astro.config.mjs` (T002a-T002d)
+3. Create custom page layouts using `<StarlightPage>` wrapper for consistency
+4. Define multiple content collections (licenses, blog, template-blocks) in `src/content/config.ts`
+5. Build custom license/blog components that integrate with Starlight's design system
 
-**Options**:
-1. **Heavily customize Starlight**: Override most components, may fight theme conventions
-2. **Use base Astro without Starlight**: Build custom layouts matching Plain License brand
-3. **Hybrid approach**: Starlight for docs sections, custom layouts for licenses/blog
-4. **Different stack entirely**: Reconsider if Astro is right fit
+**Rationale**: Starlight's component override system is production-ready and well-documented. The `<StarlightPage>` component allows full custom layouts while maintaining design consistency. This approach provides the best balance of:
+- Professional foundation (Starlight's accessibility and performance)
+- Flexibility for custom features (comparison UI, download center, blog)
+- Maintainability (leverage Starlight updates, override only what's needed)
+- Development speed (reuse proven components, customize strategically)
 
-**Recommendation**: Resolve before Phase 0 research. Starlight may constrain UI/UX flexibility needed for license platform features.
+**Risk Assessment**: LOW - Starlight override system is straightforward, active community support, easy fallback to base Astro if needed
 
-**Decision needed by**: Before T002 execution (Phase 1)
+**Estimated Additional Effort**: ~8-10 days for component overrides and custom layouts beyond base tasks
 
 ## Requirements *(mandatory)*
 

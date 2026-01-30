@@ -20,6 +20,12 @@ Complete redesign of Plain License website to add headless CMS for content manag
 **Performance Goals**: <2s page load (SC-002), <50ms comparison highlighting, 5-12s PDF generation (10 licenses, parallel)
 **Constraints**: Free Cloudflare Pages hosting, Git-based content management (no database costs), build-time export generation, 98% download success (CDN redundancy)
 **Scale/Scope**: Dozens of licenses, Git-based content management, multiple content editors with OAuth-based access control, blog functionality, full version history via Git
+**Starlight Customization Strategy**: Hybrid approach using strategic component overrides
+  - **Keep**: Base layout, accessibility (WCAG 2.1 AA), performance optimizations, design system, typography
+  - **Override**: Header (Plain License branding), Footer (custom attribution), Sidebar (license navigation)
+  - **Custom Pages**: License detail pages, blog listing/detail, homepage using `<StarlightPage>` wrapper
+  - **Custom Components**: Comparison UI, download center, reactive components (FAQ, tables, decision trees)
+  - **Multiple Collections**: licenses, blog, docs (optional), template-blocks via Astro Content Collections API
 
 ## Constitution Check
 
