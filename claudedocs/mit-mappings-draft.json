@@ -1,0 +1,110 @@
+{
+  "license_id": "MIT",
+  "version": "0.2.1",
+  "last_updated": "2026-01-30T09:45:00Z",
+  "mapping_philosophy": "section-level with educational expansions included",
+  "mappings": [
+    {
+      "id": "map-copyright",
+      "type": "one-to-one",
+      "plain_section": {
+        "id": "plain-copyright",
+        "hash": "sha256:placeholder-001",
+        "title": "Copyright Notice",
+        "content_preview": "Copyright Notice: (c) {{ year }} [copyright holders]"
+      },
+      "original_section": {
+        "id": "original-copyright",
+        "hash": "sha256:placeholder-002",
+        "title": "Copyright",
+        "content_preview": "Copyright (c) {{ year }} <copyright holders>"
+      },
+      "confidence": 0.99,
+      "notes": "Direct correspondence - nearly identical text with minor formatting differences",
+      "created_at": "2026-01-30T09:45:00Z"
+    },
+    {
+      "id": "map-permissions",
+      "type": "one-to-one-expanded",
+      "plain_section": {
+        "id": "plain-permissions",
+        "hash": "sha256:placeholder-003",
+        "title": "You Can Do Anything with The Work",
+        "content_preview": "We give you permission to: Use, Copy, Change, Share, Sell, Mix..."
+      },
+      "original_section": {
+        "id": "original-permission-grant",
+        "hash": "sha256:placeholder-004",
+        "title": "Permission Grant",
+        "content_preview": "Permission is hereby granted, free of charge, to any person obtaining a copy..."
+      },
+      "confidence": 0.90,
+      "notes": "Plain version expands 'deal in the Software without restriction' into explicit 6-item list. Also adds educational context ('for free', 'for any reason', 'Everyone else can do these things too') not literally in original but consistent with intent.",
+      "expansion_type": "educational-clarification",
+      "created_at": "2026-01-30T09:45:00Z"
+    },
+    {
+      "id": "map-conditions",
+      "type": "one-to-one-expanded",
+      "plain_section": {
+        "id": "plain-conditions",
+        "hash": "sha256:placeholder-005",
+        "title": "If You Give Us Credit and Keep This Notice",
+        "content_preview": "You must keep our copyright notice... You must also keep this notice with all versions..."
+      },
+      "original_section": {
+        "id": "original-conditions",
+        "hash": "sha256:placeholder-006",
+        "title": "Conditions",
+        "content_preview": "The above copyright notice and this permission notice shall be included..."
+      },
+      "confidence": 0.85,
+      "notes": "Plain version interprets 'shall be included in all copies' as allowing multiple compliance methods (physical inclusion, linking, SPDX identifier). This is reasonable legal interpretation but adds options not explicit in original.",
+      "expansion_type": "legal-interpretation-with-examples",
+      "created_at": "2026-01-30T09:45:00Z"
+    },
+    {
+      "id": "map-warranty",
+      "type": "one-to-one",
+      "plain_section": {
+        "id": "plain-warranty-disclaimer",
+        "hash": "sha256:placeholder-007",
+        "title": "We Give No Promises or Guarantees",
+        "content_preview": "We give the work to you as it is, without any promises or guarantees..."
+      },
+      "original_section": {
+        "id": "original-warranty-disclaimer",
+        "hash": "sha256:placeholder-008",
+        "title": "Warranty Disclaimer",
+        "content_preview": "THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND..."
+      },
+      "confidence": 0.95,
+      "notes": "Direct translation of legal warranty disclaimer into plain language. 'AS IS' → 'as it is, including anything broken', 'WITHOUT WARRANTY' → 'No Guarantees', 'NOT BE LIABLE' → 'not responsible'.",
+      "created_at": "2026-01-30T09:45:00Z"
+    },
+    {
+      "id": "unmapped-original-title",
+      "type": "unmapped-original",
+      "plain_section": null,
+      "original_section": {
+        "id": "original-title",
+        "hash": "sha256:placeholder-009",
+        "title": "The MIT License (MIT)",
+        "content_preview": "# The MIT License (MIT)"
+      },
+      "confidence": null,
+      "notes": "Original license has title heading that doesn't appear in plain version. Plain version uses frontmatter 'plain_name' field instead. This is a structural difference, not semantic content.",
+      "created_at": "2026-01-30T09:45:00Z"
+    }
+  ],
+  "metadata": {
+    "total_mappings": 5,
+    "mapping_types": {
+      "one-to-one": 2,
+      "one-to-one-expanded": 2,
+      "unmapped-original": 1
+    },
+    "average_confidence": 0.92,
+    "editor_notes": "MIT license is relatively simple with clear 1:1 correspondences. Main challenge is deciding how to handle educational expansions in plain version that add content not literally in original but consistent with legal intent."
+  }
+}
