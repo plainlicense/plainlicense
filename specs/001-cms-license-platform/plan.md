@@ -14,7 +14,13 @@ Complete redesign of Plain License website to add headless CMS for content manag
 **Language/Version**: Python 3.11+ (MkDocs), TypeScript 5.x (frontend), Bun 1.x (build tooling)
 **Primary Dependencies**: Astro (site generator), Starlight (documentation theme), Sveltia CMS (Git-based headless CMS), Typst (PDF generation), esbuild (bundling), GSAP (animations)
 **Storage**: Git repository (Sveltia CMS content) + Cloudflare R2 or DigitalOcean Spaces (export artifacts)
-**Testing**: Vitest + @vitest/coverage-v8 (TypeScript), Playwright (E2E)
+**Testing**: Vitest + @vitest/coverage-v8 (unit/integration), Playwright (E2E), Lighthouse CI (performance), axe-core (accessibility)
+**Test Strategy**: Test-Driven Development (TDD) with comprehensive coverage - 111 test tasks across all user stories
+**Coverage Targets**: 80% unit, 70% integration, 90% E2E, 100% success criteria validation
+**Test Automation**: GitHub Actions CI with parallel execution, coverage reporting (Codecov), visual regression (Percy/Chromatic)
+**Performance Testing**: Lighthouse CI performance budgets, custom benchmarks, load testing (1000 concurrent users)
+**Security Testing**: OAuth flow security audit, XSS/CSRF protection, dependency vulnerability scanning (npm audit, Snyk)
+**Test Effort**: 70-90 hours (25-30% of total project) - industry standard for quality software
 **Target Platform**: Cloudflare Pages (static site + Sveltia CMS admin interface)
 **Project Type**: Web (Git-based static site + headless CMS)
 **Performance Goals**: <2s page load (SC-002), <50ms comparison highlighting, 5-12s PDF generation (10 licenses, parallel)
@@ -26,6 +32,16 @@ Complete redesign of Plain License website to add headless CMS for content manag
   - **Custom Pages**: License detail pages, blog listing/detail, homepage using `<StarlightPage>` wrapper
   - **Custom Components**: Comparison UI, download center, reactive components (FAQ, tables, decision trees)
   - **Multiple Collections**: licenses, blog, docs (optional), template-blocks via Astro Content Collections API
+**Authentication Strategy**: OAuth 2.0 with PKCE + localStorage token storage
+  - **Approach**: Sveltia CMS standard OAuth flow with localStorage (industry-standard for Git-based SPAs)
+  - **Security**: Mitigate XSS risks via strict CSP Level 3 (FR-047), 15-min token expiration, secure token rotation
+  - **Rationale**: Aligns with Sveltia CMS architecture, free tier constraints, modern browser localStorage isolation
+  - **Implementation**: Short-lived access tokens (15 min), long-lived refresh tokens (7 days), input sanitization (FR-048)
+**Export Generation Strategy**: Incremental builds with content-based hashing
+  - **Approach**: SHA-256 hash of license content + templates, skip exports if unchanged, build manifest tracking
+  - **Performance**: 50 licenses: ~2s incremental, 500 licenses: ~20s first build / ~5s incremental (vs ~100s linear)
+  - **Parallelization**: 5-10 concurrent Typst processes using Bun concurrency for faster PDF generation
+  - **Scalability**: Supports FR-053 target of 500 licenses without Cloudflare Pages timeout (30-min limit)
 
 ## Constitution Check
 

@@ -316,7 +316,7 @@ GitHub Repository → Settings → Collaborators → Remove
 1. **CLIENT_SECRET Protection**: Stored securely in Cloudflare Workers secrets (never exposed)
 2. **HTTPS Only**: All OAuth flows over HTTPS
 3. **Origin Validation**: Worker validates postMessage origin matches CMS_URL
-4. **Token Storage**: Access token stored in browser localStorage (HTTPS only)
+4. **Token Storage**: Access token stored in browser localStorage with XSS mitigations (strict CSP Level 3, 15-min token expiration, token rotation, input sanitization per FR-047/FR-048)
 5. **Scoped Permissions**: OAuth only requests necessary scopes (public_repo, read:user)
 6. **No Database**: No user data stored server-side (stateless authentication)
 
@@ -328,18 +328,23 @@ GitHub Repository → Settings → Collaborators → Remove
 - ❌ **Token Theft**: HTTPS + httpOnly cookies (if upgraded)
 - ❌ **Unauthorized Access**: GitHub repository permissions enforced
 
-**Potential Vulnerabilities**:
-- ⚠️ **localStorage Token**: Token in localStorage vulnerable to XSS (mitigated by CMS CSP)
-- ⚠️ **Phishing**: Users could be tricked into authorizing malicious OAuth app (user education)
+**Mitigated Risks**:
+- ✅ **localStorage XSS Protection**: Token in localStorage protected by strict CSP Level 3 (nonce-based scripts only), 15-minute token expiration, secure refresh token rotation, and comprehensive input sanitization (FR-047, FR-048)
+- ⚠️ **Phishing**: Users could be tricked into authorizing malicious OAuth app (mitigated by user education and GitHub's OAuth app verification)
 
-### Upgrade Path (Future)
+### localStorage Security Approach
 
-**httpOnly Cookies** (More Secure):
-- Store access token in httpOnly cookie instead of localStorage
-- Requires worker to proxy Git API requests (adds complexity)
-- Protects against XSS token theft
+**Rationale for localStorage** (Production Approach):
+- Industry standard for Git-based static CMSs (Sveltia, Netlify CMS, Decap CMS)
+- Aligns with Sveltia CMS architecture and free tier constraints
+- Modern browser localStorage isolation provides origin-level security
+- XSS risks effectively mitigated through multi-layer defense:
+  1. **CSP Level 3**: Nonce-based script execution prevents inline script injection
+  2. **Token Lifecycle**: 15-minute access token expiration limits exposure window
+  3. **Token Rotation**: Automatic refresh token rotation prevents long-term compromise
+  4. **Input Sanitization**: Comprehensive HTML escaping and markdown strict mode (FR-048)
 
-**For v1.0**: localStorage is acceptable (standard for static CMSs like Netlify CMS/Decap/Sveltia)
+**Alternative Considered**: httpOnly cookies provide immunity to XSS but require significant architectural changes (worker proxying all Git API requests, abandoning Sveltia CMS standard flow). Risk/benefit analysis favors localStorage with comprehensive XSS mitigations.
 
 ## Performance
 

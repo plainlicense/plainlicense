@@ -191,19 +191,33 @@ A visitor needs to read blog posts about Plain License updates, license guides, 
 
 **Estimated Additional Effort**: ~8-10 days for component overrides and custom layouts beyond base tasks
 
+### Session 2026-01-30 (Checklist Conflict Resolution)
+
+**Context**: Resolved 4 critical ambiguities identified during comprehensive CMS requirements checklist generation (checklists/cms.md)
+
+- Q: CHK114 - Token storage strategy - httpOnly cookies vs localStorage? → A: **localStorage with XSS mitigations** (strict CSP Level 3, 15-min token expiration, token rotation per FR-046/FR-047)
+- Q: CHK115 - Visual editor type - WYSIWYG vs markdown editor? → A: **WYSIWYG visual editor** (updated FR-001)
+- Q: CHK116 - When are exports generated - save, publish, or manual build? → A: **Build triggered on content publish** (not draft save), updated FR-013a
+- Q: CHK116b - Draft content storage - D1 database vs Git-based? → A: **Git-based with `draft: true` frontmatter** (pure Git workflow, no database, updated FR-005a)
+- Q: CHK118 - Sveltia CMS authentication - separate flow or shared OAuth? → A: **Shared OAuth proxy** (Sveltia uses Cloudflare Worker OAuth from Phase 10, updated FR-006a)
+- Q: CHK117 - Template blocks vs reactive components - same system or different? → A: **Different systems** - Template blocks (FR-003) are static text snippets for legal language reuse (User Story 1), Reactive components (FR-030-034) are interactive widgets for enhanced UX (User Story 6)
+
+**Impact**: Resolved all critical specification conflicts blocking Phase 1 implementation. Architecture confirmed as pure Git-based (no D1 database), localStorage token strategy with CSP protections, and unified OAuth flow for CMS access.
+
 ## Requirements *(mandatory)*
 
 ### Functional Requirements
 
 #### Content Management
 
-- **FR-001**: System MUST provide a visual editor interface for creating and editing license content without code using one of: (a) traditional database-backed CMS with free tier (Strapi, Directus), (b) API-first SaaS CMS with free tier (Contentful, Sanity), or (c) Git-based headless CMS (Tina CMS, Decap CMS) as fallback
+- **FR-001**: System MUST provide a WYSIWYG visual editor interface for creating and editing license content without code using Sveltia CMS (Git-based headless CMS) with Astro Content Collections API per architectural decision in plan.md (research.md Phase 0)
 - **FR-002**: System MUST support rich text formatting including headings, lists, emphasis, links, and blockquotes
-- **FR-003**: System MUST maintain a centralized template library for common boilerplate text that can be inserted into any license
+- **FR-003**: System MUST maintain a centralized template library for common boilerplate text that can be inserted into any license (Note: Template blocks are static text snippets for legal language consistency, distinct from reactive components in FR-030-034 which are interactive widgets)
 - **FR-004**: System MUST allow non-technical users to preview content changes before publishing
 - **FR-005**: System MUST support draft and published states for license content
+- **FR-005a**: Draft content MUST be stored in GitHub repository with `draft: true` frontmatter flag (pure Git-based workflow, no separate database required)
 - **FR-006**: Editors MUST be able to create, read, update, and delete license entries through the CMS interface
-- **FR-006a**: System MUST authenticate editors using OAuth (GitHub/Google) and/or passwordless email magic links before granting CMS access
+- **FR-006a**: System MUST authenticate editors using OAuth (GitHub/Google) via Cloudflare Worker OAuth proxy (Phase 10) before granting Sveltia CMS access - CMS uses the same OAuth flow as the main application
 
 #### Multi-Format Export
 
@@ -214,7 +228,7 @@ A visitor needs to read blog posts about Plain License updates, license guides, 
 - **FR-011**: System MUST generate SPDX XML format for license metadata
 - **FR-012**: System MUST generate print-optimized PDF with proper typography and page layout using Typst PDF generation engine with legal document templates
 - **FR-013**: All export formats MUST include version metadata and attribution
-- **FR-013a**: Export formats MUST be either pre-generated when content is published or generated during static site build process (not on-demand at download time)
+- **FR-013a**: Export formats MUST be generated during static site build process (Astro build pipeline) triggered on content publish action (not on draft save), with incremental generation for changed licenses only, not on-demand at download time (build-time static generation per plan.md Technical Context)
 
 #### License Comparison
 
@@ -243,7 +257,7 @@ A visitor needs to read blog posts about Plain License updates, license guides, 
 
 #### Reactive Components
 
-- **FR-030**: System MUST allow editors to insert component placeholders using simple markup syntax
+- **FR-030**: System MUST allow editors to insert component placeholders using simple markup syntax (Note: Reactive components are interactive widgets for enhanced UX, distinct from template blocks in FR-003 which are static text snippets for legal language reuse)
 - **FR-031**: System MUST provide a component library including FAQ, comparison tables, and decision trees
 - **FR-032**: Components MUST render as interactive elements in web format
 - **FR-033**: Components MUST convert to appropriate static equivalents in PDF and plaintext formats
@@ -256,36 +270,130 @@ A visitor needs to read blog posts about Plain License updates, license guides, 
 - **FR-037**: Blog posts MUST support the same rich text features as license content
 - **FR-038**: System MUST provide navigation between related blog posts and license content
 
+### Non-Functional Requirements
+
+#### Performance
+
+- **FR-039**: System MUST deliver license pages within 2 seconds for 95% of visitors (LCP <2.0s, FCP <1.2s, TBT <200ms) measured via Lighthouse CI and Cloudflare Web Analytics - SC-002
+- **FR-040**: System MUST complete full rebuild in <60 seconds for up to 50 licenses with incremental build support using content-based hashing (SHA-256) to skip unchanged licenses, achieving <20s builds (500 licenses) and <5s incremental builds
+- **FR-040a**: Build MUST timeout and fail after 5 minutes (300 seconds) to prevent runaway processes, with warning alerts at 2 minutes and error alerts at 3 minutes to prevent resource exhaustion on Cloudflare Pages
+- **FR-041**: Comparison mode highlighting MUST respond to hover interactions within 100ms (95th percentile) with smooth 60fps animation - SC-004
+
+#### Availability & Reliability
+
+- **FR-042**: System MUST maintain 99.9% uptime (monthly basis) as guaranteed by Cloudflare Pages SLA with synthetic monitoring (Pingdom/Uptime Robot)
+- **FR-043**: Export generation MUST achieve 100% success rate for all published licenses with fail-fast build strategy (abort on first export failure) - SC-005
+
+#### Accessibility
+
+- **FR-044**: System MUST comply with WCAG 2.1 Level AA accessibility standards across all pages (validated via axe-core automated testing, target Lighthouse accessibility score 100) - SC-010
+- **FR-045**: All interactive features MUST be fully operable via keyboard without mouse (tab navigation through all elements, no keyboard traps, Escape closes modals)
+
+#### Security
+
+- **FR-046**: CMS authentication MUST implement OAuth 2.0 with PKCE, 15-minute JWT access token expiration (RS256 signing), 7-day refresh tokens, CSRF protection, and secure localStorage token storage with XSS mitigations (strict CSP, token rotation, input sanitization per FR-047/FR-048)
+- **FR-047**: System MUST enforce strict Content Security Policy (CSP Level 3 with nonces), HSTS headers, X-Frame-Options: DENY, and X-Content-Type-Options: nosniff
+- **FR-048**: CMS MUST sanitize all user input to prevent XSS (HTML escaping), markdown injection (strict GFM mode), and path traversal attacks
+
+#### Monitoring & Observability
+
+- **FR-049**: System MUST log all build and export generation attempts with success/failure status, stack traces for errors, and alert team after 3 consecutive build failures
+- **FR-050**: System MUST track page load performance (LCP, FCP, TTI percentiles), JavaScript errors, CMS authentication failures, and export download metrics with anomaly alerting
+
+#### Data Integrity
+
+- **FR-051**: System MUST retain all version history indefinitely via Git with branch protection (require PR reviews), daily automated backups, and 30-day soft delete for CMS content
+- **FR-052**: CMS MUST validate all content against Zod schemas before publish and prevent publishing licenses with >10% invalid section mappings
+
+#### Scalability
+
+- **FR-053**: System SHOULD support growth from 50 to 500 licenses without degrading build performance beyond 120 seconds via incremental export generation strategy (future growth requirement)
+
+#### Resilience
+
+- **FR-054**: System MUST implement circuit breaker pattern for external dependencies (GitHub API, OAuth providers, Typst PDF generation) with half-open state attempts every 60 seconds and full recovery after 3 consecutive successes to ensure graceful degradation during service failures
+
 ### Key Entities
 
 - **Editor**: User with content creation privileges, including authentication provider (GitHub, Google, email), unique identifier, display name, email address, and role/permission level
 - **License**: Core content entity representing a legal license with plain language version, original text, metadata (name, identifier, category), version information, publication status, and creation/modification timestamps
 - **License Version**: Historical snapshot of a license at a specific point, including version number (MAJOR.MINOR.PATCH), publication date, changelog entry, content state, and all format exports for that version
 - **Section Mapping**: Connection between plain language section and original license section(s), including source section identifier, target section identifier(s), mapping type (one-to-one, one-to-many, many-to-one), and relationship description (technical approach for section identification to be determined during planning)
-- **Template Block**: Reusable boilerplate content including block identifier, category (warranty, permission, condition), content text, and usage tracking across licenses
+- **Template Block**: Reusable static boilerplate text snippet for legal language consistency, including block identifier, category (warranty, permission, condition), content text, and usage tracking across licenses (User Story 1 - basic CMS feature, distinct from reactive components)
 - **Export Format**: Generated output in specific format including format type (markdown, plaintext, PDF, XML, embed), file content or URL, generation timestamp, and version association
 - **Blog Post**: Supplementary content including title, author, body content, publication date, tags/categories, and related licenses
-- **Component Instance**: Reactive component embedded in content including component type (FAQ, table, decision tree), configuration parameters, position in content, and static export fallback
+- **Component Instance**: Interactive reactive component embedded in content for enhanced UX, including component type (FAQ, table, decision tree), configuration parameters, position in content, and static export fallback (User Story 6 - advanced feature, distinct from template blocks)
 
 ## Success Criteria *(mandatory)*
 
 ### Measurable Outcomes
 
 - **SC-001**: Non-technical content editors can create and publish a complete license without developer assistance in under 30 minutes
+  - **Measurement**: Timed E2E test with realistic license content
+  - **Test**: T265 (success-criteria/sc-001-editor-time.test.ts)
+
 - **SC-002**: License pages load and display at-a-glance summary within 2 seconds for 95% of visitors
+  - **Measurement**: Lighthouse CI (target LCP <2.0s, FCP <1.2s), Cloudflare Web Analytics (Real User Monitoring)
+  - **Acceptance**: LCP <2.0s (p95), FCP <1.2s (p95), TBT <200ms, CLS <0.1
+  - **Requirements**: FR-039
+  - **Tests**: T226 (performance test), T266 (SC validation)
+
 - **SC-003**: Visitors can successfully download their preferred license format on first attempt with 98% success rate
+  - **Measurement**: Reliability testing with various network conditions and browsers
+  - **Test**: T267 (success-criteria/sc-003-download-reliability.test.ts)
+
 - **SC-004**: Comparison mode highlighting responds to hover interactions within 100 milliseconds
+  - **Measurement**: Automated performance testing with high-resolution timing assertions
+  - **Acceptance**: Hover → highlight latency <100ms (p95), 60fps animation
+  - **Requirements**: FR-041
+  - **Tests**: T239 (performance test), T268 (SC validation)
+
 - **SC-005**: All export formats (markdown, plaintext, PDF, XML, embed) generate successfully for 100% of published licenses
+  - **Measurement**: Build error tracking, export generation metrics dashboard
+  - **Requirements**: FR-043
+  - **Tests**: T220 (integration test), T269 (SC validation)
+
 - **SC-006**: PDF exports maintain consistent typography and layout quality equivalent to professional legal documents
+  - **Measurement**: Visual regression testing + typography validation against golden files
+  - **Acceptance**: 12pt serif font, 1.5 line spacing, 1-inch margins, proper page breaks
+  - **Test**: T270 (success-criteria/sc-006-pdf-quality.test.ts)
+
 - **SC-007**: Section mapping interface allows editors to create 10 section connections in under 5 minutes
+  - **Measurement**: Timed integration test simulating mapping workflow
+  - **Test**: T271 (success-criteria/sc-007-mapping-time.test.ts)
+
 - **SC-008**: Version history displays and allows access to all historical versions within 3 seconds
+  - **Measurement**: Performance testing with multiple versions
+  - **Test**: T272 (success-criteria/sc-008-history-speed.test.ts)
+
 - **SC-009**: Template blocks reduce duplicate content writing by 60% compared to current system
+  - **Measurement**: Statistical analysis of content reuse across licenses
+  - **Test**: T273 (success-criteria/sc-009-template-reuse.test.ts)
+
 - **SC-010**: Site remains accessible and usable for visitors using screen readers and keyboard navigation
+  - **Measurement**: Axe-core automated testing (zero critical/serious violations), manual screen reader testing
+  - **Requirements**: FR-044, FR-045
+  - **Tests**: T177 (manual audit), T274 (automated testing), T282 (CI integration)
+
 - **SC-011**: OpenGraph images generate correctly and display properly when licenses are shared on social media platforms
+  - **Measurement**: Visual validation of generated OG images, social media sharing tests
+  - **Tests**: T224 (E2E test), T275 (SC validation)
+
 - **SC-012**: Blog post creation and publishing time is reduced by 50% compared to current markdown file process
+  - **Measurement**: Baseline comparison timing study (current vs new system)
+  - **Test**: T276 (success-criteria/sc-012-blog-efficiency.test.ts)
+
 - **SC-013**: Reactive components render correctly in web format while maintaining readable static equivalents in PDF/plaintext
+  - **Measurement**: Cross-format validation of component output
+  - **Tests**: T254-T257 (component tests), T277 (SC validation)
+
 - **SC-014**: Session preference for comparison mode persists across page navigation within the same visit
+  - **Measurement**: E2E state testing with navigation simulation
+  - **Tests**: T242 (E2E test), T278 (SC validation)
+
 - **SC-015**: System handles concurrent editing by multiple users without data loss or corruption
+  - **Measurement**: Multi-user simulation with Git conflict detection
+  - **Test**: T279 (success-criteria/sc-015-concurrent-editing.test.ts)
 
 ### Assumptions
 
