@@ -6,7 +6,7 @@ I strived to avoid hardcoding any license text in the codebase. For the most par
 
 ## Adding a License
 
-1.  **The License**. License files consist of YAML frontmatter within a (usually empty) markdown file. The template is [LICENSE_TEMPLATE.md](./LICENSE_TEMPLATE.md). Instructions for this part are in the file itself and [docs/helping/craft.md](./docs/helping/craft.md).
+1.  **The License**. License files consist of YAML frontmatter within a (usually empty) markdown file. The template is [LICENSE_TEMPLATE.md](./LICENSE_TEMPLATE.md). Instructions for this part are in the file itself and the [crafting guide](/helping/craft).
 
 2.  **The License File Location**. The license file should be placed at `content/licenses/{category}/{spdx-id}.md`, where:
 
