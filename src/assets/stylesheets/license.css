@@ -834,4 +834,4 @@ p.md-nav__description.license {
 
 /* ── Keyboard / close on Escape ──────────────────────────── */
 
-/* Handled via JS; no CSS needed */
+/* Escape key and focus-trap are handled in UserInfoManager.showPanel() / hidePanel(); no CSS needed here. */

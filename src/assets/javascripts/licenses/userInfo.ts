@@ -44,13 +44,20 @@ const URL_PARAMS = {
   project: 'user-project',
 } as const;
 
-/** Text that marks a placeholder in the rendered license HTML. */
-const PLACEHOLDER_TEXTS = [
+/** Text that marks a copyright-holder placeholder in the rendered license HTML. */
+const PLACEHOLDER_HOLDER_TEXTS = [
   '[copyright holders]',
   '<copyright holders>',
   '[author]',
   '[your name]',
   '[organization]',
+] as const;
+
+/** Text that marks a project-name placeholder in the rendered license HTML. */
+const PLACEHOLDER_PROJECT_TEXTS = [
+  '[project name]',
+  '[software name]',
+  '[project]',
 ] as const;
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -72,12 +79,24 @@ interface UserInfoMessage {
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 function isUserInfoMessage(event: MessageEvent): event is MessageEvent<UserInfoMessage> {
-  return (
-    typeof event.data === 'object' &&
-    event.data !== null &&
-    event.data.type === 'userInfo' &&
-    typeof event.data.data === 'object'
-  );
+  if (
+    typeof event.data !== 'object' ||
+    event.data === null ||
+    event.data.type !== 'userInfo' ||
+    typeof event.data.data !== 'object' ||
+    event.data.data === null ||
+    Array.isArray(event.data.data)
+  ) {
+    return false;
+  }
+
+  const data = event.data.data as Partial<UserInfo>;
+
+  const nameOk = data.name === undefined || typeof data.name === 'string';
+  const yearOk = data.year === undefined || typeof data.year === 'string';
+  const projectNameOk = data.projectName === undefined || typeof data.projectName === 'string';
+
+  return nameOk && yearOk && projectNameOk;
 }
 
 function currentYear(): string {
@@ -98,6 +117,8 @@ export class UserInfoManager {
   private info: UserInfo;
   private readonly change$ = new Subject<UserInfo>();
   public readonly subscription: Subscription;
+  private _escapeHandler: ((e: KeyboardEvent) => void) | null = null;
+  private _focusTrapHandler: ((e: KeyboardEvent) => void) | null = null;
 
   public constructor() {
     this.info = this.loadInfo();
@@ -139,6 +160,7 @@ export class UserInfoManager {
 
   /** Clean up subscriptions and DOM elements. */
   public cleanup(): void {
+    this.hidePanel(); // removes keyboard handlers
     this.subscription?.unsubscribe();
     this.change$.complete();
     document.getElementById(PANEL_ID)?.remove();
@@ -216,24 +238,41 @@ export class UserInfoManager {
   // ── DOM: placeholder marking ───────────────────────────────────────────────
 
   /**
-   * Scans all `<code>` elements for known placeholder strings and wraps
-   * their parent text node in a `<span data-user-placeholder="...">` so the
-   * JS can find them reliably after MkDocs renders the markdown.
+   * Scans all `<code>` elements for known placeholder strings and annotates
+   * the `<code>` element itself with `data-user-placeholder="holder"` (for
+   * copyright-holder names) or `data-user-placeholder="project"` (for project
+   * names), a marker CSS class, and the original content so the JS can find
+   * and replace them reliably after the page renders.
+   *
+   * It also looks for 4-digit year values in nearby text nodes (within the
+   * same paragraph/list item/container as a holder placeholder) and wraps
+   * just the matched year text in a `<span data-user-placeholder="year">`
+   * to allow those year values to be updated dynamically as well.
    */
   private markPlaceholders(): void {
     const codeEls = Array.from(document.querySelectorAll<HTMLElement>('code'));
 
     for (const el of codeEls) {
       const text = el.textContent ?? '';
-      const matchedText = PLACEHOLDER_TEXTS.find((p) => text.includes(p));
-      if (!matchedText) continue;
 
       // Don't mark the same element twice
       if (el.hasAttribute(PLACEHOLDER_ATTR)) continue;
 
-      el.setAttribute(PLACEHOLDER_ATTR, 'holder');
-      el.classList.add(PLACEHOLDER_CLASS);
-      el.dataset['original'] = el.innerHTML;
+      const matchedHolder = PLACEHOLDER_HOLDER_TEXTS.find((p) => text.includes(p));
+      if (matchedHolder) {
+        el.setAttribute(PLACEHOLDER_ATTR, 'holder');
+        el.classList.add(PLACEHOLDER_CLASS);
+        el.dataset['original'] = el.innerHTML;
+        continue;
+      }
+
+      const lowerText = text.toLowerCase();
+      const matchedProject = PLACEHOLDER_PROJECT_TEXTS.find((p) => lowerText.includes(p));
+      if (matchedProject) {
+        el.setAttribute(PLACEHOLDER_ATTR, 'project');
+        el.classList.add(PLACEHOLDER_CLASS);
+        el.dataset['original'] = el.innerHTML;
+      }
     }
 
     // Also mark year values that sit adjacent to the holder placeholder.
@@ -297,6 +336,16 @@ export class UserInfoManager {
       );
       for (const el of years) {
         el.textContent = info.year;
+        el.classList.add(FILLED_CLASS);
+      }
+    }
+
+    if (info.projectName) {
+      const projects = Array.from(
+        document.querySelectorAll<HTMLElement>(`[${PLACEHOLDER_ATTR}="project"]`),
+      );
+      for (const el of projects) {
+        el.textContent = info.projectName;
         el.classList.add(FILLED_CLASS);
       }
     }
@@ -465,6 +514,35 @@ export class UserInfoManager {
     trigger?.setAttribute('aria-expanded', 'true');
     // Focus first input
     (panel.querySelector<HTMLInputElement>('input'))?.focus();
+
+    // Close on Escape
+    this._escapeHandler = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        this.hidePanel();
+      }
+    };
+    document.addEventListener('keydown', this._escapeHandler);
+
+    // Trap focus within the dialog
+    this._focusTrapHandler = (e: KeyboardEvent) => {
+      if (e.key !== 'Tab') return;
+      const focusable = Array.from(
+        panel.querySelectorAll<HTMLElement>(
+          'button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+        ),
+      );
+      if (!focusable.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
+    panel.addEventListener('keydown', this._focusTrapHandler);
   }
 
   private hidePanel(): void {
@@ -474,6 +552,16 @@ export class UserInfoManager {
     panel.hidden = true;
     trigger?.setAttribute('aria-expanded', 'false');
     trigger?.focus();
+
+    // Remove keyboard handlers installed by showPanel()
+    if (this._escapeHandler) {
+      document.removeEventListener('keydown', this._escapeHandler);
+      this._escapeHandler = null;
+    }
+    if (this._focusTrapHandler) {
+      panel.removeEventListener('keydown', this._focusTrapHandler);
+      this._focusTrapHandler = null;
+    }
   }
 
   // ── Observables ───────────────────────────────────────────────────────────
@@ -539,7 +627,25 @@ export class UserInfoManager {
 
   private watchPostMessage(): Observable<void> {
     return fromEvent<MessageEvent>(window, 'message').pipe(
-      filter(isUserInfoMessage),
+      filter((event) => {
+        // When running as an embedded iframe (window !== top), the parent page
+        // can be any origin — that's the whole point of the embedded use-case.
+        // When running as the top-level page, only accept messages from the
+        // same origin to prevent arbitrary third-party sites from injecting
+        // display names into the DOM.
+        // Accessing window.top can throw a SecurityError in cross-origin iframes,
+        // so we treat any access error as "definitely in an iframe".
+        let inIframe = false;
+        try {
+          inIframe = window !== window.top;
+        } catch {
+          inIframe = true;
+        }
+        if (!inIframe && event.origin !== window.location.origin) {
+          return false;
+        }
+        return isUserInfoMessage(event);
+      }),
       tap((event) => {
         logger.debug('UserInfo: received postMessage', event.data.data);
         this.applyInfo(event.data.data);

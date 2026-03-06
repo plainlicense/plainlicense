@@ -104,10 +104,10 @@
                 document.body.setAttribute('data-md-color-scheme', scheme);
             };
 
-            // Apply user personalization (name, year, projectName) to placeholder elements.
-            // Placeholder elements are marked with data-user-placeholder by the JS bundle,
-            // but this inline handler catches early postMessage / URL-param values before
-            // the bundle fully initialises — the bundle will pick up sessionStorage on load.
+            // Pre-seed user personalization data (name, year, projectName) into sessionStorage.
+            // The JS bundle later reads this data and applies it to any placeholder elements
+            // (marked with data-user-placeholder) once it has fully initialised.
+            // This inline handler just catches early postMessage / URL-param values.
             const applyUserInfo = (info) => {
                 if (!info || typeof info !== 'object') return;
                 if (info.name) {
