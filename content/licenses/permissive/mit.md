@@ -67,8 +67,12 @@ Everyone else can do these things too, as long as they follow these rules.
 
 You can do any of these things with the work, **if you follow these two rules**:
 
-1. **You must keep our copyright notice**. This tells people who created the work.
-2. **You must *also* keep this notice with all versions of the work**. 
+1. **You must keep our copyright notice**. This tells people who created the work and when.
+2. **You must *also* keep this notice with all versions of the work**. You can give this notice a few ways:
+   1.  Include this complete notice in the work (the Plain MIT License).
+   2.  Include this notice in materials that come with the work.
+   3.  [Link to this notice](https://plainlicense.org/licenses/permissive/mit/) from the work.
+   4.  Use an accepted standard for linking to licenses, like the [SPDX Identifier](https://spdx.dev/learn/handling-license-info/): `SPDX-LICENSE-IDENTIFIER: MIT`.
 
 {{block:warranty}}
 

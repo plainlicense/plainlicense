@@ -6,7 +6,7 @@ original_version: '2.0'
 description: The Elastic License 2.0 allows use, copying, and changes but prohibits offering the work as a managed service. You must keep notices and may lose patent rights if you sue.
 license_type: source-available
 is_osi_approved: false
-is_fsf_approved: true
+is_fsf_approved: false
 status: published
 summary: The Elastic License 2.0 allows most uses but prohibits managed service offerings.
 permissions:
@@ -39,11 +39,15 @@ You are free to:
 
 You can do all of these things **for free** and for *most* tasks or reasons. Everyone else can do these things too, as long as they follow these rules.
 
+We give you this permission, but *you* can't give it to anyone else. If you want to let others use the work, you must give them a copy of this license (these rules).
 
 ## You Must Follow These Rules
 
 You can do any of these things with the work, **if you follow these five rules**:
 
+1. You **can't offer the work or its features as a service to others**. You can't let others use the work's main features in a way that you manage.[^1]
+2. You **can't change, turn off, or avoid any license controls in the work** (like license keys). This means you can't mess with the controls or remove any protections on the work.
+3. You **can't change, take away, or hide any notices about licenses, copyrights, or trademarks** that come with the work. They tell you who created the work, when, and what rules you need to follow to use it.
 4. You must follow the law if you want to use our brand name, logo, or other branding. In many cases, this means you need to get our permission first.
 5. You must **clearly say if you change the work**. You must clearly tell people you changed the work and how you changed it. This helps others know what parts of the work are original and what parts are your changes.
 
@@ -58,18 +62,21 @@ If you change or add to the work in a way that breaks someone else's patent righ
 If you or your company *say in writing* that **the work breaks ^^any^^ patent rules or rights**, your right to use the work ends right away. This means you or your company claim the work copies or uses someone else's patented idea without permission.
 
 - If ^^you^^ **say** the work breaks a patent, you lose your rights to the work for everything you do.
+- If ^^your **company**^^ says the work breaks a patent, you lose your rights to the work for everything you do *for the company*. You don't lose your rights for other work (like work you do for other companies or as a hobby).
 
 ## You Can Also Lose Your Rights by Breaking These Rules
 
 If you use the work in a way that breaks these rules, you lose your rights to use the work:
 
 - **First time**. If we tell you that you broke the rules, and **you fix the problem within 30 days** of our notice, you can get your rights back.
+- **Second time**. If you break the rules again, or take longer than 30 days to fix the problem, you lose your rights permanently. *We don't have to warn you* before you lose your rights.
 
 ## We Offer No Promises or Guarantees
 
 We give the work to you **as it is**. This means:
 
 - You get the work *exactly how it is*, including anything broken.
+- We don't promise it will work well for any specific tasks, or that it will not break any rules. It may not work at all.
 - We are not responsible for any problems or damages that happen because of the work. You use it at your own risk.
 
 ## You Must Give This License to Others
@@ -84,6 +91,7 @@ If you share any part of the work with anyone else, you must give them a copy of
 
 ## Accepting these Rules
 
+When you use the work in any way, you agree to follow these rules. **If you don't agree to these rules, you can't use the work.** These rules are the *only rules* that apply to your use of the work -- you have no other rights to use it.
 
 ## Definitions
 
@@ -103,7 +111,7 @@ If you share any part of the work with anyone else, you must give them a copy of
 
 :    The materials provided under this license.
 
-
+[^1]: You *can* build a product or service using the work, including a product or service for your company or customers. It just can't be a service where others use the work's features directly.
 
 ---
 
