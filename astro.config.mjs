@@ -24,21 +24,33 @@ function getLicenseRedirects() {
   let categories;
   try {
     categories = readdirSync(contentBase);
-  } catch {
-    return redirects;
+  } catch (err) {
+    if (err && err.code === 'ENOENT') {
+      // content/licenses does not exist; no license redirects to generate.
+      return redirects;
+    }
+    throw err;
   }
   for (const category of categories) {
     const catDir = join(contentBase, category);
     try {
       if (!statSync(catDir).isDirectory()) continue;
-    } catch {
-      continue;
+    } catch (err) {
+      if (err && err.code === 'ENOENT') {
+        // Category directory disappeared or is missing; skip it.
+        continue;
+      }
+      throw err;
     }
     let files;
     try {
       files = readdirSync(catDir);
-    } catch {
-      continue;
+    } catch (err) {
+      if (err && err.code === 'ENOENT') {
+        // Category directory disappeared between checks; skip it.
+        continue;
+      }
+      throw err;
     }
     for (const file of files) {
       if (!file.endsWith('.md')) continue;
