@@ -1,0 +1,240 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection, getEntry } from 'astro:content';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog');
+  return posts.map(post => {
+    // Extract filename without prefix/extension if slug is missing
+    // e.g. "posts/welcome.md" -> "welcome"
+    const slug = post.data.slug || post.id.split('/').pop()?.replace(/\.md$/, '');
+    return {
+      params: { slug },
+      props: { post },
+    };
+  });
+}
+
+const { post } = Astro.props;
+const { Content } = await post.render();
+
+// Get related licenses if any
+const relatedLicenses = [];
+if (post.data.tags) {
+  // In a real app, we might find licenses by tags or explicit references
+}
+
+// Simple next/prev navigation
+const allPosts = (await getCollection('blog', ({ data }) => {
+  return import.meta.env.DEV ? true : data.status === 'published';
+})).sort((a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime());
+
+const currentIndex = allPosts.findIndex(p => p.id === post.id);
+const nextPost = currentIndex > 0 ? allPosts[currentIndex - 1] : null;
+const prevPost = currentIndex < allPosts.length - 1 ? allPosts[currentIndex + 1] : null;
+---
+
+<BaseLayout title={post.data.title} description={post.data.description}>
+  <article class="blog-post">
+    <header class="post-header">
+      <div class="container">
+        <div class="meta">
+          <time datetime={post.data.date}>{new Date(post.data.date).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+          })}</time>
+          {post.data.category && <span class="category">{post.data.category}</span>}
+        </div>
+        <h1>{post.data.title}</h1>
+        <p class="description">{post.data.description}</p>
+        <div class="author-box">
+          <span class="author">By {post.data.author}</span>
+        </div>
+      </div>
+    </header>
+
+    {post.data.og_image && (
+      <div class="featured-image">
+        <img src={post.data.og_image} alt="" />
+      </div>
+    )}
+
+    <div class="container post-body">
+      <div class="content prose">
+        <Content />
+      </div>
+
+      <aside class="post-sidebar">
+        {post.data.tags && post.data.tags.length > 0 && (
+          <section class="tags">
+            <h3>Tags</h3>
+            <div class="tag-list">
+              {post.data.tags.map(tag => <span class="tag">{tag}</span>)}
+            </div>
+          </section>
+        )}
+
+        <section class="share">
+          <h3>Share</h3>
+          <div class="share-links">
+            <a href={`https://twitter.com/intent/tweet?text=${post.data.title}&url=https://plainlicense.org/blog/${post.slug || post.id}`} target="_blank">Twitter</a>
+            <a href={`https://www.linkedin.com/sharing/share-offsite/?url=https://plainlicense.org/blog/${post.slug || post.id}`} target="_blank">LinkedIn</a>
+          </div>
+        </section>
+      </aside>
+    </div>
+
+    <footer class="post-footer">
+      <div class="container">
+        <nav class="post-nav">
+          {prevPost && (
+            <a href={`/blog/${prevPost.slug || prevPost.id}/`} class="prev">
+              <span class="label">← Previous Post</span>
+              <span class="title">{prevPost.data.title}</span>
+            </a>
+          )}
+          {nextPost && (
+            <a href={`/blog/${nextPost.slug || nextPost.id}/`} class="next">
+              <span class="label">Next Post →</span>
+              <span class="title">{nextPost.data.title}</span>
+            </a>
+          )}
+        </nav>
+      </div>
+    </footer>
+  </article>
+</BaseLayout>
+
+<style>
+  .blog-post {
+    padding-bottom: 4rem;
+  }
+  .post-header {
+    padding: 4rem 0;
+    background: #0d0f14;
+    border-bottom: 1px solid #333;
+  }
+  .container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 2rem;
+  }
+  .meta {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.9rem;
+    color: #888;
+    margin-bottom: 1rem;
+  }
+  .category {
+    color: #883aea;
+    text-transform: uppercase;
+    font-weight: bold;
+  }
+  h1 {
+    font-size: 3rem;
+    margin: 0 0 1.5rem 0;
+    line-height: 1.1;
+  }
+  .description {
+    font-size: 1.25rem;
+    color: #aaa;
+    margin-bottom: 2rem;
+  }
+  .author-box {
+    color: #888;
+    font-style: italic;
+  }
+  .featured-image {
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+  .featured-image img {
+    width: 100%;
+    height: 400px;
+    object-fit: cover;
+  }
+  .post-body {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 4rem;
+    margin-top: 4rem;
+  }
+  @media (min-width: 1024px) {
+    .post-body {
+      grid-template-columns: 1fr 200px;
+      max-width: 1100px;
+    }
+  }
+  .prose {
+    line-height: 1.8;
+    font-size: 1.1rem;
+    color: #eee;
+  }
+  .post-sidebar h3 {
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    color: #888;
+    letter-spacing: 0.05em;
+    margin-bottom: 1rem;
+  }
+  .tag-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+  }
+  .tag {
+    background: #1a1c23;
+    padding: 0.25rem 0.75rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    color: #ccc;
+  }
+  .share-links {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .share-links a {
+    color: #883aea;
+    text-decoration: none;
+    font-size: 0.9rem;
+  }
+  .share-links a:hover {
+    text-decoration: underline;
+  }
+  .post-footer {
+    margin-top: 6rem;
+    padding-top: 4rem;
+    border-top: 1px solid #333;
+  }
+  .post-nav {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+  }
+  .post-nav a {
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+  }
+  .post-nav .next {
+    text-align: right;
+    grid-column: 2;
+  }
+  .post-nav .label {
+    font-size: 0.8rem;
+    color: #888;
+    margin-bottom: 0.5rem;
+  }
+  .post-nav .title {
+    color: white;
+    font-weight: bold;
+    font-size: 1.1rem;
+  }
+  .post-nav a:hover .title {
+    color: #883aea;
+  }
+</style>

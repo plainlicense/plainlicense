@@ -6,7 +6,7 @@
   "scripts": {
     "release": "semantic-release"
   },
-  "main": "../../docs/licenses/permissive/mit/index.md",
+  "main": "../../content/licenses/permissive/mit.md",
   "devDependencies": {
     "@commitlint/cli": "^19.8.1",
     "@semantic-release/changelog": "^6.0.3",
@@ -65,13 +65,20 @@
         }
       ],
       ["@semantic-release/release-notes-generator"],
-      ["@semantic-release/github"
-        ,
+      ["@semantic-release/github",
         {
           "assets": [
             {
-              "path": "../../docs/licenses/permissive/mit/index.md",
-              "label": "Plain MIT License"
+              "path": "../../public/exports/mit/v${nextRelease.version}/MIT.md",
+              "label": "Plain MIT License (Markdown)"
+            },
+            {
+              "path": "../../public/exports/mit/v${nextRelease.version}/MIT.pdf",
+              "label": "Plain MIT License (PDF)"
+            },
+            {
+              "path": "../../public/exports/mit/v${nextRelease.version}/MIT.txt",
+              "label": "Plain MIT License (Plaintext)"
             }
           ]
         }

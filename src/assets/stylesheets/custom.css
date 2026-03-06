@@ -1,0 +1,78 @@
+@import "./bodyfont.css";
+@import "./colors.css";
+
+:root {
+  /* Brand override for Starlight */
+  --sl-color-accent-low: var(--castleton-green);
+  --sl-color-accent: var(--emerald);
+  --sl-color-accent-high: var(--aquamarine);
+
+  /* Typography */
+  --sl-font: "Inter", "Noto Sans", "Open Sans", Lato, Helvetica, Arial, system-ui, sans-serif;
+  --sl-font-mono: "Source Code Pro", "Fira Code", "Inconsolata", "Monaco", "Consolas", "Courier New", monospace;
+}
+
+/* Header Brand Styling */
+.site-title {
+  font-family: "Raleway", sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.05em;
+}
+
+/* Prose Consistency */
+.sl-markdown-content {
+  font-family: var(--sl-font);
+  line-height: 1.6;
+}
+
+.sl-markdown-content h1,
+.sl-markdown-content h2,
+.sl-markdown-content h3,
+.sl-markdown-content h4,
+.sl-markdown-content h5,
+.sl-markdown-content h6 {
+  font-family: "Raleway", sans-serif;
+  color: var(--zaffre);
+}
+
+[data-theme='dark'] .sl-markdown-content h1,
+[data-theme='dark'] .sl-markdown-content h2,
+[data-theme='dark'] .sl-markdown-content h3,
+[data-theme='dark'] .sl-markdown-content h4,
+[data-theme='dark'] .sl-markdown-content h5,
+[data-theme='dark'] .sl-markdown-content h6 {
+  color: var(--emerald);
+}
+
+/* Custom License Page Styles */
+.license-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.license-header {
+  border-bottom: 2px solid var(--sl-color-accent);
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+}
+
+.license-metadata {
+  background-color: var(--sl-color-gray-6);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin-bottom: 2rem;
+}
+
+/* Custom Highlights (from main.css) */
+.highlight-match {
+  background-color: rgba(21, 219, 149, 0.2);
+  transition: background-color 0.2s;
+  border-radius: 4px;
+}
+
+.highlight-active {
+  background-color: rgba(21, 219, 149, 0.4);
+  transition: background-color 0.2s;
+  border-radius: 4px;
+}

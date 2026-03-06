@@ -1,0 +1,63 @@
+---
+import BaseLayout from './BaseLayout.astro';
+
+const { frontmatter } = Astro.props;
+---
+
+<BaseLayout title={frontmatter.title} description={frontmatter.description}>
+  <main class="content-page">
+    <div class="container">
+      <header class="page-header">
+        <h1>{frontmatter.title}</h1>
+        {frontmatter.description && <p class="description">{frontmatter.description}</p>}
+      </header>
+      
+      <article class="prose">
+        <slot />
+      </article>
+    </div>
+  </main>
+</BaseLayout>
+
+<style>
+  .content-page {
+    padding: 4rem 0;
+  }
+  .container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 2rem;
+  }
+  .page-header {
+    margin-bottom: 3rem;
+    border-bottom: 1px solid #333;
+    padding-bottom: 2rem;
+  }
+  h1 {
+    font-size: 3rem;
+    margin: 0 0 1rem 0;
+  }
+  .description {
+    font-size: 1.25rem;
+    color: #aaa;
+  }
+  .prose {
+    line-height: 1.8;
+    color: #eee;
+  }
+  /* Style markdown content */
+  .prose :global(h2) {
+    margin-top: 2.5rem;
+    color: #883aea;
+  }
+  .prose :global(p) {
+    margin-bottom: 1.5rem;
+  }
+  .prose :global(ul) {
+    margin-bottom: 1.5rem;
+    padding-left: 1.5rem;
+  }
+  .prose :global(li) {
+    margin-bottom: 0.5rem;
+  }
+</style>

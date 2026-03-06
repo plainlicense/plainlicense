@@ -1,0 +1,24 @@
+{
+  "$schema": "../../src/schemas/mapping-schema.json",
+  "license_id": "MIT",
+  "version": "0.2.1",
+  "mapping_philosophy": "clause-level with interpretive correspondence",
+  "mappings": [
+    {
+      "id": "map-perm-use",
+      "type": "one-to-one-expanded",
+      "plain_clause": {
+        "id": "plain-perm-use",
+        "hash": "sha256:1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
+        "content": "You can use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the work."
+      },
+      "original_clause": {
+        "id": "original-grant-use",
+        "hash": "sha256:fedcba0987654321fedcba0987654321fedcba0987654321fedcba0987654321",
+        "content": "Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the \"Software\"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, per the conditions below."
+      },
+      "confidence": 0.92,
+      "semantic_tag": "permissions"
+    }
+  ]
+}

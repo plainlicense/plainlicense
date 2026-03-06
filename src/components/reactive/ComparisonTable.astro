@@ -1,0 +1,87 @@
+---
+interface Props {
+  id?: string;
+  title?: string;
+  data?: any;
+}
+
+const { id, title, data } = Astro.props;
+
+// Default data for the prototype if none provided
+const tableData = data || {
+  headers: ['Feature', 'MIT', 'GPL v3', 'Apache 2.0'],
+  rows: [
+    ['Commercial Use', '✅', '✅', '✅'],
+    ['Modification', '✅', '✅', '✅'],
+    ['Distribution', '✅', '✅', '✅'],
+    ['Sublicensing', '✅', '❌', '✅'],
+    ['Patent Grant', '❌', '✅', '✅'],
+  ]
+};
+---
+
+<div class="table-container" id={id}>
+  {title && <h3>{title}</h3>}
+  <div class="responsive-table">
+    <table>
+      <thead>
+        <tr>
+          {tableData.headers.map((header: string) => (
+            <th>{header}</th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        {tableData.rows.map((row: string[]) => (
+          <tr>
+            {row.map((cell: string, index: number) => (
+              <td class={index === 0 ? 'feature-label' : 'feature-value'}>{cell}</td>
+            ))}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<style>
+  .table-container {
+    margin: 2rem 0;
+  }
+  .responsive-table {
+    overflow-x: auto;
+    border: 1px solid #333;
+    border-radius: 8px;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #1a1c23;
+    font-size: 0.9rem;
+  }
+  th {
+    background: #252833;
+    text-align: left;
+    padding: 1rem;
+    border-bottom: 2px solid #333;
+    color: #883aea;
+  }
+  td {
+    padding: 1rem;
+    border-bottom: 1px solid #333;
+  }
+  tr:last-child td {
+    border-bottom: none;
+  }
+  .feature-label {
+    font-weight: bold;
+    background: #1e2129;
+    width: 30%;
+  }
+  .feature-value {
+    text-align: center;
+  }
+  tr:hover {
+    background: #252833;
+  }
+</style>

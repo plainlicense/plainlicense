@@ -307,7 +307,10 @@ sync:
 .PHONY: build
 
 build:
-	$(BUN) src/build/index.ts
+	bun run build
+	bun src/build/generate-exports.ts
+	bun src/build/generate-og-images.ts
+	bun src/build/build-versions.ts
 
 #! =========== ALL ===========
 #* fix includes all checks and formats, so we really just add build
@@ -319,7 +322,10 @@ all: fix build
 .PHONY: deploy
 
 deploy:
-	$(MKDOCS)
+	# Cloudflare Pages handles deployment automatically on push to main
+	# but we can trigger a build if needed via wrangler or webhook
+	@echo "Deploying to Cloudflare Pages..."
+	git push origin main
 
 #! =========== UPGRADE COMMANDS ===========
 .PHONY: upgrade upgrade-libs upgrade-tools

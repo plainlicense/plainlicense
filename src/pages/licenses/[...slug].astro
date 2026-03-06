@@ -1,0 +1,194 @@
+---
+import { getCollection, type CollectionEntry } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import LicenseSummary from '../../components/LicenseSummary.astro';
+import DownloadOptions from '../../components/DownloadOptions.astro';
+import VersionHistory from '../../components/VersionHistory.astro';
+import ComparisonToggle from '../../components/ComparisonToggle.astro';
+import ComparisonModal from '../../components/ComparisonModal.astro';
+import { parseComponentPlaceholders } from '../../utils/component-parser.ts';
+import ComponentRegistry from '../../components/reactive/ComponentRegistry.astro';
+import { marked } from 'marked';
+
+export async function getStaticPaths() {
+  const licenses = await getCollection('licenses');
+  console.log('Generating paths for', licenses.length, 'licenses');
+  
+  return licenses.map(license => {
+    const slug = license.slug || license.id;
+    console.log(' - Path:', `/licenses/${slug}`);
+    return {
+      params: { slug },
+      props: { license },
+    };
+  });
+}
+
+const { license } = Astro.props;
+const { data } = license;
+
+// Template Block Injection Logic
+const templateBlocks = await getCollection('template-blocks');
+let processedBody = license.body;
+
+// Split into plain and original parts
+const bodyParts = processedBody.split(/---[\s\n]+# Original License Text/i);
+const plainBody = bodyParts[0];
+const originalBody = bodyParts.length > 1 ? bodyParts[1] : '';
+
+// Replace {{block:id}} markers in plainBody
+const blockRegex = /{{block:([a-z0-9-]+)}}/g;
+const matches = plainBody.matchAll(blockRegex);
+let finalPlainBody = plainBody;
+
+for (const match of matches) {
+  const blockId = match[1];
+  const block = templateBlocks.find(b => b.id === blockId || b.id.split('/').pop()?.replace(/\.md$/, '') === blockId);
+  if (block) {
+    finalPlainBody = finalPlainBody.replace(match[0], block.body);
+  }
+}
+
+// Component parsing for plain body
+const placeholders = parseComponentPlaceholders(finalPlainBody);
+const contentParts = finalPlainBody.split(/{{component:[a-z-]+.*?}}/g);
+
+// Full processed body for clipboard/exports (replaces blocks but keeps original text if present)
+// Also strip component markers as they are for interactive UI only
+const fullProcessedBody = (finalPlainBody + (originalBody ? '\n\n---\n\n# Original License Text\n' + originalBody : ''))
+  .replace(/{{component:[a-z-]+.*?}}/g, '');
+---
+
+<BaseLayout title={data.title}>
+  <div class="license-container" data-spdx-id={data.spdx_id}>
+    <ComparisonToggle />
+    <LicenseSummary license={license} />
+    
+    <div class="license-layout">
+      <div class="license-column plain-version">
+        <h2>Plain Language Version</h2>
+        <div class="license-content prose">
+          {contentParts.map((part, index) => (
+            <>
+              <div set:html={marked.parse(part)} />
+              {placeholders[index] && (
+                <ComponentRegistry 
+                  type={placeholders[index].type} 
+                  id={placeholders[index].id} 
+                  props={placeholders[index].props} 
+                />
+              )}
+            </>
+          ))}
+        </div>
+      </div>
+
+      <div class="license-column original-version">
+        <h2>Original License Text</h2>
+        <div class="license-content prose" set:html={marked.parse(originalBody)} />
+      </div>
+    </div>
+
+    <DownloadOptions license={license} processedBody={fullProcessedBody} />
+    <VersionHistory license={license} />
+    <ComparisonModal />
+  </div>
+</BaseLayout>
+
+<script>
+  import { initMappingViewer } from '../../components/MappingViewer.ts';
+
+  const container = document.querySelector('.license-container') as HTMLElement;
+  const spdxId = container?.dataset.spdxId;
+
+  if (spdxId) {
+    fetch(`/mappings/${spdxId}-mapping.json`)
+      .then(res => res.json())
+      .then(mappingData => {
+        initMappingViewer(container, mappingData);
+      })
+      .catch(() => {
+        console.log(`No mapping found for ${spdxId}`);
+      });
+  }
+</script>
+
+<style>
+  .license-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+    transition: max-width 0.3s ease;
+  }
+  
+  .license-layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    margin-top: 2rem;
+  }
+
+  .original-version {
+    display: none;
+    opacity: 0.6;
+    transition: opacity 0.3s;
+  }
+
+  .original-version:hover {
+    opacity: 1;
+  }
+
+  @media (min-width: 1024px) {
+    .license-layout {
+      gap: 4rem;
+    }
+
+    .comparison-active .license-layout {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .comparison-active .original-version {
+      display: block;
+    }
+
+    .comparison-active.license-container {
+      max-width: 1400px;
+    }
+  }
+
+  .license-content {
+    line-height: 1.6;
+  }
+
+  /* Interactive Mapped Sections */
+  .comparison-active .license-content [id] {
+    cursor: pointer;
+    position: relative;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+  }
+
+  @media (max-width: 1023px) {
+    .comparison-active .license-content [id]:active {
+      background-color: rgba(var(--sl-color-accent-rgb), 0.1);
+    }
+  }
+
+  .comparison-active .license-content [id]:hover {
+    background-color: rgba(var(--sl-color-accent-rgb), 0.05);
+  }
+
+  :global(.highlight-active) {
+    background-color: rgba(var(--sl-color-accent-rgb), 0.2);
+    border-radius: 4px;
+    box-shadow: 0 0 0 4px rgba(var(--sl-color-accent-rgb), 0.2);
+    transition: all 0.2s ease;
+  }
+
+  :global(.highlight-match) {
+    background-color: rgba(var(--sl-color-accent-rgb), 0.1);
+    border-radius: 4px;
+    box-shadow: 0 0 0 4px rgba(var(--sl-color-accent-rgb), 0.1);
+    transition: all 0.2s ease;
+  }
+</style>

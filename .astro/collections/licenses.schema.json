@@ -1,0 +1,142 @@
+{
+  "$ref": "#/definitions/licenses",
+  "definitions": {
+    "licenses": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "spdx_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9.-]+$|^custom-[a-z0-9-]+$"
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "original_version": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 300
+        },
+        "changelog": {
+          "type": "string"
+        },
+        "license_type": {
+          "type": "string",
+          "enum": [
+            "permissive",
+            "copyleft",
+            "source-available",
+            "public-domain"
+          ]
+        },
+        "is_osi_approved": {
+          "type": "boolean"
+        },
+        "is_fsf_approved": {
+          "type": "boolean"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "draft",
+            "published"
+          ],
+          "default": "draft"
+        },
+        "plain_gunning_fog": {
+          "type": "number"
+        },
+        "shame_words_count": {
+          "type": "number"
+        },
+        "fair_code": {
+          "type": "boolean",
+          "default": false
+        },
+        "summary": {
+          "type": "string"
+        },
+        "use_cases": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "restrictions": {
+          "type": "object",
+          "properties": {
+            "commercial_use": {
+              "type": "boolean"
+            },
+            "attribution_required": {
+              "type": "boolean"
+            },
+            "share_alike": {
+              "type": "boolean"
+            }
+          },
+          "additionalProperties": false
+        },
+        "canonical_url": {
+          "type": "string",
+          "format": "uri"
+        },
+        "created_date": {
+          "type": "string"
+        },
+        "last_modified": {
+          "type": "string"
+        },
+        "author": {
+          "type": "string"
+        },
+        "meta_description": {
+          "type": "string"
+        },
+        "og_image": {
+          "type": "string"
+        },
+        "has_mapping": {
+          "type": "boolean",
+          "default": false
+        },
+        "mapping_version": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "show_original_comparison": {
+          "type": "boolean",
+          "default": true
+        },
+        "show_shame_counter": {
+          "type": "boolean",
+          "default": true
+        },
+        "featured": {
+          "type": "boolean",
+          "default": false
+        }
+      },
+      "required": [
+        "title",
+        "spdx_id",
+        "version",
+        "original_version",
+        "description",
+        "license_type",
+        "is_osi_approved",
+        "is_fsf_approved"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}

@@ -1,0 +1,19 @@
+---
+---
+
+<div id="search" class="search-container"></div>
+
+<script is:inline>
+  window.addEventListener('DOMContentLoaded', (event) => {
+    new PagefindUI({ element: "#search", showSubResults: true });
+  });
+</script>
+
+<link href="/_pagefind/pagefind-ui.css" rel="stylesheet">
+<script src="/_pagefind/pagefind-ui.js" is:inline></script>
+
+<style>
+  .search-container {
+    margin: 2rem 0;
+  }
+</style>

@@ -39,12 +39,20 @@
     "strictPropertyInitialization": true,
     "stripInternal": true,
     "target": "es2020",
-    "verbatimModuleSyntax": false
+    "verbatimModuleSyntax": false,
+    "plugins": [
+      {
+        "name": "@astrojs/ts-plugin"
+      }
+    ]
   },
-  "exclude": ["src/build/*.ts", "./commitlint.config.ts"],
+  "exclude": ["src/build/*.ts", "./commitlint.config.ts", "dist"],
   "extends": "@tsconfig/bun/tsconfig.json",
   "include": [
     "src/**/*.ts",
+    "src/**/*.d.ts",
+    "src/**/*.tsx",
+    "src/**/*.astro",
     "./external/mkdocs-material/typings",
     "./external/mkdocs-material/material/src/templates/assets/javascripts/bundle.ts",
     "./external/mkdocs-material/material/src/templates/assets/javascripts/**/*.ts",
