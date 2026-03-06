@@ -578,3 +578,260 @@ p.md-nav__description.license {
   mask-position: center;
   mask-size: contain;
 }
+
+/* ============================================================
+   LICENSE PERSONALIZATION
+   ============================================================ */
+
+/* ── Placeholder markers ─────────────────────────────────── */
+
+.user-placeholder {
+  border-bottom: 2px dashed var(--emerald);
+  cursor: pointer;
+  transition: background-color 150ms ease, border-color 150ms ease;
+}
+
+.user-placeholder--filled {
+  border-bottom: 2px solid var(--emerald);
+  background-color: rgba(21, 219, 149, 0.12);
+  border-radius: 2px;
+  padding: 0 2px;
+  font-style: normal;
+}
+
+[data-md-color-scheme="slate"] .user-placeholder--filled {
+  background-color: rgba(21, 219, 149, 0.18);
+}
+
+/* ── Trigger button ──────────────────────────────────────── */
+
+.user-info-trigger-wrapper {
+  padding: 0.5rem 0.75rem 0;
+}
+
+.user-info-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  width: 100%;
+  padding: 0.45rem 0.75rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--md-default-fg-color--light);
+  background: transparent;
+  border: 1.5px solid var(--emerald);
+  border-radius: 0.4rem;
+  cursor: pointer;
+  transition: background-color 150ms ease, color 150ms ease;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.user-info-trigger:hover,
+.user-info-trigger:focus-visible {
+  background-color: rgba(21, 219, 149, 0.12);
+  color: var(--md-default-fg-color);
+  outline: none;
+}
+
+.user-info-trigger[aria-expanded="true"] {
+  background-color: rgba(21, 219, 149, 0.18);
+  border-color: var(--shamrock-green);
+}
+
+/* ── Panel backdrop ──────────────────────────────────────── */
+
+.user-info-panel {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 1rem;
+  background-color: rgba(0, 0, 0, 0.4);
+  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
+}
+
+@media (width >= 600px) {
+  .user-info-panel {
+    align-items: center;
+  }
+}
+
+.user-info-panel[hidden] {
+  display: none;
+}
+
+/* ── Panel inner card ────────────────────────────────────── */
+
+.user-info-panel__inner {
+  width: 100%;
+  max-width: 440px;
+  background-color: var(--md-default-bg-color);
+  border: 1.5px solid var(--emerald);
+  border-radius: 0.75rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.24);
+  overflow: hidden;
+}
+
+/* ── Panel header ────────────────────────────────────────── */
+
+.user-info-panel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem 0.75rem;
+  border-bottom: 1px solid var(--md-default-fg-color--lightest);
+}
+
+.user-info-panel__title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--md-default-fg-color);
+}
+
+.user-info-panel__close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  padding: 0;
+  font-size: 1rem;
+  line-height: 1;
+  color: var(--md-default-fg-color--light);
+  background: transparent;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background-color 150ms ease;
+}
+
+.user-info-panel__close:hover {
+  background-color: var(--md-default-fg-color--lightest);
+}
+
+/* ── Panel body ──────────────────────────────────────────── */
+
+.user-info-panel__description {
+  margin: 0;
+  padding: 0.75rem 1.25rem 0.25rem;
+  font-size: 0.8rem;
+  color: var(--md-default-fg-color--light);
+  line-height: 1.5;
+}
+
+.user-info-panel__form {
+  padding: 0.75rem 1.25rem 1.25rem;
+}
+
+/* ── Form fields ─────────────────────────────────────────── */
+
+.user-info-panel__field {
+  margin-bottom: 0.9rem;
+}
+
+.user-info-panel__label {
+  display: block;
+  margin-bottom: 0.3rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--md-default-fg-color);
+}
+
+.user-info-panel__required {
+  color: var(--shamrock-green);
+}
+
+.user-info-panel__input {
+  display: block;
+  width: 100%;
+  padding: 0.5rem 0.65rem;
+  font-size: 0.88rem;
+  font-family: inherit;
+  color: var(--md-default-fg-color);
+  background-color: var(--md-default-bg-color);
+  border: 1.5px solid var(--md-default-fg-color--lightest);
+  border-radius: 0.35rem;
+  box-sizing: border-box;
+  transition: border-color 150ms ease;
+}
+
+.user-info-panel__input:focus {
+  border-color: var(--emerald);
+  outline: 2px solid rgba(21, 219, 149, 0.3);
+  outline-offset: 1px;
+}
+
+.user-info-panel__input--short {
+  width: 7rem;
+}
+
+.user-info-panel__hint {
+  display: block;
+  margin-top: 0.25rem;
+  font-size: 0.74rem;
+  color: var(--md-default-fg-color--light);
+}
+
+/* ── Form actions ────────────────────────────────────────── */
+
+.user-info-panel__actions {
+  display: flex;
+  gap: 0.6rem;
+  margin-top: 1rem;
+}
+
+.user-info-panel__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.45rem 1rem;
+  font-size: 0.84rem;
+  font-weight: 600;
+  border-radius: 0.35rem;
+  cursor: pointer;
+  border: 1.5px solid transparent;
+  transition: background-color 150ms ease, color 150ms ease;
+}
+
+.user-info-panel__btn--primary {
+  color: var(--penn-blue);
+  background-color: var(--emerald);
+  border-color: var(--emerald);
+}
+
+.user-info-panel__btn--primary:hover {
+  background-color: var(--aquamarine);
+  border-color: var(--aquamarine);
+}
+
+.user-info-panel__btn--secondary {
+  color: var(--md-default-fg-color--light);
+  background-color: transparent;
+  border-color: var(--md-default-fg-color--lightest);
+}
+
+.user-info-panel__btn--secondary:hover {
+  background-color: var(--md-default-fg-color--lightest);
+  color: var(--md-default-fg-color);
+}
+
+/* ── Copy hint ───────────────────────────────────────────── */
+
+.user-info-panel__copy-hint {
+  margin: 0;
+  padding: 0 1.25rem 0.75rem;
+  font-size: 0.78rem;
+  color: var(--shamrock-green);
+  min-height: 1.2em;
+}
+
+/* ── Keyboard / close on Escape ──────────────────────────── */
+
+/* Handled via JS; no CSS needed */

@@ -103,15 +103,51 @@
                 const scheme = value === 'dark' ? 'slate' : 'default';
                 document.body.setAttribute('data-md-color-scheme', scheme);
             };
+
+            // Apply user personalization (name, year, projectName) to placeholder elements.
+            // Placeholder elements are marked with data-user-placeholder by the JS bundle,
+            // but this inline handler catches early postMessage / URL-param values before
+            // the bundle fully initialises — the bundle will pick up sessionStorage on load.
+            const applyUserInfo = (info) => {
+                if (!info || typeof info !== 'object') return;
+                if (info.name) {
+                    try {
+                        sessionStorage.setItem(
+                            'plainlicense-user-info',
+                            JSON.stringify({
+                                name: info.name || '',
+                                year: info.year || String(new Date().getFullYear()),
+                                projectName: info.projectName || '',
+                            })
+                        );
+                    } catch (_) { /* storage unavailable */ }
+                }
+            };
+
             const params = new URLSearchParams(window.location.search);
             if (params.has('theme')) {
                 theme(params.get('theme'));
             }
+            // Magic-link: pre-seed sessionStorage from URL params so the JS bundle
+            // picks them up when it initialises the UserInfoManager.
+            if (params.has('user-name')) {
+                applyUserInfo({
+                    name: params.get('user-name'),
+                    year: params.get('user-year'),
+                    projectName: params.get('user-project'),
+                });
+            }
+
             window.addEventListener('message', (event) => {
                 if (event.origin !== 'https://plainlicense.org') return;
 
                 if (event.data.theme) {
                     theme(event.data.theme);
+                }
+
+                // Support: parent page sends { type: 'userInfo', data: { name, year, projectName } }
+                if (event.data.type === 'userInfo' && event.data.data) {
+                    applyUserInfo(event.data.data);
                 }
             });
 
