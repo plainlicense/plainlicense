@@ -8,33 +8,21 @@ I strived to avoid hardcoding any license text in the codebase. For the most par
 
 1.  **The License**. License files consist of YAML frontmatter within a (usually empty) markdown file. The template is [LICENSE_TEMPLATE.md](./LICENSE_TEMPLATE.md). Instructions for this part are in the file itself and [docs/helping/craft.md](./docs/helping/craft.md).
 
-2.  **The License File Location**. The license file should be placed in the `docs/licenses/{category}/{spdx-id}/index.md` directory, where:
+2.  **The License File Location**. The license file should be placed at `content/licenses/{category}/{spdx-id}.md`, where:
 
     - `{category}` is the category of the license (one of: `permissive`, `copyleft`, `source-available`, `public-domain`, `proprietary`).
     - `{spdx-id}` is the SPDX identifier for the license in lower case (e.g., `mit`, `gpl-3.0`). All spdx-ids are in the [license-list-data submodule](./external/license-list-data/json/licenses.json) or at [spdx.org](https://spdx.org/licenses/).
     - If a license is a Plain License original, the spdx-id should be prefixed with and follow the SPDX convention for naming (e.g., `plain-public-domain`). Don't include a version number in version IDs for Plain License originals -- we're constantly iterating.
 
-3.  **The License File Name**. The license file should be named `index.md` (e.g., `/licenses/permissive/mit/`).
+3.  **The License File Name**. The license file should be named `{spdx-id}.md` (e.g., `content/licenses/permissive/mit.md`). The canonical URL will be `/licenses/{category}/{spdx-id}` (e.g., `/licenses/permissive/mit`).
 
-4.  **Linking the License File**. The license file must be referenced and linked in the root [`mkdocs.yml`](./mkdocs.yml) in the `nav` section. Currently the licenses are linked under `our licenses` -> category -> spdx-id. For example, the MIT license is linked as follows:
+4.  **URL Routing is Automatic**. No manual routing configuration is needed. When the site is built, short-slug redirects are automatically generated from the `content/licenses/` directory structure:
+    - `/licenses/{spdx-id}` → `/licenses/{category}/{spdx-id}` (e.g., `/licenses/mit` → `/licenses/permissive/mit`)
+    - `/{spdx-id}` → `/licenses/{category}/{spdx-id}` (e.g., `/mit` → `/licenses/permissive/mit`)
 
-    ```yaml
-    nav:
-      # stuff
-      - our licenses:
-          # more stuff
-          - permissive licenses:
-              - licenses/permissive/index.md
-              - MIT: licenses/permissive/mit/index.md # <-- this is the link to the MIT license
-    ```
+    This happens in `astro.config.mjs` via `getLicenseRedirects()`, which reads all `.md` files from `content/licenses/` at build time.
 
-5.  **Updating the Category Index**. If you're adding a new license, you should also update the category index file (e.g., `docs/licenses/permissive/index.md` for the permissive category) to include a link to your new license and a brief description. For convenience, here are the index files for each category:
-
-    - [permissive](./docs/licenses/permissive/index.md)
-    - [copyleft](./docs/licenses/copyleft/index.md)
-    - [source-available](./docs/licenses/source-available/index.md)
-    - [public-domain](./docs/licenses/public-domain/index.md)
-    - [proprietary](./docs/licenses/proprietary/index.md)
+5.  **Updating the Category Index**. If you're adding a new license, you should also update the relevant category index page in `src/pages/licenses/` (if one exists) to include a link to your new license and a brief description.
 
 6.  **Add a Package to the Workspace**. After adding the license, you should add a package to the workspace. Steps:
 
