@@ -39,6 +39,10 @@ The person who created the work has given up their copyright. This means you can
 
 You can do all of these things **for free**. You don't have to follow any rules or include any notices.
 
+## We Also Give Everyone a License Without Restrictions
+
+In places that follow copyright laws, we give up all our rights to the work. Everyone can use it freely, and with no benefit to us or our children. We give up all rights permanently. We want everyone to know we give up our rights to the work now and forever.
+
 ## You can Change the License
 
 **You can share the work under any other license.** This includes "copyleft" licenses (like the GPL) and "proprietary" licenses (where you keep all rights).
