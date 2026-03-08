@@ -1,12 +1,19 @@
-import { defineConfig } from 'astro/config';
-import sitemap from '@astrojs/sitemap';
-import preact from '@astrojs/preact';
-import mdx from '@astrojs/mdx';
 import cloudflare from '@astrojs/cloudflare';
+import mdx from '@astrojs/mdx';
+import preact from '@astrojs/preact';
+import sitemap from '@astrojs/sitemap';
 import starlight from '@astrojs/starlight';
+import favicons from 'astro-favicons';
+import { defineConfig } from 'astro/config';
 import { readdirSync, statSync } from 'node:fs';
-import { join, dirname } from 'node:path';
+import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import starlightAutoDrafts from 'starlight-auto-drafts';
+import starlightContextualMenu from 'starlight-contextual-menu';
+import starlightHeadingBadges from 'starlight-heading-badges';
+import starlightLLMsTxt from 'starlight-llms-txt';
+import starlightTags from 'starlight-tags';
+import { searchForWorkspaceRoot } from 'vite';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -76,14 +83,98 @@ function getLicenseRedirects() {
 export default defineConfig({
   redirects: getLicenseRedirects(),
   site: 'https://plainlicense.org',
+  base: '/',
   output: 'static',
-  adapter: cloudflare(),
+  adapter: cloudflare({
+    imageService: 'compile',
+    environment: process.env.NODE_ENV === 'development' ? 'local' : undefined,
+}),
+  favicon: join(__dirname, 'assets/images/logo_only_color_transp.svg'),
+  // Image optimization
+  image: {
+    service: {
+      entrypoint: 'astro/assets/services/sharp',
+    },
+    responsiveStyles: true,
+    layout: 'constrained',
+    domains: [
+      'github.com',
+      'raw.githubusercontent.com',
+      'docs.plainlicense.org',
+      'plainlicense.org',
+      'readscore.plainlicense.org',
+      'plainr.plainlicense.org',
+      'avatars.githubusercontent.com',
+      'ui-avatars.com',
+    ],
+  },
+  build: {
+    inlineStylesheets: 'auto',
+    assets: '_astro',
+  },
+  markdown: {
+    shikiConfig: { theme: 'github-dark' },
+  },
+  vite: {
+    server: {
+      fs: {
+        allow: [
+          searchForWorkspaceRoot(process.cwd())
+        ],
+      },
+    },
+    assetsInclude: [
+      'src/*.webp',
+      'src/*.png',
+      'src/*.jpg',
+      'src/*.jpeg',
+      'src/*.svg',
+      'src/*.avif',
+    ],
+    build: {
+      cssCodeSplit: true,
+      cssMinify: 'lightningcss',
+      rollupOptions: {
+        output: {
+          experimental: {
+            integrations: true,
+            nativeMagicString: true,
+          },
+        },
+        treeshake: "smallest",
+        optimization: {
+          inlineConst: "smart"
+        },
+        ssr: false,
+      },
+    },
+    css: {
+      lightningcss: {},
+    }
+  },
+  prefetch: {
+    defaultStrategy: "viewport",
+  },
+  experimental: {
+    chromeDevtoolsWorkspace: true,
+    clientPrerender: true,
+    contentIntellisense: true,
+    svgo: {
+      plugins: [
+        {
+          name: 'preset-default',
+    },
+      ],
+    },
+  },
   integrations: [
     starlight({
       title: 'Plain License',
-      description: 'Plain language versions of popular software licenses',
+      description: 'Creative licenses in plain language for everyone.',
       logo: {
         src: './src/assets/images/logo_named.svg',
+        alt: 'Plain License Logo',
+        replacesTitle: true,
       },
       social: [
         { icon: 'github', label: 'GitHub', href: 'https://github.com/plainlicense/plainlicense' }
@@ -110,8 +201,47 @@ export default defineConfig({
           link: '/about',
         },
       ],
+      plugins: [
+        starlightAutoDrafts(),
+        starlightHeadingBadges(),
+        starlightContextualMenu({
+          actions: ["copy", "view", "claude", "chatgpt"]
+        }),
+        starlightLLMsTxt({
+          projectName: "Plain License",
+          description: `Plain License is a community project that provides creative licenses in plain language for everyone. Our mission is to make it easy for creators and users to understand their rights and obligations under various licenses, without needing a law degree.
+          
+          We recraft popular creative licenses into easy-to-understand versions that capture the original intent. All Plain License licenses have fallback provisions to their original hard-to-understand counterparts, ensuring similar legal treatment while being more accessible. Our project is open source and community-driven, with contributions from volunteers around the world. We believe that clear, plain language licenses can empower creators and users alike, fostering a more inclusive and vibrant creative ecosystem.
+          `,
+          promote: ["/licenses/*/*/*", "/blog/**", "/index*", "/faq/*", "/helping/*", "/about/*"],
+          demote: ["/contributing*", "/changelog*"],
+          minify: {
+            whitespace: true,
+            note: true,
+            details: true,
+          },
+        }),
+        starlightTags(),
+      ]
     }),
-    sitemap(),
+    sitemap({
+      filter: (page) => { !/\^\/(?!cdn-cgi\/)/.test(page) },
+      changefreq: 'weekly',
+      lastmod: new Date(),
+      namespaces: {
+        image: false,
+        video: false,
+      },
+    }),
+    ,
+    favicons({
+      name: 'Plain License',
+      short_name: 'PlainLicense',
+      description: 'Creative licenses in plain language for everyone.',
+      input: {
+        favicons: [join(__dirname, 'src/assets/images/logo_only_color_transp.svg')],
+      },
+    }),
     preact(),
     mdx(),
   ],

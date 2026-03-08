@@ -1,8 +1,8 @@
-import { describe, it, expect } from 'vitest';
-import fs from 'node:fs/promises';
-import path from 'node:path';
-import matter from 'gray-matter';
-import { z } from 'zod';
+import { z } from 'astro/zod'
+import matter from 'gray-matter'
+import fs from 'node:fs/promises'
+import path from 'node:path'
+import { describe, expect, it } from 'vitest'
 
 // We'll define the schema here since importing from src/content/config.ts
 // might be tricky due to Astro's internal types.

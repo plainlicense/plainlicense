@@ -1,7 +1,15 @@
+[settings]
+idiomatic_version_file_enable_tools = []
+experimental = true
+
+[settings.npm]
+package_manager = "bun"
+
 [tools]
 actionlint = "latest"
 biome = "latest"
 bun = "latest"
+"cargo:submod" = "latest"
 delta = "latest"
 hk = "latest"
 "npm:markdownlint-cli2" = "latest"
@@ -15,4 +23,119 @@ typos = "latest"
 uv = "latest"
 
 [env]
-HK_MISE = true
+HK_MISE = 1
+MISE_EXPERIMENTAL = 1
+_.path = [
+  "bin",
+]
+GH_REPO = "plainlicense/plainlicense"
+CI = '''{% if get_env(name="GITHUB_ACTIONS", default="") != "" %}true{% else %}false{% endif %}'''
+MISE_ENV = '''{% if get_env(name="CI", default="") == "true" %}""{% else %}dev{% endif %}
+'''
+MISE_YES = 1
+
+[tasks]
+[tasks._doctor-output]
+run = '''
+mise doctor --json | jq '.' | jq 'with_entries(select([.key] | inside(["activated", "shims_on_path", "self_update_available", "shell", "toolset"])))'
+'''
+hide = true
+
+[tasks._check_doctor]
+usage = '''
+arg "<action>" {
+  choices "activated" "shims" "update-available" "shell" "list-tools"
+  help "The doctor field to check"
+  }
+'''
+run = '''
+doctor="$(mise run _doctor-output 2>/dev/null || echo '{}')"
+case "$usage_action" in
+  activated)
+    echo "$doctor" | jq '.activated'
+    ;;
+  shims)
+    echo "$doctor" | jq '.shims_on_path'
+    ;;
+  update-available)
+    echo "$doctor" | jq '.self_update_available'
+    ;;
+  shell)
+    echo "$doctor" | jq -r '.shell.name // empty'
+    ;;
+  list-tools)
+    tools="$(echo "$doctor" | jq -r '.toolset | keys[]')"
+    echo "$tools"
+    ;;
+esac
+'''
+
+[tasks._is-setup]
+usage = '''
+arg "[tool]..." {
+  help "Check if specific tools are set up (e.g. node, bun, hk)"
+  }
+'''
+run = '''
+if [ "$CI" == "true" ]; then
+   shims="$(mise run _check_doctor shims 2>/dev/null)"
+   if [ "$shims" != "true" ]; then
+     mise run setup
+  `   exit 0
+   fi
+else
+    activated="$(mise run _check_doctor activated 2>/dev/null)"
+    if [ "$activated" != "true" ]; then
+      mise run setup
+      exit 0
+    fi
+if [ x"${usage_tool}" != "x" ]; then
+    eval "tools=($usage_tool)"
+    toolset="$(mise run _check_doctor list-tools 2>/dev/null || echo '')"
+    for tool in "${tools[@]}"; do
+      if ! echo "$toolset" | grep -qx "$tool"; then
+        mise install "$tool" &>/dev/null || echo " ⚠️  WARNING: mise install $tool failed during setup "
+      fi
+    done
+fi
+'''
+
+[tasks.setup]
+shell = "bash"
+run = [
+  "mise set &> /dev/null",
+  # trust can error if it's already trusted, so we ignore errors here
+  "mise -yq trust --all &>/dev/null || ''",
+  "ln -sf AGENTS.md CLAUDE.md &>/dev/null",
+  "ln -sf AGENTS.md GEMINI.md &>/dev/null",
+  '''
+  if [ "$CI" != "true" ]; then
+    mise -yq reshim
+    shell="$(mise run _shell)"
+    rcfile="$HOME/.bashrc"
+    shellname="$(basename "$shell")"
+    if [ "$shellname" = "zsh" ]; then
+      rcfile="$HOME/.zshrc"
+    fi
+    if [ "$shellname" = "fish" ]; then
+      rcfile="$HOME/.config/fish/config.fish"
+    fi
+  else
+    eval "$(mise activate --shell=bash)"
+  fi
+  ''',
+  "hk install --mise 2>&1 || mise x hk@latest -- hk install --mise 2>&1 || echo \" ⚠️  WARNING: hk install failed during setup \"",
+  "bun install 2>&1 || mise x bun@latest -- bun install 2>&1 || echo \" ⚠️  WARNING: bun install failed during setup \"",
+  "mise -yq sync node &>/dev/null || echo \" ⚠️  WARNING: mise sync node failed during setup \"",
+]
+
+[tasks.update-tools]
+run = [
+  '''
+    update_available="$(mise run _check_doctor update-available 2>/dev/null)"
+    if [ "$update_available" = "true" ]; then
+        mise -yq self-update
+    fi
+    ''',
+  "mise -yq upgrade --bump"
+]

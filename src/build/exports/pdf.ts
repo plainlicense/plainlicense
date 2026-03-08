@@ -92,6 +92,17 @@ function generateTypst(markdown: string, metadata: any, version: string): string
         case 'blockquote':
           result += '#quote(block: true)[' + processTokens(token.tokens) + ']\n\n';
           break;
+        case 'table':
+          const header = token.header.map((h: any) => `[*${processTokens(h.tokens)}*]`).join(', ');
+          const rows = token.rows.map((row: any) => row.map((cell: any) => `[${processTokens(cell.tokens)}]`).join(', ')).join(',\n    ');
+          result += `#table(
+  columns: ${token.header.length},
+  inset: 10pt,
+  align: horizon,
+  ${header},
+  ${rows}
+)\n\n`;
+          break;
         case 'hr':
           result += '#line(length: 100%, stroke: 0.5pt + gray)\n\n';
           break;

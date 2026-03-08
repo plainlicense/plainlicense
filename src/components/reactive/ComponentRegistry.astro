@@ -7,12 +7,23 @@ interface Props {
   type: string;
   id?: string;
   props?: Record<string, any>;
+  licenseData?: any;
 }
 
-const { type, id, props = {} } = Astro.props;
+const { type, id, props = {}, licenseData } = Astro.props;
 
 // Process props to parse JSON strings if they look like JSON
 const processedProps = { ...props };
+
+// Data flow enhancement: if props are missing data, try to pull from license frontmatter
+if (type === 'faq' && !processedProps.items && licenseData?.faq) {
+  processedProps.items = licenseData.faq[id || 'default'];
+} else if (type === 'table' && !processedProps.data && licenseData?.tables) {
+  processedProps.data = licenseData.tables[id || 'default'];
+} else if (type === 'tree' && !processedProps.steps && licenseData?.trees) {
+  processedProps.steps = licenseData.trees[id || 'default'];
+}
+
 for (const key in processedProps) {
   const val = processedProps[key];
   if (typeof val === 'string' && (val.trim().startsWith('[') || val.trim().startsWith('{'))) {

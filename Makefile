@@ -6,7 +6,6 @@ BUN := bun run --bun
 BIOME := $(BUN) biome
 PRETTIER := $(BUN) prettier
 MDLINT := $(BUN) markdownlint-cli2
-MKDOCS := mkdocs gh-deploy --clean -m "Deploying Plain License" --remote-branch gh-pages --config-file mkdocs.yml
 SHELLCHECK := $(BUN) shellcheck
 SHFMT := shfmt
 SLINT := $(BUN) stylelint
@@ -16,15 +15,15 @@ CZ := $(BUN) git-cz
 #! =========== FILES GROUPS ============
 #* Scripts and Code
 BUILD_TS := bin/*.ts commitlint.config.ts src/build/**/*.ts
-PYTHON_FILES := bin/*.py overrides/hooks/*.py
-SHELL_FILES := .devcontainer/** bin/**/*.bash bin/**/*.sh bin/**/*.zsh overrides/**/*.sh
+PYTHON_FILES := bin/*.py
+SHELL_FILES := .devcontainer/** bin/**/*.bash bin/**/*.sh bin/**/*.zsh
 WEB_TS := src/assets/javascripts/**/*.ts src/assets/javascripts/**/*.tsx
 
 #* Assets and Config
 CSS_FILES := src/assets/stylesheets/**/*.css
-HTML_FILES := assets/**/*.html overrides/**/*.html
-MD_FILES := *.md *.md *LICENSE .github/**/*.md .github/**/*.md .roo/**/*.md .vscode/**/*.md assets/**/*.md bin/**/*.md docs/**/*.md includes.md overrides/**/*.md packages/**/*.md packages/changelogs/*.md
-CONFIG_FILE_TYPES := *.conf *.config *.env *.json *.jsonc *.md *.toml *.txt *.yaml *.yml .*config .*rc .claude/* .github/**/*.json .github/**/*.jsonc .github/**/*.toml .github/**/*.yaml .github/**/*.yml .json5 .quokka .roo/*.json .roo/*.yaml .roo/*.yml .vscode/*.json .vscode/*.jsonc overrides/**/*.json overrides/**/*.jsonc overrides/**/*.yaml overrides/**/*.yml packages/**/*.json packages/**/*.jsonc packages/**/*.toml packages/**/*.yaml packages/**/*.yml src/**/*.json src/**/*.jsonc src/**/*.toml src/**/*.yaml src/**/*.yml
+HTML_FILES := src/**/*.html
+MD_FILES := *.md .github/**/*.md .roo/**/*.md .vscode/**/*.md bin/**/*.md content/**/*.md packages/**/*.md
+CONFIG_FILE_TYPES := *.conf *.config *.env *.json *.jsonc *.md *.toml *.txt *.yaml *.yml .*config .*rc .claude/* .github/**/*.json .github/**/*.jsonc .github/**/*.toml .github/**/*.yaml .github/**/*.yml .json5 .quokka .roo/*.json .roo/*.yaml .roo/*.yml .vscode/*.json .vscode/*.jsonc packages/**/*.json packages/**/*.jsonc packages/**/*.toml packages/**/*.yaml packages/**/*.yml src/**/*.json src/**/*.jsonc src/**/*.toml src/**/*.yaml src/**/*.yml
 
 # Config files
 BIOME_BUILD_CONFIG := src/build/biome.jsonc
@@ -84,7 +83,7 @@ TYPOS := typos $(TYPOS_FLAGS)
 #todo: SETUP CMD
 
 #! =========== DEV COMMANDS ===========
-.PHONY: cm serve setup help
+.PHONY: cm dev setup help
 
 # Show available commands
 help:
@@ -92,7 +91,7 @@ help:
 	@echo ""
 	@echo "🔧 Development:"
 	@echo "  cm           - Commit changes with conventional commits"
-	@echo "  serve        - Start mkdocs development server"
+	@echo "  dev          - Start Astro development server"
 	@echo "  setup        - Initial project setup"
 	@echo ""
 	@echo "✨ Code Quality:"
@@ -108,7 +107,7 @@ help:
 	@echo "🔄 Project Management:"
 	@echo "  sync         - Sync dependencies and tools"
 	@echo "  build        - Build the project"
-	@echo "  deploy       - Deploy to GitHub Pages"
+	@echo "  deploy       - Deploy to Cloudflare Pages"
 	@echo "  all          - Run fix + build"
 	@echo ""
 	@echo "📦 Dependencies:"
@@ -133,8 +132,8 @@ cm:
 	$(BIOME) check $(BIOME_FLAGS) --write --staged --config $(BUILD_TS)
 	$(BUN) git-cz --all
 
-serve:
-	mkdocs serve
+dev:
+	$(BUN) astro dev
 
 setup:
 	git submodule update --init --recursive
@@ -307,10 +306,10 @@ sync:
 .PHONY: build
 
 build:
-	bun run build
-	bun src/build/generate-exports.ts
-	bun src/build/generate-og-images.ts
-	bun src/build/build-versions.ts
+	$(BUN) astro build
+	$(BUN) src/build/generate-exports.ts
+	$(BUN) src/build/generate-og-images.ts
+	$(BUN) src/build/generate-versions.ts
 
 #! =========== ALL ===========
 #* fix includes all checks and formats, so we really just add build

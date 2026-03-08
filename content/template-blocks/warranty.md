@@ -2,9 +2,10 @@
 title: Standard No Warranty Block
 category: warranty
 description: Common plain language warranty disclaimer
+version: 1.0.0
 ---
 
-We give the work to you as it is, without any promises or guarantees. This means:
+We give you the work as it is, and with no promises or guarantees. This means:
 
 - **"As is"**: You get the work exactly how it is, including anything broken.
 - **No Guarantees**: We are not promising it will work well for any specific tasks, or that it will not break any rules. It may not work at all.

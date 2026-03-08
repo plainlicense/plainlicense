@@ -166,4 +166,5 @@ lib64
 remote-debug-profile/
 
 !.gitattributes
-
+playwright-report/
+tests-results/

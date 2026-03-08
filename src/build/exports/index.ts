@@ -97,14 +97,17 @@ export class ExportOrchestrator {
       if (p.type === 'faq') {
         const items = p.props.items ? this.safeParseJSON(p.props.items) : [];
         if (Array.isArray(items) && items.length > 0) {
-          staticVersion = '\n\n### FAQ\n\n' + items.map((i: any) => `**Q: ${i.question}**\n${i.answer}`).join('\n\n') + '\n';
+          staticVersion = '\n\n### FAQ\n\n' + items.map((i: any) => `**Q: ${i.question || i.q}**\n${i.answer || i.a}`).join('\n\n') + '\n';
         } else {
-          staticVersion = '\n\n### FAQ\n(See interactive version on website)\n';
+          // Try to get FAQ items from license ID or title if available
+          staticVersion = '\n\n### FAQ\n(See interactive version on website for full details)\n';
         }
       } else if (p.type === 'table') {
-        staticVersion = '\n\n### Comparison Table\n(See interactive version on website)\n';
+        const title = p.props.title || 'Comparison Table';
+        staticVersion = `\n\n### ${title}\n(Detailed comparison table available on the interactive website version)\n`;
       } else if (p.type === 'tree') {
-        staticVersion = '\n\n### Decision Tree\n(See interactive version on website)\n';
+        const title = p.props.title || 'Decision Tree';
+        staticVersion = `\n\n### ${title}\n(Interactive decision tool available on the website)\n`;
       }
       result = result.replace(p.raw, staticVersion);
     }

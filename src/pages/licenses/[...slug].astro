@@ -29,25 +29,20 @@ const { data } = license;
 
 // Template Block Injection Logic
 const templateBlocks = await getCollection('template-blocks');
-let processedBody = license.body;
 
 // Split into plain and original parts
-const bodyParts = processedBody.split(/---[\s\n]+# Original License Text/i);
+const bodyParts = license.body.split(/---[\s\n]+# Original License Text/i);
 const plainBody = bodyParts[0];
 const originalBody = bodyParts.length > 1 ? bodyParts[1] : '';
 
-// Replace {{block:id}} markers in plainBody
-const blockRegex = /{{block:([a-z0-9-]+)}}/g;
-const matches = plainBody.matchAll(blockRegex);
-let finalPlainBody = plainBody;
-
-for (const match of matches) {
-  const blockId = match[1];
-  const block = templateBlocks.find(b => b.id === blockId || b.id.split('/').pop()?.replace(/\.md$/, '') === blockId);
-  if (block) {
-    finalPlainBody = finalPlainBody.replace(match[0], block.body);
-  }
-}
+// Replace {{block:id}} markers in plainBody globally and robustly
+const finalPlainBody = plainBody.replace(/{{block:([a-z0-9-]+)}}/g, (match, blockId) => {
+  const block = templateBlocks.find(b => 
+    b.id === blockId || 
+    b.id.split('/').pop()?.replace(/\.md$/, '') === blockId
+  );
+  return block ? block.body : `[Missing Block: ${blockId}]`;
+});
 
 // Component parsing for plain body
 const placeholders = parseComponentPlaceholders(finalPlainBody);
@@ -56,7 +51,8 @@ const contentParts = finalPlainBody.split(/{{component:[a-z-]+.*?}}/g);
 // Full processed body for clipboard/exports (replaces blocks but keeps original text if present)
 // Also strip component markers as they are for interactive UI only
 const fullProcessedBody = (finalPlainBody + (originalBody ? '\n\n---\n\n# Original License Text\n' + originalBody : ''))
-  .replace(/{{component:[a-z-]+.*?}}/g, '');
+  .replace(/{{component:[a-z-]+.*?}}/g, '')
+  .trim();
 ---
 
 <BaseLayout title={data.title}>
@@ -75,7 +71,8 @@ const fullProcessedBody = (finalPlainBody + (originalBody ? '\n\n---\n\n# Origin
                 <ComponentRegistry 
                   type={placeholders[index].type} 
                   id={placeholders[index].id} 
-                  props={placeholders[index].props} 
+                  props={placeholders[index].props}
+                  licenseData={data}
                 />
               )}
             </>
