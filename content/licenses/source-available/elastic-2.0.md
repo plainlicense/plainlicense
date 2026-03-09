@@ -27,7 +27,6 @@ shame_words_count: 1
 ---
 # Plain Elastic License
 
-
 ## You Can Do Many Things with the Work for Free
 
 You are free to:

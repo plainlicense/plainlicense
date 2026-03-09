@@ -1,11 +1,12 @@
 ---
 title: "Welcome to the New Plain License Platform"
-date: "2026-03-05"
-author: "Adam Poulemanos"
+date: 2026-03-05
+authors: adam
 description: "We've completely redesigned our platform to make software licenses even easier to understand and use."
-category: "announcements"
-status: "published"
-tags: ["redesign", "astro", "cms"]
+tags:
+  - announcements
+  - astro
+  - cms
 ---
 
 # Welcome to the New Plain License Platform

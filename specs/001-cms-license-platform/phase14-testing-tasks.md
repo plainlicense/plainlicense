@@ -220,6 +220,7 @@
 **Total Test Tasks**: 111 (T199-T309)
 
 **Task Distribution**:
+
 - **Infrastructure Setup**: 6 tasks (T199-T204)
 - **User Story 1 (Content Editor)**: 9 tasks (T205-T213)
 - **User Story 2 (Visitor Downloads)**: 14 tasks (T214-T227)
@@ -246,12 +247,14 @@
 ## Test Coverage Targets
 
 **Minimum Coverage Requirements**:
+
 - **Unit Tests**: 80% line coverage for critical business logic
 - **Integration Tests**: 70% coverage for component interactions
 - **E2E Tests**: 90% coverage for user acceptance scenarios
 - **Success Criteria**: 100% coverage (all 15 criteria must have automated validation)
 
 **Critical Paths Requiring 100% Coverage**:
+
 - SHA-256 hash generation and normalization
 - Export format generation (all 6 formats)
 - Mapping validation and confidence scoring
@@ -262,25 +265,25 @@
 
 ## Testing Best Practices
 
-1. **Test Naming Convention**: `[TestType]_[FeatureName]_[Scenario]_[ExpectedOutcome]`
+1.  **Test Naming Convention**: `[TestType]_[FeatureName]_[Scenario]_[ExpectedOutcome]`
    - Example: `Integration_ExportOrchestrator_GenerateAllFormats_ReturnsAllSixFormats`
 
-2. **Golden File Management**:
+2.  **Golden File Management**:
    - Store in `tests/golden/{format}/{license}/`
    - Update with `npm run test:update-golden`
    - Review changes in PR diffs
 
-3. **Flaky Test Prevention**:
+3.  **Flaky Test Prevention**:
    - Avoid hard-coded timeouts (use waitFor with conditions)
    - Mock external dependencies (GitHub API, Claude Code API)
    - Use test isolation (clean database/fixtures between tests)
 
-4. **Performance Test Stability**:
+4.  **Performance Test Stability**:
    - Run on dedicated CI runners (not shared infrastructure)
    - Use percentile measurements (p50, p95, p99) not averages
    - Allow 10% variance for flaky threshold
 
-5. **CI/CD Integration**:
+5.  **CI/CD Integration**:
    - Fail fast on unit test failures
    - Run E2E tests in parallel where possible
    - Cache dependencies and build artifacts

@@ -38,8 +38,8 @@ This document tracks the gaps, implementation flaws, and incomplete tasks identi
 
 ## 7. Testing & Quality Assurance (Highest Priority for MVP)
 
-- [x] **Integration Test Suite**: Complete coverage for content validation, export coordination, and block injection.
-- [x] **Success Criteria Validation (SC-001 - SC-015)**: 100% of defined success criteria are verified by automated Vitest or Playwright tests.
+-   [x] **Integration Test Suite**: Complete coverage for content validation, export coordination, and block injection.
+-   [x] **Success Criteria Validation (SC-001 - SC-015)**: 100% of defined success criteria are verified by automated Vitest or Playwright tests.
     - [x] SC-001: Plain language version
     - [x] SC-002: Performance (LCP < 2s)
     - [x] SC-003: Download reliability
@@ -55,7 +55,7 @@ This document tracks the gaps, implementation flaws, and incomplete tasks identi
     - [x] SC-013: Reactive Component Conversion
     - [x] SC-014: Session persistence
     - [x] SC-015: Concurrent editing
-- [x] **E2E Expansion**: Finalized CMS editor interface and smoke tests.
+-   [x] **E2E Expansion**: Finalized CMS editor interface and smoke tests.
 
 ## 8. Data Integrity (Cleanup)
 

@@ -1,184 +1,131 @@
+// SPDX-FileCopyrightText: 2025 Knitli Inc.
+// SPDX-FileContributor: Adam Poulemanos <adam@knit.li>
+//
+// SPDX-License-Identifier: LicenseRef-KnitliProprietary
+
 {
-  "$schema": "https://biomejs.dev/schemas/2.4.6/schema.json",
-  "assist": {
+  "$schema": "https://biomejs.dev/schemas/2.3.8/schema.json",
+  "vcs": {
     "enabled": true,
-    "actions": {
-      "source": {
-        "organizeImports": "on",
-        "recommended": true,
-        "useSortedAttributes": "on",
-        "useSortedKeys": "on",
-        "useSortedProperties": "on"
-      }
-    }
+    "clientKind": "git",
+    "useIgnoreFile": true
   },
   "files": {
-    "ignoreUnknown": true,
     "includes": [
-      "**/*.astro",
-      "**/*.cjs",
-      "**/*.css",
-      "**/*.cts",
-      "**/*.gql",
-      "**/*.graphql",
-      "**/*.graphqls",
-      "**/*.html",
-      "**/*.js",
-      "**/*.json",
-      "**/*.jsonc",
-      "**/*.jsx",
-      "**/*.mjs",
-      "**/*.mts",
-      "**/*.svelte",
-      "**/*.ts",
-      "**/*.tsx",
-      "**/*.vue",
-      "**/*.yaml",
-      "**/*.yml",
-      "!tools/**",
-      "!external/**",
-      "!**/node_modules/**",
-      "!**/dist/**",
-      "!src/build/**",
-      "!commitlint.config.ts",
-      "!docs/*.js",
-      "!docs/assets/javascripts/**/*.js",
-      "!docs/assets/stylesheets/**/*.css",
-      "!**/package.json"
+      "**",
+      "!!/**/dist",
+      "!!/**/node_modules",
+      "!!/**/.astro",
+      "!!/**/worker-configuration.d.ts",
+      "!!src/hooks/__tests__/*.ts",
+      "!!src/providers/__tests__/*.tsx"
     ]
   },
   "formatter": {
     "enabled": true,
-    "formatWithErrors": true,
     "indentStyle": "space",
-    "lineEnding": "lf",
-    "lineWidth": 100
-  },
-  "javascript": {
-    "formatter": {
-      "attributePosition": "auto",
-      "bracketSameLine": false,
-      "bracketSpacing": true,
-      "enabled": true,
-      "jsxQuoteStyle": "single",
-      "quoteProperties": "asNeeded",
-      "quoteStyle": "single",
-      "semicolons": "always",
-      "trailingCommas": "all"
-    }
+    "lineEnding": "lf"
   },
   "linter": {
     "enabled": true,
     "rules": {
-      "complexity": {
-        "noExcessiveCognitiveComplexity": "warn",
-        "noUselessStringConcat": "warn",
-        "useDateNow": "error",
-        "useSimplifiedLogicExpression": "error"
-      },
-      "correctness": {
-        "noConstantMathMinMaxClamp": "error",
-        "noInvalidBuiltinInstantiation": {
-          "level": "error"
-        },
-        "noInvalidNewBuiltin": "error",
-        "noNodejsModules": "warn",
-        "noUndeclaredDependencies": "error",
-        "noUndeclaredVariables": "warn",
-        "noUnusedImports": "warn",
-        "useArrayLiterals": "error"
-      },
-      "nursery": {
-        "noAwaitInLoop": "warn",
-        "noCommonJs": "warn",
-        "noDocumentCookie": "warn",
-        "noDuplicateElseIf": "warn",
-        "noFloatingPromises": "warn",
-        "noMissingVarFunction": "warn",
-        "noSecrets": "warn",
-        "noSubstr": "warn",
-        "noTemplateCurlyInString": "warn",
-        "noUselessEscapeInRegex": "warn",
-        "noUselessStringRaw": "warn",
-        "useAriaPropsSupportedByRole": "warn",
-        "useDeprecatedReason": "warn",
-        "useGuardForIn": "warn"
-      },
-      "performance": {
-        "noBarrelFile": "error",
-        "noReExportAll": "error",
-        "useTopLevelRegex": "error"
-      },
-      "recommended": true,
-      "style": {
-        "noArguments": "error",
-        "noCommaOperator": "error",
-        "noDoneCallback": "error",
-        "noImplicitBoolean": "error",
-        "noInferrableTypes": "error",
-        "noNamespace": "error",
-        "noNamespaceImport": "warn",
-        "noNegationElse": "error",
-        "noNonNullAssertion": "error",
-        "noParameterAssign": "error",
-        "noParameterProperties": "error",
-        "noUnusedTemplateLiteral": "error",
-        "noUselessElse": "error",
-        "useAsConstAssertion": "error",
-        "useBlockStatements": "error",
-        "useConsistentArrayType": {
-          "level": "error",
-          "options": {
-            "syntax": "shorthand"
-          }
-        },
-        "useConsistentBuiltinInstantiation": "error",
-        "useConst": "error",
-        "useDefaultParameterLast": "error",
-        "useDefaultSwitchClause": "error",
-        "useEnumInitializers": "error",
-        "useExponentiationOperator": "error",
-        "useExportType": "error",
-        "useFilenamingConvention": {
-          "level": "error",
-          "options": {
-            "filenameCases": [
-              "camelCase",
-              "export"
-            ],
-            "requireAscii": true,
-            "strictCase": true
-          }
-        },
-        "useForOf": "error",
-        "useImportType": "error",
-        "useLiteralEnumMembers": "error",
-        "useNodeAssertStrict": "warn",
-        "useNodejsImportProtocol": "error",
-        "useNumberNamespace": "error",
-        "useNumericLiterals": "error",
-        "useSelfClosingElements": "error",
-        "useShorthandAssign": "error",
-        "useShorthandFunctionType": "error",
-        "useSingleVarDeclarator": "error",
-        "useTemplate": "error",
-        "useThrowNewError": "error",
-        "useThrowOnlyError": "error"
-      },
-      "suspicious": {
-        "noEmptyBlock": "error",
-        "noEmptyBlockStatements": "warn",
-        "noEvolvingTypes": "error",
-        "noExportsInTest": "off",
-        "noReactSpecificProps": "warn",
-        "useAwait": "error",
-        "useErrorMessage": "error"
+      "recommended": true
+    },
+    "domains": {
+      "react": "recommended"
+    }
+  },
+  "javascript": {
+    "formatter": {
+      "quoteStyle": "double"
+    }
+  },
+  "css": {
+    "linter": {
+      "enabled": true
+    },
+    "formatter": {
+      "enabled": true
+    },
+    "parser": {
+      "cssModules": true
+    }
+  },
+  "json": {
+    "linter": {
+      "enabled": true
+    },
+    "formatter": {
+      "enabled": true
+    }
+  },
+  "graphql": {
+    "linter": {
+      "enabled": true
+    },
+    "formatter": {
+      "enabled": true
+    }
+  },
+  "html": {
+    "linter": {
+      "enabled": true
+    },
+    "experimentalFullSupportEnabled": true,
+    "formatter": {
+      "enabled": true
+    }
+  },
+  "assist": {
+    "enabled": true,
+    "actions": {
+      "source": {
+        "organizeImports": "on"
       }
     }
   },
-  "vcs": {
-    "clientKind": "git",
-    "enabled": true,
-    "useIgnoreFile": true
-  }
+  "overrides": [
+    {
+      "includes": ["**/*.astro"],
+
+      "linter": {
+        "rules": {
+          "style": {
+            "useConst": "off",
+
+            "useImportType": "off"
+          },
+
+          "correctness": {
+            "noUnusedVariables": "off",
+
+            "noUnusedImports": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": ["tests/**", "**/*.test.*", "**/*.spec.*"],
+      "linter": {
+        "rules": {
+          "correctness": {
+            "noUnusedVariables": "off",
+
+            "noUnusedImports": "off"
+          },
+          "suspicious": {
+            "noExplicitAny": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": [
+        "/**/worker-configuration.d.ts",
+      ],
+      "linter": {
+        "enabled": false
+      }
+    }
+  ]
 }

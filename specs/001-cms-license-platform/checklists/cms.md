@@ -276,6 +276,7 @@
 **Coverage Gaps**: 38 items marked [Gap] requiring additional requirements
 
 **✅ ALL BLOCKERS RESOLVED** (2026-01-30):
+
 1. ✅ **CHK114**: localStorage with XSS mitigations (FR-046 authoritative)
 2. ✅ **CHK115**: WYSIWYG visual editor (FR-001 updated)
 3. ✅ **CHK116**: Build on publish, Git-based drafts with `draft: true` (FR-005a, FR-013a updated)

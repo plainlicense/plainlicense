@@ -29,6 +29,7 @@
 **Definition**: A clause is the smallest semantic unit of legal meaning within a license that can be independently understood and mapped.
 
 **Granularity**:
+
 - **Primary**: Sentence-level
 - **Refinement**: Can be more granular (sub-sentence) when a sentence contains multiple distinct legal concepts
 - **Never**: Less granular than a sentence (no paragraph-level clauses)
@@ -36,24 +37,29 @@
 **Examples**:
 
 **Valid Clause** (sentence-level):
+
 ```markdown
 You must keep our copyright notice.
 ```
 
 **Valid Clause** (sub-sentence, distinct concept):
+
 ```markdown
 - **Use** it
 ```
+
 (Part of list: "We give you permission to: - Use it - Copy it - Change it")
 
 **Valid Clause** (sub-sentence, complex sentence):
 Original: "Permission is hereby granted, free of charge, to any person obtaining a copy of this software"
 Can be split into:
+
 - Clause 1: "Permission is hereby granted"
 - Clause 2: "free of charge"
 - Clause 3: "to any person obtaining a copy of this software"
 
 **Invalid Clause** (paragraph-level, too broad):
+
 ```markdown
 ## We Give No Promises or Guarantees
 
@@ -61,6 +67,7 @@ We give the work to you as it is, without any promises or guarantees. This means
 - "As is": You get the work exactly how it is, including anything broken.
 - "No Guarantees": We are not promising it will work well...
 ```
+
 (This is a SECTION containing multiple clauses)
 
 ---
@@ -70,12 +77,14 @@ We give the work to you as it is, without any promises or guarantees. This means
 **Definition**: A mapping is a documented correspondence between one or more plain language clauses and one or more original license clauses that express the same legal concept.
 
 **Purpose**:
+
 1. **Traceability**: Show which original legal text informed each plain language clause
 2. **Transparency**: Help users understand how plain language relates to original
 3. **Validation**: Enable detection of unmapped or incorrectly mapped content
 4. **Navigation**: Power interactive UI features (click plain → highlight original)
 
 **Mapping is NOT**:
+
 - A guarantee of legal equivalence (plain licenses are interpretive)
 - A word-for-word translation
 - Required to be one-to-one (can be many-to-many)
@@ -87,12 +96,15 @@ We give the work to you as it is, without any promises or guarantees. This means
 ### Clause Identification Rules
 
 #### Rule 1: Sentence Boundaries
+
 - Start with sentence-level parsing using standard sentence boundary detection
 - Period (.), question mark (?), exclamation mark (!) indicate boundaries
 - EXCEPTION: Abbreviations (e.g., "i.e.", "e.g.") do not create boundaries
 
 #### Rule 2: List Items as Clauses
+
 When content is formatted as a list:
+
 ```markdown
 We give you permission to:
 - **Use** it
@@ -101,6 +113,7 @@ We give you permission to:
 ```
 
 Each list item is an independent clause:
+
 - Clause 1: "Use it"
 - Clause 2: "Copy it"
 - Clause 3: "Change it"
@@ -108,20 +121,24 @@ Each list item is an independent clause:
 **Context preservation**: Store parent text ("We give you permission to:") as `context` field
 
 #### Rule 3: Complex Sentences
+
 Sentences with multiple independent concepts CAN be split:
 
 **Example 1** - Multiple legal requirements:
+
 ```
 "The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software."
 ```
 
 Can be split:
+
 - Clause 1: "The above copyright notice... shall be included in all copies"
 - Clause 2: "this permission notice shall be included in all copies"
 
 OR kept as single clause - **editor decides based on mapping needs**
 
 **Example 2** - Qualifiers that modify meaning:
+
 ```
 "Permission is hereby granted, free of charge, to any person..."
 ```
@@ -131,6 +148,7 @@ Keep as single clause if "free of charge" is essential qualifier, OR split if pl
 **Guiding principle**: Split when plain language maps concepts independently, keep together when plain language treats as unified concept.
 
 #### Rule 4: Headings are NOT Clauses
+
 ```markdown
 ## We Give No Promises or Guarantees
 ```
@@ -140,6 +158,7 @@ This is a **section heading**, not a clause. It provides context and structure b
 **Storage**: Headings stored as `context` for clauses within that section.
 
 #### Rule 5: Annotations and Notes
+
 ```markdown
 <div class="annotate" markdown>
 1. **You must keep our copyright notice**.(1) This tells people who created the work. { .annotate }
@@ -199,14 +218,17 @@ Each clause has the following required and optional fields:
 ### Mapping Types
 
 #### Type 1: `one-to-one`
+
 **Definition**: Single plain clause maps to single original clause with minimal interpretation.
 
 **Characteristics**:
+
 - Direct semantic equivalence
 - Only language simplification (legalese → plain)
 - No structural reorganization
 
 **Example**:
+
 - Plain: "Use it"
 - Original: "to use"
 - Notes: "Direct translation with friendly formatting"
@@ -214,14 +236,17 @@ Each clause has the following required and optional fields:
 ---
 
 #### Type 2: `one-to-one-expanded`
+
 **Definition**: Single plain clause maps to single original clause but adds educational context or examples.
 
 **Characteristics**:
+
 - Core meaning preserved
 - Plain adds explanatory content not literal in original
 - Expansion consistent with legal intent
 
 **Example**:
+
 - Plain: "You can do all of these things **for free**. You can do them for any reason."
 - Original: "free of charge"
 - Notes: "Plain expands 'free of charge' to clarify both cost and purpose freedom"
@@ -229,69 +254,81 @@ Each clause has the following required and optional fields:
 ---
 
 #### Type 3: `one-to-many`
+
 **Definition**: Single plain clause maps to multiple original clauses.
 
 **Characteristics**:
+
 - Plain consolidates multiple original concepts
 - Used when original is verbose or repetitive
 - Plain summarizes without losing legal meaning
 
 **Example**:
-- Plain: "We are not responsible for any problems or damages"
-- Original Clauses:
-  - "SHALL NOT BE LIABLE FOR ANY CLAIM"
-  - "DAMAGES OR OTHER LIABILITY"
-  - "WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE"
-- Notes: "Plain consolidates various liability disclaimers into single accessible statement"
+
+-   Plain: "We are not responsible for any problems or damages"
+-   Original Clauses:
+    - "SHALL NOT BE LIABLE FOR ANY CLAIM"
+    - "DAMAGES OR OTHER LIABILITY"
+    - "WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE"
+-   Notes: "Plain consolidates various liability disclaimers into single accessible statement"
 
 ---
 
 #### Type 4: `many-to-one`
+
 **Definition**: Multiple plain clauses map to single original clause.
 
 **Characteristics**:
+
 - Original has complex compound sentence
 - Plain splits into multiple clear statements
 - Used for readability and comprehension
 
 **Example**:
-- Plain Clauses:
-  - "You must keep our copyright notice"
-  - "You must also keep this notice with all versions of the work"
-- Original: "The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software"
-- Notes: "Original compound requirement split into two explicit rules"
+
+-   Plain Clauses:
+    - "You must keep our copyright notice"
+    - "You must also keep this notice with all versions of the work"
+-   Original: "The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software"
+-   Notes: "Original compound requirement split into two explicit rules"
 
 ---
 
 #### Type 5: `many-to-many`
+
 **Definition**: Multiple plain clauses map to multiple original clauses.
 
 **Characteristics**:
+
 - Used when plain language completely reorganizes original structure
 - Common in complex copyleft licenses
 - Original concepts "dismantled" and rebuilt in plain language
 
 **Example**:
-- Plain Clauses:
-  - "If you change the work, you must share your changes under the same license"
-  - "You must make the source materials available"
-  - "You must include a copy of this license with your changes"
-- Original Clauses:
-  - "You must license... under the terms of this License"
-  - "The Source Code... must be available under this License"
-  - "A copy of this License must be included"
-- Notes: "Original scattered requirements reorganized into logical sequence in plain language"
+
+-   Plain Clauses:
+    - "If you change the work, you must share your changes under the same license"
+    - "You must make the source materials available"
+    - "You must include a copy of this license with your changes"
+-   Original Clauses:
+    - "You must license... under the terms of this License"
+    - "The Source Code... must be available under this License"
+    - "A copy of this License must be included"
+-   Notes: "Original scattered requirements reorganized into logical sequence in plain language"
 
 ---
 
 #### Type 6: `unmapped-plain`
+
 **Definition**: Plain clause exists with no corresponding original clause.
 
 **Characteristics**:
+
 - Content added by Plain License project
 - Examples: Legal disclaimers, interpretation notes, navigation aids
 
 **Example**:
+
 - Plain: "This plain language version is not legal advice. When in doubt, consult the original license or a lawyer."
 - Original: (none)
 - Notes: "Plain License editorial addition for legal clarity"
@@ -299,13 +336,16 @@ Each clause has the following required and optional fields:
 ---
 
 #### Type 7: `unmapped-original`
+
 **Definition**: Original clause exists with no corresponding plain clause.
 
 **Characteristics**:
+
 - Original content omitted from plain version
 - Typically structural (title, metadata) or redundant
 
 **Example**:
+
 - Plain: (none)
 - Original: "# The MIT License (MIT)"
 - Notes: "Title heading omitted in plain version, covered by frontmatter"
@@ -344,6 +384,7 @@ Each clause has the following required and optional fields:
 ```
 
 **For many-to-one, one-to-many, many-to-many**:
+
 ```json
 {
   "id": "map-conditions-split",
@@ -373,7 +414,9 @@ Each clause has the following required and optional fields:
 ## Semantic Tag Taxonomy
 
 ### Purpose
+
 Group clauses by legal concept to enable:
+
 1. **Tag-based validation**: Detect changes by semantic area
 2. **Organized review**: Review all warranty clauses together
 3. **Navigation**: Filter mappings by legal topic
@@ -382,9 +425,11 @@ Group clauses by legal concept to enable:
 ### Core Tags (Universal)
 
 #### `permissions`
+
 **Definition**: Rights explicitly granted to users of the work
 
 **Examples**:
+
 - "Use it"
 - "Copy it"
 - "Modify it"
@@ -392,6 +437,7 @@ Group clauses by legal concept to enable:
 - "Sell copies"
 
 **Subtags** (optional):
+
 - `permissions:commercial` - Commercial use rights
 - `permissions:modification` - Right to create derivative works
 - `permissions:distribution` - Right to share/distribute
@@ -399,14 +445,17 @@ Group clauses by legal concept to enable:
 ---
 
 #### `conditions`
+
 **Definition**: Requirements users must follow to exercise permissions
 
 **Examples**:
+
 - "You must keep our copyright notice"
 - "You must share changes under same license"
 - "You must include a copy of this license"
 
 **Subtags** (optional):
+
 - `conditions:attribution` - Credit/copyright requirements
 - `conditions:share-alike` - Copyleft requirements
 - `conditions:distribution` - Requirements when distributing
@@ -414,14 +463,17 @@ Group clauses by legal concept to enable:
 ---
 
 #### `warranty`
+
 **Definition**: Disclaimers about guarantees, warranties, and quality
 
 **Examples**:
+
 - "We give the work to you as it is"
 - "No Guarantees: We are not promising it will work"
 - "THE SOFTWARE IS PROVIDED 'AS IS'"
 
 **Subtags** (optional):
+
 - `warranty:as-is` - "As is" disclaimers
 - `warranty:quality` - Quality/fitness disclaimers
 - `warranty:merchantability` - Merchantability disclaimers
@@ -429,14 +481,17 @@ Group clauses by legal concept to enable:
 ---
 
 #### `liability`
+
 **Definition**: Limitations on liability and damages
 
 **Examples**:
+
 - "We are not responsible for any problems or damages"
 - "SHALL NOT BE LIABLE FOR ANY CLAIM"
 - "You use it at your own risk"
 
 **Subtags** (optional):
+
 - `liability:damages` - Damage disclaimers
 - `liability:claims` - Claim limitations
 - `liability:indemnification` - Indemnification clauses
@@ -444,9 +499,11 @@ Group clauses by legal concept to enable:
 ---
 
 #### `termination`
+
 **Definition**: Conditions under which license ends or rights are revoked
 
 **Examples**:
+
 - "If you break these rules, you lose your permissions"
 - "This License shall terminate automatically"
 - "Upon termination, you must cease all use"
@@ -454,9 +511,11 @@ Group clauses by legal concept to enable:
 ---
 
 #### `definitions`
+
 **Definition**: Terms defined for use throughout license
 
 **Examples**:
+
 - "The 'work' means the software or creative content covered by this license"
 - "'Source materials' means the preferred form for making modifications"
 - "'You' means the person or entity using the work"
@@ -464,9 +523,11 @@ Group clauses by legal concept to enable:
 ---
 
 #### `scope`
+
 **Definition**: What the license covers or applies to
 
 **Examples**:
+
 - "This license applies to the software and associated documentation"
 - "Covers all versions and derivative works"
 - "Applies to source code and compiled binaries"
@@ -474,9 +535,11 @@ Group clauses by legal concept to enable:
 ---
 
 #### `interpretation`
+
 **Definition**: How to interpret the license (Plain License additions)
 
 **Examples**:
+
 - "This plain language version is not legal advice"
 - "When in doubt, consult the original license"
 - "Plain language may not capture all legal nuances"
@@ -484,12 +547,14 @@ Group clauses by legal concept to enable:
 ---
 
 #### `metadata`
+
 **Definition**: License metadata (title, version, URL)
 
 **Examples**:
+
 - "The MIT License (MIT)"
 - "Version 2.0"
-- "https://opensource.org/licenses/MIT"
+- "<https://opensource.org/licenses/MIT>"
 
 ---
 
@@ -505,23 +570,28 @@ Group clauses by legal concept to enable:
 ## Confidence Scoring Rubric
 
 ### Purpose
+
 Confidence scores (0.0 - 1.0) indicate how certain we are that a mapping correctly represents the legal correspondence between plain and original clauses.
 
 ### Scoring Criteria
 
 #### 0.95 - 0.99: Direct Translation
+
 **Criteria**:
+
 - Nearly identical legal meaning
 - Only language simplification (legalese → plain English)
 - No interpretation or expansion
 - One-to-one correspondence
 
 **Examples**:
+
 - "use" → "Use it" (0.98)
 - "copy" → "Copy it" (0.98)
 - "modify" → "Change it" (0.97 - slight semantic shift)
 
 **Use When**:
+
 - Mapping is obvious and unambiguous
 - No legal interpretation required
 - Any competent reader would agree
@@ -529,19 +599,23 @@ Confidence scores (0.0 - 1.0) indicate how certain we are that a mapping correct
 ---
 
 #### 0.85 - 0.94: Translation with Educational Expansion
+
 **Criteria**:
+
 - Core legal meaning preserved
 - Plain adds explanatory context not literal in original
 - Expansion consistent with legal intent
 - Examples or clarifications added
 
 **Examples**:
+
 - Original: "free of charge"
 - Plain: "You can do all of these things **for free**. You can do them for any reason."
 - Score: 0.90
 - Reason: Adds "for any reason" as clarification of "free of charge" intent
 
 **Use When**:
+
 - Plain explains concepts not explicit in original
 - Educational additions don't change legal meaning
 - Reasonable lawyers would agree expansion is valid
@@ -549,19 +623,23 @@ Confidence scores (0.0 - 1.0) indicate how certain we are that a mapping correct
 ---
 
 #### 0.70 - 0.84: Legal Interpretation with Examples
+
 **Criteria**:
+
 - Plain interprets how to comply with requirement
 - Adds compliance methods not explicit in original
 - Interpretation reasonable but not literal
 - May introduce minor legal ambiguity
 
 **Examples**:
+
 - Original: "shall be included in all copies"
 - Plain: "You can give this notice a few ways: [4 methods including SPDX identifiers, linking]"
 - Score: 0.80
 - Reason: Interprets "included" to allow multiple compliance methods
 
 **Use When**:
+
 - Plain makes interpretation of original's intent
 - Adds practical examples of compliance
 - Interpretation defensible but not universally agreed
@@ -569,19 +647,23 @@ Confidence scores (0.0 - 1.0) indicate how certain we are that a mapping correct
 ---
 
 #### 0.50 - 0.69: Conceptual Correspondence
+
 **Criteria**:
+
 - Plain restructures original concept
 - Many-to-many mapping common
 - Legal meaning preserved but form dramatically different
 - Requires careful review
 
 **Examples**:
+
 - Complex copyleft clause "dismantled" into multiple plain clauses
 - Original scattered requirements reorganized logically
 - Score: 0.65
 - Reason: Significant restructuring, meaning preserved but transformed
 
 **Use When**:
+
 - Original and plain have different structures
 - Concept mapping rather than text mapping
 - Requires legal expertise to verify equivalence
@@ -589,19 +671,23 @@ Confidence scores (0.0 - 1.0) indicate how certain we are that a mapping correct
 ---
 
 #### 0.30 - 0.49: Loose Association
+
 **Criteria**:
+
 - Thematically related but not direct translation
 - Plain may combine multiple original concepts loosely
 - Or original split into very different plain structure
 - Mapping questionable
 
 **Examples**:
+
 - Plain summary that paraphrases multiple original sections
 - Original legalese that plain interprets broadly
 - Score: 0.40
 - Reason: Uncertain correspondence, needs legal review
 
 **Use When**:
+
 - Mapping is uncertain
 - Multiple interpretations possible
 - Needs expert legal review
@@ -609,17 +695,21 @@ Confidence scores (0.0 - 1.0) indicate how certain we are that a mapping correct
 ---
 
 #### Below 0.30: Unmapped or Questionable
+
 **Criteria**:
+
 - No clear correspondence
 - Mapping likely incorrect
 - Should be flagged for review
 
 **Examples**:
+
 - Plain content with no original source
 - Original content omitted in plain
 - Score: 0.20 or use `unmapped-plain` / `unmapped-original` types
 
 **Use When**:
+
 - Mapping is very uncertain
 - Better to mark as unmapped
 
@@ -628,11 +718,13 @@ Confidence scores (0.0 - 1.0) indicate how certain we are that a mapping correct
 ### Confidence Adjustment Factors
 
 **Increase confidence (+0.05 to +0.10)**:
+
 - Multiple legal experts agree on mapping
 - Mapping validated across multiple license versions
 - Clear precedent in legal interpretation
 
 **Decrease confidence (-0.05 to -0.10)**:
+
 - Plain adds substantial new content
 - Ambiguity in original legal language
 - Multiple valid interpretations possible
@@ -642,6 +734,7 @@ Confidence scores (0.0 - 1.0) indicate how certain we are that a mapping correct
 ## Hash Generation Specification
 
 ### Purpose
+
 Content hashes enable validation and change detection without storing full text.
 
 ### Algorithm: SHA-256
@@ -649,6 +742,7 @@ Content hashes enable validation and change detection without storing full text.
 ### Input Normalization Rules
 
 #### Rule 1: Whitespace Normalization
+
 ```javascript
 // Trim leading/trailing whitespace
 content = content.trim();
@@ -661,6 +755,7 @@ content = content.replace(/\n/g, ' ');
 ```
 
 **Example**:
+
 ```
 Input:  "  You  must   keep\nour   copyright  notice  "
 Output: "You must keep our copyright notice"
@@ -669,11 +764,13 @@ Output: "You must keep our copyright notice"
 ---
 
 #### Rule 2: Markdown Preservation
+
 **KEEP markdown formatting** in hash input.
 
 **Rationale**: Markdown affects meaning and display.
 
 **Example**:
+
 ```
 Input:  "- **Use** it"
 Hash:   sha256("- **Use** it")  // NOT sha256("Use it")
@@ -684,9 +781,11 @@ Hash:   sha256("- **Use** it")  // NOT sha256("Use it")
 ---
 
 #### Rule 3: Template Variables
+
 **PRESERVE template variables** (e.g., `{{ year }}`)
 
 **Example**:
+
 ```
 Input:  "Copyright (c) {{ year }} <copyright holders>"
 Hash:   sha256("Copyright (c) {{ year }} <copyright holders>")
@@ -697,9 +796,11 @@ Hash:   sha256("Copyright (c) {{ year }} <copyright holders>")
 ---
 
 #### Rule 4: Annotations and HTML
+
 **EXCLUDE** HTML annotations and metadata.
 
 **Example**:
+
 ```
 Input:  "You must keep our copyright notice.(1) This tells people... { .annotate }"
 Clean:  "You must keep our copyright notice."
@@ -707,6 +808,7 @@ Hash:   sha256("You must keep our copyright notice.")
 ```
 
 **Rule**: Strip all HTML/markdown annotations:
+
 - `<div class="annotate">...</div>`
 - `{ .annotate }`
 - `(1)` reference markers
@@ -729,6 +831,7 @@ sha256:a1b2c3d4e5f6...
 **Probability**: Negligible for license clauses (2^-256)
 
 **If collision detected** (same hash, different content):
+
 - Add disambiguation suffix to clause ID: `plain-perm-use-1`, `plain-perm-use-2`
 - Recalculate hash with suffix included
 - Log warning for manual review
@@ -759,6 +862,7 @@ function validateMapping(mapping, currentLicenseContent) {
 ```
 
 **Tag-based validation**:
+
 ```javascript
 // When content changes, identify affected tags
 function identifyChangedTags(oldMappings, currentContent) {
@@ -785,6 +889,7 @@ function identifyChangedTags(oldMappings, currentContent) {
 ### Mapping Completeness
 
 #### Rule: All Plain Clauses Should Be Mapped
+
 **Validation**: Check that every identified plain clause appears in at least one mapping (or is marked `unmapped-plain`)
 
 **Tolerance**: <5% unmapped clauses acceptable
@@ -793,6 +898,7 @@ function identifyChangedTags(oldMappings, currentContent) {
 ---
 
 #### Rule: All Original Clauses Should Be Mapped
+
 **Validation**: Check that every identified original clause appears in at least one mapping (or is marked `unmapped-original`)
 
 **Tolerance**: <10% unmapped acceptable (structural content like titles)
@@ -803,7 +909,9 @@ function identifyChangedTags(oldMappings, currentContent) {
 ### Mapping Consistency
 
 #### Rule: Confidence Score Matches Mapping Type
+
 **Validation**:
+
 - `one-to-one`: confidence ≥ 0.95
 - `one-to-one-expanded`: confidence ≥ 0.85
 - `many-to-many`: confidence ≥ 0.50
@@ -813,9 +921,11 @@ function identifyChangedTags(oldMappings, currentContent) {
 ---
 
 #### Rule: Semantic Tags Consistent
+
 **Validation**: If plain and original clauses in same mapping, their semantic tags should match or be related
 
 **Example**:
+
 - ✅ Valid: plain `permissions`, original `permissions`
 - ✅ Valid: plain `permissions:commercial`, original `permissions`
 - ⚠️ Warning: plain `permissions`, original `warranty` (likely incorrect)
@@ -825,9 +935,11 @@ function identifyChangedTags(oldMappings, currentContent) {
 ### Content Change Detection
 
 #### Rule: Hash Mismatch Triggers Review
+
 **Validation**: When license content changes, compare current hashes to stored hashes
 
 **Action**:
+
 1. Identify all mappings with hash mismatches
 2. Group by semantic tag
 3. Present tag-level summary: "warranty: 7 mappings need review"
@@ -840,6 +952,7 @@ function identifyChangedTags(oldMappings, currentContent) {
 See separate file: `mapping-schema.json`
 
 Key structure:
+
 ```json
 {
   "license_id": "MIT",
@@ -878,6 +991,7 @@ Key structure:
 ### Edge Case 1: Clause Spans Multiple Sentences
 
 **Original**:
+
 ```
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -890,10 +1004,12 @@ furnished to do so, subject to the following conditions:
 **Decision**: Split into logical clauses or keep as one?
 
 **Recommendation**:
+
 - If plain language treats as unified grant: **Keep as one clause**
 - If plain language splits concepts: **Create multiple clauses**
 
 **MIT Example**: Plain treats as unified "You Can Do Anything" section
+
 - **Solution**: Single original clause "permission-grant-paragraph"
 - Maps to multiple plain clauses (Use it, Copy it, Change it, etc.) as `one-to-many`
 
@@ -902,6 +1018,7 @@ furnished to do so, subject to the following conditions:
 ### Edge Case 2: Repeated Content
 
 **Plain**:
+
 ```
 ## Permissions
 - Use it
@@ -914,6 +1031,7 @@ You must keep the copyright notice when you copy it.
 **Question**: Does "copy it" appear twice? Same clause ID?
 
 **Answer**: No - different contexts, different clauses
+
 - `plain-perm-copy`: "Copy it" (permissions context)
 - `plain-cond-copy-notice`: "when you copy it" (conditions context, reference to copying)
 
@@ -924,6 +1042,7 @@ You must keep the copyright notice when you copy it.
 ### Edge Case 3: Parenthetical Clarifications
 
 **Original**:
+
 ```
 copies of the Software (in Source or Object form)
 ```
@@ -944,6 +1063,7 @@ copies of the Software (in Source or Object form)
 ### Edge Case 4: Cross-References
 
 **Plain**:
+
 ```
 1. You must keep our copyright notice.(1)
 
@@ -955,6 +1075,7 @@ copies of the Software (in Source or Object form)
 **Answer**: No - footnote is editorial explanation, not legal content
 
 **Storage**:
+
 ```json
 {
   "id": "plain-cond-copyright",
@@ -975,6 +1096,7 @@ Annotations NOT hashed, NOT mapped.
 ### Edge Case 5: License Added Content
 
 **Plain License adds**:
+
 ```
 ## About This Plain Language Version
 
@@ -1008,11 +1130,13 @@ original license or a lawyer.
 **Decision**: Manual semantic IDs following naming schema conventions
 
 **Schema**: `{source}-{semantic-category}-{descriptor}`
+
 - Source: `plain` or `original`
 - Category: `perm`, `cond`, `warranty`, `liability`, etc.
 - Descriptor: Specific identifier (e.g., `use`, `copyright`, `as-is`)
 
 **Examples**:
+
 - `plain-perm-use` (plain language, permissions, use)
 - `original-grant-copyright` (original, grant/permissions, copyright)
 - `plain-cond-copyright` (plain language, conditions, copyright)
@@ -1028,6 +1152,7 @@ original license or a lawyer.
 **Format**: `{primary-tag}:{subtag}`
 
 **Examples**:
+
 - `permissions:commercial`
 - `warranty:as-is`
 - `conditions:attribution`
@@ -1045,6 +1170,7 @@ original license or a lawyer.
 **Example**: `sha256:a1b2c3d4e5f6789012345678901234567890123456789012345678901234`
 
 **Display**: Truncate to first 8-16 chars in UI for readability
+
 - Storage: Full 64 chars
 - Display: `sha256:a1b2c3d4...`
 
@@ -1057,6 +1183,7 @@ original license or a lawyer.
 **Decision**: Block publishing for critical tags, warn for non-critical tags
 
 **Critical Tags** (hash mismatch blocks publishing):
+
 - `permissions` - Rights granted
 - `conditions` - Requirements
 - `warranty` - Warranty disclaimers
@@ -1065,11 +1192,13 @@ original license or a lawyer.
 - `scope` - What license covers
 
 **Non-Critical Tags** (hash mismatch warns only):
+
 - `metadata` - Title, version, URL
 - `interpretation` - How to interpret license
 - `definitions` - Term definitions (maybe promote to critical later)
 
 **Behavior**:
+
 - **Critical tag mismatch**: "❌ Cannot publish: 7 warranty mappings need review"
 - **Non-critical tag mismatch**: "⚠️ Warning: 2 metadata mappings outdated (can publish anyway)"
 
@@ -1082,6 +1211,7 @@ original license or a lawyer.
 **Decision**: Display many-to-many as grouped clauses side-by-side
 
 **v1.0 Implementation**: Simple side-by-side groups
+
 ```
 ┌─ Plain Language Group ───────┐  ┌─ Original License Group ──┐
 │ • Clause 1                    │  │ • Original Clause A       │
@@ -1104,6 +1234,7 @@ Notes: "Original scattered requirements reorganized into
 **Decision**: Maintain versioned standard taxonomy with custom tag escape hatch
 
 **Standard Taxonomy v1.0** (9 core tags):
+
 1. `permissions` - Rights granted
 2. `conditions` - Requirements
 3. `warranty` - Warranty disclaimers
@@ -1115,9 +1246,11 @@ Notes: "Original scattered requirements reorganized into
 9. `metadata` - Title, version, URL
 
 **Extension Mechanism**: `custom:{tag-name}` for edge cases
+
 - Example: `custom:patent-grant`, `custom:trademark-restrictions`
 
 **Governance**: Propose new standard tags when pattern emerges
+
 - If 3+ licenses need same custom tag → propose for standard taxonomy
 - Community review and inclusion in v1.1, v2.0, etc.
 
@@ -1130,6 +1263,7 @@ Notes: "Original scattered requirements reorganized into
 **Decision**: Allow confidence override with required justification
 
 **Implementation**:
+
 ```json
 {
   "confidence": 0.90,
@@ -1142,6 +1276,7 @@ Notes: "Original scattered requirements reorganized into
 ```
 
 **Guidelines**:
+
 - Small adjustments (±0.05): Brief note acceptable
 - Large adjustments (>0.10): Detailed justification required
 - All overrides logged in mapping history
@@ -1156,6 +1291,7 @@ Notes: "Original scattered requirements reorganized into
 **Decision**: Track schema version explicitly, use Git for content versioning
 
 **Implementation**:
+
 ```json
 {
   "$schema": "https://plainlicense.org/schemas/mapping/v1.0.0",
@@ -1168,13 +1304,15 @@ Notes: "Original scattered requirements reorganized into
 ```
 
 **Versioning Strategy**:
-- **Schema version** (in `$schema` URL): Enables migrations and backward compatibility
-  - v1.0.0 → v1.1.0: Add optional fields (backward compatible)
-  - v1.x.x → v2.0.0: Breaking changes (migration tools required)
-- **License version** (in `version` field): Indicates which license content mappings apply to
-- **Git commits**: Track content changes (who, when, what changed)
+
+-   **Schema version** (in `$schema` URL): Enables migrations and backward compatibility
+    - v1.0.0 → v1.1.0: Add optional fields (backward compatible)
+    - v1.x.x → v2.0.0: Breaking changes (migration tools required)
+-   **License version** (in `version` field): Indicates which license content mappings apply to
+-   **Git commits**: Track content changes (who, when, what changed)
 
 **Schema Evolution**:
+
 - Migration tools upgrade old mappings.json to new schema versions
 - Validation checks schema version compatibility
 

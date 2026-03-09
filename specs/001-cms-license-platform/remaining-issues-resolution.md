@@ -13,10 +13,12 @@
 **Problem**: Sveltia CMS expects localStorage for auth tokens, but auth-contract.md specifies httpOnly cookies for security
 
 **Impact**:
+
 - Security vulnerability if using localStorage (XSS attacks can steal tokens)
 - Implementation blocker - cannot proceed with Phase 10 (Authentication) without resolution
 
 **Root Cause**:
+
 - Sveltia CMS is designed for Netlify Identity / GitHub OAuth which uses localStorage
 - Security best practice requires httpOnly cookies to prevent XSS token theft
 - Current specification has conflicting requirements
@@ -24,7 +26,9 @@
 **Solution Options**:
 
 #### Option A: Use Sveltia CMS with localStorage + Enhanced Security (RECOMMENDED)
+
 **Approach**:
+
 - Accept Sveltia CMS's localStorage pattern (industry-standard for Git-based CMS)
 - Mitigate XSS risks through strict CSP (already in FR-047)
 - Implement short-lived access tokens (15 min expiration per FR-046)
@@ -32,12 +36,14 @@
 - Add XSS protection through input sanitization (FR-048)
 
 **Rationale**:
+
 - Sveltia CMS is Git-based and free (aligns with project constraints)
 - localStorage is standard for OAuth 2.0 PKCE flow in SPAs
 - CSP Level 3 + token expiration provides adequate security
 - Modern browsers isolate localStorage per origin
 
 **Changes Required**:
+
 1. Update `auth-contract.md` to clarify localStorage approach with security mitigations
 2. Add task T010a: "Implement secure localStorage token management with XSS protections"
 3. Update FR-046 to explicitly mention localStorage with security context
@@ -45,21 +51,26 @@
 **Effort**: 2 hours documentation + existing implementation
 
 #### Option B: Custom Authentication with httpOnly Cookies
+
 **Approach**:
+
 - Build custom authentication service with Cloudflare Workers
 - Implement httpOnly cookie-based sessions
 - Create custom CMS admin interface to work with cookies
 
 **Rationale**:
+
 - Maximum security (httpOnly cookies immune to XSS)
 - Full control over authentication flow
 
 **Drawbacks**:
+
 - Requires abandoning Sveltia CMS or extensive customization
 - Estimated effort: 40-60 hours additional development
 - Conflicts with "use Git-based free CMS" constraint
 
 **Changes Required**:
+
 1. Major architecture change - replace Sveltia CMS
 2. Add 15-20 new tasks for custom auth + CMS admin
 3. Extend MVP timeline by 2-3 weeks
@@ -73,6 +84,7 @@
 **Problem**: Build time grows linearly with license count - could timeout at 100+ licenses on Cloudflare Pages (30-minute build limit)
 
 **Impact**:
+
 - Current approach: regenerate all 6 formats for all licenses on every build
 - At 50 licenses: ~10-15 seconds (acceptable)
 - At 100 licenses: ~20-30 seconds (approaching limits)
@@ -80,6 +92,7 @@
 - At 500 licenses (FR-053 scalability target): ~100+ seconds (FAILURE)
 
 **Root Cause**:
+
 - Typst PDF generation is slowest operation (~2-5 seconds per license)
 - Current build script regenerates all exports unconditionally
 - No incremental build support for changed licenses only
@@ -87,20 +100,21 @@
 **Solution**: Incremental Export Generation
 
 **Approach**:
-1. **Content-Based Hashing**:
+
+1.  **Content-Based Hashing**:
    - Generate SHA-256 hash of license content (frontmatter + markdown)
    - Store hash in `dist/exports/.build-manifest.json`
    - Skip export generation if content hash unchanged
 
-2. **Parallel Export Generation**:
+2.  **Parallel Export Generation**:
    - Use Bun's built-in concurrency for parallel Typst processes
    - Process 5-10 licenses concurrently (balance speed vs memory)
 
-3. **Smart Cache Invalidation**:
+3.  **Smart Cache Invalidation**:
    - Invalidate exports when license content OR templates change
    - Track template modification times in manifest
 
-4. **Fallback to Full Rebuild**:
+4.  **Fallback to Full Rebuild**:
    - Full rebuild if manifest missing or corrupted
    - Manual full rebuild option via environment variable
 
@@ -137,11 +151,13 @@ async function shouldRegenerateExport(
 ```
 
 **Performance Impact**:
+
 - 50 licenses: ~10s → ~2s (first build), ~0.5s (incremental)
 - 100 licenses: ~20s → ~4s (first build), ~1s (incremental)
 - 500 licenses: ~100s → ~20s (first build), ~3-5s (incremental)
 
 **Changes Required**:
+
 1. Add new task: **T051a: Implement incremental export generation with content hashing**
 2. Add new task: **T051b: Add parallel export processing (5-10 concurrent Typst processes)**
 3. Update T051 to integrate incremental strategy
@@ -160,18 +176,21 @@ async function shouldRegenerateExport(
 **Problem**: T093 references `semantic-release-action-llm-conventional-commits` which is a hypothetical GitHub Action (does not exist)
 
 **Impact**:
+
 - CI/CD pipeline will fail without fallback
 - Deployment automation blocked
 
 **Root Cause**:
+
 - Specification referenced an aspirational tool without verifying existence
 - No fallback strategy for AI-powered commit analysis
 
 **Solution**: Implement Fallback Strategy
 
 **Approach**:
-1. **Primary**: Use standard `semantic-release` with `conventional-changelog`
-2. **Enhancement** (Post-MVP): Explore LLM-powered commit analysis via:
+
+1.  **Primary**: Use standard `semantic-release` with `conventional-changelog`
+2.  **Enhancement** (Post-MVP): Explore LLM-powered commit analysis via:
    - OpenAI API with custom prompt for commit message analysis
    - Claude API for commit message classification
    - Custom GitHub Action with LLM integration
@@ -193,6 +212,7 @@ async function shouldRegenerateExport(
 ```
 
 **Changes Required**:
+
 1. Update **T093**: "Configure semantic-release with conventional-changelog (standard approach)"
 2. Add **T093a**: "Research LLM-powered commit analysis options (Post-MVP enhancement)"
 3. Update **T094**: "Setup GitHub Actions release workflow with standard semantic-release"
@@ -208,6 +228,7 @@ async function shouldRegenerateExport(
 **Status**: ✅ RESOLVED via NFRs FR-049 and FR-050
 
 **Resolution**:
+
 - FR-049: Build and export logging with failure alerting
 - FR-050: Performance monitoring, error tracking, anomaly detection
 - Tests: T305 (monitoring setup), T279 (SC validation)
@@ -221,11 +242,13 @@ async function shouldRegenerateExport(
 **Problem**: `package.json` and `content/versions.json` can diverge, causing version inconsistencies
 
 **Impact**:
+
 - Website may display incorrect license version numbers
 - Manual synchronization error-prone
 - Version history can become inaccurate
 
 **Root Cause**:
+
 - Two sources of truth for version data
 - No automated synchronization mechanism
 - Human error during version bumps
@@ -233,6 +256,7 @@ async function shouldRegenerateExport(
 **Solution**: Generated Artifact Pattern
 
 **Approach**:
+
 1. **Single Source of Truth**: `package.json` (managed by Lerna + semantic-release)
 2. **Generate `versions.json`**: Build-time generation from package.json files
 3. **Validation**: Fail build if versions.json generation fails
@@ -275,6 +299,7 @@ async function generateVersionsJson(): Promise<void> {
 ```
 
 **Changes Required**:
+
 1. Add **T020a**: "Implement build-time versions.json generation from package.json"
 2. Update **T020**: "Create content validation schemas" to include versions.json validation
 3. Add build script to `src/build/index.ts`
@@ -291,11 +316,13 @@ async function generateVersionsJson(): Promise<void> {
 **Problem**: Cloudflare Pages build environment installation approach for Typst not verified
 
 **Impact**:
+
 - PDF generation may fail in production
 - Build failures on Cloudflare Pages
 - Manual workaround may be required
 
 **Root Cause**:
+
 - Typst is not pre-installed in Cloudflare Pages build environment
 - Cloudflare uses Amazon Linux 2 (different from local development)
 - Installation approach needs verification
@@ -303,7 +330,9 @@ async function generateVersionsJson(): Promise<void> {
 **Solution Options**:
 
 #### Option A: Use Typst Docker Image (RECOMMENDED)
+
 **Approach**:
+
 - Cloudflare Pages supports custom Docker images (preview feature)
 - Use official `ghcr.io/typst/typst:latest` image
 - Fallback: Pre-compile Typst binary and include in repository
@@ -328,6 +357,7 @@ CMD ["bun", "run", "preview"]
 ```
 
 **Cloudflare Pages Configuration**:
+
 ```toml
 # wrangler.toml
 [build]
@@ -340,6 +370,7 @@ NODE_VERSION = "20"
 ```
 
 **Changes Required**:
+
 1. Add **T006a**: "Verify Typst installation in Cloudflare Pages build environment"
 2. Add **T006b**: "Create Dockerfile with Typst binary (if Docker approach needed)"
 3. Update **T006**: "Install build tooling" to document Typst installation approach
@@ -349,12 +380,15 @@ NODE_VERSION = "20"
 **Priority**: P1 (MVP) - Must work in production
 
 #### Option B: Pre-compiled Typst Binary
+
 **Approach**:
+
 - Download Typst binary for Linux x86_64
 - Include in repository at `bin/typst`
 - Use in build script
 
 **Changes Required**:
+
 1. Add `bin/typst` binary to repository (10MB)
 2. Update build script to use `./bin/typst` instead of global `typst`
 
@@ -369,6 +403,7 @@ NODE_VERSION = "20"
 ### New Tasks to Add
 
 **Critical Priority (P1 - MVP)**:
+
 - **T010a**: Implement secure localStorage token management with XSS protections (2 hours)
 - **T020a**: Implement build-time versions.json generation from package.json (2-3 hours)
 - **T051a**: Implement incremental export generation with content hashing (6-8 hours)
@@ -377,6 +412,7 @@ NODE_VERSION = "20"
 - **T006b**: Create Dockerfile with Typst binary (fallback if needed) (2 hours)
 
 **Post-MVP Enhancements (P3)**:
+
 - **T093a**: Research LLM-powered commit analysis options (4-6 hours)
 
 **Total Additional Effort**: 20-27 hours
@@ -389,19 +425,19 @@ NODE_VERSION = "20"
 
 ### Documents to Update
 
-1. **spec.md**:
+1.  **spec.md**:
    - Update FR-046 to clarify localStorage approach with security mitigations
    - Update FR-040 to specify incremental export generation behavior
 
-2. **auth-contract.md**:
+2.  **auth-contract.md**:
    - Clarify localStorage approach with CSP and XSS protections
    - Document security trade-offs and mitigation strategies
 
-3. **tasks.md**:
+3.  **tasks.md**:
    - Insert new tasks (T006a, T006b, T010a, T020a, T051a, T051b, T093a)
    - Update T051, T093, T094 with revised approaches
 
-4. **plan.md**:
+4.  **plan.md**:
    - Update Technical Context with incremental build strategy
    - Clarify authentication approach (Sveltia + OAuth with localStorage)
 
@@ -410,6 +446,7 @@ NODE_VERSION = "20"
 ## Implementation Priority
 
 ### Phase 1: Critical Architecture Decisions (Before Implementation Begins)
+
 1. ✅ Approve authentication approach (Sveltia + localStorage with mitigations)
 2. ✅ Approve incremental export generation strategy
 3. ✅ Approve versions.json generation approach
@@ -417,15 +454,18 @@ NODE_VERSION = "20"
 5. ✅ Update specification documents (spec.md, tasks.md, plan.md)
 
 ### Phase 2: Early Implementation (Week 1-2)
+
 1. **T006a**: Verify Typst in Cloudflare Pages (before relying on it)
 2. **T020a**: Implement versions.json generation (foundational)
 3. **T093**: Setup standard semantic-release (CI/CD foundation)
 
 ### Phase 3: User Story 2 (Export Generation)
+
 1. **T051a**: Implement incremental export generation
 2. **T051b**: Add parallel export processing
 
 ### Phase 4: Authentication (Phase 10)
+
 1. **T010a**: Implement secure localStorage token management
 
 ---
@@ -433,6 +473,7 @@ NODE_VERSION = "20"
 ## Risk Assessment
 
 ### Before Resolution
+
 - **Authentication**: 🔴 BLOCKED (conflicting requirements)
 - **Scalability**: 🔴 HIGH RISK (build timeouts at scale)
 - **Deployment**: 🟡 MEDIUM RISK (hypothetical GitHub Action)
@@ -440,6 +481,7 @@ NODE_VERSION = "20"
 - **Production PDF**: 🟡 MEDIUM RISK (unverified installation)
 
 ### After Resolution
+
 - **Authentication**: 🟢 LOW RISK (standard OAuth + localStorage with mitigations)
 - **Scalability**: 🟢 LOW RISK (incremental builds + parallelization)
 - **Deployment**: 🟢 LOW RISK (standard semantic-release)

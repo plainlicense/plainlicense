@@ -41,12 +41,14 @@ packages/
 ```
 
 **Each package**:
+
 - Independent semantic versioning (v0.2.1, v1.0.0, etc.)
 - Automated changelog generation (@semantic-release/changelog)
 - GitHub releases with markdown assets
 - Commit-based versioning (type: stable/new/subs/admin/bot)
 
 **Package metadata** points to actual content:
+
 ```json
 {
   "main": "../../docs/licenses/permissive/mit/index.md"
@@ -99,6 +101,7 @@ reference_links:
 ```
 
 **Key Features**:
+
 - **Jinja2 templates**: `{{ year }}` for dynamic copyright years
 - **Rich metadata**: Permissions/conditions/limitations for at-a-glance view
 - **Dual content**: Both plain language (`reader_license_text`) and original (`original_license_text`)
@@ -112,25 +115,31 @@ reference_links:
 Located in `overrides/hooks/`, these process content during MkDocs build:
 
 ### 1. **license_factory.py**
+
 - **Purpose**: Assembles licenses from frontmatter and boilerplate
 - **What it does**: Likely parses YAML frontmatter, processes Jinja2 templates, inserts boilerplate text
 - **Size**: 23,627 characters (complex logic)
 
 ### 2. **shame_counter.py**
+
 - **Purpose**: Counts "shame words" (complex legal terms) in licenses
 - **Integration**: Tracks plain language quality
 
 ### 3. **socialmedia.py**
+
 - **Purpose**: Generates social media cards (OpenGraph images)
 - **Material integration**: Uses MkDocs Material social cards plugin
 
 ### 4. **update_site_license.py**
+
 - **Purpose**: Keeps site license current with latest Plain Unlicense
 
 ### 5. **fix_html.py**
+
 - **Purpose**: Post-rendering HTML fixes
 
 ### Supporting Files:
+
 - `_utils.py`: Utility functions
 - `hook_logger.py`: Centralized logging
 - `env_settings.py`: Jinja environment configuration
@@ -142,6 +151,7 @@ Located in `overrides/hooks/`, these process content during MkDocs build:
 **Size**: 11,151 characters (comprehensive build orchestrator)
 
 **Likely responsibilities** (based on size and structure):
+
 - Asset optimization (images, videos, fonts)
 - TypeScript compilation with esbuild
 - CSS processing and bundling
@@ -153,6 +163,7 @@ Located in `overrides/hooks/`, these process content during MkDocs build:
 ## Categories & Navigation
 
 ### License Categories (4 total)
+
 1. **Public Domain**: Unlicense
 2. **Permissive**: MIT
 3. **Copyleft**: MPL-2.0
@@ -160,6 +171,7 @@ Located in `overrides/hooks/`, these process content during MkDocs build:
 5. **Proprietary**: (Category exists but no licenses yet)
 
 ### Site Structure
+
 ```
 /
 ├── home (index.md)
@@ -179,26 +191,31 @@ Located in `overrides/hooks/`, these process content during MkDocs build:
 ## Current Pain Points (Inferred)
 
 ### 1. **Non-Technical User Barrier** ❌
+
 - **Problem**: Editing YAML frontmatter requires technical knowledge
 - **Impact**: Violates SC-001 ("non-technical editors create license <30 minutes")
 - **Evidence**: 111 lines of YAML frontmatter for MIT license alone
 
 ### 2. **No Visual Preview** ❌
+
 - **Problem**: No live preview of changes before committing to Git
 - **Impact**: Editors can't see formatted output until after push
 - **Workflow**: Edit YAML → commit → push → wait for build → view on site
 
 ### 3. **MkDocs Unmaintained** ❌
+
 - **Problem**: MkDocs unmaintained for 18 months (confirmed by user)
 - **Impact**: Security vulnerabilities, no bug fixes, ecosystem stagnation
 - **Risk**: Incompatibility with future dependencies
 
 ### 4. **No Draft/Publish Workflow** ❌
+
 - **Problem**: All changes go directly to Git (published immediately)
 - **Impact**: No ability to work on drafts without publishing
 - **Missing**: Content versioning (beyond Git commits)
 
 ### 5. **Manual Metadata Management** ⚠️
+
 - **Problem**: Permissions, conditions, limitations manually maintained
 - **Risk**: Inconsistency across licenses (typos, missing tags)
 - **Example**: `permissions: [commercial-use, modifications, ...]` - easy to misspell
@@ -208,28 +225,33 @@ Located in `overrides/hooks/`, these process content during MkDocs build:
 ## What Works Well ✅
 
 ### 1. **Elegant Content Model**
+
 - Frontmatter-based is **clean and maintainable** for developers
 - Dual plain/original content in single file is **smart architecture**
 - Jinja2 templates allow **dynamic elements** (`{{ year }}`)
 - Reference links prevent **duplicate URLs** across content
 
 ### 2. **Readability Tracking**
+
 - **Gunning Fog scores** prove plain language improvement (MIT: 21.94 → 9.74)
 - **Shame word counter** enforces plain language standards
 - **Measurable quality** aligns with Plain License mission
 
 ### 3. **Semantic Versioning**
+
 - **Lerna monorepo** allows independent license versioning
 - **Automated changelogs** via semantic-release
 - **GitHub releases** provide version history
 - **Commit-based versioning** enables automated releases
 
 ### 4. **Custom Processing Pipeline**
+
 - **Python hooks** enable powerful content transformations
 - **TypeScript build** optimizes frontend assets
 - **Modular architecture** separates concerns cleanly
 
 ### 5. **Plain Language Quality**
+
 - **Constitution-driven** (CLAUDE.md standards)
 - **Shame words list** in mkdocs.yml enforces vocabulary
 - **Consistent terminology** across licenses
@@ -239,16 +261,19 @@ Located in `overrides/hooks/`, these process content during MkDocs build:
 ## Technical Debt
 
 ### 1. **MkDocs Lock-In**
+
 - Entire content processing relies on MkDocs Material
 - Python hooks tightly coupled to MkDocs plugin system
 - Migration requires rewriting all hooks
 
 ### 2. **No Automated Tests**
+
 - Build pipeline untested
 - Python hooks untested
 - Risk of regressions when changing content
 
 ### 3. **Manual Content Assembly**
+
 - No automated mapping between plain/original sections
 - Section comparison feature (FR-014-018) requires new infrastructure
 
@@ -257,18 +282,21 @@ Located in `overrides/hooks/`, these process content during MkDocs build:
 ## Migration Challenges
 
 ### Content Migration
+
 - **100+ lines of frontmatter** per license → CMS fields
 - **Jinja2 templates** → CMS dynamic fields or build-time rendering
 - **Reference links** → CMS link management
 - **Permissions/conditions** → CMS taxonomy or tags
 
 ### Process Migration
+
 - **Python hooks logic** → New static site generator hooks or build scripts
 - **Shame counter** → CMS plugin or build validation
 - **Social media cards** → New generator's social card system
 - **License assembly** → CMS content model + templates
 
 ### Version Control Migration
+
 - **Lerna packages** → CMS version tracking
 - **Semantic release** → Manual versioning or CMS workflows
 - **Changelogs** → CMS changelog generation
@@ -304,6 +332,7 @@ Located in `overrides/hooks/`, these process content during MkDocs build:
 ## Recommendations for Redesign
 
 ### What to Keep
+
 1. **Content model**: Frontmatter-based structure is elegant (translate to CMS fields)
 2. **Dual content**: Plain/original in same entity (preserve in CMS)
 3. **Readability tracking**: Gunning Fog, shame words (integrate with CMS)
@@ -311,12 +340,14 @@ Located in `overrides/hooks/`, these process content during MkDocs build:
 5. **Plain language standards**: Constitution, shame words list (enforce in CMS)
 
 ### What to Replace
+
 1. **MkDocs**: Choose maintained static site generator
 2. **Manual YAML editing**: Visual CMS editor for non-technical users
 3. **Git-only workflow**: Add CMS with draft/publish
 4. **No preview**: Live preview in CMS before publishing
 
 ### What to Build New
+
 1. **Section mapping**: Plain-to-original comparison (FR-014-018)
 2. **Reactive components**: FAQ, tables, decision trees (FR-030-034)
 3. **Multi-format export**: Build-time generation (FR-007-013)

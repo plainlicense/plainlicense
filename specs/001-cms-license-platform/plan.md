@@ -27,50 +27,56 @@ Complete redesign of Plain License website to add headless CMS for content manag
 **Constraints**: Free Cloudflare Pages hosting, Git-based content management (no database costs), build-time export generation, 98% download success (CDN redundancy)
 **Scale/Scope**: Dozens of licenses, Git-based content management, multiple content editors with OAuth-based access control, blog functionality, full version history via Git
 **Starlight Customization Strategy**: Hybrid approach using strategic component overrides
-  - **Keep**: Base layout, accessibility (WCAG 2.1 AA), performance optimizations, design system, typography
-  - **Override**: Header (Plain License branding), Footer (custom attribution), Sidebar (license navigation)
-  - **Custom Pages**: License detail pages, blog listing/detail, homepage using `<StarlightPage>` wrapper
-  - **Custom Components**: Comparison UI, download center, reactive components (FAQ, tables, decision trees)
-  - **Multiple Collections**: licenses, blog, docs (optional), template-blocks via Astro Content Collections API
+
+-   **Keep**: Base layout, accessibility (WCAG 2.1 AA), performance optimizations, design system, typography
+-   **Override**: Header (Plain License branding), Footer (custom attribution), Sidebar (license navigation)
+-   **Custom Pages**: License detail pages, blog listing/detail, homepage using `<StarlightPage>` wrapper
+-   **Custom Components**: Comparison UI, download center, reactive components (FAQ, tables, decision trees)
+-   **Multiple Collections**: licenses, blog, docs (optional), template-blocks via Astro Content Collections API
 **Authentication Strategy**: OAuth 2.0 with PKCE + localStorage token storage
-  - **Approach**: Sveltia CMS standard OAuth flow with localStorage (industry-standard for Git-based SPAs)
-  - **Security**: Mitigate XSS risks via strict CSP Level 3 (FR-047), 15-min token expiration, secure token rotation
-  - **Rationale**: Aligns with Sveltia CMS architecture, free tier constraints, modern browser localStorage isolation
-  - **Implementation**: Short-lived access tokens (15 min), long-lived refresh tokens (7 days), input sanitization (FR-048)
+-   **Approach**: Sveltia CMS standard OAuth flow with localStorage (industry-standard for Git-based SPAs)
+-   **Security**: Mitigate XSS risks via strict CSP Level 3 (FR-047), 15-min token expiration, secure token rotation
+-   **Rationale**: Aligns with Sveltia CMS architecture, free tier constraints, modern browser localStorage isolation
+-   **Implementation**: Short-lived access tokens (15 min), long-lived refresh tokens (7 days), input sanitization (FR-048)
 **Export Generation Strategy**: Incremental builds with content-based hashing
-  - **Approach**: SHA-256 hash of license content + templates, skip exports if unchanged, build manifest tracking
-  - **Performance**: 50 licenses: ~2s incremental, 500 licenses: ~20s first build / ~5s incremental (vs ~100s linear)
-  - **Parallelization**: 5-10 concurrent Typst processes using Bun concurrency for faster PDF generation
-  - **Scalability**: Supports FR-053 target of 500 licenses without Cloudflare Pages timeout (30-min limit)
+-   **Approach**: SHA-256 hash of license content + templates, skip exports if unchanged, build manifest tracking
+-   **Performance**: 50 licenses: ~2s incremental, 500 licenses: ~20s first build / ~5s incremental (vs ~100s linear)
+-   **Parallelization**: 5-10 concurrent Typst processes using Bun concurrency for faster PDF generation
+-   **Scalability**: Supports FR-053 target of 500 licenses without Cloudflare Pages timeout (30-min limit)
 
 ## Constitution Check
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
 ### I. Plain Language First ✅
+
 - CMS will enable rich text editing with readability tools integration
 - Export formats must maintain plain language quality
 - No violations expected
 
 ### II. Voice Consistency ✅
+
 - CMS template blocks enforce consistent voice across licenses
 - Reactive components maintain Plain License tone
 - Blog functionality uses same editorial standards
 - No violations expected
 
 ### III. Universal Applicability ✅
+
 - CMS must support "source materials" terminology system
 - Template blocks will include cross-medium examples
 - Export formats must preserve universal applicability
 - No violations expected
 
 ### IV. Cross-License Consistency ✅
+
 - Template blocks will standardize permission/warranty language
 - CMS validation can enforce terminology standards
 - Version management tracks consistency across updates
 - No violations expected
 
 ### V. Documentation Quality ✅
+
 - Rich text editor supports structured formatting
 - PDF export maintains typography standards (FR-012)
 - Reactive components provide visual enhancement

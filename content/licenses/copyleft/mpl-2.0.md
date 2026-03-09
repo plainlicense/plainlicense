@@ -29,7 +29,6 @@ shame_words_count: 12
 ---
 # Plain MPL
 
-
 ## You are Free to Use, Change, and Share the Work
 
 **We, the authors, give you a free license to use the work anywhere in the world.** Everyone else gets the same license too.
@@ -74,15 +73,15 @@ You can include this work in a larger project and license the larger project dif
 
 When you include the work as part of something else:
 
-- **Include a copy of this license** with the parts of the work that stay under the Plain MPL
-- **Don't change anyone's rights** to the parts covered by the Plain MPL.
-- **People who get your larger project can choose**
+-   **Include a copy of this license** with the parts of the work that stay under the Plain MPL
+-   **Don't change anyone's rights** to the parts covered by the Plain MPL.
+-   **People who get your larger project can choose**
 
-  - To use the parts of the larger work that are covered by the Plain MPL under the Plain MPL or the Mozilla Public License 2.0
-  - To use the parts covered by the Plain MPL, along with the rest of the larger work, under the terms of your other license. If:
+    -   To use the parts of the larger work that are covered by the Plain MPL under the Plain MPL or the Mozilla Public License 2.0
+    -   To use the parts covered by the Plain MPL, along with the rest of the larger work, under the terms of your other license. If:
 
-    - The authors of the work allow it. If any part of the work is marked with the [Same-License Notice](#same-license-notice--optional), then everyone must *always* share it under the Plain MPL or the Mozilla Public License 2.0 (also see [How to Provide Notices](#how-to-provide-notices)).
-    - The other license does not stop people from getting the source materials for the parts under the Plain MPL [^2].
+        - The authors of the work allow it. If any part of the work is marked with the [Same-License Notice](#same-license-notice--optional), then everyone must *always* share it under the Plain MPL or the Mozilla Public License 2.0 (also see [How to Provide Notices](#how-to-provide-notices)).
+        - The other license does not stop people from getting the source materials for the parts under the Plain MPL [^2].
 
 You may always choose to share the work under the Mozilla Public License 2.0 or a later version published by the Mozilla Foundation.
 
@@ -143,12 +142,12 @@ If you sue the authors for any reason related to the work covered by this licens
 
 ## Other Terms
 
-- This license is our entire agreement. We aren’t giving you any other rights or promises.
-- If a court can’t enforce part of this agreement, it may change that part only enough to make it enforceable, leaving the rest of the license as is.
-- Some courts interpret contracts in favor of the person who didn’t write them. Those laws don’t apply.
-  - The authors chose this standard publicly available license to help everyone, not just themselves.
-  - The Plain MPL is a standard license agreement that the authors chose for the work to be fair to everyone, including the authors, contributors, and users.
-  - It is not a contract that favors one party over another.
+-   This license is our entire agreement. We aren’t giving you any other rights or promises.
+-   If a court can’t enforce part of this agreement, it may change that part only enough to make it enforceable, leaving the rest of the license as is.
+-   Some courts interpret contracts in favor of the person who didn’t write them. Those laws don’t apply.
+    - The authors chose this standard publicly available license to help everyone, not just themselves.
+    - The Plain MPL is a standard license agreement that the authors chose for the work to be fair to everyone, including the authors, contributors, and users.
+    - It is not a contract that favors one party over another.
 
 ## How to Provide Notices
 
@@ -193,7 +192,6 @@ You may use the work under the [Plain MPL](https://plainlicense.org/{{ plain_url
 `the work`
 
 :    The materials covered by this license
-
 
 ---
 

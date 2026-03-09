@@ -1,4 +1,4 @@
-import { getEntry, type CollectionEntry } from 'astro:content';
+import { getEntry, type CollectionEntry } from 'astro:content'
 
 /**
  * Injects template blocks into license content.
@@ -15,13 +15,11 @@ export async function injectTemplateBlocks(license: CollectionEntry<'licenses'>)
       // Example: look for {{template:blockId}} or append at the end if not specified
       const placeholder = `{{template:${blockId}}}`;
       if (content.includes(placeholder)) {
-        content = content.replace(placeholder, block.body);
-      } else {
-        // Fallback: append at the end with a separator if it's a critical block like warranty
-        if (block.data.category === 'warranty') {
-          content += `\n\n---\n\n## Warranty Disclaimer\n\n${block.body}`;
-        }
-      }
+              content = content.replace(placeholder, block.body);
+            }
+      else if (block.data.category === 'warranty') {
+                content += `\n\n---\n\n## Warranty Disclaimer\n\n${block.body}`;
+              }
     }
   }
 

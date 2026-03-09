@@ -79,6 +79,7 @@ plainlicense/
 **Format**: Markdown file with YAML frontmatter
 
 **Frontmatter Schema**:
+
 ```yaml
 ---
 # Identity
@@ -176,6 +177,7 @@ sections:
 ```
 
 **Validation Rules** (Sveltia CMS config):
+
 - `spdx_id`: Required, unique, matches SPDX format
 - `slug`: Required, unique, URL-safe (lowercase, hyphens only)
 - `category`: Required, one of: permissive, copyleft, source-available, public-domain, proprietary
@@ -200,11 +202,13 @@ sections:
 **Definition**: The smallest semantic unit of legal meaning within a license that can be independently understood and mapped.
 
 **Granularity**:
+
 - **Primary**: Sentence-level
 - **Refinement**: Can be sub-sentence when a sentence contains multiple distinct legal concepts
 - **Never**: Paragraph-level (sections contain multiple clauses)
 
 **Examples**:
+
 - Valid: "You must keep our copyright notice." (sentence)
 - Valid: "- **Use** it" (list item with distinct concept)
 - Invalid: Entire section with multiple concepts
@@ -230,6 +234,7 @@ sections:
 **Purpose**: Group clauses by legal concept for validation, navigation, and analytics
 
 **Core Tags**:
+
 - `permissions` - Rights granted (use, copy, modify, distribute, sell)
 - `conditions` - Requirements (attribution, share-alike, include license)
 - `warranty` - Warranty disclaimers (as-is, quality, merchantability)
@@ -241,6 +246,7 @@ sections:
 - `metadata` - Title, version, URL
 
 **Subtag Support**: Use colon notation for specificity
+
 - `permissions:commercial` - Commercial use rights
 - `warranty:as-is` - "As is" disclaimers
 - `conditions:attribution` - Credit requirements
@@ -265,6 +271,7 @@ sections:
 **Algorithm**: SHA-256 with specific normalization rules
 
 **Normalization Rules**:
+
 1. **Whitespace**: Trim leading/trailing, collapse multiple spaces, remove line breaks
 2. **Markdown**: PRESERVE formatting (affects meaning and display)
 3. **Template Variables**: PRESERVE (e.g., `{{ year }}`)
@@ -273,6 +280,7 @@ sections:
 **Output Format**: `sha256:a1b2c3d4e5f6...` (hexadecimal lowercase with prefix)
 
 **Example**:
+
 ```javascript
 Input:  "  You  must   keep\nour   copyright  notice  "
 Normalized: "You must keep our copyright notice"
@@ -286,6 +294,7 @@ Hash: sha256:a1b2c3d4e5f6... (64 hex chars)
 **Complete Schema**: See [`mapping-schema.json`](./mapping-schema.json)
 
 **Top-Level Structure**:
+
 ```json
 {
   "$schema": "https://plainlicense.org/schemas/mapping/v1.0.0",
@@ -331,6 +340,7 @@ Hash: sha256:a1b2c3d4e5f6... (64 hex chars)
 ```
 
 **Clause Object** (used in mappings):
+
 ```json
 {
   "id": "plain-perm-use",
@@ -353,16 +363,19 @@ Hash: sha256:a1b2c3d4e5f6... (64 hex chars)
 #### Validation Rules (from specification)
 
 **Mapping Completeness**:
+
 - <5% unmapped plain clauses acceptable
 - <10% unmapped original clauses acceptable (structural content)
 
 **Mapping Consistency**:
+
 - `one-to-one`: confidence ≥ 0.95
 - `one-to-one-expanded`: confidence ≥ 0.85
 - `many-to-many`: confidence ≥ 0.50
 - Semantic tags should match between plain and original clauses in same mapping
 
 **Content Change Detection**:
+
 1. Compare current content hashes to stored hashes
 2. Identify mappings with hash mismatches
 3. Group by semantic tag
@@ -374,11 +387,12 @@ Hash: sha256:a1b2c3d4e5f6... (64 hex chars)
 #### Editor UX Decision (from brainstorming)
 
 **Recommendation for Implementation**:
-- **v1.0**: Manual JSON editing with CLI hash generation tool (4-6 hours development)
-- **v2.0**: Browser-based web app for visual mapping (15-25 hours development)
-  - Upload license markdown → visual side-by-side interface → download mappings.json
-  - No local setup required, hosted on Cloudflare Pages
-  - Optional: AI-assisted mapping suggestions
+
+-   **v1.0**: Manual JSON editing with CLI hash generation tool (4-6 hours development)
+-   **v2.0**: Browser-based web app for visual mapping (15-25 hours development)
+    - Upload license markdown → visual side-by-side interface → download mappings.json
+    - No local setup required, hosted on Cloudflare Pages
+    - Optional: AI-assisted mapping suggestions
 
 **Rationale**: Ship v1.0 quickly with manual approach, learn from usage, build proper visual tool for v2.0
 
@@ -389,6 +403,7 @@ Hash: sha256:a1b2c3d4e5f6... (64 hex chars)
 All 8 technical design questions have been resolved. See [`mapping-specification.md`](./mapping-specification.md) section "Design Decisions (Resolved)" for full details.
 
 **Summary of Decisions**:
+
 1. **Clause ID Generation**: Manual semantic IDs (`plain-perm-use` pattern)
 2. **Subtag Delimiter**: Colon (`:`) for hierarchical tags
 3. **Hash Storage**: Full SHA-256 hash (64 chars) with UI truncation
@@ -406,6 +421,7 @@ All 8 technical design questions have been resolved. See [`mapping-specification
 **Format**: Dual-storage (Lerna package.json + version metadata JSON)
 
 **Lerna Package** (`packages/mit/package.json`):
+
 ```json
 {
   "name": "@plainlicense/mit",
@@ -430,6 +446,7 @@ All 8 technical design questions have been resolved. See [`mapping-specification
 ```
 
 **Version Metadata** (`content/licenses/{category}/{slug}/versions.json`):
+
 ```json
 {
   "license_id": "MIT",
@@ -465,6 +482,7 @@ All 8 technical design questions have been resolved. See [`mapping-specification
 ```
 
 **Versioning Workflow** (Lerna + semantic-release):
+
 1. Editor makes content changes via Sveltia CMS
 2. Commit message follows conventional commits format: `fix(mit): clarify warranty section`
 3. Merge to `main` branch triggers semantic-release
@@ -475,6 +493,7 @@ All 8 technical design questions have been resolved. See [`mapping-specification
 8. Updates `versions.json` with new version metadata
 
 **⚠️ VERSION MANAGEMENT UX NEEDED**: How do editors manage versions?
+
 - Automatic via commit messages (conventional commits)?
 - Manual version bump control in CMS?
 - Preview changelog before release?
@@ -488,6 +507,7 @@ All 8 technical design questions have been resolved. See [`mapping-specification
 **Format**: Markdown file with minimal frontmatter
 
 **Schema**:
+
 ```yaml
 ---
 identifier: warranty-disclaimer  # Machine-readable ID (unique)
@@ -504,11 +524,13 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
 ```
 
 **Usage**:
+
 - Referenced in license frontmatter: `template_blocks: [warranty-disclaimer]`
 - Sveltia CMS provides selection interface (multi-select field)
 - Build process injects template block content into final output
 
 **Categories**:
+
 - `warranty`: Warranty disclaimers
 - `permission`: Permission grants
 - `condition`: License conditions
@@ -523,6 +545,7 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
 **Format**: Markdown file with YAML frontmatter
 
 **Schema**:
+
 ```yaml
 ---
 title: Why Plain Language Matters for Legal Documents
@@ -549,6 +572,7 @@ updated_at: 2026-01-15T10:00:00Z
 ```
 
 **Relationships**:
+
 - `related_licenses`: Array of SPDX IDs linking to license pages
 - Build process generates related content widgets
 
@@ -560,6 +584,7 @@ updated_at: 2026-01-15T10:00:00Z
 **Format**: Generated files during build process
 
 **Generated Artifacts**:
+
 ```
 exports/
 └── mit/
@@ -573,12 +598,14 @@ exports/
 ```
 
 **Generation Process**:
+
 1. **Build-time**: Astro build script generates all formats
 2. **Tools**: Pandoc (Markdown/PDF), Python (plaintext/XML), htmlmin (embed)
 3. **GitHub Actions**: Attaches exports to GitHub release as assets
 4. **CDN**: Also deployed to Cloudflare Pages `/exports/` directory
 
 **Metadata Tracking** (in `versions.json`):
+
 - URLs point to GitHub release assets (permanent, CDN-backed)
 - SHA-256 hashes for cache busting and integrity verification
 - Generation timestamp and method
@@ -590,12 +617,14 @@ exports/
 **Model**: GitHub repository permissions = CMS permissions
 
 **Roles** (GitHub repository access levels):
+
 - **Read**: Can view admin interface, cannot edit
 - **Write**: Can create/edit content, create PRs (if branch protection enabled)
 - **Maintain**: Can merge PRs, manage settings
 - **Admin**: Full repository access
 
 **OAuth Flow**:
+
 1. Editor visits `/admin`
 2. Sveltia CMS redirects to Cloudflare Worker OAuth proxy
 3. Worker initiates GitHub OAuth flow
@@ -740,17 +769,20 @@ collections:
 ### From Current System (MkDocs + YAML)
 
 **Content Migration**:
+
 1. Current frontmatter structure is **already compatible** with Git-based CMS
 2. No database migration required (content stays in repository)
 3. Move license content from `docs/licenses/` to `content/licenses/`
 4. Lerna packages remain unchanged (`packages/` directory)
 
 **Python Hooks → TypeScript**:
+
 - Rewrite `license_factory.py` as Astro integration
 - Rewrite `shame_counter.py` as Astro build script
 - Rewrite `socialmedia.py` using Astro social cards integration
 
 **Section Mappings**:
+
 - Create initial `mappings.json` files manually (editor tooling TBD)
 - Preserve existing section relationships if any
 
@@ -763,17 +795,20 @@ collections:
 ### Frontmatter Validation (Sveltia CMS)
 
 **Required Fields**:
+
 - License: `spdx_id`, `name`, `slug`, `category`, `permissions`, `status`
 - Blog Post: `title`, `slug`, `author`, `status`
 - Template Block: `identifier`, `category`, `title`
 
 **Format Validation**:
+
 - `spdx_id`: Matches SPDX identifier format (uppercase, hyphens, numbers)
 - `slug`: URL-safe (lowercase, hyphens only, no spaces)
 - `permissions`/`conditions`/`limitations`: Valid enum values only
 - Gunning Fog scores: Positive float values
 
 **Content Validation** (build-time checks):
+
 - Minimum content length (100 characters for plain language version)
 - Section ID uniqueness within document
 - Template block references exist
@@ -784,15 +819,18 @@ collections:
 ## Performance Considerations
 
 **Build Time Projections**:
+
 - Static site generation (Astro): 20-30 seconds
 - Export generation (6 formats × 10 licenses): +6-10 seconds
 - Total: **<1 minute** for full build
 
 **Repository Size**:
+
 - Estimated: <50 MB for 50 licenses + 100 blog posts
 - Git history: Keep export artifacts out of repo (GitHub Releases only)
 
 **CMS Performance**:
+
 - Sveltia CMS: Client-side app, instant UI responsiveness
 - GitHub API rate limits: 5,000 requests/hour (authenticated)
 - Sufficient for dozens of editors making hundreds of edits/day
@@ -806,49 +844,58 @@ collections:
 **Decision**: Fully automated versioning with LLM-assisted commit message generation
 
 **Approach**: Lerna + semantic-release with AI-generated conventional commit messages
+
 - Editors write natural language descriptions of changes in Sveltia CMS
 - LLM (GPT-4/Claude) converts description to conventional commit format
 - Semantic-release analyzes commits and auto-bumps versions
 - Changelog auto-generated from commit messages
 
 **Versioning Rules** (from FAQ - docs/faq/index.md):
+
 - **Major** (X.0.0): Version 1.0 when confident license is accurate; future majors only for significant errors requiring major changes
 - **Minor** (x.X.0): Significant changes (adding/removing terms, structure changes, substantial style/formatting changes)
 - **Patch** (x.x.X): Minor changes (typos, simpler synonyms, formatting fixes that don't affect structure/meaning)
 
 **Workflow**:
-1. Editor makes content changes via Sveltia CMS
-2. Editor writes natural description in "Changelog" field:
+
+1.  Editor makes content changes via Sveltia CMS
+2.  Editor writes natural description in "Changelog" field:
+
    ```
    Fixed typo in warranty section, changed "utilization" to "use"
    ```
-3. Pre-commit hook invokes LLM to generate conventional commit:
+
+3.  Pre-commit hook invokes LLM to generate conventional commit:
+
    ```
    fix(mit): fix typo in warranty section
 
    Changed "utilization" to simpler "use" for clarity
    ```
-4. Commit merged to `main` triggers semantic-release
-5. Semantic-release analyzes commit type (`fix` = patch, `feat` = minor, `BREAKING CHANGE` = major)
-6. Bumps version in `packages/mit/package.json` (e.g., 1.2.0 → 1.2.1)
-7. Creates Git tag `mit-v1.2.1`
-8. Generates changelog entry
-9. Creates GitHub release with exports
+
+4.  Commit merged to `main` triggers semantic-release
+5.  Semantic-release analyzes commit type (`fix` = patch, `feat` = minor, `BREAKING CHANGE` = major)
+6.  Bumps version in `packages/mit/package.json` (e.g., 1.2.0 → 1.2.1)
+7.  Creates Git tag `mit-v1.2.1`
+8.  Generates changelog entry
+9.  Creates GitHub release with exports
 
 **LLM Integration Point**: GitHub Actions with Claude Code OAuth (FREE)
 
 **Workflow**:
-1. Editor writes changes with natural language description (any format)
-2. Sveltia CMS creates commit with editor's natural description
-3. Editor creates Pull Request
-4. **GitHub Actions** (on PR or merge to main):
+
+1.  Editor writes changes with natural language description (any format)
+2.  Sveltia CMS creates commit with editor's natural description
+3.  Editor creates Pull Request
+4.  **GitHub Actions** (on PR or merge to main):
    - Reads commit message(s) from PR
    - Uses **Claude Code OAuth** to call Claude API (FREE)
    - Claude generates conventional commit message following rules
    - GitHub Actions amends commit message OR creates standardized commit
-5. Semantic-release analyzes conventional commit → bumps version
+5.  Semantic-release analyzes conventional commit → bumps version
 
 **GitHub Actions Workflow** (`.github/workflows/conventional-commits.yml`):
+
 ```yaml
 name: Generate Conventional Commits
 
@@ -895,11 +942,13 @@ jobs:
 ```
 
 **Claude Code OAuth Setup**:
+
 - No API costs (uses Claude Code's free authentication)
 - Configure in repository settings: `CLAUDE_CODE_OAUTH` secret
 - Claude Code provides OAuth tokens for CI/CD use
 
 **Benefits**:
+
 - ✅ **100% FREE** (no LLM API costs via Claude Code OAuth)
 - ✅ Non-technical editors write natural descriptions
 - ✅ Consistent commit message format (Claude enforces rules)
@@ -908,11 +957,13 @@ jobs:
 - ✅ Works with Pull Request workflow (standardize before merge)
 
 **Trade-offs**:
+
 - ⚠️ Requires Claude Code OAuth setup (one-time configuration)
 - ⚠️ Slight PR workflow delay (~5-10 seconds for Claude API call in CI)
 - ⚠️ Commit message rewrite in CI (force-push to PR branch)
 
 **Alternative Approach** (if commit amending is problematic):
+
 - Keep original commits as-is
 - Generate conventional commit in **separate commit** for semantic-release
 - Preserve editor's natural language for human changelog
@@ -927,6 +978,7 @@ jobs:
 **Decision**: Clause-level mapping with comprehensive specification
 
 **Specification Created**:
+
 - Complete mapping specification: [`mapping-specification.md`](./mapping-specification.md)
 - Formal JSON schema: [`mapping-schema.json`](./mapping-schema.json)
 - 7 mapping types defined with confidence rubrics
@@ -935,6 +987,7 @@ jobs:
 - Validation rules and edge case handling
 
 **Implementation Approach**:
+
 - **v1.0**: Manual JSON editing with CLI hash generation tool (ship quickly, learn requirements)
 - **v2.0**: Browser-based visual mapping tool (no local setup, upload/download workflow)
 - **Phase 1 Prototype**: AI-assisted mapping tool (see `phase1-ai-prototype-spec.md`)
@@ -948,6 +1001,7 @@ jobs:
 **Question**: Should license version history be visible on the site, or just in GitHub?
 
 **Options**:
+
 - **GitHub Only**: Link to GitHub releases page
 - **Site Integration**: Build changelog page per license
 - **Both**: GitHub for raw data, site for formatted presentation
@@ -958,14 +1012,14 @@ jobs:
 
 ## Next Steps
 
-1. **Review & Approve Data Model** (this document)
-2. **Create API Contracts** (`contracts/` directory)
+1.  **Review & Approve Data Model** (this document)
+2.  **Create API Contracts** (`contracts/` directory)
    - CMS → Git API contract
    - Build → Export Generation contract
    - Frontend → Section Mapping contract
-3. **Create Quickstart Guide** (`quickstart.md`)
+3.  **Create Quickstart Guide** (`quickstart.md`)
    - Developer environment setup
    - Running Astro + Sveltia CMS locally
    - Making first content edit
-4. **Prototype Section Mapping Tool** (spike/POC)
+4.  **Prototype Section Mapping Tool** (spike/POC)
    - Validate UX approach before full implementation

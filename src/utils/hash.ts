@@ -6,8 +6,7 @@ export async function sha256(content: string): Promise<string> {
   const data = encoder.encode(content);
   const hashBuffer = await crypto.subtle.digest('SHA-256', data);
   const hashArray = Array.from(new Uint8Array(hashBuffer));
-  const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-  return hashHex;
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
 /**
@@ -26,6 +25,5 @@ export function normalizeContent(text: string): string {
  */
 export async function generateClauseHash(text: string): Promise<string> {
   const normalized = normalizeContent(text);
-  const hash = await sha256(normalized);
-  return hash;
+  return await sha256(normalized);
 }

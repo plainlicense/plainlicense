@@ -1,22 +1,22 @@
 ---
-import { getCollection, type CollectionEntry } from 'astro:content';
-import BaseLayout from '../../layouts/BaseLayout.astro';
-import LicenseSummary from '../../components/LicenseSummary.astro';
-import DownloadOptions from '../../components/DownloadOptions.astro';
-import VersionHistory from '../../components/VersionHistory.astro';
-import ComparisonToggle from '../../components/ComparisonToggle.astro';
-import ComparisonModal from '../../components/ComparisonModal.astro';
-import { parseComponentPlaceholders } from '../../utils/component-parser.ts';
-import ComponentRegistry from '../../components/reactive/ComponentRegistry.astro';
-import { marked } from 'marked';
+import { getCollection } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import LicenseSummary from "../../components/LicenseSummary.astro";
+import DownloadOptions from "../../components/DownloadOptions.astro";
+import VersionHistory from "../../components/VersionHistory.astro";
+import ComparisonToggle from "../../components/ComparisonToggle.astro";
+import ComparisonModal from "../../components/ComparisonModal.astro";
+import { parseComponentPlaceholders } from "../../utils/component-parser";
+import ComponentRegistry from "../../components/reactive/ComponentRegistry.astro";
+import { marked } from "marked";
 
 export async function getStaticPaths() {
-  const licenses = await getCollection('licenses');
-  console.log('Generating paths for', licenses.length, 'licenses');
-  
-  return licenses.map(license => {
+  const licenses = await getCollection("licenses");
+  console.log("Generating paths for", licenses.length, "licenses");
+
+  return licenses.map((license) => {
     const slug = license.slug || license.id;
-    console.log(' - Path:', `/licenses/${slug}`);
+    console.log(" - Path:", `/licenses/${slug}`);
     return {
       params: { slug },
       props: { license },
@@ -28,21 +28,25 @@ const { license } = Astro.props;
 const { data } = license;
 
 // Template Block Injection Logic
-const templateBlocks = await getCollection('template-blocks');
+const templateBlocks = await getCollection("template-blocks");
 
 // Split into plain and original parts
 const bodyParts = license.body.split(/---[\s\n]+# Original License Text/i);
 const plainBody = bodyParts[0];
-const originalBody = bodyParts.length > 1 ? bodyParts[1] : '';
+const originalBody = bodyParts.length > 1 ? bodyParts[1] : "";
 
 // Replace {{block:id}} markers in plainBody globally and robustly
-const finalPlainBody = plainBody.replace(/{{block:([a-z0-9-]+)}}/g, (match, blockId) => {
-  const block = templateBlocks.find(b => 
-    b.id === blockId || 
-    b.id.split('/').pop()?.replace(/\.md$/, '') === blockId
-  );
-  return block ? block.body : `[Missing Block: ${blockId}]`;
-});
+const finalPlainBody = plainBody.replace(
+  /{{block:([a-z0-9-]+)}}/g,
+  (_match, blockId) => {
+    const block = templateBlocks.find(
+      (b) =>
+        b.id === blockId ||
+        b.id.split("/").pop()?.replace(/\.md$/, "") === blockId,
+    );
+    return block ? block.body : `[Missing Block: ${blockId}]`;
+  },
+);
 
 // Component parsing for plain body
 const placeholders = parseComponentPlaceholders(finalPlainBody);
@@ -50,39 +54,47 @@ const contentParts = finalPlainBody.split(/{{component:[a-z-]+.*?}}/g);
 
 // Full processed body for clipboard/exports (replaces blocks but keeps original text if present)
 // Also strip component markers as they are for interactive UI only
-const fullProcessedBody = (finalPlainBody + (originalBody ? '\n\n---\n\n# Original License Text\n' + originalBody : ''))
-  .replace(/{{component:[a-z-]+.*?}}/g, '')
+const fullProcessedBody = (
+  finalPlainBody +
+  (originalBody ? "\n\n---\n\n# Original License Text\n" + originalBody : "")
+)
+  .replace(/{{component:[a-z-]+.*?}}/g, "")
   .trim();
 ---
 
-<BaseLayout title={data.title}>
+<BaseLayout title={data.plain_name}>
   <div class="license-container" data-spdx-id={data.spdx_id}>
     <ComparisonToggle />
     <LicenseSummary license={license} />
-    
+
     <div class="license-layout">
       <div class="license-column plain-version">
-        <h2>Plain Language Version</h2>
+        <h2>{data.plain_name}</h2>
         <div class="license-content prose">
-          {contentParts.map((part, index) => (
-            <>
-              <div set:html={marked.parse(part)} />
-              {placeholders[index] && (
-                <ComponentRegistry 
-                  type={placeholders[index].type} 
-                  id={placeholders[index].id} 
-                  props={placeholders[index].props}
-                  licenseData={data}
-                />
-              )}
-            </>
-          ))}
+          {
+            contentParts.map((part, index) => (
+              <>
+                <div set:html={marked.parse(part)} />
+                {placeholders[index] && (
+                  <ComponentRegistry
+                    type={placeholders[index].type}
+                    id={placeholders[index].id}
+                    props={placeholders[index].props}
+                    licenseData={data}
+                  />
+                )}
+              </>
+            ))
+          }
         </div>
       </div>
 
       <div class="license-column original-version">
-        <h2>Original License Text</h2>
-        <div class="license-content prose" set:html={marked.parse(originalBody)} />
+        <h2>{data.original_version_name}</h2>
+        <div
+          class="license-content prose"
+          set:html={marked.parse(originalBody)}
+        />
       </div>
     </div>
 
@@ -93,15 +105,15 @@ const fullProcessedBody = (finalPlainBody + (originalBody ? '\n\n---\n\n# Origin
 </BaseLayout>
 
 <script>
-  import { initMappingViewer } from '../../components/MappingViewer.ts';
+  import { initMappingViewer } from "../../components/MappingViewer";
 
-  const container = document.querySelector('.license-container') as HTMLElement;
+  const container = document.querySelector(".license-container") as HTMLElement;
   const spdxId = container?.dataset.spdxId;
 
   if (spdxId) {
     fetch(`/mappings/${spdxId}-mapping.json`)
-      .then(res => res.json())
-      .then(mappingData => {
+      .then((res) => res.json())
+      .then((mappingData) => {
         initMappingViewer(container, mappingData);
       })
       .catch(() => {
@@ -117,7 +129,7 @@ const fullProcessedBody = (finalPlainBody + (originalBody ? '\n\n---\n\n# Origin
     padding: 2rem;
     transition: max-width 0.3s ease;
   }
-  
+
   .license-layout {
     display: grid;
     grid-template-columns: 1fr;

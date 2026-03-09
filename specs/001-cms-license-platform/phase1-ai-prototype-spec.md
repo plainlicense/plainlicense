@@ -37,6 +37,7 @@
 ```
 
 **Tech Stack**:
+
 - Pure HTML/CSS/JavaScript (or simple React/Vue if needed)
 - Anthropic Claude API (Claude 3.5 Sonnet for cost/speed balance)
 - No backend server (all API calls from browser)
@@ -49,6 +50,7 @@
 ### Step 1: Input License Content
 
 **UI**: Simple form with two text areas
+
 ```
 ┌─────────────────────────────────────────────────┐
 │  Plain License Mapper - AI Prototype            │
@@ -78,6 +80,7 @@
 ```
 
 **Alternative**: Tool fetches from GitHub
+
 - Input: License ID (MIT, MPL-2.0)
 - Tool fetches `docs/licenses/permissive/mit/index.md`
 - Parses frontmatter to extract plain and original text
@@ -87,6 +90,7 @@
 ### Step 2: AI Processing
 
 **Display**: Loading state with progress
+
 ```
 ┌─────────────────────────────────────────────────┐
 │  🤖 Analyzing license with AI...                │
@@ -165,6 +169,7 @@
 ```
 
 **Edit Details Modal**:
+
 ```
 ┌─────────────────────────────────────────────────┐
 │  Edit Mapping Details                           │
@@ -205,6 +210,7 @@
 ### Step 4: Review Semantic Tags
 
 **UI**: Tag management interface
+
 ```
 ┌─────────────────────────────────────────────────┐
 │  Semantic Tags Review                            │
@@ -243,6 +249,7 @@
 ### Step 5: Export mappings.json
 
 **UI**: Preview and download
+
 ```
 ┌─────────────────────────────────────────────────┐
 │  Export Mappings                                 │
@@ -334,6 +341,7 @@ EXAMPLE OUTPUT:
 
 Now parse this license:
 [LICENSE TEXT HERE]
+
 ```
 
 ---
@@ -343,18 +351,22 @@ Now parse this license:
 **Note**: Uses confidence rubric and semantic taxonomy from Design Decisions #6-7 (see `mapping-specification.md`)
 
 ```
+
 You are an expert legal analyst. You have two versions of a license:
+
 1. PLAIN language version (simplified, educational)
 2. ORIGINAL legal version (traditional legal language)
 
 Your task: Create clause-level mappings showing how plain clauses correspond to original clauses.
 
 INPUT:
+
 - Plain clauses (from Prompt 1)
 - Original clauses (from Prompt 1)
 
 OUTPUT:
 A JSON array of mappings with:
+
 - plain_clause: Reference to plain clause (using semantic ID)
 - original_clause: Reference to original clause(s) (using semantic ID)
 - mapping_type: one-to-one | one-to-one-expanded | one-to-many | many-to-one | many-to-many
@@ -364,6 +376,7 @@ A JSON array of mappings with:
 - notes: Brief explanation of the correspondence
 
 CONFIDENCE SCORING (from specification):
+
 - 0.95-0.99: Direct translation (only language simplification)
 - 0.85-0.94: Translation with educational expansion
 - 0.70-0.84: Legal interpretation with examples
@@ -372,6 +385,7 @@ CONFIDENCE SCORING (from specification):
 - Below 0.30: Mark as unmapped
 
 SEMANTIC TAGS (9 core tags):
+
 - permissions: Rights granted
 - conditions: Requirements
 - warranty: Warranty disclaimers
@@ -383,6 +397,7 @@ SEMANTIC TAGS (9 core tags):
 - metadata: Title, version, URL
 
 RULES:
+
 - Plain clauses often EXPAND original clauses with examples/explanations
 - Plain may REORGANIZE complex original sections
 - Some clauses may be unmapped (exist in only one version)
@@ -391,6 +406,7 @@ RULES:
 - Use semantic IDs from Prompt 1 (e.g., plain-perm-use, not plain-clause-1)
 
 EXAMPLE OUTPUT:
+
 ```json
 [
   {
@@ -410,6 +426,7 @@ PLAIN CLAUSES:
 
 ORIGINAL CLAUSES:
 [ORIGINAL CLAUSES JSON]
+
 ```
 
 ---
@@ -419,13 +436,16 @@ ORIGINAL CLAUSES:
 **Note**: Uses standard 9-tag taxonomy from Design Decision #6 with colon-delimited subtags
 
 ```
+
 You are reviewing semantic tags assigned to license clauses. Your task is to ensure consistency with the standard taxonomy and suggest appropriate subtags.
 
 INPUT:
+
 - All clauses with preliminary tags
 - All mappings with semantic tags
 
 STANDARD TAXONOMY (9 core tags):
+
 1. permissions - Rights granted
 2. conditions - Requirements
 3. warranty - Warranty disclaimers
@@ -438,11 +458,13 @@ STANDARD TAXONOMY (9 core tags):
 
 OUTPUT:
 A refined tag mapping with:
+
 - Validation that all tags use standard taxonomy
 - Suggested subtags using colon notation (e.g., permissions:commercial)
 - Tag consolidation recommendations
 
 EXAMPLE OUTPUT:
+
 ```json
 {
   "tags": {
@@ -469,6 +491,7 @@ EXAMPLE OUTPUT:
 
 CURRENT TAGS:
 [TAGS JSON]
+
 ```
 
 ---
@@ -686,22 +709,22 @@ CURRENT TAGS:
 
 ### Phase 1 Prototype Success Criteria
 
-1. **AI Accuracy**:
+1.  **AI Accuracy**:
    - MIT: ≥90% of AI suggestions accepted by human reviewer
    - MPL-2.0: ≥75% of AI suggestions accepted (more complex)
    - Elastic-2.0: ≥70% of AI suggestions accepted
 
-2. **Time Savings**:
+2.  **Time Savings**:
    - Manual mapping (estimated): 2-3 hours for MIT
    - AI-assisted mapping: <30 minutes for MIT
    - Target: 60-75% time reduction
 
-3. **Mapping Quality**:
+3.  **Mapping Quality**:
    - Average confidence score: ≥0.85
    - Completeness: <5% unmapped clauses
    - Human review time: <30 minutes per license
 
-4. **Usability**:
+4.  **Usability**:
    - Editor can complete workflow without technical help
    - Export valid JSON on first try
    - <5% error rate in mapping review process
@@ -711,6 +734,7 @@ CURRENT TAGS:
 ## Development Phases
 
 ### Week 1: Core Functionality
+
 - [ ] AI prompt engineering and testing
 - [ ] Basic HTML/JS interface for input
 - [ ] API integration (Anthropic Claude)
@@ -719,6 +743,7 @@ CURRENT TAGS:
 - [ ] JSON export
 
 ### Week 2: Refinement
+
 - [ ] Semantic tag review/edit UI
 - [ ] Bulk approve/reject actions
 - [ ] Edit mapping details modal
@@ -726,6 +751,7 @@ CURRENT TAGS:
 - [ ] Improved parsing for edge cases
 
 ### Week 3: Testing & Documentation
+
 - [ ] Create MIT mapping (validate)
 - [ ] Create MPL-2.0 mapping (complex test)
 - [ ] Create Elastic-2.0 mapping (source-available test)
@@ -736,7 +762,7 @@ CURRENT TAGS:
 
 ## Deliverables
 
-1. **Working Prototype**: https://mapper.plainlicense.org (or local HTML file)
+1. **Working Prototype**: <https://mapper.plainlicense.org> (or local HTML file)
 2. **Real Mappings**: `mappings.json` for MIT, MPL-2.0, Elastic-2.0
 3. **Lessons Learned Document**: Findings to inform CMS widget design
 4. **Refined Data Model**: Final JSON schema based on real usage
@@ -748,19 +774,19 @@ CURRENT TAGS:
 
 **Design Decisions Resolved**: See `mapping-specification.md` for 8 resolved technical decisions. Implementation questions below focus on AI prototype validation.
 
-1. **Clause Boundary Detection**: How does AI handle complex sentence structures?
+1.  **Clause Boundary Detection**: How does AI handle complex sentence structures?
    - Test with MPL-2.0 (has very long sentences with semicolons)
    - Validate AI follows sentence-level parsing rules from specification
 
-2. **Many-to-Many UI**: ✅ DECIDED - Side-by-side groups (Decision #5)
+2.  **Many-to-Many UI**: ✅ DECIDED - Side-by-side groups (Decision #5)
    - Prototype simple many-to-many (1 plain → 2 original)
    - Implement grouped display as specified in mapping-specification.md
 
-3. **Semantic Tag Taxonomy**: ✅ DECIDED - 9 core tags + `custom:` extensions (Decision #6)
+3.  **Semantic Tag Taxonomy**: ✅ DECIDED - 9 core tags + `custom:` extensions (Decision #6)
    - Use standard taxonomy from specification
    - Test AI's ability to suggest correct core tags
 
-4. **Hash Generation**: ✅ DECIDED - Full SHA-256 with markdown preserved (Decision #3)
+4.  **Hash Generation**: ✅ DECIDED - Full SHA-256 with markdown preserved (Decision #3)
    - Implement normalization rules from specification
    - Test hash stability across edits
 
@@ -769,18 +795,22 @@ CURRENT TAGS:
 ## Risk Mitigation
 
 ### Risk: AI Inaccuracy
+
 - **Mitigation**: Start with simple MIT license to validate
 - **Backup**: Manual mapping fallback if AI <70% accurate
 
 ### Risk: Prompt Token Limits
+
 - **Mitigation**: Split large licenses into sections
 - **Strategy**: Process permissions, warranty, conditions separately
 
 ### Risk: API Costs
+
 - **Mitigation**: Use Claude 3.5 Sonnet (~$0.50/license vs Opus $2/license)
 - **Budget**: $50 for 100 test iterations (generous)
 
 ### Risk: Complex Many-to-Many
+
 - **Mitigation**: Defer complex cases to manual review
 - **Note**: Flag for human attention, don't force AI mapping
 

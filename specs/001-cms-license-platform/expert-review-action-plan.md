@@ -9,11 +9,13 @@
 ## What Was Created
 
 ### 1. Phase 14 Testing Tasks (NEW)
+
 **File**: `phase14-testing-tasks.md`
 **Content**: 111 comprehensive testing tasks (T199-T309)
 **Effort**: 70-90 hours (25-30% of total project)
 
 **Task Breakdown**:
+
 - Test infrastructure setup (6 tasks)
 - User story 1-7 tests (65 tasks)
 - Success criteria validation (15 tasks)
@@ -24,15 +26,18 @@
 - Migration testing (4 tasks)
 
 **Coverage Targets**:
+
 - Unit tests: 80% line coverage
 - Integration tests: 70% coverage
 - E2E tests: 90% user story coverage
 - Success criteria: 100% automated validation
 
 ### 2. Non-Functional Requirements (NEW)
+
 **File**: `nfr-requirements.md`
 **Content**: 15 NFR requirements (FR-039 to FR-053)
 **Category Distribution**:
+
 - Performance: 3 requirements
 - Availability & Reliability: 2 requirements
 - Accessibility: 2 requirements
@@ -42,6 +47,7 @@
 - Scalability: 1 requirement
 
 **Priority**:
+
 - P1 (MVP): 13 requirements
 - P2: 2 requirements
 - P3 (Post-MVP): 1 requirement
@@ -51,16 +57,19 @@
 ## Critical Issues Resolved
 
 ### 🚨 BLOCKER #1: No Test Strategy (FIXED)
+
 **Impact**: Cannot validate 15 success criteria, regression risk EXTREME
 **Resolution**: Added Phase 14 with 111 test tasks covering all user stories and success criteria
 **Effort**: 70-90 hours
 
 ### 🚨 BLOCKER #2: Missing NFRs (FIXED)
+
 **Impact**: No performance, availability, accessibility guarantees
 **Resolution**: Added FR-039 to FR-053 covering all critical NFR categories
 **Effort**: 2-4 hours specification + implementation in existing tasks
 
 ### ⚠️ HIGH PRIORITY: Success Criteria Measurement (FIXED)
+
 **Impact**: Cannot objectively validate SC-001 to SC-015
 **Resolution**: Each NFR includes specific measurement methods and acceptance criteria
 **Example**: SC-002 now measured via Lighthouse CI + Cloudflare Web Analytics (FR-039)
@@ -76,6 +85,7 @@
 **Action**: Insert Phase 14 content from `phase14-testing-tasks.md`
 
 **Changes**:
+
 ```diff
 ## Phase 13: Polish & Cross-Cutting Concerns
 [Existing Phase 13 content...]
@@ -92,6 +102,7 @@
 ```
 
 **Updated Task Distribution**:
+
 ```markdown
 **Task Distribution by Phase**:
 - Setup + Starlight Overrides (Phase 1): 12 tasks
@@ -112,6 +123,7 @@
 **Action**: Insert NFR section from `nfr-requirements.md`
 
 **Changes**:
+
 ```diff
 #### Blog Functionality
 
@@ -136,6 +148,7 @@
 **Action**: Add measurement methods to each SC
 
 **Example Changes**:
+
 ```diff
 - **SC-002**: License pages load and display at-a-glance summary within 2 seconds for 95% of visitors
 + **SC-002**: License pages load and display at-a-glance summary within 2 seconds for 95% of visitors
@@ -159,6 +172,7 @@
 **Action**: Add testing framework information
 
 **Changes**:
+
 ```diff
 **Testing**: Vitest + @vitest/coverage-v8 (TypeScript), Playwright (E2E)
 + **Test Coverage Targets**: 80% unit, 70% integration, 90% E2E, 100% success criteria
@@ -174,6 +188,7 @@
 **Action**: Mark expert review completion and testing additions
 
 **Changes**:
+
 ```diff
 ## Current Phase: Phase 0 - Research
 
@@ -194,6 +209,7 @@
 ## Revised Project Metrics
 
 ### Before Expert Review:
+
 - **Total Tasks**: 202
 - **Specification Score**: 5.7/10
 - **Test Coverage**: 0% (no test tasks)
@@ -201,6 +217,7 @@
 - **Ready for Implementation**: ❌ NO
 
 ### After Integration:
+
 - **Total Tasks**: 313 (+111 testing tasks)
 - **Specification Score**: 8.5/10 (projected)
 - **Test Coverage**: 80%+ (comprehensive test strategy)
@@ -208,11 +225,14 @@
 - **Ready for Implementation**: ✅ YES (after integration)
 
 ### MVP Scope Impact:
+
 **Before**:
+
 - MVP Tasks: T001-T057 (59 tasks)
 - Estimated Effort: 15-20 business days
 
 **After**:
+
 - MVP Tasks: T001-T057 (implementation) + T199-T227 (US1-US2 tests) + T265-T279 (SC validation)
 - Estimated Effort: 25-30 business days (with testing)
 
@@ -223,6 +243,7 @@
 ## Implementation Timeline
 
 ### Week 1: Specification Integration (2-4 hours)
+
 - [ ] **Day 1**: Update tasks.md with Phase 14 content
 - [ ] **Day 1**: Update spec.md with NFR requirements
 - [ ] **Day 2**: Update success criteria with measurement methods
@@ -230,12 +251,14 @@
 - [ ] **Day 2**: Update PLANNING_STATUS.md with review completion
 
 ### Week 2: Critical Task Resolution (8-12 hours)
+
 - [ ] **T051a**: Design incremental export generation strategy
 - [ ] **T006a**: Verify Typst installation in Cloudflare Pages
 - [ ] **Auth Resolution**: Clarify Sveltia CMS + httpOnly cookie approach
 - [ ] **T093a-T093b**: Implement LLM conventional commits fallback
 
 ### Week 3-4: MVP Implementation Begins
+
 - [ ] **Phase 1**: Setup (T001-T008) - 1-2 days
 - [ ] **Phase 2**: Foundational (T009-T020) - 3-4 days
 - [ ] **Phase 3**: User Story 1 (T021-T037) - 4-5 days
@@ -252,6 +275,7 @@
 Before proceeding to implementation, verify:
 
 ### Specification Quality
+
 - [ ] All 313 tasks properly numbered and organized
 - [ ] All 15 NFRs properly integrated into spec.md
 - [ ] All 15 success criteria have measurement methods
@@ -259,6 +283,7 @@ Before proceeding to implementation, verify:
 - [ ] Traceability maintained (FR → US → Task → Test → SC)
 
 ### Architecture Decisions
+
 - [ ] Export scalability addressed (incremental builds)
 - [ ] Authentication approach clarified (Sveltia + OAuth)
 - [ ] LLM fallback strategy documented
@@ -266,6 +291,7 @@ Before proceeding to implementation, verify:
 - [ ] Dual version storage resolved (generated artifact)
 
 ### Test Coverage
+
 - [ ] All user stories have corresponding test tasks
 - [ ] All success criteria have validation tests
 - [ ] Performance tests cover SC-002, SC-004
@@ -273,6 +299,7 @@ Before proceeding to implementation, verify:
 - [ ] Accessibility tests cover WCAG 2.1 AA compliance
 
 ### Readiness Gates
+
 - [ ] Constitution check: Still passing (no violations introduced)
 - [ ] Specification score: Target 8.5/10 achieved
 - [ ] Critical blockers: All 4 blockers resolved
@@ -298,18 +325,21 @@ Before proceeding to implementation, verify:
 ## Next Steps
 
 ### Immediate (Today)
+
 1. Review `phase14-testing-tasks.md` and `nfr-requirements.md`
 2. Approve testing effort increase (70-90 hours)
 3. Approve extended MVP timeline (25-30 days)
 4. Decide: Integrate now OR defer some tests to post-MVP
 
 ### This Week
+
 1. Integrate Phase 14 into tasks.md
 2. Integrate NFRs into spec.md
 3. Update success criteria with measurement methods
 4. Resolve critical architecture decisions (scalability, auth, LLM fallback)
 
 ### Week 2+
+
 1. Begin Phase 1 implementation (Setup)
 2. Setup test infrastructure (T199-T204)
 3. Implement foundational features (Phase 2)
@@ -319,22 +349,22 @@ Before proceeding to implementation, verify:
 
 ## Questions for Decision
 
-1. **Testing Effort**: Are you comfortable with 70-90 hours of testing (25-30% of project)?
+1.  **Testing Effort**: Are you comfortable with 70-90 hours of testing (25-30% of project)?
    - Industry standard for quality software
    - Reduces long-term maintenance cost
    - Validates all 15 success criteria
 
-2. **MVP Timeline**: Accept extended timeline (25-30 days vs 15-20 days)?
+2.  **MVP Timeline**: Accept extended timeline (25-30 days vs 15-20 days)?
    - More realistic with testing
    - Reduces post-launch bug fixing
    - Delivers higher-quality MVP
 
-3. **Test Prioritization**: Implement all tests OR defer some to post-MVP?
+3.  **Test Prioritization**: Implement all tests OR defer some to post-MVP?
    - **Option A**: All tests with MVP (safest, slower)
    - **Option B**: Critical tests with MVP, nice-to-have tests post-MVP (faster, riskier)
    - **Recommendation**: Option A (test-driven development pays off)
 
-4. **NFR Implementation**: All NFRs in MVP OR phased approach?
+4.  **NFR Implementation**: All NFRs in MVP OR phased approach?
    - **P1 NFRs (13)**: Must implement in MVP
    - **P2 NFRs (2)**: Can defer to iteration 1
    - **P3 NFRs (1)**: Defer to future (scalability)
@@ -344,16 +374,19 @@ Before proceeding to implementation, verify:
 ## Success Metrics
 
 ### Specification Quality (Target: 8.5/10)
+
 - Requirements quality: 7/10 → 9/10 (NFRs added)
 - Testing strategy: 2/10 → 9/10 (Phase 14 added)
 - Architecture clarity: 7.5/10 → 8/10 (critical issues resolved)
 - Production readiness: 5.5/10 → 8.5/10 (monitoring, security added)
 
 ### Implementation Readiness
+
 - ❌ Before: NOT READY (critical gaps)
 - ✅ After: READY (comprehensive specification)
 
 ### Risk Level
+
 - 🔴 Before: HIGH (no tests, no NFRs)
 - 🟢 After: LOW (comprehensive quality assurance)
 
@@ -366,6 +399,7 @@ Before proceeding to implementation, verify:
 3. ✅ `expert-review-action-plan.md` - This integration guide
 
 **Total Additions**:
+
 - 111 testing tasks
 - 15 NFR requirements
 - Comprehensive measurement methods

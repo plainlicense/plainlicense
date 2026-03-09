@@ -11,6 +11,7 @@
 **Recommended Approach**: Build-time generation with GitHub Actions + GitHub Releases storage
 
 **Key Findings**:
+
 - ✅ GitHub Actions offers **unlimited build minutes** for public repositories
 - ✅ GitHub Releases provide **free permanent storage** (2 GB per file limit)
 - ✅ Pandoc with Typst engine generates PDFs **27x faster** than traditional LaTeX (~356ms per PDF)
@@ -24,18 +25,20 @@
 ### How It Works
 
 **Generation Pipeline**:
-1. MkDocs build hook triggers export generation (`on_pre_build`)
-2. Python script generates all formats in parallel:
+
+1.  MkDocs build hook triggers export generation (`on_pre_build`)
+2.  Python script generates all formats in parallel:
    - Markdown GFM/CommonMark: Direct Python conversion
    - Plaintext: Strip markdown formatting
    - PDF: Pandoc with Typst engine
    - SPDX XML: Template-based generation
    - Embed HTML: Minified HTML snippets
-3. Outputs stored in `/exports` directory
-4. Static site includes exports for direct download
-5. GitHub Actions uploads exports to GitHub Releases on version tags
+3.  Outputs stored in `/exports` directory
+4.  Static site includes exports for direct download
+5.  GitHub Actions uploads exports to GitHub Releases on version tags
 
 **Tools Stack**:
+
 - **Pandoc** (with Typst engine): Markdown → PDF conversion
 - **Python**: Markdown manipulation, SPDX XML generation
 - **MkDocs hooks**: Build-time orchestration
@@ -53,6 +56,7 @@
 ### Build Time Impact
 
 **Per-License Generation Time** (estimated):
+
 - Markdown GFM/CommonMark: <50ms (direct Python)
 - Plaintext: <20ms (strip formatting)
 - PDF (Pandoc + Typst): ~356ms ([benchmark source](https://slhck.info/software/2025/10/25/typst-pdf-generation-xelatex-alternative.html))
@@ -74,17 +78,20 @@
 ### Storage Strategy
 
 **Primary Distribution**: GitHub Releases
+
 - Permanent storage (no expiration)
 - No cost for unlimited downloads
 - Version-tagged releases (e.g., `v1.0.0` includes all exports)
 - CDN-backed via GitHub's infrastructure
 
 **Secondary Access**: Static Site Direct Downloads
+
 - Exports included in MkDocs `site/` directory
 - Served via existing hosting (Netlify/Vercel)
 - No additional storage costs
 
 **Workflow**:
+
 ```yaml
 # On tagged release (v*)
 1. Generate all exports
@@ -116,6 +123,7 @@
 **Low to Medium**
 
 **Required Changes**:
+
 1. Add Pandoc + Typst to GitHub Actions environment
 2. Create MkDocs hook for export generation
 3. Add Python export generation script
@@ -131,6 +139,7 @@
 ### How It Works
 
 **Alternative to Releases**:
+
 1. Generate exports in GitHub Actions workflow
 2. Upload as workflow artifacts
 3. Store artifacts for 90 days (GitHub default)
@@ -155,6 +164,7 @@ Same as Approach 1: All formats supported
 ### Storage
 
 **GitHub Actions Artifacts**:
+
 - 90-day retention by default
 - Not permanent (expires)
 - Accessible via GitHub API
@@ -184,6 +194,7 @@ Same as Approach 1: All formats supported
 ### How It Works
 
 **On-Demand Generation**:
+
 1. User requests PDF export
 2. Cloudflare Worker receives request
 3. Browser Rendering generates PDF from HTML
@@ -192,11 +203,13 @@ Same as Approach 1: All formats supported
 ### Cost
 
 **Free Tier Limits**:
+
 - **Workers Free Plan**: 10 minutes browser usage/day, 3 concurrent browsers ([source](https://developers.cloudflare.com/browser-rendering/))
 - **Workers Paid Plan**: 10 hours/month free, then $0.09/browser hour
 - **Estimated Usage**: ~1 second per PDF = **600 PDFs/day free**
 
 **Monthly Cost**:
+
 - If staying within free tier: **$0/month**
 - If exceeding (unlikely): ~$0.09/hour browser time
 
@@ -243,6 +256,7 @@ Same as Approach 1: All formats supported
 ### How It Works
 
 **Serverless PDF Generation**:
+
 1. User requests export
 2. Netlify Function executes
 3. Generate PDF (Playwright, Puppeteer, or Pandoc)
@@ -251,11 +265,13 @@ Same as Approach 1: All formats supported
 ### Cost
 
 **Free Tier Limits**:
+
 - **125,000 function invocations/month** ([source](https://www.freetiers.com/directory/netlify))
 - **100 GB bandwidth/month**
 - **300 build minutes/month**
 
 **Monthly Cost**:
+
 - Within free tier: **$0/month**
 - Estimated usage: ~10-100 PDFs/day = **300-3,000/month** (well within limits)
 
@@ -303,16 +319,19 @@ PDF generation can be resource-intensive and slow, especially with browser-based
 #### 1. **Pandoc + Typst (RECOMMENDED)**
 
 **Performance**:
+
 - **356ms per PDF** on average ([benchmark](https://slhck.info/software/2025/10/25/typst-pdf-generation-xelatex-alternative.html))
 - **27x faster than XeLaTeX** (traditional LaTeX engine)
 - **Consistent performance** across document sizes
 
 **Quality**:
+
 - LaTeX-quality typography
 - Professional appearance
 - CSS styling support via Typst
 
 **Setup**:
+
 - Single dependency: `pandoc` + `typst`
 - Available in GitHub Actions (`apt-get install pandoc typst`)
 - No external APIs or services
@@ -322,6 +341,7 @@ PDF generation can be resource-intensive and slow, especially with browser-based
 #### 2. **Pandoc + XeLaTeX**
 
 **Performance**:
+
 - **~9.6 seconds per PDF** ([benchmark](https://slhck.info/software/2025/10/25/typst-pdf-generation-xelatex-alternative.html))
 - 27x slower than Typst
 - Not practical for CI/CD builds
@@ -333,16 +353,19 @@ PDF generation can be resource-intensive and slow, especially with browser-based
 #### 3. **WeasyPrint**
 
 **Performance**:
+
 - Moderate speed (slower than Typst, faster than XeLaTeX)
 - HTML/CSS to PDF conversion
 - Python-native solution
 
 **Quality**:
+
 - Good HTML rendering
 - CSS paged media support
 - Professional output
 
 **Setup**:
+
 - Python library: `pip install weasyprint`
 - External dependencies: `cairo`, `pango`
 - Available in GitHub Actions
@@ -354,11 +377,13 @@ PDF generation can be resource-intensive and slow, especially with browser-based
 #### 4. **Playwright PDF (Build-Time)**
 
 **Performance**:
+
 - **1-3 seconds per PDF** (includes browser startup)
 - High quality (browser-native rendering)
 - Resource-intensive
 
 **Feasibility**: **Possible but slow**
+
 - GitHub Actions unlimited minutes (public repos)
 - Would add 10-30 seconds to builds (10 licenses)
 - Unnecessary given Typst's speed
@@ -368,11 +393,13 @@ PDF generation can be resource-intensive and slow, especially with browser-based
 #### 5. **Cloudflare Workers Browser Rendering**
 
 **Performance**:
+
 - **1-2 seconds per PDF** (after cold start)
 - **3-5 second cold start** latency
 - High quality
 
 **Cost**:
+
 - **FREE** (10 min/day = ~600 PDFs/day)
 - $0.09/hour beyond free tier
 
@@ -383,6 +410,7 @@ PDF generation can be resource-intensive and slow, especially with browser-based
 #### 6. **GitHub Actions with Playwright**
 
 **Performance**:
+
 - Same as Playwright (1-3s per PDF)
 - Adds 10-30 seconds to CI builds
 
@@ -393,17 +421,20 @@ PDF generation can be resource-intensive and slow, especially with browser-based
 ### Final PDF Recommendation
 
 **Primary**: **Pandoc + Typst** (build-time generation)
+
 - Fastest option (356ms per PDF)
 - FREE with no limits
 - Professional quality
 - Simple setup
 
 **Fallback**: **WeasyPrint** (if Typst styling insufficient)
+
 - Python-native
 - Good HTML/CSS support
 - Moderate speed
 
 **NOT RECOMMENDED**:
+
 - ❌ XeLaTeX (too slow: 9.6s per PDF)
 - ❌ Playwright build-time (unnecessary: 1-3s vs 356ms)
 - ❌ Cloudflare Workers (complexity, cold starts, single format only)
@@ -420,6 +451,7 @@ PDF generation can be resource-intensive and slow, especially with browser-based
 **Output**: `.md` file compatible with GitHub
 
 **Implementation**:
+
 ```python
 import markdown
 from markdown.extensions import fenced_code, tables, nl2br
@@ -436,6 +468,7 @@ gfm_output = md.convert(plain_license_content)
 **Output**: Strict CommonMark `.md`
 
 **Implementation**:
+
 ```bash
 pandoc input.md --from=markdown --to=commonmark -o output.md
 ```
@@ -448,6 +481,7 @@ pandoc input.md --from=markdown --to=commonmark -o output.md
 **Output**: `.txt` file with readable plain text
 
 **Implementation**:
+
 ```python
 import re
 
@@ -467,11 +501,13 @@ def markdown_to_plaintext(md_content):
 **Output**: Professional PDF with typography
 
 **Implementation**:
+
 ```bash
 pandoc input.md --pdf-engine=typst --standalone -o output.pdf
 ```
 
 **Styling**:
+
 ```typst
 // Custom Typst template for Plain License branding
 #set page(
@@ -490,6 +526,7 @@ pandoc input.md --pdf-engine=typst --standalone -o output.pdf
 **Output**: Valid SPDX XML conforming to official schema
 
 **Implementation**:
+
 ```python
 from xml.etree.ElementTree import Element, SubElement, tostring
 from xml.dom.minidom import parseString
@@ -517,6 +554,7 @@ def generate_spdx_xml(license_data):
 **Output**: Self-contained HTML embed code
 
 **Implementation**:
+
 ```python
 import htmlmin
 
@@ -556,17 +594,19 @@ def generate_embed_html(license_content):
 ### Phase 1: Core Export Generation (MVP)
 
 **Tasks**:
-1. Create `exports/` directory structure
-2. Implement Python export generation script
+
+1.  Create `exports/` directory structure
+2.  Implement Python export generation script
    - Markdown GFM/CommonMark conversion
    - Plaintext generation
    - SPDX XML templates
-3. Add MkDocs `on_pre_build` hook
-4. Test local generation
+3.  Add MkDocs `on_pre_build` hook
+4.  Test local generation
 
 **Time Estimate**: 2-3 hours
 
 **Deliverables**:
+
 - Working export generation for all non-PDF formats
 - MkDocs integration
 - Local testing validation
@@ -574,6 +614,7 @@ def generate_embed_html(license_content):
 ### Phase 2: PDF Generation with Typst
 
 **Tasks**:
+
 1. Install Pandoc + Typst in development environment
 2. Create custom Typst template for Plain License branding
 3. Integrate PDF generation into export script
@@ -582,6 +623,7 @@ def generate_embed_html(license_content):
 **Time Estimate**: 1-2 hours
 
 **Deliverables**:
+
 - Professional PDF generation
 - Custom styling
 - Performance validation
@@ -589,16 +631,18 @@ def generate_embed_html(license_content):
 ### Phase 3: GitHub Actions Integration
 
 **Tasks**:
-1. Update `.github/workflows/build.yml`:
+
+1.  Update `.github/workflows/build.yml`:
    - Install Pandoc + Typst
    - Run export generation
    - Upload exports to GitHub Releases (on tags)
-2. Test CI/CD pipeline
-3. Create release workflow documentation
+2.  Test CI/CD pipeline
+3.  Create release workflow documentation
 
 **Time Estimate**: 2-3 hours
 
 **Deliverables**:
+
 - Automated export generation in CI
 - GitHub Releases integration
 - Workflow documentation
@@ -606,6 +650,7 @@ def generate_embed_html(license_content):
 ### Phase 4: Site Integration & User Experience
 
 **Tasks**:
+
 1. Add download links to license pages
 2. Create exports landing page
 3. Add format descriptions and use cases
@@ -614,6 +659,7 @@ def generate_embed_html(license_content):
 **Time Estimate**: 1-2 hours
 
 **Deliverables**:
+
 - User-friendly download interface
 - Export documentation
 - Landing page
@@ -646,16 +692,19 @@ def generate_embed_html(license_content):
 ### Scalability Analysis
 
 **50 Licenses** (future growth):
+
 - Export generation: ~33 seconds (50 × 656ms)
 - Total build time: ~63-93 seconds
 - Still within acceptable CI limits (<2 minutes)
 
 **100 Licenses** (ambitious):
+
 - Export generation: ~66 seconds
 - Total build time: ~96-126 seconds (~1.5-2 minutes)
 - May require optimization (parallel Pandoc processes)
 
 **Optimization Strategy** (if needed):
+
 - Parallel Pandoc execution (4-8 workers)
 - Reduce to ~10-15 seconds for 100 licenses
 - Caching unchanged exports
@@ -667,12 +716,14 @@ def generate_embed_html(license_content):
 ### WeasyPrint vs Typst
 
 **WeasyPrint**:
+
 - ✅ HTML/CSS native support
 - ✅ Good for web-first designs
 - ⚠️ Slower than Typst (no direct benchmark)
 - ✅ Python-native (easier integration)
 
 **Typst**:
+
 - ✅ **27x faster than XeLaTeX** ([benchmark](https://slhck.info/software/2025/10/25/typst-pdf-generation-xelatex-alternative.html))
 - ✅ LaTeX-quality typography
 - ✅ Modern, actively developed
@@ -709,17 +760,17 @@ def generate_embed_html(license_content):
 
 ### Medium Risks ⚠️
 
-1. **Repository Size Growth**:
+1.  **Repository Size Growth**:
    - **Risk**: Exports stored in Git could bloat repo
    - **Mitigation**: Use `.gitignore` for `/exports` directory, only store in build artifacts and releases
    - **Impact**: Minimal (exports are small: ~10-50KB per license per format)
 
-2. **GitHub API Rate Limits** (release uploads):
+2.  **GitHub API Rate Limits** (release uploads):
    - **Risk**: Hitting GitHub API limits during release creation
    - **Mitigation**: Use official GitHub Actions (no rate limits for Actions)
    - **Impact**: Low (Actions have elevated permissions)
 
-3. **Pandoc/Typst Version Compatibility**:
+3.  **Pandoc/Typst Version Compatibility**:
    - **Risk**: Breaking changes in tool versions
    - **Mitigation**: Pin specific versions in GitHub Actions
    - **Impact**: Low (tools are stable)
@@ -753,28 +804,28 @@ def generate_embed_html(license_content):
 
 **Why This Is the Best FREE Solution**:
 
-1. **100% Free, Forever**:
+1.  **100% Free, Forever**:
    - GitHub Actions: Unlimited minutes (public repos) ([source](https://docs.github.com/en/actions/concepts/billing-and-usage))
    - GitHub Releases: Permanent free storage ([source](https://github.com/orgs/community/discussions/73875))
    - No hidden costs, no usage limits
 
-2. **Fast & Reliable**:
+2.  **Fast & Reliable**:
    - Pandoc + Typst: **27x faster than LaTeX** ([source](https://slhck.info/software/2025/10/25/typst-pdf-generation-xelatex-alternative.html))
    - Total build time: +6-10 seconds (acceptable for CI)
    - Proven GitHub infrastructure
 
-3. **Comprehensive Format Support**:
+3.  **Comprehensive Format Support**:
    - All 6 required formats in single pipeline
    - Professional quality output
    - Consistent generation
 
-4. **Excellent User Experience**:
+4.  **Excellent User Experience**:
    - Permanent storage (never expires)
    - CDN-backed downloads (fast global access)
    - Version-tagged releases
    - Direct links from site
 
-5. **Low Complexity**:
+5.  **Low Complexity**:
    - Single build pipeline
    - No external services
    - No API dependencies
@@ -800,30 +851,30 @@ def generate_embed_html(license_content):
 
 ## Next Steps
 
-1. **Prototype Export Script** (2 hours):
+1.  **Prototype Export Script** (2 hours):
    - Create Python script for all non-PDF formats
    - Test locally with existing licenses
 
-2. **Add PDF Generation** (1 hour):
+2.  **Add PDF Generation** (1 hour):
    - Install Pandoc + Typst locally
    - Create custom Typst template
    - Generate sample PDFs
 
-3. **Integrate with MkDocs** (1 hour):
+3.  **Integrate with MkDocs** (1 hour):
    - Add `on_pre_build` hook
    - Test full build pipeline
 
-4. **GitHub Actions Setup** (2 hours):
+4.  **GitHub Actions Setup** (2 hours):
    - Update workflow with Pandoc/Typst
    - Configure release upload
    - Test CI pipeline
 
-5. **User Interface** (2 hours):
+5.  **User Interface** (2 hours):
    - Add download links to site
    - Create exports landing page
    - Document usage
 
-6. **Testing & Validation** (2 hours):
+6.  **Testing & Validation** (2 hours):
    - Verify all formats
    - Performance benchmarking
    - User experience testing

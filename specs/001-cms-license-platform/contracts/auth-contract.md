@@ -25,6 +25,7 @@ CMS Editor Authenticated → Git Repository Access
 ```
 
 **Cost**: $0.00/month forever
+
 - Cloudflare Workers: 100K requests/day free (3M/month)
 - GitHub OAuth: Free
 - No database required: OAuth state in browser localStorage
@@ -36,6 +37,7 @@ CMS Editor Authenticated → Git Repository Access
 **Location**: GitHub → Settings → Developer settings → OAuth Apps → New OAuth App
 
 **Configuration**:
+
 ```
 Application name: Plain License CMS
 Homepage URL: https://plainlicense.org
@@ -47,6 +49,7 @@ Authorization callback URL: https://auth.plainlicense.org/callback
 ### 2. OAuth Scopes
 
 **Required Scopes**:
+
 - `public_repo`: Write access to public repositories
 - `read:user`: Read user profile (name, email for commit attribution)
 
@@ -61,11 +64,13 @@ GitHub OAuth requires `CLIENT_SECRET` which cannot be exposed in static CMS. The
 ### Worker Architecture
 
 **Endpoints**:
+
 1. `/auth` - Initiate OAuth flow
 2. `/callback` - OAuth callback handler
 3. `/success` - Return access token to CMS
 
 **Flow**:
+
 ```
 User clicks "Login with GitHub" in CMS
     ↓
@@ -278,16 +283,16 @@ collections:
 
 **Permission Levels**:
 
-1. **Read Access** (No CMS Access):
+1.  **Read Access** (No CMS Access):
    - Can clone/fork repository
    - Cannot use CMS to edit (write permission required)
 
-2. **Write Access** (CMS Editor):
+2.  **Write Access** (CMS Editor):
    - Can login to CMS
    - Can create/edit/delete content
    - Commits attributed to GitHub user
 
-3. **Admin Access** (CMS Admin):
+3.  **Admin Access** (CMS Admin):
    - Full CMS access
    - Can configure CMS settings
    - Can manage other editors (via GitHub)
@@ -295,6 +300,7 @@ collections:
 ### Adding/Removing Editors
 
 **Add Editor**:
+
 ```
 GitHub Repository → Settings → Collaborators → Add people
 → Grant "Write" or "Admin" access
@@ -302,6 +308,7 @@ GitHub Repository → Settings → Collaborators → Add people
 ```
 
 **Remove Editor**:
+
 ```
 GitHub Repository → Settings → Collaborators → Remove
 → User can no longer login to CMS
@@ -323,22 +330,25 @@ GitHub Repository → Settings → Collaborators → Remove
 ### Threat Model
 
 **Attacks Prevented**:
+
 - ❌ **CLIENT_SECRET Exposure**: Secrets in Cloudflare Workers, not client
 - ❌ **CSRF**: GitHub OAuth includes state parameter validation
 - ❌ **Token Theft**: HTTPS + httpOnly cookies (if upgraded)
 - ❌ **Unauthorized Access**: GitHub repository permissions enforced
 
 **Mitigated Risks**:
+
 - ✅ **localStorage XSS Protection**: Token in localStorage protected by strict CSP Level 3 (nonce-based scripts only), 15-minute token expiration, secure refresh token rotation, and comprehensive input sanitization (FR-047, FR-048)
 - ⚠️ **Phishing**: Users could be tricked into authorizing malicious OAuth app (mitigated by user education and GitHub's OAuth app verification)
 
 ### localStorage Security Approach
 
 **Rationale for localStorage** (Production Approach):
-- Industry standard for Git-based static CMSs (Sveltia, Netlify CMS, Decap CMS)
-- Aligns with Sveltia CMS architecture and free tier constraints
-- Modern browser localStorage isolation provides origin-level security
-- XSS risks effectively mitigated through multi-layer defense:
+
+-   Industry standard for Git-based static CMSs (Sveltia, Netlify CMS, Decap CMS)
+-   Aligns with Sveltia CMS architecture and free tier constraints
+-   Modern browser localStorage isolation provides origin-level security
+-   XSS risks effectively mitigated through multi-layer defense:
   1. **CSP Level 3**: Nonce-based script execution prevents inline script injection
   2. **Token Lifecycle**: 15-minute access token expiration limits exposure window
   3. **Token Rotation**: Automatic refresh token rotation prevents long-term compromise
@@ -351,12 +361,14 @@ GitHub Repository → Settings → Collaborators → Remove
 ### Metrics
 
 **Authentication Flow**:
+
 - Initial OAuth: ~5-10 seconds (GitHub authorization page)
 - Subsequent logins: ~2-3 seconds (GitHub remembers authorization)
 - Token exchange: ~200-500ms (Worker → GitHub API)
 - Total CMS login: ~5 seconds average
 
 **Worker Performance**:
+
 - Cold start: ~10-50ms (Cloudflare Workers)
 - Warm execution: <10ms
 - Token exchange: ~200-500ms (network to GitHub)
@@ -364,11 +376,13 @@ GitHub Repository → Settings → Collaborators → Remove
 ### Limits
 
 **Cloudflare Workers Free Tier**:
+
 - 100,000 requests/day = 3,000,000/month ✅
 - Typical usage: ~10-50 requests/day (editor logins)
 - Plenty of headroom for growth
 
 **GitHub OAuth API**:
+
 - 5,000 requests/hour per OAuth app
 - Typical usage: <100 requests/day
 - No rate limit concerns
@@ -378,6 +392,7 @@ GitHub Repository → Settings → Collaborators → Remove
 ### OAuth Errors
 
 **User Denies Authorization**:
+
 ```
 GitHub redirects to: /callback?error=access_denied
 Worker response: "OAuth error: User denied authorization"
@@ -385,6 +400,7 @@ CMS: Display "Login failed, please try again"
 ```
 
 **Invalid CLIENT_SECRET**:
+
 ```
 GitHub API response: { error: "incorrect_client_credentials" }
 Worker response: 500 Internal Server Error
@@ -392,6 +408,7 @@ Action: Check Cloudflare Workers secrets configuration
 ```
 
 **Token Exchange Timeout**:
+
 ```
 Worker timeout after 30 seconds
 Response: 504 Gateway Timeout
@@ -401,6 +418,7 @@ CMS: Display "Login timed out, please try again"
 ### Worker Errors
 
 **Missing Environment Variables**:
+
 ```
 Worker startup check:
 if (!env.GITHUB_CLIENT_ID || !env.GITHUB_CLIENT_SECRET) {
@@ -409,6 +427,7 @@ if (!env.GITHUB_CLIENT_ID || !env.GITHUB_CLIENT_SECRET) {
 ```
 
 **CORS Issues**:
+
 ```
 Worker includes CORS headers for CMS origin:
 headers: {
@@ -422,6 +441,7 @@ headers: {
 ### Local Development
 
 **Worker Local Testing**:
+
 ```bash
 # Run worker locally with wrangler
 wrangler dev
@@ -433,6 +453,7 @@ wrangler dev
 ```
 
 **CMS Local Testing**:
+
 ```bash
 # Update config.yml for local worker
 backend:
@@ -447,7 +468,8 @@ npm run dev
 ### Production Testing
 
 **Smoke Test** (After Deployment):
-1. Navigate to CMS: https://plainlicense.org/admin
+
+1. Navigate to CMS: <https://plainlicense.org/admin>
 2. Click "Login with GitHub"
 3. Authorize app (if first time)
 4. Verify successful authentication
@@ -466,6 +488,7 @@ npm run dev
 ### Cloudflare Analytics
 
 **Available Metrics** (Free):
+
 - Total requests
 - Success rate (2xx responses)
 - Error rate (4xx, 5xx responses)
@@ -479,6 +502,7 @@ npm run dev
 **Current**: No CMS (direct Git edits)
 
 **Migration**:
+
 1. **Setup OAuth**: Register GitHub OAuth App
 2. **Deploy Worker**: Deploy Cloudflare Worker with secrets
 3. **Configure CMS**: Update Sveltia CMS config.yml
@@ -497,6 +521,7 @@ npm run dev
 | **TOTAL** | **$0.00** |
 
 **vs. Alternatives**:
+
 - Auth0: $300/month × 60 months = $18,000
 - Paid CMS Auth: $50-100/month × 60 months = $3,000-$6,000
 - **Savings**: $18,000 over 5 years
@@ -506,6 +531,7 @@ npm run dev
 **Goal**: Non-technical editor can login and start editing in <30 seconds
 
 **Login Time Breakdown**:
+
 1. Navigate to CMS: ~5 seconds
 2. Click "Login with GitHub": ~1 second
 3. GitHub OAuth (if already authorized): ~2-3 seconds
@@ -521,7 +547,7 @@ npm run dev
 
 ## References
 
-- GitHub OAuth: https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps
-- Cloudflare Workers: https://developers.cloudflare.com/workers/
-- Sveltia CMS Backend: https://github.com/sveltia/sveltia-cms/blob/main/docs/backends.md
-- Decap OAuth Proxy Pattern: https://github.com/sterlingwes/decap-proxy
+- GitHub OAuth: <https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps>
+- Cloudflare Workers: <https://developers.cloudflare.com/workers/>
+- Sveltia CMS Backend: <https://github.com/sveltia/sveltia-cms/blob/main/docs/backends.md>
+- Decap OAuth Proxy Pattern: <https://github.com/sterlingwes/decap-proxy>

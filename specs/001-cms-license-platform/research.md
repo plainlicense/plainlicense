@@ -15,6 +15,7 @@ This document resolves all NEEDS CLARIFICATION items from the Technical Context 
 **Decision**: **Directus (self-hosted)** with **CloudCannon** as premium alternative
 
 **Rationale**:
+
 - Directus is free for organizations <$5M revenue (Plain License qualifies)
 - No artificial content entry limits (vs Strapi Cloud 500 entries, Contentful 25 models)
 - Excellent visual editing UX with content versioning and draft/publish workflows
@@ -23,12 +24,14 @@ This document resolves all NEEDS CLARIFICATION items from the Technical Context 
 - Cost: $10-20/month VPS hosting (vs CloudCannon $55-300/month)
 
 **Integration Approach**:
+
 - Self-host Directus on VPS with PostgreSQL/MySQL
 - Create Python hook (`overrides/hooks/directus_integration.py`) to fetch content via REST/GraphQL API
 - Generate markdown files during MkDocs build
 - Webhook from Directus → GitHub Actions → Rebuild site
 
 **Alternatives Considered**:
+
 - **CloudCannon**: Best MkDocs integration but no free tier ($55+/month)
 - **Strapi Cloud**: Free tier too restrictive (500 entries)
 - **Contentful**: Severe free tier restrictions (25 models, personal use only)
@@ -47,6 +50,7 @@ This document resolves all NEEDS CLARIFICATION items from the Technical Context 
 **Decision**: **Database-backed (PostgreSQL with Directus)**
 
 **Rationale**:
+
 - Directus uses PostgreSQL/MySQL for structured content storage
 - Native content versioning and draft/publish workflows
 - Better performance for complex queries and relationships
@@ -54,12 +58,14 @@ This document resolves all NEEDS CLARIFICATION items from the Technical Context 
 - Content migration: One-time import from current `packages/` markdown to Directus
 
 **Implementation**:
+
 - PostgreSQL database hosted on same VPS as Directus
 - Database size estimate: <100MB for dozens of licenses + blog
 - Automated daily backups to object storage (DigitalOcean Spaces/S3)
 - Version control: Directus native versioning + database snapshots
 
 **Migration Strategy**:
+
 - Parse existing markdown files in `packages/` directories
 - Extract frontmatter and content
 - Import via Directus API or bulk SQL import
@@ -76,17 +82,20 @@ This document resolves all NEEDS CLARIFICATION items from the Technical Context 
 **Decision**: **pytest (Python) + Vitest (TypeScript) + Playwright (E2E)**
 
 **Rationale**:
+
 - **pytest**: Industry standard for Python, excellent MkDocs hook testing support
 - **Vitest**: 10-20× faster than Jest for TypeScript in 2026, native ESM support
 - **Playwright**: Already available for PDF generation, reuse for E2E tests
 
 **Coverage Goals** (realistic for documentation sites):
+
 - Python hooks: 80% (core business logic)
 - TypeScript: 70% (animations harder to test)
 - Build validation: 90% (critical asset checks)
 - E2E scenarios: 5-10 critical user flows
 
 **Test Structure**:
+
 ```
 tests/
 ├── unit/           # pytest for Python, Vitest for TypeScript
@@ -96,12 +105,14 @@ tests/
 ```
 
 **CI/CD Integration**:
+
 - GitHub Actions matrix testing (Python 3.10-3.12, Node 20-22)
 - Coverage reporting with pytest-cov and @vitest/coverage-v8
 - Target: <10 minute pipeline duration
 - Coverage badges on PR comments
 
 **Key Tools**:
+
 - mkdocs-test framework for MkDocs integration testing
 - RxJS marble testing for Observable streams
 - jsdom for GSAP browser API support
@@ -118,33 +129,39 @@ tests/
 **Decision**: **SHA-256 content hashing with CSS Custom Highlight API**
 
 **Section Identification**:
+
 - Primary: SHA-256 hash of normalized section content (automatic, survives minor edits)
 - Override: Manual `data-section="custom-id"` attributes for stability
 - Hybrid approach balances automation with editorial control
 
 **Data Model**:
+
 - Graph structure stored in `packages/{license}/mappings.json`
 - Supports one-to-one, one-to-many, many-to-one, many-to-many relationships
 - Includes confidence levels and editorial metadata
 
 **Interactive Rendering**:
+
 - CSS Custom Highlight API (500× faster than DOM manipulation)
 - Graceful degradation for older browsers (DOM wrapper fallback)
 - Performance target: <50ms for 10-section highlighting
 
 **Editor UX**:
+
 - Click-based selection interface (simple MVP)
 - Side-by-side plain vs original view
 - Local development server for creating mappings
 - Visual preview of highlights before saving
 
 **Mapping Preservation**:
+
 - Fuzzy matching algorithm detects broken mappings when content changes
 - Suggests migrations based on text similarity
 - Requires editorial review before applying migrations
 - Version control tracks mapping changes
 
 **Storage Format**:
+
 ```json
 {
   "mappings": [
@@ -160,6 +177,7 @@ tests/
 ```
 
 **Implementation Libraries**:
+
 - CSS Custom Highlight API (native browser API)
 - Fuzzy matching: Levenshtein distance for similarity scoring
 - Virtual scrolling for large documents
@@ -175,6 +193,7 @@ tests/
 **Decision**: **Hybrid Approach - Build-time (lightweight) + Publish-time (PDFs)**
 
 **Build-Time Generation** (Lightweight formats):
+
 - GitHub-flavored Markdown
 - Vanilla Markdown (CommonMark)
 - Plaintext
@@ -185,30 +204,35 @@ tests/
 - **Duration**: <5 seconds for all static formats
 
 **Publish-Time PDF Generation** (Resource-intensive):
+
 - Playwright headless browser PDF generation
 - **Architecture**: CMS Webhook → API Gateway → SQS Queue → Lambda (Playwright) → S3 → CDN
 - **Async processing**: Prevents timeout issues, decouples from build
 - **Duration**: <30 seconds per PDF (doesn't block users)
 
 **Cache Strategy**:
+
 - **Content hash fingerprinting**: `MIT.a3f7b9.md` instead of query strings
 - **Long TTL**: 1 year for immutable hashed exports (`Cache-Control: public, max-age=31536000, immutable`)
 - **Multi-layer caching**: Browser → CDN Edge → Origin
 - **Invalidation**: Version-based CDN purge using manifest mapping
 
 **Storage**:
+
 - Object storage: DigitalOcean Spaces or AWS S3 ($5-20/month)
 - Integrated CDN for global distribution
 - **Structure**: `s3://plainlicense-exports/{license}/v{version}/{license}.{hash}.{ext}`
 - Version symlinks: `latest/` → current version
 
 **Technology Stack**:
+
 - **Markdown conversion**: Pandoc (supports all required formats)
 - **PDF generation**: Playwright on AWS Lambda (ARM64 for cost)
 - **Queueing**: AWS SQS (native Lambda integration)
 - **CDN**: Integrated with object storage
 
 **Performance Targets** (from spec):
+
 - ✅ Page load: <2 seconds (pre-generated static exports)
 - ✅ Download success: 98% (CDN redundancy)
 - ✅ Build time impact: +5-10 seconds for static formats
@@ -224,6 +248,7 @@ tests/
 **Decision**: **Cloudflare Pages**
 
 **Rationale**:
+
 - **Unlimited bandwidth** on free tier (vs 100GB limits on GitHub Pages/Vercel)
 - **Superior CDN performance**: 300+ data center locations (2× competitors)
 - **Serverless functions**: 100K requests/day on free tier (for magic link authentication)
@@ -242,11 +267,13 @@ tests/
 | MkDocs Guide | ✅ Yes | ✅ Yes | Manual setup |
 
 **CMS Backend Hosting**:
+
 - **Directus**: Separate VPS hosting ($10-20/month)
 - Not on same platform (static site vs app server)
 - Webhook integration: Directus → Cloudflare Pages rebuild
 
 **Migration**:
+
 - Connect GitHub repo to Cloudflare Pages
 - Configure build settings (existing `bun run build`)
 - Set up custom domain with automatic SSL
@@ -265,12 +292,14 @@ tests/
 **Decision**: **Build-time generation with browser pooling**
 
 **Legal Document Standards**:
+
 - **Page size**: Letter (8.5" × 11") for US legal documents
 - **Margins**: 1-inch on all sides
 - **Typography**: 12pt serif fonts (Times New Roman), 1.5 line spacing
 - **Alignment**: Left-aligned, right-justified
 
 **PDF Configuration**:
+
 ```typescript
 await page.pdf({
   path: outputPath,
@@ -285,21 +314,25 @@ await page.pdf({
 ```
 
 **Font Embedding**:
+
 - Use local WOFF2 files for reliability
 - Wait for fonts: `await page.evaluate(() => document.fonts.ready)`
 - Base64 data URLs for header/footer fonts if needed
 
 **Table of Contents**:
+
 - **Limitation**: Playwright lacks native PDF bookmark support
 - **Solution**: Generate HTML-based TOC as part of content
 - **Alternative**: Post-processing with pdf-lib (limited bookmark support)
 
 **Performance Optimization**:
+
 - **Browser instance pooling**: 3-5 reusable browser instances
 - **Parallel generation**: 10 licenses in 5-12 seconds with 3 workers
 - **Build-time vs publish-time**: Build-time for static assets, publish-time for async queue
 
 **CSS Print Optimization**:
+
 ```css
 @media print {
   @page { size: letter; margin: 1in; }
@@ -310,6 +343,7 @@ await page.pdf({
 ```
 
 **Integration**:
+
 - Add `src/pdf/generator.ts` with `LicensePDFGenerator` class
 - Extend build pipeline: `bun run build:pdf`
 - Lambda function for publish-time async generation
@@ -325,6 +359,7 @@ await page.pdf({
 **Decision**: **OAuth 2.0 (GitHub/Google) + Passwordless Magic Links with JWT**
 
 **OAuth Implementation**:
+
 - **Providers**: GitHub and Google OAuth 2.0
 - **Flow**: Authorization Code Grant with PKCE
 - **Scopes**: Minimal (user:email for GitHub, profile+email for Google)
@@ -332,6 +367,7 @@ await page.pdf({
 - **Alternative**: Directus built-in OAuth support
 
 **Magic Link Security**:
+
 - **Token generation**: Cryptographically secure (crypto.randomBytes(32))
 - **Expiration**: 10-15 minutes maximum
 - **One-time use**: Invalidate immediately after verification
@@ -339,17 +375,20 @@ await page.pdf({
 - **Email validation**: Verify email before sending link
 
 **JWT Token Strategy**:
+
 - **Access tokens**: 15-minute expiration, RS256 algorithm (asymmetric)
 - **Refresh tokens**: 7-day expiration, opaque tokens (not JWT)
 - **Storage**: httpOnly, secure cookies (prevents XSS)
 - **Claims**: Minimal payload (user ID, role, expiration)
 
 **Session Management**:
+
 - **Regenerate session** after successful authentication (prevents session fixation)
 - **Hybrid approach**: Sessions mint new JWTs before expiration
 - **Instant revocation**: Session invalidation for security events
 
 **Role-Based Access Control (RBAC)**:
+
 ```typescript
 enum UserRole {
   VIEWER = 'viewer',    // Read-only
@@ -359,6 +398,7 @@ enum UserRole {
 ```
 
 **Security Measures**:
+
 - **CSRF protection**: Synchronizer token pattern on state-changing requests
 - **XSS prevention**: Input sanitization, Content Security Policy headers
 - **Session fixation**: Regenerate session ID after authentication
@@ -366,6 +406,7 @@ enum UserRole {
 - **HTTPS only**: Secure flag on all cookies
 
 **Security Headers**:
+
 ```typescript
 {
   'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline'",
@@ -376,12 +417,14 @@ enum UserRole {
 ```
 
 **Directus Integration**:
+
 - Native OAuth providers configured in Directus admin
 - Magic link via @magicdx/auth extension
 - Role mapping between app roles and Directus roles
 - API tokens for CMS access from frontend
 
 **Implementation Roadmap**:
+
 - **Phase 1**: OAuth setup (GitHub, Google)
 - **Phase 2**: Magic links + security hardening
 - **Phase 3**: RBAC + CMS integration
@@ -396,11 +439,13 @@ enum UserRole {
 **Phase 0 Status**: ✅ **COMPLETED** - All 8 research tasks finished
 
 **Execution Approach**:
+
 - Dispatched 7 parallel research agents for independent tasks
 - Tasks 1-8 all moved from PENDING to COMPLETED
 - Total research time: ~40 minutes (parallel execution)
 
 **Key Architectural Decisions Made**:
+
 1. **CMS**: Directus (self-hosted) - Free, no limits, excellent UX
 2. **Storage**: PostgreSQL database with Directus - Structured, versioned
 3. **Testing**: pytest + Vitest + Playwright - Modern, fast, comprehensive

@@ -11,6 +11,7 @@
 This proposal presents a comprehensive technical design for implementing section mapping between Plain License's plain language text and original license text. The system enables editors to create relationships between sections, then renders these as interactive highlights for visitors.
 
 **Key Design Decisions**:
+
 - **Content-hash based stable IDs** for section identification (resilient to minor edits)
 - **Graph-structured JSON mapping** for flexible relationship types
 - **Separate mapping files** stored alongside license packages
@@ -35,6 +36,7 @@ interface SectionIdentifier {
 ```
 
 **Algorithm**:
+
 ```typescript
 function generateSectionId(element: HTMLElement): string {
   // Normalize content (lowercase, trim whitespace, remove punctuation)
@@ -56,6 +58,7 @@ function generateSectionId(element: HTMLElement): string {
 ```
 
 **Why This Approach**:
+
 - ✅ Survives minor content edits (punctuation, whitespace changes)
 - ✅ Human-readable when using semantic markers
 - ✅ Deterministic across builds
@@ -71,6 +74,7 @@ For critical sections requiring stability through major rewrites:
 ```
 
 **Trade-offs**:
+
 - ✅ Completely stable regardless of content changes
 - ✅ Editor-controlled identifiers
 - ❌ Requires manual maintenance
@@ -85,6 +89,7 @@ For critical sections requiring stability through major rewrites:
 ### 2.1 Graph-Based Relationship Model
 
 **JSON Schema**:
+
 ```json
 {
   "licenseId": "MIT",
@@ -122,12 +127,14 @@ For critical sections requiring stability through major rewrites:
 ```
 
 **Relationship Types**:
+
 - `one-to-one`: Single plain section maps to single original section
 - `one-to-many`: Single plain section covers multiple original clauses
 - `many-to-one`: Multiple plain sections explain single original clause
 - `many-to-many`: Complex cross-references (rare, but supported)
 
 **Confidence Levels**:
+
 - `high`: Direct semantic equivalence, minimal interpretation
 - `medium`: Interpretive mapping, plain language expansion
 - `low`: Loose connection, supplementary information
@@ -169,6 +176,7 @@ interface LicenseMappings {
 **Location**: `packages/{license-name}/mappings.json`
 
 **Rationale**:
+
 - ✅ Clean separation of content and metadata
 - ✅ Easy version control and diffs
 - ✅ No impact on existing license frontmatter
@@ -176,6 +184,7 @@ interface LicenseMappings {
 - ✅ Easy to programmatically update/validate
 
 **Integration with Build System**:
+
 ```typescript
 // In license_factory.py or equivalent
 function loadLicenseMappings(licenseId: string): LicenseMappings | null {
@@ -204,6 +213,7 @@ section_mappings:
 ```
 
 **Trade-offs**:
+
 - ✅ Single-file simplicity
 - ❌ Clutters license frontmatter
 - ❌ Harder to maintain large mapping sets
@@ -265,6 +275,7 @@ function findBestMatch(
 ```
 
 **Migration Workflow**:
+
 1. Build system detects broken section IDs
 2. Auto-generates migration suggestions based on similarity
 3. Editor reviews suggestions via CLI tool or web UI
@@ -345,6 +356,7 @@ class HighlightRenderer {
 ```
 
 **Performance Benefits**:
+
 - ✅ No DOM manipulation (no wrapper elements)
 - ✅ No layout recalculation
 - ✅ Browser-native optimization
@@ -379,6 +391,7 @@ class FallbackHighlightRenderer {
 ```
 
 **Trade-offs**:
+
 - ✅ Works in all browsers
 - ❌ Modifies DOM structure
 - ❌ Triggers layout recalculation
@@ -418,6 +431,7 @@ function drawConnectionLine(connection: ConnectionLine): void {
 ```
 
 **Performance Optimization**:
+
 - Use `requestIdleCallback` to batch line rendering
 - Debounce on scroll events
 - Virtual scrolling for documents >100 sections
@@ -429,6 +443,7 @@ function drawConnectionLine(connection: ConnectionLine): void {
 ### 6.1 Recommended: Click-Based Selection
 
 **Workflow**:
+
 1. Editor clicks "Create Mapping" button
 2. UI enters mapping mode (visual indicator)
 3. Editor clicks plain section (highlighted in blue)
@@ -438,6 +453,7 @@ function drawConnectionLine(connection: ConnectionLine): void {
 7. Mapping saved to `mappings.json`
 
 **UI Layout**:
+
 ```
 ┌────────────────────────────────────────────────────┐
 │ [Create Mapping] [Edit Mapping] [Delete Mapping]  │
@@ -459,11 +475,13 @@ function drawConnectionLine(connection: ConnectionLine): void {
 ### 6.2 Alternative: Drag-and-Drop Interface
 
 **Libraries**:
+
 - [DragDropAnnotate](https://github.com/AntoninoBonanno/DragDropAnnotate) - jQuery-based, image-focused
 - [Recogito Text Annotator](https://github.com/recogito/text-annotator-js) - Modern text annotation with relationships
 - Custom implementation with HTML5 Drag & Drop API
 
 **Trade-offs**:
+
 - ✅ More intuitive for complex mappings
 - ✅ Visual feedback during interaction
 - ❌ More complex implementation
@@ -476,13 +494,13 @@ function drawConnectionLine(connection: ConnectionLine): void {
 
 **Implementation Options**:
 
-1. **Build-Time Editor** (Recommended for MVP):
+1.  **Build-Time Editor** (Recommended for MVP):
    - Local web UI served by development server
    - Saves directly to `mappings.json` files
    - Committed to Git like other content
    - No authentication needed (trust-based for contributors)
 
-2. **Hosted Editor** (Future enhancement):
+2.  **Hosted Editor** (Future enhancement):
    - Web-based UI at `editor.plainlicense.org`
    - GitHub OAuth for authentication
    - Creates pull requests with mapping changes
@@ -497,12 +515,14 @@ function drawConnectionLine(connection: ConnectionLine): void {
 ### 7.1 Highlight-on-Hover
 
 **User Experience**:
+
 1. Visitor hovers over plain language section
 2. Corresponding original section(s) highlighted automatically
 3. Visual connection line appears (optional, can be distracting)
 4. Tooltip shows relationship type and confidence
 
 **Implementation**:
+
 ```typescript
 class InteractiveMapping {
   private mappings: LicenseMappings;
@@ -555,6 +575,7 @@ handleClick(event: MouseEvent): void {
 ### 7.3 Toggle Controls
 
 **UI Controls**:
+
 - "Show Mappings" toggle (on/off)
 - Filter by relationship type (one-to-one, many-to-one, etc.)
 - Filter by confidence level (high, medium, low)
@@ -568,7 +589,8 @@ handleClick(event: MouseEvent): void {
 
 **Strategies**:
 
-1. **Virtual Scrolling**: Only render highlights for visible sections
+1.  **Virtual Scrolling**: Only render highlights for visible sections
+
    ```typescript
    class VirtualHighlightManager {
      private observer: IntersectionObserver;
@@ -592,14 +614,16 @@ handleClick(event: MouseEvent): void {
    }
    ```
 
-2. **Debounced Rendering**: Delay highlight updates on rapid interactions
+2.  **Debounced Rendering**: Delay highlight updates on rapid interactions
+
    ```typescript
    const debouncedHighlight = debounce((sectionId: string) => {
      this.renderHighlights(sectionId);
    }, 150);
    ```
 
-3. **Range Caching**: Pre-compute text ranges at page load
+3.  **Range Caching**: Pre-compute text ranges at page load
+
    ```typescript
    class RangeCache {
      private cache: Map<string, Range[]> = new Map();
@@ -620,12 +644,14 @@ handleClick(event: MouseEvent): void {
 ### 8.2 Benchmark Targets
 
 **Performance Goals**:
+
 - Initial page load: <100ms additional overhead
 - Hover response: <16ms (60fps)
 - Highlight rendering: <50ms for 10 sections
 - Memory usage: <5MB for 50 mappings
 
 **Testing Strategy**:
+
 - Use Chrome DevTools Performance profiler
 - Test with MIT License (~150 lines) and MPL 2.0 (~400 lines)
 - Measure on low-end devices (throttled CPU)
@@ -638,20 +664,20 @@ handleClick(event: MouseEvent): void {
 
 **Research Findings**:
 
-1. **[Recogito Text Annotator](https://github.com/recogito/text-annotator-js)** (BSD-3-Clause)
+1.  **[Recogito Text Annotator](https://github.com/recogito/text-annotator-js)** (BSD-3-Clause)
    - Modern TypeScript library for web text annotation
    - Supports relationships between annotations
    - Built-in UI for creating/managing annotations
    - **Evaluation**: Strong candidate for editor interface
    - **Limitation**: Annotation data stored in memory, need custom persistence
 
-2. **[Annotator.js](http://annotatorjs.org/)** (MIT)
+2.  **[Annotator.js](http://annotatorjs.org/)** (MIT)
    - Established library used by Hypothes.is, edX
    - Plugin architecture for extensibility
    - **Evaluation**: Mature but older codebase
    - **Limitation**: jQuery dependency, less active development
 
-3. **[Hypothes.is](https://web.hypothes.is/)** (BSD-2-Clause)
+3.  **[Hypothes.is](https://web.hypothes.is/)** (BSD-2-Clause)
    - Full annotation platform with server component
    - Focuses on collaborative annotation and discussion
    - **Evaluation**: Too heavyweight for Plain License needs
@@ -661,19 +687,19 @@ handleClick(event: MouseEvent): void {
 
 **Research Findings**:
 
-1. **[react-diff-viewer](https://www.npmjs.com/package/react-diff-viewer)** (MIT)
+1.  **[react-diff-viewer](https://www.npmjs.com/package/react-diff-viewer)** (MIT)
    - React component for side-by-side text comparison
    - Split view, inline view, word-level highlighting
    - **Evaluation**: Good for visual comparison UI
    - **Adaptation**: Could repurpose for license comparison view
 
-2. **[diff2html](https://github.com/rtfpessoa/diff2html)** (MIT)
+2.  **[diff2html](https://github.com/rtfpessoa/diff2html)** (MIT)
    - Generates HTML diff visualizations
    - Syntax highlighting support
    - **Evaluation**: Designed for code diffs, may need adaptation
    - **Use Case**: Could generate static comparison views
 
-3. **[Python difflib.HtmlDiff](https://docs.python.org/3/library/difflib.html)** (Python Standard Library)
+3.  **[Python difflib.HtmlDiff](https://docs.python.org/3/library/difflib.html)** (Python Standard Library)
    - Built-in Python library for HTML diff generation
    - Side-by-side comparison with highlighting
    - **Evaluation**: Could use in build pipeline
@@ -683,11 +709,11 @@ handleClick(event: MouseEvent): void {
 
 **Recommendations**:
 
-1. **JavaScript/TypeScript**:
+1.  **JavaScript/TypeScript**:
    - `crypto.subtle.digest()` (Web Crypto API, native)
    - [js-sha256](https://www.npmjs.com/package/js-sha256) (MIT) - Fallback for older browsers
 
-2. **Python**:
+2.  **Python**:
    - `hashlib.sha256()` (Standard library)
    - For build-time ID generation in `license_factory.py`
 
@@ -706,6 +732,7 @@ handleClick(event: MouseEvent): void {
 - [ ] Add `data-section` attributes to rendered HTML
 
 **Deliverables**:
+
 - `src/mapping/types.ts` - Type definitions
 - `src/mapping/section-id.ts` - ID generation logic
 - `overrides/hooks/mapping_processor.py` - Build integration
@@ -722,6 +749,7 @@ handleClick(event: MouseEvent): void {
 - [ ] Implement toggle controls (show/hide mappings)
 
 **Deliverables**:
+
 - `src/assets/javascripts/mapping/renderer.ts` - Highlight rendering
 - `src/assets/javascripts/mapping/interactions.ts` - User interactions
 - `src/assets/stylesheets/mapping.scss` - Highlight styles
@@ -738,6 +766,7 @@ handleClick(event: MouseEvent): void {
 - [ ] Add save functionality to update `mappings.json`
 
 **Deliverables**:
+
 - `src/editor/index.html` - Editor UI
 - `src/editor/editor.ts` - Editor logic
 - `overrides/hooks/editor_server.py` - Local dev server
@@ -753,6 +782,7 @@ handleClick(event: MouseEvent): void {
 - [ ] Add CI check for broken mappings
 
 **Deliverables**:
+
 - `src/mapping/migration.ts` - Migration logic
 - `scripts/check-mappings.py` - CI validation script
 - `scripts/migrate-mappings.py` - Interactive migration tool
@@ -770,6 +800,7 @@ handleClick(event: MouseEvent): void {
 - [ ] Write user documentation
 
 **Deliverables**:
+
 - Performance optimizations
 - Cross-browser testing report
 - Accessibility compliance report
@@ -914,10 +945,12 @@ describe('Performance', () => {
 ### 12.1 Content Security
 
 **Concerns**:
+
 - Malicious mapping data could inject unwanted highlights
 - Section IDs could be manipulated to confuse users
 
 **Mitigations**:
+
 - Validate `mappings.json` schema during build
 - Sanitize all section IDs (alphanumeric + hyphen only)
 - Use TypeScript strict mode for type safety
@@ -926,10 +959,12 @@ describe('Performance', () => {
 ### 12.2 Editor Access Control
 
 **Concerns**:
+
 - Unauthorized users modifying mappings
 - Conflicting edits from multiple editors
 
 **Mitigations**:
+
 - Local dev server only accessible on localhost
 - Production editor requires GitHub OAuth
 - Mapping changes submitted as pull requests
@@ -938,6 +973,7 @@ describe('Performance', () => {
 ### 12.3 Privacy
 
 **User Data**:
+
 - No personal data collected from visitors
 - No tracking of which mappings users interact with
 - All functionality client-side (no server requests)
@@ -949,12 +985,14 @@ describe('Performance', () => {
 ### 13.1 Keyboard Navigation
 
 **Requirements**:
+
 - Tab key navigates between sections
 - Enter/Space activates highlight
 - Escape clears highlights
 - Arrow keys navigate between related sections
 
 **Implementation**:
+
 ```typescript
 class KeyboardAccessibility {
   handleKeyDown(event: KeyboardEvent): void {
@@ -982,11 +1020,13 @@ class KeyboardAccessibility {
 ### 13.2 Screen Reader Support
 
 **Requirements**:
+
 - ARIA labels describe mapping relationships
 - Screen reader announces related sections on focus
 - Highlight state communicated verbally
 
 **Implementation**:
+
 ```html
 <div
   data-section="warranty-abc123"
@@ -1006,12 +1046,14 @@ class KeyboardAccessibility {
 ### 13.3 Visual Accessibility
 
 **Requirements**:
+
 - Sufficient color contrast (WCAG AA minimum)
 - Multiple visual indicators (color + border + icon)
 - Respects prefers-reduced-motion
 - High contrast mode support
 
 **Implementation**:
+
 ```css
 @media (prefers-reduced-motion: reduce) {
   ::highlight(plain-active) {
@@ -1222,6 +1264,7 @@ interface MappingWithDiff {
 This design provides a comprehensive, performant, and maintainable solution for section mapping in Plain License. The hybrid content-hashing approach balances stability with automation, while the graph-based mapping structure supports complex license relationships. The CSS Custom Highlight API ensures modern performance, and the click-based editor interface enables rapid mapping creation.
 
 Key strengths:
+
 - **Scalable**: Handles large documents efficiently
 - **Maintainable**: Separate mapping files, clear schema
 - **Accessible**: Keyboard navigation, screen reader support

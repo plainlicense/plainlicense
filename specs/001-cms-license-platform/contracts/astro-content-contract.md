@@ -160,6 +160,7 @@ const featured = license.data.featured;     // boolean (defaults to false)
 **Route**: `src/pages/licenses/[...slug].astro`
 
 **Slug Generation**:
+
 1. Filename without extension becomes slug
 2. `mit.md` → slug: `mit`
 3. `mpl-2-0.md` → slug: `mpl-2-0`
@@ -172,6 +173,7 @@ const featured = license.data.featured;     // boolean (defaults to false)
 **Route**: `src/pages/blog/[...slug].astro`
 
 **Slug Generation Options**:
+
 1. **Date + Slug**: Keep date in URL (SEO, uniqueness)
 2. **Slug Only**: Remove date from URL (cleaner, requires unique titles)
 
@@ -436,16 +438,19 @@ npm run preview
 ### Build-Time Validation
 
 **Schema Validation** (Zod):
+
 - Invalid frontmatter → Build fails with error
 - Missing required fields → Build fails with error
 - Type mismatches → Build fails with error
 
 **Content Validation**:
+
 - Broken internal links → Warning (configurable to block)
 - Missing images → Warning (configurable to block)
 - Invalid markdown → Build fails with parse error
 
 **Cross-Reference Validation**:
+
 - `has_mapping: true` but no mapping file → Warning
 - Mapping file but `has_mapping: false` → Warning
 - Invalid mapping JSON → Error (imported as module)
@@ -496,18 +501,21 @@ export const featuredLicenses = allLicenses.filter(l => l.data.featured);
 ### Build Errors
 
 **Invalid Schema**:
+
 ```
 [ERROR] [content] Invalid frontmatter in content/licenses/mit.md
   version: Expected string matching /^\d+\.\d+\.\d+$/, received "1.0"
 ```
 
 **Missing Collection**:
+
 ```
 [ERROR] [astro] Collection 'licenses' not found
   Did you forget to export it from src/content/config.ts?
 ```
 
 **Invalid Reference**:
+
 ```
 [WARN] [astro] License 'MIT' has has_mapping: true but mapping file not found
   Expected: content/mappings/MIT-mapping.json
@@ -516,6 +524,7 @@ export const featuredLicenses = allLicenses.filter(l => l.data.featured);
 ### Runtime Errors (Dev Only)
 
 Development server shows helpful errors:
+
 - Schema validation failures
 - Missing files
 - Broken imports
@@ -526,16 +535,19 @@ Production build fails fast on any error.
 ## Success Criteria
 
 ### Type Safety ✅
+
 - Frontmatter fields fully typed via Zod
 - TypeScript errors for invalid access
 - Autocomplete for all frontmatter fields
 
 ### Build Performance ✅
+
 - Full site rebuild: <30 seconds (20-25 licenses)
 - Incremental builds: <5 seconds (single file change)
 - Dev server hot reload: <1 second
 
 ### Content Validation ✅
+
 - Invalid content blocks build (fail-fast)
 - Clear error messages with file/line references
 - Pre-commit validation via Git hooks
@@ -548,7 +560,7 @@ Production build fails fast on any error.
 
 ## References
 
-- Astro Content Collections: https://docs.astro.build/en/guides/content-collections/
-- Zod Schema Validation: https://zod.dev/
-- Astro Routing: https://docs.astro.build/en/core-concepts/routing/
-- Vite Build Optimization: https://vitejs.dev/guide/build.html
+- Astro Content Collections: <https://docs.astro.build/en/guides/content-collections/>
+- Zod Schema Validation: <https://zod.dev/>
+- Astro Routing: <https://docs.astro.build/en/core-concepts/routing/>
+- Vite Build Optimization: <https://vitejs.dev/guide/build.html>

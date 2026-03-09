@@ -35,11 +35,12 @@ public/
 ## License Content Schema
 
 ### File Location
-- **Path**: `content/licenses/{license-id}.md`
-- **Naming**: Kebab-case, matches SPDX ID when possible
-  - `mit.md` (SPDX: MIT)
-  - `mpl-2-0.md` (SPDX: MPL-2.0)
-  - `elastic-2-0.md` (SPDX: Elastic-2.0)
+
+-   **Path**: `content/licenses/{license-id}.md`
+-   **Naming**: Kebab-case, matches SPDX ID when possible
+    - `mit.md` (SPDX: MIT)
+    - `mpl-2-0.md` (SPDX: MPL-2.0)
+    - `elastic-2-0.md` (SPDX: Elastic-2.0)
 
 ### Frontmatter Schema
 
@@ -96,6 +97,7 @@ featured: false                   # Featured on homepage
 ### Frontmatter Field Validation
 
 **Required Fields**:
+
 - `title` (string, 1-100 chars)
 - `spdx_id` (string, pattern: `^[A-Z0-9.-]+$` or `^custom-[a-z0-9-]+$`)
 - `version` (string, semantic version pattern: `^\d+\.\d+\.\d+$`)
@@ -106,9 +108,11 @@ featured: false                   # Featured on homepage
 - `is_fsf_approved` (boolean)
 
 **Optional Fields**:
+
 - All other fields are optional but recommended for completeness
 
 **Validation Rules**:
+
 1. `spdx_id` must be unique across all licenses
 2. `version` must follow semantic versioning
 3. If `fair_code: true`, then `license_type` must be `source-available`
@@ -117,9 +121,10 @@ featured: false                   # Featured on homepage
 ## Blog Post Schema
 
 ### File Location
-- **Path**: `content/blog/{date}-{slug}.md`
-- **Naming**: `YYYY-MM-DD-{kebab-case-title}.md`
-  - Example: `2026-01-30-introducing-plain-license.md`
+
+-   **Path**: `content/blog/{date}-{slug}.md`
+-   **Naming**: `YYYY-MM-DD-{kebab-case-title}.md`
+    - Example: `2026-01-30-introducing-plain-license.md`
 
 ### Frontmatter Schema
 
@@ -146,21 +151,25 @@ og_image: "/images/blog/post-og.png"
 ## Mapping Data Schema
 
 ### File Location
-- **Path**: `content/mappings/{spdx_id}-mapping.json`
-- **Naming**: Matches corresponding license file
-  - `mit-mapping.json` for `mit.md`
-  - `mpl-2-0-mapping.json` for `mpl-2-0.md`
+
+-   **Path**: `content/mappings/{spdx_id}-mapping.json`
+-   **Naming**: Matches corresponding license file
+    - `mit-mapping.json` for `mit.md`
+    - `mpl-2-0-mapping.json` for `mpl-2-0.md`
 
 ### Schema Reference
+
 See `mapping-schema.json` for complete JSON Schema.
 
 **Key Requirements**:
+
 1. Must validate against `mapping-schema.json`
 2. File must be valid JSON (no comments)
 3. `license_id` in mapping must match license `spdx_id`
 4. `version` in mapping must match Plain License system version (from `package.json`)
 
 ### Example Structure
+
 ```json
 {
   "license_id": "MIT",
@@ -257,22 +266,22 @@ CI/CD Build Trigger (Cloudflare Pages)
 
 ### Pre-Commit Validation (Git Hooks)
 
-1. **Frontmatter Validation**:
+1.  **Frontmatter Validation**:
    - All required fields present
    - Field types correct (string, boolean, array)
    - Patterns match (spdx_id, version)
 
-2. **File Structure Validation**:
+2.  **File Structure Validation**:
    - File in correct directory
    - Filename matches conventions
    - No duplicate `spdx_id` values
 
-3. **Mapping Validation**:
+3.  **Mapping Validation**:
    - If `has_mapping: true`, mapping file exists
    - Mapping JSON validates against schema
    - `license_id` in mapping matches license `spdx_id`
 
-4. **Markdown Validation**:
+4.  **Markdown Validation**:
    - Valid markdown syntax
    - No broken internal links
    - Images referenced exist
@@ -287,6 +296,7 @@ CI/CD Build Trigger (Cloudflare Pages)
 ## Migration from Current System
 
 ### Current System (MkDocs)
+
 ```
 packages/
 └── licenses/
@@ -297,6 +307,7 @@ packages/
 ```
 
 ### New System (Astro + Sveltia CMS)
+
 ```
 content/
 └── licenses/
@@ -317,6 +328,7 @@ public/
 ## Contract Guarantees
 
 ### CMS Guarantees (Sveltia CMS)
+
 - ✅ Content stored as markdown + YAML in Git
 - ✅ All edits create Git commits
 - ✅ Draft/publish workflow via Git branches
@@ -324,12 +336,14 @@ public/
 - ✅ Form validation before save
 
 ### Repository Guarantees (Git)
+
 - ✅ Content versioned with full history
 - ✅ Rollback capability via Git
 - ✅ Concurrent editing via branch workflow
 - ✅ Pre-commit hooks validate content
 
 ### Build System Guarantees (Astro)
+
 - ✅ Frontmatter validates against Zod schema
 - ✅ Invalid content blocks build
 - ✅ Type-safe access to frontmatter data
@@ -340,6 +354,7 @@ public/
 **Goal**: Non-technical editor can create/publish license in <30 minutes
 
 **Workflow Time Breakdown**:
+
 1. Login to CMS: ~30 seconds (GitHub OAuth)
 2. Create new license: ~5 seconds (click button)
 3. Fill required fields: ~2-3 minutes (11 required fields)
@@ -352,16 +367,19 @@ public/
 ## Error Handling
 
 ### CMS Validation Errors
+
 - **Missing Required Field**: Show inline error in form, block save
 - **Invalid Pattern**: Show regex error message, block save
 - **Duplicate spdx_id**: Check existing files, show error, block save
 
 ### Build Errors
+
 - **Invalid Frontmatter**: Build fails with clear error message referencing file and line
 - **Missing Mapping**: Build warning (not blocking) if `has_mapping: true` but file missing
 - **Invalid Mapping JSON**: Build fails with JSON parse error and file location
 
 ### Git Conflicts
+
 - **Concurrent Edits**: Sveltia CMS detects conflicts, prompts user to resolve
 - **Branch Cleanup**: Auto-delete merged branches after publish
 
@@ -373,7 +391,7 @@ public/
 
 ## References
 
-- Sveltia CMS Documentation: https://github.com/sveltia/sveltia-cms
-- Decap CMS Config: https://decapcms.org/docs/configuration-options/
-- SPDX License List: https://spdx.org/licenses/
-- Semantic Versioning: https://semver.org/
+- Sveltia CMS Documentation: <https://github.com/sveltia/sveltia-cms>
+- Decap CMS Config: <https://decapcms.org/docs/configuration-options/>
+- SPDX License List: <https://spdx.org/licenses/>
+- Semantic Versioning: <https://semver.org/>

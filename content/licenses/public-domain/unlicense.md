@@ -23,7 +23,6 @@ shame_words_count: 1
 ---
 # Plain Unlicense
 
-
 ## The Work is Everyone's Work - Use it Freely
 
 **You can do whatever you want with the work.**

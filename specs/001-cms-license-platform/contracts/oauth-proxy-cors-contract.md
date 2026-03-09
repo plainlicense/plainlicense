@@ -14,18 +14,21 @@ The OAuth proxy sits between Sveltia CMS (browser-based admin UI) and external O
 ## Allowed Origins
 
 ### Production Environment
+
 ```
 Origin: https://plainlicense.org/admin
 Status: ALLOWED
 ```
 
 ### Staging Environment
+
 ```
 Origin: https://staging.plainlicense.org/admin
 Status: ALLOWED
 ```
 
 ### Development Environment
+
 ```
 Origin: http://localhost:4321/admin
 Origin: http://127.0.0.1:4321/admin
@@ -33,6 +36,7 @@ Status: ALLOWED (development only)
 ```
 
 ### Rejected Origins
+
 ```
 All other origins: REJECTED with 403 Forbidden
 Examples:
@@ -48,6 +52,7 @@ Examples:
 ### Preflight Request (OPTIONS)
 
 **Request Headers**:
+
 ```http
 OPTIONS /oauth/callback HTTP/1.1
 Origin: https://plainlicense.org/admin
@@ -56,6 +61,7 @@ Access-Control-Request-Headers: Content-Type, Authorization
 ```
 
 **Response Headers**:
+
 ```http
 HTTP/1.1 204 No Content
 Access-Control-Allow-Origin: https://plainlicense.org/admin
@@ -69,6 +75,7 @@ Vary: Origin
 ### Actual Request (POST/GET)
 
 **Request Headers**:
+
 ```http
 POST /oauth/token HTTP/1.1
 Origin: https://plainlicense.org/admin
@@ -77,6 +84,7 @@ Authorization: Bearer <token>
 ```
 
 **Response Headers**:
+
 ```http
 HTTP/1.1 200 OK
 Access-Control-Allow-Origin: https://plainlicense.org/admin
@@ -92,6 +100,7 @@ Vary: Origin
 ### Origin Validation
 
 **Implementation**:
+
 ```typescript
 const ALLOWED_ORIGINS = [
   'https://plainlicense.org/admin',
@@ -117,6 +126,7 @@ function validateOrigin(request: Request): string | null {
 ```
 
 **Rejection Behavior**:
+
 - If origin not in allowlist: Return `403 Forbidden`
 - If no `Origin` header: Allow (same-origin request)
 - Log all rejected requests for security monitoring
@@ -124,6 +134,7 @@ function validateOrigin(request: Request): string | null {
 ### Rate Limiting
 
 **Per-Origin Limits**:
+
 ```yaml
 Rate Limit Configuration:
   Window: 60 seconds (1 minute)
@@ -139,6 +150,7 @@ Exceeded Limit Response:
 ```
 
 **Implementation**:
+
 ```typescript
 // Use Cloudflare Workers KV for distributed rate limiting
 const rateLimitKey = `ratelimit:${origin}:${Math.floor(Date.now() / 60000)}`;
@@ -161,6 +173,7 @@ await env.KV.put(rateLimitKey, String(requestCount + 1), { expirationTtl: 120 })
 ### Content Security Policy Integration
 
 **Worker Response Headers**:
+
 ```http
 Content-Security-Policy: default-src 'none'; script-src 'none'; frame-ancestors 'none'
 X-Content-Type-Options: nosniff
@@ -180,12 +193,14 @@ Strict-Transport-Security: max-age=31536000; includeSubDomains
 **Credentials**: Not required
 
 **Request**:
+
 ```http
 GET /oauth/authorize?provider=github&state=abc123 HTTP/1.1
 Origin: https://plainlicense.org/admin
 ```
 
 **Response**:
+
 ```http
 HTTP/1.1 302 Found
 Location: https://github.com/login/oauth/authorize?client_id=...
@@ -200,6 +215,7 @@ Access-Control-Allow-Origin: https://plainlicense.org/admin
 **Credentials**: Required
 
 **Request**:
+
 ```http
 POST /oauth/callback HTTP/1.1
 Origin: https://plainlicense.org/admin
@@ -213,6 +229,7 @@ Content-Type: application/json
 ```
 
 **Response**:
+
 ```http
 HTTP/1.1 200 OK
 Access-Control-Allow-Origin: https://plainlicense.org/admin
@@ -234,6 +251,7 @@ Content-Type: application/json
 **Credentials**: Required
 
 **Request**:
+
 ```http
 POST /oauth/refresh HTTP/1.1
 Origin: https://plainlicense.org/admin
@@ -242,6 +260,7 @@ Authorization: Bearer <refresh_token>
 ```
 
 **Response**:
+
 ```http
 HTTP/1.1 200 OK
 Access-Control-Allow-Origin: https://plainlicense.org/admin
@@ -261,6 +280,7 @@ Content-Type: application/json
 ### 403 Forbidden - Invalid Origin
 
 **Response**:
+
 ```http
 HTTP/1.1 403 Forbidden
 Content-Type: application/json
@@ -273,6 +293,7 @@ Content-Type: application/json
 ```
 
 **Logging**:
+
 ```json
 {
   "timestamp": "2026-01-30T12:34:56Z",
@@ -287,6 +308,7 @@ Content-Type: application/json
 ### 429 Too Many Requests
 
 **Response**:
+
 ```http
 HTTP/1.1 429 Too Many Requests
 Retry-After: 60
@@ -305,21 +327,22 @@ Content-Type: application/json
 
 ### Metrics to Track
 
-1. **CORS Violations**:
+1.  **CORS Violations**:
    - Count of rejected origins per hour
    - Alert if >10 rejections per hour (potential attack)
 
-2. **Rate Limit Hits**:
+2.  **Rate Limit Hits**:
    - Origins hitting rate limits
    - Alert if same origin hits limit >3 times per day
 
-3. **OAuth Flow Success Rate**:
+3.  **OAuth Flow Success Rate**:
    - Successful authorizations / total attempts
    - Alert if success rate <95%
 
 ### Cloudflare Workers Analytics
 
 **Custom Metrics**:
+
 ```typescript
 // Track CORS violations
 await env.ANALYTICS.writeDataPoint({

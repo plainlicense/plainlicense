@@ -1,14 +1,12 @@
 {
-  "description": "Plain language version of Elastic License 2.0",
-  "devDependencies": {
-    "@commitlint/cli": "^19.8.1",
-    "@semantic-release/changelog": "^6.0.3",
-    "@semantic-release/commit-analyzer": "^13.0.1",
-    "@semantic-release/git": "^10.0.1"
-  },
-  "main": "../../docs/licenses/source-available/elastic-2.0/index.md",
   "name": "plain-license-elastic-2.0",
+  "version": "0.1.0",
   "private": true,
+  "description": "Plain language version of Elastic License 2.0",
+  "main": "../../docs/licenses/source-available/elastic-2.0/index.md",
+  "scripts": {
+    "release": "semantic-release"
+  },
   "release": {
     "branches": [
       "+([0-9])?(.{+([0-9]),x}).x",
@@ -57,10 +55,14 @@
       [
         "@semantic-release/git",
         {
-          "assets": ["../changelogs/elastic-2.0.md"]
+          "assets": [
+            "../changelogs/elastic-2.0.md"
+          ]
         }
       ],
-      ["@semantic-release/release-notes-generator"],
+      [
+        "@semantic-release/release-notes-generator"
+      ],
       [
         "@semantic-release/github",
         {
@@ -74,8 +76,10 @@
       ]
     ]
   },
-  "scripts": {
-    "release": "semantic-release"
-  },
-  "version": "0.1.0"
+  "devDependencies": {
+    "@commitlint/cli": "^19.8.1",
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/commit-analyzer": "^13.0.1",
+    "@semantic-release/git": "^10.0.1"
+  }
 }

@@ -57,6 +57,7 @@ We offer the work "as is" with no warranties. We are not responsible for any dam
 ```
 
 **Zod Schema** (in `src/content/config.ts`):
+
 ```typescript
 const templateBlockSchema = z.object({
   id: z.string().regex(/^[a-z0-9-]+$/),  // kebab-case only
@@ -105,6 +106,7 @@ You are free to use, copy, modify, and distribute this work...
 **Format**: `{category}.{id}`
 
 **Examples**:
+
 ```yaml
 Valid References:
   - warranty.as-is
@@ -124,6 +126,7 @@ Invalid References:
 **Format**: `{{template:{category}.{id}}}`
 
 **Examples**:
+
 ```markdown
 ## Warranty
 
@@ -144,6 +147,7 @@ This will be replaced during build with the template block content:
 **Rule**: Referenced template MUST exist in `content/template-blocks/{category}/{id}.md`
 
 **Implementation**:
+
 ```typescript
 async function validateTemplateReferences(license: LicenseContent): Promise<ValidationResult> {
   const errors: ValidationError[] = [];
@@ -181,6 +185,7 @@ async function validateTemplateReferences(license: LicenseContent): Promise<Vali
 **Rule**: Category MUST be one of: `warranty`, `permission`, `condition`, `limitation`
 
 **CMS Configuration** (`public/admin/config.yml`):
+
 ```yaml
 collections:
   - name: licenses
@@ -199,6 +204,7 @@ collections:
 **Rule**: Insertion markers `{{template:{ref}}}` in content MUST match frontmatter references
 
 **Validation**:
+
 ```typescript
 function validateInsertionPoints(license: LicenseContent): ValidationResult {
   const frontmatterRefs = new Set(license.frontmatter.template_blocks);
@@ -227,6 +233,7 @@ function validateInsertionPoints(license: LicenseContent): ValidationResult {
 ### Template Injection
 
 **Step 1**: Load template blocks during Astro build
+
 ```typescript
 // src/utils/template-loader.ts
 export async function loadTemplateBlock(ref: string): Promise<string> {
@@ -243,6 +250,7 @@ export async function loadTemplateBlock(ref: string): Promise<string> {
 ```
 
 **Step 2**: Replace insertion markers in license content
+
 ```typescript
 // src/build/template-injector.ts
 export async function injectTemplates(licenseContent: string, refs: string[]): Promise<string> {
@@ -263,6 +271,7 @@ export async function injectTemplates(licenseContent: string, refs: string[]): P
 ```
 
 **Step 3**: Increment usage counter
+
 ```typescript
 async function incrementUsageCount(ref: string): Promise<void> {
   const [category, id] = ref.split('.');
@@ -284,6 +293,7 @@ async function incrementUsageCount(ref: string): Promise<void> {
 ### CMS Validation (Client-Side)
 
 **Missing Template Warning**:
+
 ```yaml
 Severity: ERROR (block save)
 Message: "Template 'warranty.as-is' not found. Please create it or remove the reference."
@@ -291,6 +301,7 @@ Action: Prevent save until resolved
 ```
 
 **Invalid Format Warning**:
+
 ```yaml
 Severity: ERROR (block save)
 Message: "Invalid template reference format: 'as-is'. Use '{category}.{id}' format."
@@ -300,6 +311,7 @@ Action: Prevent save until resolved
 ### Build-Time Validation (Server-Side)
 
 **Missing Template Error**:
+
 ```bash
 Error: Template injection failed for license 'MIT'
   Template 'warranty.as-is' not found at content/template-blocks/warranty/as-is.md
@@ -311,6 +323,7 @@ Build failed. Fix template references before deploying.
 ```
 
 **Graceful Degradation** (Optional, for preview environments):
+
 ```typescript
 // In preview mode only, replace missing templates with placeholder
 if (process.env.PREVIEW_MODE === 'true') {
@@ -328,6 +341,7 @@ if (process.env.PREVIEW_MODE === 'true') {
 ### Scenario 1: Rename Template ID
 
 **Before**:
+
 ```
 File: content/template-blocks/warranty/as-is.md
 ID: as-is
@@ -335,6 +349,7 @@ Used by: 12 licenses
 ```
 
 **After**:
+
 ```
 File: content/template-blocks/warranty/no-warranty.md
 ID: no-warranty
@@ -343,6 +358,7 @@ ID: no-warranty
 **Migration Process**:
 
 1. **Create migration manifest** (`migrations/rename-template.json`):
+
 ```json
 {
   "migration_id": "001-rename-as-is-to-no-warranty",
@@ -358,19 +374,22 @@ ID: no-warranty
 }
 ```
 
-2. **Run migration script**:
+1. **Run migration script**:
+
 ```bash
 bun run migrate:template-rename --manifest migrations/rename-template.json
 ```
 
 **Script behavior**:
+
 - Find all licenses referencing `warranty.as-is`
 - Update frontmatter: `warranty.as-is` → `warranty.no-warranty`
 - Update content markers: `{{template:warranty.as-is}}` → `{{template:warranty.no-warranty}}`
 - Create Git commit with all changes
 - Generate migration report
 
-3. **Validate migration**:
+1. **Validate migration**:
+
 ```bash
 bun run validate:templates
 # Checks: All template references valid, no broken links
@@ -379,17 +398,20 @@ bun run validate:templates
 ### Scenario 2: Merge Templates
 
 **Before**:
+
 ```
 warranty.as-is        (8 licenses)
 warranty.no-warranty  (4 licenses)
 ```
 
 **After**:
+
 ```
 warranty.as-is        (12 licenses, merged content)
 ```
 
 **Migration**:
+
 ```json
 {
   "migration_id": "002-merge-warranty-templates",
@@ -407,11 +429,13 @@ warranty.as-is        (12 licenses, merged content)
 ### Scenario 3: Split Template
 
 **Before**:
+
 ```
 permission.use-distribute  (covers both use and distribution)
 ```
 
 **After**:
+
 ```
 permission.use
 permission.distribute
@@ -530,12 +554,14 @@ collections:
 ### Usage Tracking
 
 **Metrics to track**:
+
 1. Template block usage count (in frontmatter)
 2. Most/least used templates
 3. Orphaned templates (usage_count = 0)
 4. Template reference errors during build
 
 **Dashboard Query**:
+
 ```sql
 -- Most used templates
 SELECT id, category, title, usage_count

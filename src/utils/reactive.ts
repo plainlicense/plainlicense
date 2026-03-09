@@ -1,5 +1,4 @@
-import { gsap } from 'gsap';
-import { BehaviorSubject, fromEvent } from 'rxjs';
+import { BehaviorSubject, fromEvent } from 'rxjs'
 
 /**
  * Shared GSAP defaults for consistent animation quality.

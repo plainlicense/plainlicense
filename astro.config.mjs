@@ -9,9 +9,11 @@ import { readdirSync, statSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import starlightAutoDrafts from 'starlight-auto-drafts';
+import starlightBlog from 'starlight-blog';
 import starlightContextualMenu from 'starlight-contextual-menu';
 import starlightHeadingBadges from 'starlight-heading-badges';
 import starlightLLMsTxt from 'starlight-llms-txt';
+import starlightScrollToTop from 'starlight-scroll-to-top';
 import starlightTags from 'starlight-tags';
 import { searchForWorkspaceRoot } from 'vite';
 
@@ -193,15 +195,22 @@ export default defineConfig({
           link: '/licenses/permissive/mit',
         },
         {
-          label: 'Blog',
-          link: '/blog',
-        },
-        {
           label: 'About',
           link: '/about',
         },
       ],
       plugins: [
+        starlightBlog({
+          authors: {
+            adam: {
+              name: 'Adam Poulemanos',
+              url: 'https://github.com/knitli',
+            },
+          },
+          metrics: {
+            readingTime: true,
+          },
+        }),
         starlightAutoDrafts(),
         starlightHeadingBadges(),
         starlightContextualMenu({
@@ -214,14 +223,17 @@ export default defineConfig({
           We recraft popular creative licenses into easy-to-understand versions that capture the original intent. All Plain License licenses have fallback provisions to their original hard-to-understand counterparts, ensuring similar legal treatment while being more accessible. Our project is open source and community-driven, with contributions from volunteers around the world. We believe that clear, plain language licenses can empower creators and users alike, fostering a more inclusive and vibrant creative ecosystem.
           `,
           promote: ["/licenses/*/*/*", "/blog/**", "/index*", "/faq/*", "/helping/*", "/about/*"],
-          demote: ["/contributing*", "/changelog*"],
+          demote: ["/contributing*", "/changelog*", "/tags*"],
           minify: {
             whitespace: true,
             note: true,
             details: true,
           },
         }),
-        starlightTags(),
+        starlightTags({
+          onInlineTagsNotFound: 'warn',
+        }),
+        starlightScrollToTop(),
       ]
     }),
     sitemap({

@@ -12,7 +12,6 @@
         "noNodejsModules": "off"
       },
       "style": {
-        "noNamespaceImport": "off"
       }
     }
   }

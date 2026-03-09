@@ -155,11 +155,12 @@ A visitor needs to read blog posts about Plain License updates, license guides, 
 
 ### Session 2026-01-30 (Architecture Decisions - RESOLVED)
 
-- Q: Which static site generator and theme will be used? → A: **Astro static site generator with Starlight theme using strategic component overrides (hybrid approach)**. 
+- Q: Which static site generator and theme will be used? → A: **Astro static site generator with Starlight theme using strategic component overrides (hybrid approach)**.
 
 **Architecture Decision**: After evaluating Starlight's capabilities, the hybrid approach is selected:
 
 **Starlight Strengths to Leverage**:
+
 - Excellent WCAG 2.1 AA accessibility out of box
 - Fast performance with built-in optimizations  
 - Robust component override system (can replace ANY component: Header, Footer, Sidebar, etc.)
@@ -169,12 +170,14 @@ A visitor needs to read blog posts about Plain License updates, license guides, 
 - Great developer experience and documentation
 
 **Plain License Customizations**:
+
 - **Keep**: Base layout, design system, accessibility features, typography, navigation structure
 - **Override**: Header (Plain License branding), Footer (custom attribution), Sidebar (license navigation)
 - **Custom Pages**: License detail pages (`src/pages/licenses/[slug].astro`), blog pages (`src/pages/blog/`), homepage
 - **Custom Components**: License comparison UI, download center, reactive components (FAQ, tables, decision trees)
 
-**Technical Approach**: 
+**Technical Approach**:
+
 1. Initialize Astro + Starlight (T002)
 2. Configure component overrides in `astro.config.mjs` (T002a-T002d)
 3. Create custom page layouts using `<StarlightPage>` wrapper for consistency
@@ -182,6 +185,7 @@ A visitor needs to read blog posts about Plain License updates, license guides, 
 5. Build custom license/blog components that integrate with Starlight's design system
 
 **Rationale**: Starlight's component override system is production-ready and well-documented. The `<StarlightPage>` component allows full custom layouts while maintaining design consistency. This approach provides the best balance of:
+
 - Professional foundation (Starlight's accessibility and performance)
 - Flexibility for custom features (comparison UI, download center, blog)
 - Maintainability (leverage Starlight updates, override only what's needed)
@@ -328,72 +332,72 @@ A visitor needs to read blog posts about Plain License updates, license guides, 
 
 ### Measurable Outcomes
 
-- **SC-001**: Non-technical content editors can create and publish a complete license without developer assistance in under 30 minutes
-  - **Measurement**: Timed E2E test with realistic license content
-  - **Test**: T265 (success-criteria/sc-001-editor-time.test.ts)
+-   **SC-001**: Non-technical content editors can create and publish a complete license without developer assistance in under 30 minutes
+    - **Measurement**: Timed E2E test with realistic license content
+    - **Test**: T265 (success-criteria/sc-001-editor-time.test.ts)
 
-- **SC-002**: License pages load and display at-a-glance summary within 2 seconds for 95% of visitors
-  - **Measurement**: Lighthouse CI (target LCP <2.0s, FCP <1.2s), Cloudflare Web Analytics (Real User Monitoring)
-  - **Acceptance**: LCP <2.0s (p95), FCP <1.2s (p95), TBT <200ms, CLS <0.1
-  - **Requirements**: FR-039
-  - **Tests**: T226 (performance test), T266 (SC validation)
+-   **SC-002**: License pages load and display at-a-glance summary within 2 seconds for 95% of visitors
+    - **Measurement**: Lighthouse CI (target LCP <2.0s, FCP <1.2s), Cloudflare Web Analytics (Real User Monitoring)
+    - **Acceptance**: LCP <2.0s (p95), FCP <1.2s (p95), TBT <200ms, CLS <0.1
+    - **Requirements**: FR-039
+    - **Tests**: T226 (performance test), T266 (SC validation)
 
-- **SC-003**: Visitors can successfully download their preferred license format on first attempt with 98% success rate
-  - **Measurement**: Reliability testing with various network conditions and browsers
-  - **Test**: T267 (success-criteria/sc-003-download-reliability.test.ts)
+-   **SC-003**: Visitors can successfully download their preferred license format on first attempt with 98% success rate
+    - **Measurement**: Reliability testing with various network conditions and browsers
+    - **Test**: T267 (success-criteria/sc-003-download-reliability.test.ts)
 
-- **SC-004**: Comparison mode highlighting responds to hover interactions within 100 milliseconds
-  - **Measurement**: Automated performance testing with high-resolution timing assertions
-  - **Acceptance**: Hover → highlight latency <100ms (p95), 60fps animation
-  - **Requirements**: FR-041
-  - **Tests**: T239 (performance test), T268 (SC validation)
+-   **SC-004**: Comparison mode highlighting responds to hover interactions within 100 milliseconds
+    - **Measurement**: Automated performance testing with high-resolution timing assertions
+    - **Acceptance**: Hover → highlight latency <100ms (p95), 60fps animation
+    - **Requirements**: FR-041
+    - **Tests**: T239 (performance test), T268 (SC validation)
 
-- **SC-005**: All export formats (markdown, plaintext, PDF, XML, embed) generate successfully for 100% of published licenses
-  - **Measurement**: Build error tracking, export generation metrics dashboard
-  - **Requirements**: FR-043
-  - **Tests**: T220 (integration test), T269 (SC validation)
+-   **SC-005**: All export formats (markdown, plaintext, PDF, XML, embed) generate successfully for 100% of published licenses
+    - **Measurement**: Build error tracking, export generation metrics dashboard
+    - **Requirements**: FR-043
+    - **Tests**: T220 (integration test), T269 (SC validation)
 
-- **SC-006**: PDF exports maintain consistent typography and layout quality equivalent to professional legal documents
-  - **Measurement**: Visual regression testing + typography validation against golden files
-  - **Acceptance**: 12pt serif font, 1.5 line spacing, 1-inch margins, proper page breaks
-  - **Test**: T270 (success-criteria/sc-006-pdf-quality.test.ts)
+-   **SC-006**: PDF exports maintain consistent typography and layout quality equivalent to professional legal documents
+    - **Measurement**: Visual regression testing + typography validation against golden files
+    - **Acceptance**: 12pt serif font, 1.5 line spacing, 1-inch margins, proper page breaks
+    - **Test**: T270 (success-criteria/sc-006-pdf-quality.test.ts)
 
-- **SC-007**: Section mapping interface allows editors to create 10 section connections in under 5 minutes
-  - **Measurement**: Timed integration test simulating mapping workflow
-  - **Test**: T271 (success-criteria/sc-007-mapping-time.test.ts)
+-   **SC-007**: Section mapping interface allows editors to create 10 section connections in under 5 minutes
+    - **Measurement**: Timed integration test simulating mapping workflow
+    - **Test**: T271 (success-criteria/sc-007-mapping-time.test.ts)
 
-- **SC-008**: Version history displays and allows access to all historical versions within 3 seconds
-  - **Measurement**: Performance testing with multiple versions
-  - **Test**: T272 (success-criteria/sc-008-history-speed.test.ts)
+-   **SC-008**: Version history displays and allows access to all historical versions within 3 seconds
+    - **Measurement**: Performance testing with multiple versions
+    - **Test**: T272 (success-criteria/sc-008-history-speed.test.ts)
 
-- **SC-009**: Template blocks reduce duplicate content writing by 60% compared to current system
-  - **Measurement**: Statistical analysis of content reuse across licenses
-  - **Test**: T273 (success-criteria/sc-009-template-reuse.test.ts)
+-   **SC-009**: Template blocks reduce duplicate content writing by 60% compared to current system
+    - **Measurement**: Statistical analysis of content reuse across licenses
+    - **Test**: T273 (success-criteria/sc-009-template-reuse.test.ts)
 
-- **SC-010**: Site remains accessible and usable for visitors using screen readers and keyboard navigation
-  - **Measurement**: Axe-core automated testing (zero critical/serious violations), manual screen reader testing
-  - **Requirements**: FR-044, FR-045
-  - **Tests**: T177 (manual audit), T274 (automated testing), T282 (CI integration)
+-   **SC-010**: Site remains accessible and usable for visitors using screen readers and keyboard navigation
+    - **Measurement**: Axe-core automated testing (zero critical/serious violations), manual screen reader testing
+    - **Requirements**: FR-044, FR-045
+    - **Tests**: T177 (manual audit), T274 (automated testing), T282 (CI integration)
 
-- **SC-011**: OpenGraph images generate correctly and display properly when licenses are shared on social media platforms
-  - **Measurement**: Visual validation of generated OG images, social media sharing tests
-  - **Tests**: T224 (E2E test), T275 (SC validation)
+-   **SC-011**: OpenGraph images generate correctly and display properly when licenses are shared on social media platforms
+    - **Measurement**: Visual validation of generated OG images, social media sharing tests
+    - **Tests**: T224 (E2E test), T275 (SC validation)
 
-- **SC-012**: Blog post creation and publishing time is reduced by 50% compared to current markdown file process
-  - **Measurement**: Baseline comparison timing study (current vs new system)
-  - **Test**: T276 (success-criteria/sc-012-blog-efficiency.test.ts)
+-   **SC-012**: Blog post creation and publishing time is reduced by 50% compared to current markdown file process
+    - **Measurement**: Baseline comparison timing study (current vs new system)
+    - **Test**: T276 (success-criteria/sc-012-blog-efficiency.test.ts)
 
-- **SC-013**: Reactive components render correctly in web format while maintaining readable static equivalents in PDF/plaintext
-  - **Measurement**: Cross-format validation of component output
-  - **Tests**: T254-T257 (component tests), T277 (SC validation)
+-   **SC-013**: Reactive components render correctly in web format while maintaining readable static equivalents in PDF/plaintext
+    - **Measurement**: Cross-format validation of component output
+    - **Tests**: T254-T257 (component tests), T277 (SC validation)
 
-- **SC-014**: Session preference for comparison mode persists across page navigation within the same visit
-  - **Measurement**: E2E state testing with navigation simulation
-  - **Tests**: T242 (E2E test), T278 (SC validation)
+-   **SC-014**: Session preference for comparison mode persists across page navigation within the same visit
+    - **Measurement**: E2E state testing with navigation simulation
+    - **Tests**: T242 (E2E test), T278 (SC validation)
 
-- **SC-015**: System handles concurrent editing by multiple users without data loss or corruption
-  - **Measurement**: Multi-user simulation with Git conflict detection
-  - **Test**: T279 (success-criteria/sc-015-concurrent-editing.test.ts)
+-   **SC-015**: System handles concurrent editing by multiple users without data loss or corruption
+    - **Measurement**: Multi-user simulation with Git conflict detection
+    - **Test**: T279 (success-criteria/sc-015-concurrent-editing.test.ts)
 
 ### Assumptions
 

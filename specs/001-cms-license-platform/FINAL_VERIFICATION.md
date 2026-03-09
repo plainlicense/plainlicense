@@ -23,18 +23,23 @@ Following the assessment on March 5, 2026, all identified gaps in the `001-cms-l
 ## 2. Technical Improvements
 
 ### CSS Refactor
+
 The comparison mode now triggers a responsive two-column grid:
+
 - **Left Column**: Plain Language version with interactive highlights.
 - **Right Column**: Original legal text (hidden by default, appears on toggle).
 - **SVG Connectors**: Correctly bridge the two columns using `MappingViewer.ts`.
 
 ### Export Orchestration
+
 - **Static Fallbacks**: FAQ components now render as meaningful markdown lists in plaintext/markdown exports instead of "See website" placeholders.
 - **Typst Quality**: The new converter handles nested lists, blockquotes, and complex formatting with high fidelity.
 
 ### Testing Suite
+
 - **100% Pass Rate**: All 38 tests (Unit, Integration, and E2E) are passing.
 - **E2E Coverage**: Added coverage for session persistence, download reliability, and clipboard integrity.
 
 ## 3. Final Status: GREEN
+
 The `001-cms-license-platform` feature is now considered **Complete** and ready for merge to `main`.

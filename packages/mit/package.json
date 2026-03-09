@@ -3,15 +3,9 @@
   "version": "0.2.1",
   "private": true,
   "description": "Plain language version of the MIT License",
+  "main": "../../content/licenses/permissive/mit.md",
   "scripts": {
     "release": "semantic-release"
-  },
-  "main": "../../content/licenses/permissive/mit.md",
-  "devDependencies": {
-    "@commitlint/cli": "^19.8.1",
-    "@semantic-release/changelog": "^6.0.3",
-    "@semantic-release/commit-analyzer": "^13.0.1",
-    "@semantic-release/git": "^10.0.1"
   },
   "release": {
     "branches": [
@@ -61,11 +55,16 @@
       [
         "@semantic-release/git",
         {
-          "assets": ["../changelogs/mit.md"]
+          "assets": [
+            "../changelogs/mit.md"
+          ]
         }
       ],
-      ["@semantic-release/release-notes-generator"],
-      ["@semantic-release/github",
+      [
+        "@semantic-release/release-notes-generator"
+      ],
+      [
+        "@semantic-release/github",
         {
           "assets": [
             {
@@ -84,5 +83,11 @@
         }
       ]
     ]
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^19.8.1",
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/commit-analyzer": "^13.0.1",
+    "@semantic-release/git": "^10.0.1"
   }
 }

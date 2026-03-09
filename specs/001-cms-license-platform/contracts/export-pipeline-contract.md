@@ -30,6 +30,7 @@ This contract defines how Plain License generates multi-format exports during th
 **Output**: `{license-id}-gfm.md`
 
 **Features**:
+
 - GitHub-specific extensions (tables, task lists, strikethrough)
 - Autolinked URLs
 - Emoji support
@@ -38,6 +39,7 @@ This contract defines how Plain License generates multi-format exports during th
 **Frontmatter**: Preserved as YAML frontmatter block
 
 **Example**:
+
 ```markdown
 ---
 title: MIT License (Plain Language)
@@ -64,6 +66,7 @@ We give you permission to:
 **Output**: `{license-id}-commonmark.md`
 
 **Features**:
+
 - Pure CommonMark syntax (no extensions)
 - Portable across all markdown parsers
 - Predictable rendering
@@ -71,6 +74,7 @@ We give you permission to:
 **Frontmatter**: REMOVED (CommonMark doesn't specify frontmatter)
 
 **Example**:
+
 ```markdown
 # MIT License (Plain Language)
 
@@ -93,12 +97,14 @@ We give you permission to:
 **Output**: `{license-id}.txt`
 
 **Format**:
+
 - All markdown stripped
 - Plain text only
 - UTF-8 encoding
 - Newlines preserved for readability
 
 **Example**:
+
 ```
 MIT LICENSE (PLAIN LANGUAGE)
 Version: 0.2.1
@@ -123,6 +129,7 @@ We give you permission to:
 **Fallback**: Playwright headless browser (if Typst unavailable)
 
 **Features**:
+
 - Professional typography
 - Page headers/footers with metadata
 - Table of contents (if >2 pages)
@@ -132,6 +139,7 @@ We give you permission to:
 **Template**: Custom Typst template matching Plain License brand
 
 **Example Metadata**:
+
 ```
 Title: MIT License (Plain Language)
 Author: Plain License Team
@@ -146,9 +154,10 @@ Created: 2026-01-30
 **Output**: `{license-id}-spdx.xml`
 
 **Format**: SPDX License XML Schema
-**Spec**: https://spdx.org/rdf/terms/
+**Spec**: <https://spdx.org/rdf/terms/>
 
 **Example**:
+
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <SPDXLicenseCollection xmlns="http://spdx.org/rdf/terms/">
@@ -180,6 +189,7 @@ Created: 2026-01-30
 **Format**: Self-contained HTML with inline CSS, no external dependencies
 
 **Features**:
+
 - Scoped CSS (no global pollution)
 - Dark mode support (prefers-color-scheme)
 - Responsive design
@@ -187,6 +197,7 @@ Created: 2026-01-30
 - Copy button (clipboard.js inline)
 
 **Example**:
+
 ```html
 <div class="plain-license-embed" data-license="MIT" data-version="0.2.1">
   <style scoped>
@@ -623,6 +634,7 @@ export async function generateEmbed(opts: ExportOptions): Promise<void> {
 **Tag**: `v{version}` (e.g., `v0.2.1`)
 
 **Assets** (6 formats × N licenses):
+
 ```
 mit-gfm.md
 mit-commonmark.md
@@ -675,6 +687,7 @@ const releaseUrl = `https://github.com/plainlicense/plainlicense/releases/downlo
 ### Build Time Estimates
 
 **Per License** (6 formats):
+
 - Markdown (GFM): ~50ms
 - Markdown (CommonMark): ~50ms
 - Plain Text: ~100ms
@@ -702,6 +715,7 @@ const releaseUrl = `https://github.com/plainlicense/plainlicense/releases/downlo
 ### Export Generation Failures
 
 **Typst Not Installed**:
+
 ```
 Warning: Typst not found, falling back to Playwright for PDF generation
 License: MIT
@@ -709,6 +723,7 @@ Fallback: Using headless browser (slower but works)
 ```
 
 **Invalid License Content**:
+
 ```
 Error: Failed to generate export for license: MIT
 Format: PDF
@@ -719,12 +734,14 @@ Action: Fix content in content/licenses/mit.md
 ### GitHub Release Failures
 
 **Tag Already Exists**:
+
 ```
 Error: Release tag v0.2.1 already exists
 Action: Increment version or delete existing release
 ```
 
 **Upload Failure**:
+
 ```
 Error: Failed to upload assets to GitHub Release
 Reason: Network timeout
@@ -734,16 +751,19 @@ Action: GitHub Actions will retry automatically (3 attempts)
 ## Success Criteria
 
 ### Performance ✅
+
 - **Build Time**: <1 minute for full site + exports (20 licenses)
 - **Per-Format**: Each format generates in <500ms per license
 - **Parallel**: 4+ licenses processed simultaneously
 
 ### Quality ✅
+
 - **Format Validity**: All exports validate against format specs
 - **Content Accuracy**: Exports match source license content 100%
 - **Accessibility**: PDF and HTML exports meet accessibility standards
 
 ### Cost ✅
+
 - **Infrastructure**: $0.00/month (GitHub Actions + Releases = free)
 - **Bandwidth**: Unlimited downloads from GitHub Releases
 - **Storage**: Free permanent storage in releases
@@ -756,9 +776,9 @@ Action: GitHub Actions will retry automatically (3 attempts)
 
 ## References
 
-- Typst: https://typst.app/
-- GitHub Actions: https://docs.github.com/en/actions
-- GitHub Releases: https://docs.github.com/en/repositories/releasing-projects-on-github
-- SPDX XML: https://spdx.org/rdf/terms/
-- CommonMark Spec: https://commonmark.org/
-- GitHub Flavored Markdown: https://github.github.com/gfm/
+- Typst: <https://typst.app/>
+- GitHub Actions: <https://docs.github.com/en/actions>
+- GitHub Releases: <https://docs.github.com/en/repositories/releasing-projects-on-github>
+- SPDX XML: <https://spdx.org/rdf/terms/>
+- CommonMark Spec: <https://commonmark.org/>
+- GitHub Flavored Markdown: <https://github.github.com/gfm/>

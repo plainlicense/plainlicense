@@ -2,6 +2,7 @@
   "compilerOptions": {
     "allowImportingTsExtensions": false,
     "allowSyntheticDefaultImports": true,
+    "allowArbitraryExtensions": true,
     "alwaysStrict": true,
     "baseUrl": "./",
     "esModuleInterop": true,
@@ -21,6 +22,8 @@
     "outDir": "docs/assets/",
     "paths": {
       "~assets/*": ["./src/assets/*"],
+      "~spdx/*": ["./external/license-list-data/json/*", "./external/license-list-XML/src/*"],
+      "~cal/*": ["./external/choosealicense.com/_data/*", "./external/choosealicense.com/_licenses/*"],
     },
     "removeComments": true,
     "skipLibCheck": true,

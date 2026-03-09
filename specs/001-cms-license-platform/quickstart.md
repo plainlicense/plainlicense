@@ -10,6 +10,7 @@
 This guide walks you through setting up the Plain License CMS platform locally, from installation to your first license publication. Estimated setup time: **15-20 minutes**.
 
 **What you'll accomplish**:
+
 - ✅ Install and configure development environment
 - ✅ Run Astro development server with hot reload
 - ✅ Configure Sveltia CMS for local editing
@@ -142,11 +143,13 @@ collections:
 ```
 
 **Local Development Mode**:
+
 - Uses `git-gateway` backend (no OAuth required)
 - Direct Git operations via local repository
 - Changes commit to your current branch
 
 **Production Mode**:
+
 - Uses `github` backend with OAuth proxy
 - Requires Cloudflare Worker deployment (see Authentication section)
 
@@ -179,6 +182,7 @@ bun run dev
 ```
 
 **What happens**:
+
 1. Astro reads content from `content/` directories
 2. Validates frontmatter against Zod schemas
 3. Generates routes for licenses and blog posts
@@ -186,6 +190,7 @@ bun run dev
 5. Hot reload on file changes
 
 **Expected output**:
+
 ```
   🚀  astro  v4.0.0 started in 823ms
 
@@ -210,6 +215,7 @@ bun run build
 ```
 
 **Build output** goes to `dist/`:
+
 ```
 dist/
 ├── index.html
@@ -257,10 +263,12 @@ open http://localhost:4321/admin
 #### Step 2: Login
 
 **Local Development** (git-gateway):
+
 - No login required, direct Git access
 - Click "Continue" or "Work Locally"
 
 **Production** (GitHub OAuth):
+
 - Click "Login with GitHub"
 - Authorize app (first time only)
 - Redirected back to CMS
@@ -282,7 +290,7 @@ OSI Approved: ✓ (true)
 FSF Approved: ✓ (true)
 ```
 
-4. Write plain language content:
+1. Write plain language content:
 
 ```markdown
 ## What You Can Do
@@ -303,8 +311,8 @@ We offer the work "as is" with no warranties. We are not responsible
 for any damages or issues that arise from using the work.
 ```
 
-5. Click **"Save"** → Creates Git commit
-6. Click **"Publish"** → Merges to main branch
+1. Click **"Save"** → Creates Git commit
+2. Click **"Publish"** → Merges to main branch
 
 **Time**: ~15-20 minutes ✅ (meets SC-001 requirement)
 
@@ -733,12 +741,14 @@ wrangler pages deploy dist/ --project-name plainlicense
 #### Schema Validation Errors
 
 **Error**:
+
 ```
 [ERROR] [content] Invalid frontmatter in content/licenses/mit.md
   version: Expected string matching /^\d+\.\d+\.\d+$/, received "1.0"
 ```
 
 **Fix**:
+
 ```yaml
 # Change version to semver format
 version: "1.0" → "1.0.0"
@@ -747,11 +757,13 @@ version: "1.0" → "1.0.0"
 #### Missing Dependencies
 
 **Error**:
+
 ```
 Cannot find package 'astro'
 ```
 
 **Fix**:
+
 ```bash
 # Reinstall all dependencies
 rm -rf node_modules bun.lockb
@@ -761,11 +773,13 @@ bun install
 #### Typst Not Found
 
 **Error**:
+
 ```
 /bin/sh: typst: command not found
 ```
 
 **Fix**:
+
 ```bash
 # Install Typst
 # macOS:
@@ -785,6 +799,7 @@ typst --version
 **Error**: Blank page at `/admin`
 
 **Fix**:
+
 1. Check browser console for errors
 2. Verify `public/admin/index.html` exists
 3. Ensure dev server is running: `bun run dev`
@@ -794,8 +809,10 @@ typst --version
 **Error**: "Login failed, please try again"
 
 **Fix**:
-1. **Local dev**: Switch to `git-gateway` backend in `config.yml`
-2. **Production**: Verify Cloudflare Worker secrets:
+
+1.  **Local dev**: Switch to `git-gateway` backend in `config.yml`
+2.  **Production**: Verify Cloudflare Worker secrets:
+
    ```bash
    wrangler secret list
    # Should show: GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET
@@ -806,6 +823,7 @@ typst --version
 **Error**: "Failed to persist entry"
 
 **Fix**:
+
 1. Check Git status: `git status` (should be clean or have expected changes)
 2. Verify write permissions: `ls -la content/licenses/`
 3. Check Git config: `git config user.name && git config user.email`
@@ -817,6 +835,7 @@ typst --version
 **Error**: `Failed to generate PDF for MIT`
 
 **Fix**:
+
 ```bash
 # Test Typst directly
 echo "= Test" > test.typ
@@ -832,6 +851,7 @@ brew reinstall typst  # macOS
 
 **Fix**:
 Ensure license has `spdx_id` in frontmatter:
+
 ```yaml
 spdx_id: "MIT"  # Required, must match SPDX standard
 ```
@@ -843,12 +863,14 @@ spdx_id: "MIT"  # Required, must match SPDX standard
 **Issue**: Build takes >2 minutes
 
 **Diagnosis**:
+
 ```bash
 # Run build with timing
 time bun run build
 ```
 
 **Fix**:
+
 1. Clear Astro cache: `rm -rf .astro/`
 2. Clear node_modules: `rm -rf node_modules && bun install`
 3. Disable source maps for production: `astro.config.mjs → vite.build.sourcemap: false`
@@ -858,6 +880,7 @@ time bun run build
 **Issue**: Hot reload takes >5 seconds
 
 **Fix**:
+
 1. Reduce content size (temporarily move licenses out of `content/`)
 2. Disable plugins in `astro.config.mjs` during development
 3. Use `--host` flag only when needed: `bun run dev --host`
@@ -934,19 +957,19 @@ bun run build --config astro.config.validate.mjs
 
 After completing this quickstart:
 
-1. **Read the Contracts** (`specs/001-cms-license-platform/contracts/`)
+1.  **Read the Contracts** (`specs/001-cms-license-platform/contracts/`)
    - Understand system architecture and guarantees
    - Learn data flows and validation rules
 
-2. **Explore Phase 1 AI Prototype** (`specs/001-cms-license-platform/phase1-ai-prototype-spec.md`)
+2.  **Explore Phase 1 AI Prototype** (`specs/001-cms-license-platform/phase1-ai-prototype-spec.md`)
    - AI-assisted mapping generation workflow
    - Confidence scoring and validation
 
-3. **Review Data Model** (`specs/001-cms-license-platform/data-model.md`)
+3.  **Review Data Model** (`specs/001-cms-license-platform/data-model.md`)
    - Entity definitions and relationships
    - Complete schema reference
 
-4. **Join the Community**
+4.  **Join the Community**
    - GitHub Discussions: Ask questions and share feedback
    - Contributing Guide: Submit plain language licenses
    - Code of Conduct: Community standards
@@ -989,9 +1012,9 @@ After completing this quickstart:
 
 ## Support
 
-**Issues**: https://github.com/plainlicense/plainlicense/issues
-**Discussions**: https://github.com/plainlicense/plainlicense/discussions
-**Email**: hello@plainlicense.org
+**Issues**: <https://github.com/plainlicense/plainlicense/issues>
+**Discussions**: <https://github.com/plainlicense/plainlicense/discussions>
+**Email**: <hello@plainlicense.org>
 
 ---
 

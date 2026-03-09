@@ -537,16 +537,16 @@
 
 ### Phase Dependencies
 
-- **Setup (Phase 1)**: No dependencies - can start immediately
-- **Foundational (Phase 2)**: Depends on Setup completion - BLOCKS all user stories
-- **User Stories (Phase 3-9)**: All depend on Foundational phase completion
-  - User stories can then proceed in parallel (if staffed)
-  - Or sequentially in priority order: US1 (P1) → US2 (P1) → US3 (P2) → US4 (P2) → US5 (P3) → US6 (P3) → US7 (P4)
-- **Authentication (Phase 10)**: Can start after Foundational, needed before production deployment
-- **Deployment (Phase 11)**: Depends on authentication and at least US1+US2 completion for MVP
-- **Migration (Phase 12)**: Can start after Foundational, should complete before production deployment
-- **Polish (Phase 13)**: Depends on all desired user stories being complete
-- **Testing (Phase 14)**: CRITICAL - Test tasks run in parallel with implementation (TDD approach recommended)
+-   **Setup (Phase 1)**: No dependencies - can start immediately
+-   **Foundational (Phase 2)**: Depends on Setup completion - BLOCKS all user stories
+-   **User Stories (Phase 3-9)**: All depend on Foundational phase completion
+    - User stories can then proceed in parallel (if staffed)
+    - Or sequentially in priority order: US1 (P1) → US2 (P1) → US3 (P2) → US4 (P2) → US5 (P3) → US6 (P3) → US7 (P4)
+-   **Authentication (Phase 10)**: Can start after Foundational, needed before production deployment
+-   **Deployment (Phase 11)**: Depends on authentication and at least US1+US2 completion for MVP
+-   **Migration (Phase 12)**: Can start after Foundational, should complete before production deployment
+-   **Polish (Phase 13)**: Depends on all desired user stories being complete
+-   **Testing (Phase 14)**: CRITICAL - Test tasks run in parallel with implementation (TDD approach recommended)
 
 ### User Story Dependencies
 
@@ -568,6 +568,7 @@
 ### Parallel Opportunities Per User Story
 
 **User Story 1** (Content Editor Creates License):
+
 ```bash
 # Can run in parallel:
 T021 + T022  # CMS configuration (different files)
@@ -577,6 +578,7 @@ T036 + T037  # Readability metrics and shame counter (different files)
 ```
 
 **User Story 2** (Visitor Downloads License):
+
 ```bash
 # Can run in parallel:
 T038 + T039  # Page template and summary component
@@ -585,30 +587,35 @@ T052 + T053 + T054  # Clipboard, links, social cards (different files)
 ```
 
 **User Story 3** (Editor Maps Sections):
+
 ```bash
 # Can run in parallel:
 T058 + T059  # Schema validation and hash utility
 ```
 
 **User Story 4** (Visitor Compares):
+
 ```bash
 # Can run in parallel:
 T076 + T077  # Load mapping data and highlight API (different files)
 ```
 
 **User Story 5** (Versioning):
+
 ```bash
 # Can run in parallel:
 T087 + T088 + T089  # Lerna setup tasks
 ```
 
 **User Story 6** (Reactive Components):
+
 ```bash
 # Can run in parallel:
 T105 + T106 + T107 + T108  # All component implementations (different files)
 ```
 
 **User Story 7** (Blog):
+
 ```bash
 # Can run in parallel:
 T118 + T119 + T120  # Schema, CMS config, directory (different files)
@@ -647,6 +654,7 @@ Task T037: "Create shame words counter integration"
 6. Deploy MVP to staging environment
 
 **MVP Delivers**:
+
 - Editors can create and edit licenses via CMS ✅ (SC-001: <30 minutes)
 - Visitors can view and download licenses in all formats ✅ (SC-002: <2s page load, SC-003: 98% success)
 - Export generation works for all formats ✅ (SC-005: 100% success, SC-006: PDF quality)
@@ -665,16 +673,16 @@ Each release adds value without breaking previous functionality.
 
 With multiple developers after Foundational phase completes:
 
-1. **Team completes Setup + Foundational together** (~3-5 days)
-2. **Once Foundational is done**:
+1.  **Team completes Setup + Foundational together** (~3-5 days)
+2.  **Once Foundational is done**:
    - **Developer A**: User Story 1 (CMS editing workflow)
    - **Developer B**: User Story 2 (Export generation and downloads)
    - **Developer C**: Authentication & Deployment setup
-3. **After MVP (US1+US2)**:
+3.  **After MVP (US1+US2)**:
    - **Developer A**: User Story 3 (Mapping editor)
    - **Developer B**: User Story 4 (Comparison viewer)
    - **Developer C**: User Story 5 (Versioning)
-4. Stories complete and integrate independently
+4.  Stories complete and integrate independently
 
 ---
 
@@ -686,6 +694,7 @@ With multiple developers after Foundational phase completes:
 **Critical Path**: Setup → Foundational → US1 + US1 Tests → US2 + US2 Tests → SC Validation → Deploy MVP
 
 **Task Distribution by Phase**:
+
 - **Setup + Starlight Overrides** (Phase 1): 13 tasks (T001-T008, including T002a-T002d, T006a)
 - **Foundational** (Phase 2): 14 tasks (T009-T020, including T010a, T020a)
 - **US1 - Content Editor** (Phase 3): 17 tasks (T021-T037)
@@ -702,6 +711,7 @@ With multiple developers after Foundational phase completes:
 - **Testing & Quality Assurance** (Phase 14): 114 tasks (T199-T309a) ← CRITICAL MVP REQUIREMENT
 
 **Test Task Breakdown**:
+
 - Test Infrastructure: 6 tasks (T199-T204)
 - User Story 1-7 Tests: 66 tasks (T205-T264, T227a)
 - Success Criteria Validation: 15 tasks (T265-T279)
@@ -714,6 +724,7 @@ With multiple developers after Foundational phase completes:
 **Parallel Opportunities**: 143+ tasks marked [P] can run in parallel within their phases (98 implementation + 45 testing)
 
 **Estimated MVP Timeline** (single developer with TDD):
+
 - Setup: 1-2 days
 - Foundational: 3-4 days
 - User Story 1 + Tests: 6-8 days (implementation + unit/integration/E2E)

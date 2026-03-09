@@ -1,52 +1,56 @@
 ---
-import BaseLayout from '../../layouts/BaseLayout.astro';
-import MappingEditor from '../../components/MappingEditor.tsx';
-import { getCollection } from 'astro:content';
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import MappingEditor from "../../components/MappingEditor";
+import { getCollection } from "astro:content";
 
-const licenses = await getCollection('licenses');
+const licenses = await getCollection("licenses");
 const { searchParams } = Astro.url;
-const selectedId = searchParams.get('id');
+const selectedId = searchParams.get("id");
 
 let license = null;
 let originalText = "";
 
 if (selectedId) {
-  license = licenses.find(l => l.id === selectedId);
+  license = licenses.find((l) => l.id === selectedId);
   if (license) {
     // Extract original text from body or metadata
     // In our migration script, we combined them with ---
-    const parts = license.body.split('---');
+    const parts = license.body.split("---");
     // For prototype, let's assume first part is plain, second is original
     // In reality, we'd have more robust extraction
-    originalText = parts[1]?.replace('# Original License Text', '')?.trim() || "Original text not found.";
+    originalText =
+      parts[1]?.replace("# Original License Text", "")?.trim() ||
+      "Original text not found.";
   }
 }
 ---
 
 <BaseLayout title="Mapping Tool">
-  {!selectedId ? (
-    <div class="selection-screen container">
-      <h1>Select License to Map</h1>
-      <div class="license-grid">
-        {licenses.map(l => (
-          <a href={`?id=${l.id}`} class="card">
-            {l.data.title}
-          </a>
-        ))}
+  {
+    !selectedId ? (
+      <div class="selection-screen container">
+        <h1>Select License to Map</h1>
+        <div class="license-grid">
+          {licenses.map((l) => (
+            <a href={`?id=${l.id}`} class="card">
+              {l.data.title}
+            </a>
+          ))}
+        </div>
       </div>
-    </div>
-  ) : (
-    <div class="editor-screen">
-      {license && (
-        <MappingEditor 
-          client:only="preact" 
-          licenseId={license.id} 
-          plainText={license.body.split('---')[0]} 
-          originalText={originalText} 
-        />
-      )}
-    </div>
-  )}
+    ) : (
+      <div class="editor-screen">
+        {license && (
+          <MappingEditor
+            client:only="preact"
+            licenseId={license.id}
+            plainText={license.body.split("---")[0]}
+            originalText={originalText}
+          />
+        )}
+      </div>
+    )
+  }
 </BaseLayout>
 
 <style>

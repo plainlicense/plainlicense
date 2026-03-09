@@ -13,6 +13,7 @@ This contract defines the structure, validation, and usage of license clause map
 ## File Structure
 
 ### Location
+
 ```
 content/mappings/
 ├── mit-mapping.json
@@ -22,16 +23,18 @@ content/mappings/
 ```
 
 ### Naming Convention
-- **Pattern**: `{license-id}-mapping.json`
-- **Must match**: License `spdx_id` from frontmatter (lowercase with hyphens)
-  - License: `spdx_id: "MIT"` → Mapping: `mit-mapping.json`
-  - License: `spdx_id: "MPL-2.0"` → Mapping: `mpl-2-0-mapping.json`
+
+-   **Pattern**: `{license-id}-mapping.json`
+-   **Must match**: License `spdx_id` from frontmatter (lowercase with hyphens)
+    - License: `spdx_id: "MIT"` → Mapping: `mit-mapping.json`
+    - License: `spdx_id: "MPL-2.0"` → Mapping: `mpl-2-0-mapping.json`
 
 ## Schema Reference
 
 **Authoritative Schema**: `mapping-schema.json` (root of repository)
 
 All mapping files MUST validate against this schema. See `mapping-schema.json` for:
+
 - Complete field definitions
 - Validation rules
 - Type constraints
@@ -63,21 +66,21 @@ All mapping files MUST validate against this schema. See `mapping-schema.json` f
 
 ### Required Top-Level Fields
 
-1. **license_id** (string): SPDX identifier or custom ID
+1.  **license_id** (string): SPDX identifier or custom ID
    - Must match license frontmatter `spdx_id`
    - Examples: `"MIT"`, `"MPL-2.0"`, `"Elastic-2.0"`
 
-2. **version** (string): Plain License version (semantic version)
+2.  **version** (string): Plain License version (semantic version)
    - Pattern: `^\d+\.\d+\.\d+$`
    - Must match system version from `package.json`
    - Example: `"0.2.1"`
 
-3. **mapping_philosophy** (enum): Mapping approach
+3.  **mapping_philosophy** (enum): Mapping approach
    - `"clause-level with interpretive correspondence"`
    - `"section-level with strict translation"`
    - `"custom"`
 
-4. **mappings** (array): Array of mapping objects (see below)
+4.  **mappings** (array): Array of mapping objects (see below)
 
 ### Optional Top-Level Fields
 
@@ -148,11 +151,11 @@ Each mapping has a `type` field indicating the relationship:
 
 ### Required Mapping Fields
 
-1. **id** (string): Unique mapping identifier
+1.  **id** (string): Unique mapping identifier
    - Pattern: `^map-[a-z0-9-]+$`
    - Example: `"map-perm-use"`, `"map-warranty-1"`
 
-2. **type** (enum): Mapping relationship type (see above)
+2.  **type** (enum): Mapping relationship type (see above)
 
 ### Optional Mapping Fields
 
@@ -180,15 +183,15 @@ Each mapping has a `type` field indicating the relationship:
 }
 ```
 
-1. **id** (string): Semantic identifier
+1.  **id** (string): Semantic identifier
    - Pattern: `^(plain|original)-[a-z0-9-]+$`
    - Examples: `"plain-perm-use"`, `"original-grant-copyright"`
 
-2. **hash** (string): SHA-256 hash of normalized content
+2.  **hash** (string): SHA-256 hash of normalized content
    - Pattern: `^sha256:[a-f0-9]{64}$`
    - Full 64-character hash (UI truncates for display)
 
-3. **content** (string): Raw clause text
+3.  **content** (string): Raw clause text
    - Min 1 char, max 5000 chars
    - Preserves markdown formatting
 
@@ -208,6 +211,7 @@ Each mapping has a `type` field indicating the relationship:
 ### Hash Generation Rules
 
 **Normalization Process** (before hashing):
+
 1. Strip markdown formatting: `**bold**` → `bold`
 2. Normalize whitespace: Multiple spaces → single space
 3. Trim leading/trailing whitespace
@@ -216,6 +220,7 @@ Each mapping has a `type` field indicating the relationship:
 6. Prefix with `sha256:`
 
 **Example**:
+
 ```
 Original: "- **Use** it  \n"
 Normalized: "Use it"
@@ -223,6 +228,7 @@ Hash: sha256:a1b2c3d4e5f6789abcdef0123456789abcdef0123456789abcdef0123456789
 ```
 
 **Stability**: Hash remains stable across:
+
 - Markdown formatting changes (bold, italic, links)
 - Whitespace changes (extra spaces, newlines)
 - Annotation additions (not included in hash)
@@ -255,6 +261,7 @@ Use `:` delimiter for subtags (Design Decision #2):
 ### Custom Tags
 
 Use `custom:` prefix for license-specific tags:
+
 - `custom:patent-grant` - Patent-related clauses
 - `custom:trademark-exclusion` - Trademark-specific terms
 
@@ -274,6 +281,7 @@ Use `custom:` prefix for license-specific tags:
 **Null Confidence**: Set `confidence: null` for unmapped-plain and unmapped-original types.
 
 **Override with Justification** (Design Decision #7):
+
 - Allowed: Human reviewer can override AI confidence
 - Required: `reviewer_notes` must explain override reasoning
 
@@ -310,12 +318,14 @@ Use `custom:` prefix for license-specific tags:
 Per Design Decision #4 (Hybrid Validation):
 
 **Critical** (block publishing if invalid):
+
 - `permissions`
 - `conditions`
 - `warranty`
 - `liability`
 
 **Non-Critical** (warn only):
+
 - `definitions`
 - `scope`
 - `interpretation`
@@ -473,6 +483,7 @@ For mappings with type `many-to-many`, `one-to-many`, or `many-to-one`:
 ### CSS Custom Highlight API (Future Enhancement)
 
 Per Design Decision (mapping-specification.md), use CSS Custom Highlight API for:
+
 - Non-destructive clause highlighting
 - Preserve original HTML structure
 - Support overlapping highlights (multiple semantic tags)
@@ -492,6 +503,7 @@ CSS.highlights.set('mapping-perm-use', highlight);
 ### Validation Errors
 
 **Missing Required Field**:
+
 ```
 Error: Invalid mapping for MIT
   - Missing required field: license_id
@@ -499,6 +511,7 @@ Error: Invalid mapping for MIT
 ```
 
 **Schema Validation Failure**:
+
 ```
 Error: Mapping validation failed for MIT
   - mappings[0].confidence: must be <= 1.0
@@ -507,6 +520,7 @@ Error: Mapping validation failed for MIT
 ```
 
 **Hash Mismatch**:
+
 ```
 Warning: Content hash mismatch detected
   - Clause: plain-perm-use
@@ -518,6 +532,7 @@ Warning: Content hash mismatch detected
 ### Loading Errors
 
 **File Not Found**:
+
 ```
 Warning: Mapping not found for license: MIT
   - Expected: content/mappings/mit-mapping.json
@@ -525,6 +540,7 @@ Warning: Mapping not found for license: MIT
 ```
 
 **JSON Parse Error**:
+
 ```
 Error: Invalid JSON in mapping file
   - File: content/mappings/mit-mapping.json:23
@@ -550,6 +566,7 @@ Error: Invalid JSON in mapping file
 ### Migration Strategy
 
 When schema version changes:
+
 1. **Backward Compatibility**: Old mappings still load (if possible)
 2. **Migration Script**: Automated conversion to new schema
 3. **Validation**: Ensure all mappings validate against new schema
@@ -558,16 +575,19 @@ When schema version changes:
 ## Success Criteria
 
 ### Performance ✅
+
 - **Load Time**: Mapping JSON loads in <100ms (typical 20KB file)
 - **Validation**: Schema validation completes in <50ms
 - **Rendering**: UI renders mapping viewer in <200ms
 
 ### Quality ✅
+
 - **Accuracy**: All mappings validate against schema
 - **Completeness**: >90% of clauses mapped (per metadata)
 - **Confidence**: Average confidence >0.85 for non-unmapped mappings
 
 ### Usability ✅
+
 - **Visual Clarity**: User can visually trace plain → original correspondence
 - **Confidence Display**: Users see confidence scores for quality assessment
 - **Change Detection**: Users notified when content changes require review
@@ -582,6 +602,6 @@ When schema version changes:
 
 - Mapping Schema: `mapping-schema.json` (authoritative schema)
 - Mapping Specification: `mapping-specification.md` (design decisions)
-- JSON Schema: https://json-schema.org/
-- SHA-256: https://en.wikipedia.org/wiki/SHA-2
-- CSS Custom Highlight API: https://developer.mozilla.org/en-US/docs/Web/API/CSS_Custom_Highlight_API
+- JSON Schema: <https://json-schema.org/>
+- SHA-256: <https://en.wikipedia.org/wiki/SHA-2>
+- CSS Custom Highlight API: <https://developer.mozilla.org/en-US/docs/Web/API/CSS_Custom_Highlight_API>
