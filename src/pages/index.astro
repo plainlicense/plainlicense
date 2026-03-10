@@ -1,0 +1,93 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+import Search from '../components/Search.astro';
+
+const licenses = await getCollection('licenses');
+const featuredLicenses = licenses.filter(l => l.data.featured);
+---
+
+<BaseLayout title="Home">
+  <header class="hero">
+    <h1>Plain License</h1>
+    <p>Simplified, human-readable versions of popular software licenses.</p>
+    <div class="search-box">
+      <Search />
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="featured">
+      <h2>Featured Licenses</h2>
+      <div class="grid">
+        {featuredLicenses.map(license => (
+          <a href={`/licenses/${license.slug || license.id}/`} class="card">
+            <h3>{license.data.title}</h3>
+            <p>{license.data.description}</p>
+          </a>
+        ))}
+      </div>
+    </section>
+
+    <section class="all-licenses">
+      <h2>All Licenses</h2>
+      <ul>
+        {licenses.map(license => (
+          <li>
+            <a href={`/licenses/${license.slug || license.id}/`}>{license.data.title}</a>
+          </li>
+        ))}
+      </ul>
+    </section>
+  </main>
+</BaseLayout>
+
+<style>
+  .hero {
+    text-align: center;
+    padding: 4rem 2rem;
+    background: linear-gradient(rgba(136, 58, 234, 0.1), transparent);
+  }
+  .container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+  }
+  .card {
+    padding: 1.5rem;
+    background: #1a1c23;
+    border: 1px solid #333;
+    border-radius: 12px;
+    text-decoration: none;
+    color: white;
+    transition: transform 0.2s;
+  }
+  .card:hover {
+    transform: translateY(-4px);
+    border-color: #883aea;
+  }
+  .card h3 {
+    margin-top: 0;
+    color: #883aea;
+  }
+  ul {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+  }
+  li a {
+    color: #aaa;
+    text-decoration: none;
+  }
+  li a:hover {
+    color: white;
+  }
+</style>

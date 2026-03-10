@@ -1,0 +1,84 @@
+---
+title: Plain Unlicense
+spdx_id: Unlicense
+version: 0.2.0
+original_version: unknown
+description: The Unlicense is a public domain dedication that allows you to do whatever you want with the work without restrictions or required notices.
+license_type: public-domain
+is_osi_approved: true
+is_fsf_approved: true
+status: published
+summary: The Unlicense is a public domain dedication allowing any use without restrictions.
+permissions:
+  - private-use
+  - commercial-use
+  - modifications
+  - distribution
+conditions: []
+limitations:
+  - liability
+  - warranty
+plain_gunning_fog: 12.2
+shame_words_count: 1
+---
+# Plain Unlicense
+
+## The Work is Everyone's Work - Use it Freely
+
+**You can do whatever you want with the work.**
+
+The person who created the work has given up their copyright. This means you can:
+
+- **Use the work** for any reason
+- **Copy the work**
+- **Change the work**
+- **Share the work**
+- **Sell the work**
+- **Mix the work** with other materials
+
+You can do all of these things **for free**. You don't have to follow any rules or include any notices.
+
+## We Also Give Everyone a License Without Restrictions
+
+In places that follow copyright laws, we give up all our rights to the work. Everyone can use it freely, and with no benefit to us or our children. We give up all rights permanently. We want everyone to know we give up our rights to the work now and forever.
+
+## You can Change the License
+
+**You can share the work under any other license.** This includes "copyleft" licenses (like the GPL) and "proprietary" licenses (where you keep all rights).
+
+## We Offer No Warranty
+
+**Use the work at your own risk.**
+
+- **The work is provided "as is" with no warranties.**
+- We are not responsible for any problems or damages caused by using the work.
+- We don't have to fix any problems you find.
+
+---
+
+# Original License Text
+
+This is free and unencumbered software released into the public domain.
+
+Anyone is free to copy, modify, publish, use, compile, sell, or
+distribute this software, either in source code form or as a compiled
+binary, for any purpose, commercial or non-commercial, and by any
+means.
+
+In jurisdictions that recognize copyright laws, the author or authors
+of this software dedicate any and all copyright interest in the
+software to the public domain. We make this dedication for the benefit
+of the public at large and to the detriment of our heirs and
+successors. We intend this dedication to be an overt act of
+relinquishment in perpetuity of all present and future rights to this
+software under copyright law.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE.
+
+For more information, please refer to <http://unlicense.org/>

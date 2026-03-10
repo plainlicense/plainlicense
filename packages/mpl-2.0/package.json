@@ -3,15 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "description": "Plain language version of MPL 2.0",
+  "main": "../../docs/licenses/copyleft/mpl-2.0/index.md",
   "scripts": {
     "release": "semantic-release"
-  },
-  "main": "../../docs/licenses/copyleft/mpl-2.0/index.md",
-  "devDependencies": {
-    "@commitlint/cli": "^19.8.1",
-    "@semantic-release/changelog": "^6.0.3",
-    "@semantic-release/commit-analyzer": "^13.0.1",
-    "@semantic-release/git": "^10.0.1"
   },
   "release": {
     "branches": [
@@ -65,7 +59,27 @@
             "../changelogs/mpl-2.0.md"
           ]
         }
+      ],
+      [
+        "@semantic-release/release-notes-generator"
+      ],
+      [
+        "@semantic-release/github",
+        {
+          "assets": [
+            {
+              "path": "../../docs/licenses/copyleft/mpl-2.0/index.md",
+              "label": "Plain MPL 2.0 License"
+            }
+          ]
+        }
       ]
     ]
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^19.8.1",
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/commit-analyzer": "^13.0.1",
+    "@semantic-release/git": "^10.0.1"
   }
 }

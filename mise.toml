@@ -1,27 +1,441 @@
+[settings]
+idiomatic_version_file_enable_tools = []
+experimental = true
+
+[settings.npm]
+package_manager = "bun"
+
 [tools]
-actionlint = "latest"
 bun = "latest"
-gitsign = "latest"
+"cargo:submod" = "latest"
+delta = "latest"
 hk = "latest"
-"npm:@smithery/cli" = "latest"
-"npm:commitizen" = "latest"
-"npm:commitlint" = "latest"
-"npm:git-cz" = "latest"
-"npm:markdownlint-cli2" = "latest"
-"npm:prettier" = "latest"
-"npm:semantic-release-cli" = "latest"
-"npm:sort-package-json" = "latest"
-"npm:stylelint" = "latest"
-"pipx:commitizen" = "latest"
-"pipx:mkdocs" = "latest"
-"pipx:yamllint" = "latest"
 pkl = "latest"
-ruff = "latest"
-shellcheck = "latest"
-shfmt = "latest"
-typos = "latest"
-uv = "latest"
-yamllint = "latest"
 
 [env]
-HK_MISE = true
+HK_MISE = 1
+MISE_EXPERIMENTAL = 1
+_.path = [
+  "./bin",
+]
+GH_REPO = "plainlicense/plainlicense"
+CI = '''{% if get_env(name="GITHUB_ACTIONS", default="") != "" %}true{% else %}false{% endif %}'''
+MISE_ENV = '''{% if get_env(name="CI", default="") == "true" %}""{% else %}dev{% endif %}
+'''
+MISE_YES = 1
+
+[tasks]
+[tasks._array-from-sources]
+usage = '''
+arg "[sources]" {
+  help "The source files to convert into an array"
+  }
+'''
+shell = "bash"
+run = '''
+raw_files="${usage_sources}"
+# we receive them in a an array-like string: 
+# e.g. "[file1, file2, file3]" with no inner quotes, so we need to split on ", " and trim the brackets
+# replace ", " with a newline, then trim the leading "[" and trailing "]", then read into an array
+files=()
+while IFS= read -r line; do
+  trimmed_line="$(echo "$line" | sed 's/^\[//;s/\]$//')"
+  files+=("$trimmed_line")
+done <<< "$(echo "$raw_files" | tr ', ' '\n')"
+# return the array as a JSON array string
+printf '%s\n' "${files[@]}" | jq -R . | jq -s .
+'''
+
+[tasks._doctor-output]
+run = '''
+mise doctor --json | jq '.' | jq 'with_entries(select([.key] | inside(["activated", "shims_on_path", "self_update_available", "shell", "toolset"])))'
+'''
+hide = true
+
+[tasks._check_doctor]
+usage = '''
+arg "<action>" {
+  choices "activated" "shims" "update-available" "shell" "list-tools"
+  help "The doctor field to check"
+  }
+'''
+run = '''
+doctor="$(mise run _doctor-output 2>/dev/null || echo '{}')"
+case "$usage_action" in
+  activated)
+    echo "$doctor" | jq '.activated'
+    ;;
+  shims)
+    echo "$doctor" | jq '.shims_on_path'
+    ;;
+  update-available)
+    echo "$doctor" | jq '.self_update_available'
+    ;;
+  shell)
+    echo "$doctor" | jq -r '.shell.name // empty'
+    ;;
+  list-tools)
+    tools="$(echo "$doctor" | jq -r '.toolset | keys[]')"
+    echo "$tools"
+    ;;
+esac
+'''
+
+[tasks._is-setup]
+usage = '''
+arg "[tool]..." {
+  help "Check if specific tools are set up (e.g. node, bun, hk)"
+  }
+'''
+run = '''
+if [ "$CI" == "true" ]; then
+   shims="$(mise run _check_doctor shims 2>/dev/null)"
+   if [ "$shims" != "true" ]; then
+     mise run setup
+  `   exit 0
+   fi
+else
+    activated="$(mise run _check_doctor activated 2>/dev/null)"
+    if [ "$activated" != "true" ]; then
+      mise run setup
+      exit 0
+    fi
+if [ x"${usage_tool}" != "x" ]; then
+    eval "tools=($usage_tool)"
+    toolset="$(mise run _check_doctor list-tools 2>/dev/null || echo '')"
+    for tool in "${tools[@]}"; do
+      if ! echo "$toolset" | grep -qx "$tool"; then
+        mise install "$tool" &>/dev/null || echo " ⚠️  WARNING: mise install $tool failed during setup "
+      fi
+    done
+fi
+'''
+
+[tasks.setup]
+shell = "bash"
+run = [
+  "mise set &> /dev/null",
+  # trust can error if it's already trusted, so we ignore errors here
+  "mise -yq trust --all &>/dev/null || ''",
+  "ln -sf AGENTS.md CLAUDE.md &>/dev/null",
+  "ln -sf AGENTS.md GEMINI.md &>/dev/null",
+  '''
+  if [ "$CI" != "true" ]; then
+    mise -yq reshim
+    shell="$(mise run _shell)"
+    rcfile="$HOME/.bashrc"
+    shellname="$(basename "$shell")"
+    if [ "$shellname" = "zsh" ]; then
+      rcfile="$HOME/.zshrc"
+    fi
+    if [ "$shellname" = "fish" ]; then
+      rcfile="$HOME/.config/fish/config.fish"
+    fi
+  else
+    eval "$(mise activate --shell=bash)"
+  fi
+  ''',
+  "hk install --mise 2>&1 || mise x hk@latest -- hk install --mise 2>&1 || echo \" ⚠️  WARNING: hk install failed during setup \"",
+  "bun install 2>&1 || mise x bun@latest -- bun install 2>&1 || echo \" ⚠️  WARNING: bun install failed during setup \"",
+  "mise -yq sync node &>/dev/null || echo \" ⚠️  WARNING: mise sync node failed during setup \"",
+]
+
+[tasks.sync-submods]
+tools."cargo:submod" = "latest"
+run = "submod sync"
+
+[tasks._ensure-node-script]
+tools.node = "24"
+dir = "./node_modules/bun"
+silent = true
+# this may not exist if we've already done it, so we ignore errors here
+run = "node install.js &>/dev/null || true"
+
+[tasks.sync-modules]
+tools.bun = "latest"
+run = ["bun i"]
+
+[tasks.sync]
+depends = ["sync-submods", "sync-modules", "_ensure-node-script"]
+
+[tasks.update-tools]
+run = [
+  '''
+    update_available="$(mise run _check_doctor update-available 2>/dev/null)"
+    if [ "$update_available" = "true" ]; then
+        mise -yq self-update
+    fi
+    ''',
+  "mise -yq upgrade --bump",
+  "bun upgrade"
+]
+
+[tasks.update-libs]
+tools.bun = "latest"
+run = "bun update"
+
+[tasks.fmt-ts]
+tools.biome = "latest"
+sources = [
+  "./*.{ts,mjs,js,json}",
+  "./src/**/*.{ts,mjs,js,tsx,jsx,json,astro,css}",
+  "./packages/*/*.{ts,mjs,js,json,css}",
+  "./packages/*/src/**/*.{ts,mjs,js,tsx,jsx,json,astro,css}",
+  "./bin/*.{ts,mjs,js,json}",
+  "./.github/**/*.{ts,mjs,js,json}",
+]
+shell = "bash"
+run = '''
+biome check --write --unsafe ./{src,bin,tests,packages,.github,.vscode,content}/**/*.{ts,mjs,js,tsx,jsx,json,astro,css} ./*.{ts,mjs,js,json}
+'''
+
+[tasks.fmt-sh]
+tools.shfmt = "latest"
+sources = [
+  "./bin/*.{sh,bash,zsh,fish}",
+  "./*.{sh,bash,zsh,fish}",
+]
+shell = "bash"
+run = '''shfmt -w ./{bin,src,tests,packages,.github,.vscode,content}/**/*.{sh,bash,zsh,fish} ./*.{sh,bash,zsh,fish}
+'''
+
+[tasks.fmt-md]
+tools."npm:markdownlint-cli2" = "latest"
+sources = [
+  "./src/**/*.md",
+  "*.md",
+  "./packages/**/*.md",
+  "./content/**/*.md",
+  "./claudedocs/**/*.md",
+  "./specs/**/*.md",
+  "./plans/**/*.md"
+]
+run = '''
+markdownlint-cli2 ./*.md ./{src,packages,content,claudedocs,specs,plans}/**/*.md --fix
+'''
+
+[tasks.fmt-toml]
+tools.tombi = "latest"
+sources = ["*.toml"]
+run = '''
+tombi format ./*.toml
+'''
+
+[tasks.fmt-package-json]
+depends = ["fmt-ts"]
+tools.bun = "latest"
+sources = ["./package.json", "./packages/*/package.json"]
+run = '''
+bunx sort-package-json ./package.json ./{packages/*/package.json}
+'''
+
+[tasks.fmt-yaml]
+depends = ["fmt-ts"]
+tools.yq = "latest"
+sources = [
+  "./.github/*.{yaml,yml}",
+  "*.{yaml,yml}",
+  "./src/**/*.{yaml,yml}",
+  "./packages/*/*.{yaml,yml}"
+]
+run = '''yq -iP ./*.{yaml,yml} ./{src,packages,.github}/**/*.{yaml,yml}
+'''
+
+[tasks.fmt-pkl]
+tools.pkl = "latest"
+sources = ["./*.pkl"]
+run = '''pkl format --write ./*.pkl
+'''
+
+[tasks.fmt]
+depends = [
+  "fmt-ts",
+  "fmt-sh",
+  "fmt-md",
+  "fmt-toml",
+  "fmt-package-json",
+  "fmt-yaml",
+  "fmt-pkl"
+]
+
+[tasks._stage-all]
+run = "git add ."
+hide = true
+
+[tasks.commit]
+usage = '''
+arg "<message>" {
+  help "The commit message"
+  }
+'''
+depends = ["_stage-all", "fmt"]
+tools.biome = "latest"
+run = '''
+git add .
+git commit -m "$usage_message"
+'''
+
+[tasks.lint-ts]
+tools.biome = "latest"
+sources = [
+  "./*.{ts,mjs,js,json}",
+  "./src/**/*.{ts,mjs,js,tsx,jsx,json,astro,css}",
+  "./tests/**/*.{ts,mjs,js,tsx,jsx,json,astro,css}",
+  "./packages/*/*.{ts,mjs,js,json,css}",
+  "./packages/*/src/**/*.{ts,mjs,js,tsx,jsx,json,astro,css}",
+  "./bin/*.{ts,mjs,js,json}",
+  "./.github/**/*.{ts,mjs,js,json}",
+]
+run = '''
+biome check ./{src,bin,tests,packages,.github,.vscode,content}/**/*.{ts,mjs,js,tsx,jsx,json,astro,css} ./*.{ts,mjs,js,json}
+'''
+
+[tasks.lint-sh]
+tools.shellcheck = "latest"
+sources = [
+  "./bin/*.{sh,bash,zsh,fish}",
+]
+run = '''shellcheck ./{bin,src,tests,packages,.github,.vscode,content}/**/*.{sh,bash,zsh,fish} ./*.{sh,bash,zsh,fish}
+'''
+
+[tasks.lint-typos]
+tools.typos = "latest"
+sources = [
+  "./*.{md,txt,ts,js,json,astro,toml,yaml,yml,sh,fish,zsh,mdx}",
+  "./src/**/*.{md,txt,ts,js,json,astro,toml,yaml,yml,sh,fish,zsh,mdx}",
+  "./packages/*/*.{md,txt,ts,js,json,astro,toml,yaml,yml,sh,fish,zsh,mdx}",
+  "./github/**/*.{md,txt,ts,js,json,astro,toml,yaml,yml,sh,fish,zsh,mdx}",
+  "./bin/*.{md,txt,ts,js,json,astro,toml,yaml,yml,sh,fish,zsh,mdx}",
+  "./.vscode/**/*.{md,txt,ts,js,json,astro,toml,yaml,yml,sh,fish,zsh,mdx}",
+  "./tests/**/*.{md,txt,ts,js,json,astro,toml,yaml,yml,sh,fish,zsh,mdx}",
+  "./content/**/*.{md,txt,ts,js,json,astro,toml,yaml,yml,sh,fish,zsh,mdx}",
+]
+run = '''typos check ./{src,bin,tests,packages,.github,.vscode,content}/**/*.{md,txt,ts,js,json,astro,toml,yaml,yml,sh,fish,zsh,mdx} ./*.{md,txt,ts,js,json,astro,toml,yaml,yml,sh,fish,zsh,mdx}
+'''
+
+[tasks.lint-toml]
+tools.tombi = "latest"
+sources = ["./*.toml"]
+run = '''tombi lint ./*.toml
+'''
+
+[tasks.lint-astro]
+tools.bun = "latest"
+sources = ["./src/**/*.astro"]
+run = '''bunx astro check
+'''
+
+[tasks.lint]
+depends = ["lint-astro", "lint-toml", "lint-sh", "lint-ts"]
+
+[tasks.release]
+usage = '''
+flag "--dry-run" {
+  help "Perform a dry run of the release process without actually publishing"
+  }
+flag "--no-ci" {
+  help "Run release for local testing without CI environment variables"
+  }
+flag "-b --branch <name>" {
+  help "Specify the branch to release from (default: main)"
+  default "main"
+  }
+'''
+tools."npm:semantic-release-cli" = "latest"
+tools.bun = "latest"
+run = '''
+flags=()
+if [ "$usage_dry_run" = "true" ]; then
+  flags+=("--dry-run")
+fi
+if [ "$usage_no_ci" = "true" ]; then
+  flags+=("--no-ci")
+else
+  flags+=("--ci")
+fi
+if [ -n "$usage_branch" ]; then
+  flags+=("-b" "$usage_branch")
+else
+  flags+=("-b" "main")
+fi
+bunx semantic-release "${flags[@]}"
+'''
+
+[tasks.test-cov]
+tools.bun = "latest"
+run = "bunx vitest run --coverage"
+
+[tasks.test]
+usage = '''
+arg "[coverage]" {
+  choices "coverage"
+  help "Run tests with coverage reporting"
+  }
+flag "--e2e" {
+  help "Run end-to-end tests instead of unit tests"
+  }
+flag "--ui" {
+  help "Run ui tests"
+  }
+flag "--unit" {
+  help "Run unit tests"
+  }
+'''
+tools.bun = "latest"
+depends = ["sync"]
+run = '''
+if [ -n "$usage_coverage" ]; then
+  mise run test-cov
+fi
+if [ -n "$usage_e2e" ]; then
+  bunx playwright test
+fi
+if [ -n "$usage_ui" ]; then
+  bunx vitest --ui
+fi
+if [ -n "$usage_unit" ]; then
+  bunx vitest run
+fi
+if [ -z "$usage_e2e" ] && [ -z "$usage_ui" ] && [ -z "$usage_unit" ]; then
+    bunx vitest
+fi
+'''
+
+[tasks.build]
+tools.bun = "latest"
+run = '''
+bunx astro build
+bun run src/build/generate-exports.ts
+bun run src/build/generate-og-images.ts
+bun run src/build/generate-versions.ts
+'''
+
+[tasks.deploy]
+usage = '''
+arg "[env]" {
+  choices "production" "staging"
+  help "The environment to deploy to"
+  default "production"
+  }
+'''
+tools.bun = "latest"
+run = '''
+bunx wrangler types --env "$usage_env"
+bunx wrangler deploy --env "$usage_env"
+'''
+
+[tasks.ci]
+depends = ["_is-setup", "sync", "lint", "test-cov", "build"]
+
+[tasks.ci-release]
+depends = ["ci", "release", "deploy"]
+
+[tasks.dev]
+depends = ["_is-setup", "sync"]
+tools.bun = "latest"
+run = "bunx astro dev"
+
+[tasks.preview]
+depends = ["_is-setup", "sync"]
+tools.bun = "latest"
+run = "bunx astro preview"

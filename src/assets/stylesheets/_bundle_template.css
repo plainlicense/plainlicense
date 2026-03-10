@@ -1,8 +1,0 @@
-@import "external/mkdocs-material/material/templates/assets/stylesheets/palette.{{ palette-hash }}.min.css";
-@import "external/mkdocs-material/material/templates/assets/stylesheets/main.{{ main-hash }}.min.css";
-@import "bodyfont.css";
-@import "colors.css";
-@import "extra.css";
-@import "license.css";
-@import "hero.css";
-@import "tags.css";

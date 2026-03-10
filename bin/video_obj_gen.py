@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """
 Generates a TypeScript file with all the video paths for the hero section.
 """

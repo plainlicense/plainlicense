@@ -1,0 +1,22 @@
+{
+  "Unlicense": {
+    "version": "0.2.0",
+    "hash": "f68ea0429b43e5d93170c13ad9c2611b99a57a649d16c0c58b942d94336915a2",
+    "lastBuilt": "2026-03-05T19:38:12.827Z"
+  },
+  "MPL-2.0": {
+    "version": "0.1.0",
+    "hash": "e1da9bd85fe84454a9500667ecf7afac2af235c96388528d56fe9d5dfceecc12",
+    "lastBuilt": "2026-03-05T19:38:13.552Z"
+  },
+  "MIT": {
+    "version": "0.2.1",
+    "hash": "5fd69fcb2369b1121c91f9ebda942cded33eee4b39ae9bdc22cbacb05e87223f",
+    "lastBuilt": "2026-03-05T19:38:13.639Z"
+  },
+  "Elastic-2.0": {
+    "version": "0.1.0",
+    "hash": "2337b8832ceb3832c7d7c957b800dedcf6b6a53a77ca0e47f21617183971fa49",
+    "lastBuilt": "2026-03-05T19:38:13.755Z"
+  }
+}

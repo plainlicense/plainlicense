@@ -1,0 +1,135 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  license: CollectionEntry<'licenses'>;
+}
+
+const { license } = Astro.props;
+const { data } = license;
+
+// Try to load mapping data if it exists
+let mappingData = null;
+try {
+  // Use id instead of slug for consistent mapping file lookup
+  const mappingPath = `/content/mappings/${data.spdx_id}-mapping.json`;
+  // In a real app, we'd fetch this or use Astro.glob
+} catch (e) {}
+---
+
+<BaseLayout title={data.title || data.spdx_id} description={data.description}>
+  <main class="license-page" data-spdx-id={data.spdx_id}>
+    <header>
+      <h1>{data.title}</h1>
+      {data.plain_name && <p class="plain-name">{data.plain_name}</p>}
+      <div class="metadata">
+        <span class="spdx-id">{data.spdx_id}</span>
+        <span class="category">{data.category}</span>
+        {data.current_version && <span class="version">v{data.current_version}</span>}
+      </div>
+    </header>
+
+    <section class="summary">
+      <p>{data.description}</p>
+    </section>
+
+    <div class="content-wrapper">
+      <article class="prose">
+        <slot />
+      </article>
+
+      <aside class="sidebar">
+        {data.permissions && (
+          <section>
+            <h3>Permissions</h3>
+            <ul>{data.permissions.map(p => <li>{p}</li>)}</ul>
+          </section>
+        )}
+        {data.conditions && (
+          <section>
+            <h3>Conditions</h3>
+            <ul>{data.conditions.map(c => <li>{c}</li>)}</ul>
+          </section>
+        )}
+        {data.limitations && (
+          <section>
+            <h3>Limitations</h3>
+            <ul>{data.limitations.map(l => <li>{l}</li>)}</ul>
+          </section>
+        )}
+      </aside>
+    </div>
+  </main>
+</BaseLayout>
+
+<script>
+  import { initMappingViewer } from '../components/MappingViewer';
+  
+  async function loadMappings() {
+    const main = document.querySelector('.license-page');
+    const spdxId = main?.getAttribute('data-spdx-id');
+    
+    if (spdxId) {
+      try {
+        // In prototype, we try to fetch the local JSON
+        const response = await fetch(`/mappings/${spdxId}-mapping.json`);
+        if (response.ok) {
+          const mappingData = await response.json();
+          initMappingViewer(main as HTMLElement, mappingData);
+        }
+      } catch (e) {
+        console.warn('Mapping data not found for:', spdxId);
+      }
+    }
+  }
+
+  loadMappings();
+</script>
+
+<style>
+  .license-page {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+  header {
+    margin-bottom: 2rem;
+    border-bottom: 1px solid #333;
+    padding-bottom: 1rem;
+  }
+  .plain-name {
+    font-size: 1.5rem;
+    color: #aaa;
+  }
+  .metadata {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.9rem;
+    color: #888;
+  }
+  .content-wrapper {
+    display: grid;
+    grid-template-columns: 1fr 250px;
+    gap: 3rem;
+  }
+  .prose {
+    line-height: 1.6;
+  }
+  aside section {
+    margin-bottom: 1.5rem;
+  }
+  h3 {
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+    color: #888;
+  }
+  ul {
+    list-style: none;
+    padding: 0;
+  }
+  li {
+    font-size: 0.9rem;
+    margin-bottom: 0.3rem;
+  }
+</style>

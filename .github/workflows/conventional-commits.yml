@@ -1,0 +1,25 @@
+name: Conventional Commits
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize]
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Analyze Commit Messages
+        run: |
+          DIFF=$(git diff origin/${{ github.base_ref }} HEAD)
+          MSG=$(git log -1 --pretty=%B)
+          bun src/build/commit-analyzer.ts "$DIFF" "$MSG"

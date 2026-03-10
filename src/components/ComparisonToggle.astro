@@ -1,0 +1,84 @@
+---
+/**
+ * A toggle component to enable/disable interactive comparison mode.
+ * Persists preference in localStorage.
+ */
+---
+
+<div class="comparison-toggle-container">
+  <button id="comparison-toggle" class="toggle-btn" aria-pressed="false">
+    <span class="toggle-icon">🔍</span>
+    <span class="toggle-text">Enable Interactive Comparison</span>
+  </button>
+  <p class="toggle-hint">Hover over sections to see connections</p>
+</div>
+
+<script>
+  const toggleBtn = document.getElementById('comparison-toggle') as HTMLButtonElement;
+  const container = document.querySelector('.license-container') as HTMLElement;
+  const STORAGE_KEY = 'pl-comparison-mode';
+
+  function updateUI(isActive: boolean) {
+    if (isActive) {
+      container?.classList.add('comparison-active');
+      toggleBtn.setAttribute('aria-pressed', 'true');
+      toggleBtn.classList.add('active');
+      toggleBtn.querySelector('.toggle-text')!.textContent = 'Disable Interactive Comparison';
+    } else {
+      container?.classList.remove('comparison-active');
+      toggleBtn.setAttribute('aria-pressed', 'false');
+      toggleBtn.classList.remove('active');
+      toggleBtn.querySelector('.toggle-text')!.textContent = 'Enable Interactive Comparison';
+    }
+  }
+
+  // Load preference
+  const savedPreference = localStorage.getItem(STORAGE_KEY) === 'true';
+  updateUI(savedPreference);
+
+  toggleBtn.addEventListener('click', () => {
+    const isNowActive = !container.classList.contains('comparison-active');
+    localStorage.setItem(STORAGE_KEY, String(isNowActive));
+    updateUI(isNowActive);
+  });
+</script>
+
+<style>
+  .comparison-toggle-container {
+    margin-bottom: 2rem;
+    padding: 1rem;
+    background: var(--sl-color-gray-6);
+    border-radius: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    border: 1px solid var(--sl-color-gray-5);
+  }
+  .toggle-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--sl-color-black);
+    color: var(--sl-color-white);
+    border: 2px solid var(--sl-color-accent);
+    padding: 0.5rem 1.25rem;
+    border-radius: 99px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s;
+  }
+  .toggle-btn:hover {
+    background: var(--sl-color-accent);
+    color: var(--sl-color-black);
+  }
+  .toggle-btn.active {
+    background: var(--sl-color-accent);
+    color: var(--sl-color-black);
+  }
+  .toggle-hint {
+    font-size: var(--sl-text-xs);
+    color: var(--sl-color-gray-3);
+    margin: 0;
+  }
+</style>

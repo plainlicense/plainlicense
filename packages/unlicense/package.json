@@ -1,26 +1,20 @@
 {
   "name": "plain-license-unlicense",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "description": "Plain language version of the Unlicense",
+  "main": "../../docs/licenses/public-domain/unlicense/index.md",
   "scripts": {
     "release": "semantic-release"
-  },
-  "main": "../../docs/licenses/public-domain/unlicense/index.md",
-  "devDependencies": {
-    "@commitlint/cli": "^19.5.0",
-    "@semantic-release/changelog": "^6.0.3",
-    "@semantic-release/commit-analyzer": "^13.0.0",
-    "@semantic-release/git": "^10.0.1"
   },
   "release": {
     "branches": [
       "+([0-9])?(.{+([0-9]),x}).x",
       "main",
       {
+        "channel": "pre/rc",
         "name": "dev",
-        "prerelease": true,
-        "channel": "pre/rc"
+        "prerelease": true
       }
     ],
     "plugins": [
@@ -29,29 +23,43 @@
         {
           "releaseRules": [
             {
-              "type": "stable",
-              "release": "major"
+              "release": "major",
+              "type": "stable"
             },
             {
-              "type": "new",
-              "release": "minor"
+              "release": "minor",
+              "type": "new"
             },
             {
-              "type": "subs",
-              "release": "minor"
+              "release": "minor",
+              "type": "subs"
             },
             {
-              "type": "admin",
-              "release": "patch"
+              "release": "patch",
+              "type": "admin"
             },
             {
-              "type": "bot",
-              "release": false
+              "release": false,
+              "type": "bot"
             }
           ]
         }
       ],
       [
+        [
+          "@semantic-release/release-notes-generator"
+        ],
+        [
+          "@semantic-release/github"
+        ],
+        {
+          "assets": [
+            {
+              "path": "../../docs/licenses/public-domain/unlicense/index.md",
+              "label": "Plain Unlicense License"
+            }
+          ]
+        },
         "@semantic-release/changelog",
         {
           "changelogFile": "../changelogs/unlicense.md",
@@ -67,5 +75,11 @@
         }
       ]
     ]
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^19.8.1",
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/commit-analyzer": "^13.0.1",
+    "@semantic-release/git": "^10.0.1"
   }
 }

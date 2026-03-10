@@ -1,7 +1,6 @@
+#!/usr/bin/env python3
 """
 Extract a high quality AVIF frame from a video.
-
-
 """
 
 from pathlib import Path

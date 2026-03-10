@@ -1,5 +1,5 @@
-# sourcery skip: avoid-single-character-names-variables
 #!/usr/bin/env python3
+# sourcery skip: avoid-single-character-names-variables
 """
 Analyze git history to identify extensive TypeScript refactors.
 

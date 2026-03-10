@@ -1,8 +1,13 @@
 {
   "name": "plain-license-site",
   "version": "0.0.0-development",
-  "description": "Plain language versions of popular licenses",
   "private": true,
+  "description": "Plain language versions of popular licenses",
+  "author": {
+    "name": "Adam Poulemanos",
+    "email": "adam@plainlicense.org"
+  },
+  "type": "module",
   "main": "../../mkdocs.yml",
   "bin": {},
   "directories": {
@@ -17,18 +22,9 @@
     "site-typescript-source": "../../src/assets/javascripts",
     "submodules": "../../external"
   },
-  "type": "module",
   "scripts": {
-    "release": "semantic-release",
-    "deploy": "mkdocs gh-deploy"
-  },
-  "author": {
-    "name": "Adam Poulemanos",
-    "email": "adam@plainlicense.org"
-  },
-  "devDependencies": {},
-  "engines": {
-    "node": "> 19"
+    "deploy": "mkdocs gh-deploy",
+    "release": "semantic-release"
   },
   "release": {
     "branches": [
@@ -97,5 +93,9 @@
         "@semantic-release/github"
       ]
     ]
+  },
+  "devDependencies": {},
+  "engines": {
+    "node": "> 19"
   }
 }

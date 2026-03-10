@@ -1,0 +1,42 @@
+---
+import { getEntry, type CollectionEntry } from 'astro:content';
+import LicenseLayout from '../../layouts/LicenseLayout.astro';
+
+// This is a dynamic route (for previewing ANY content)
+// In production, this should be protected by authentication
+
+export const prerender = false; // Ensure it's not pre-rendered
+
+const { slug } = Astro.params;
+if (!slug) return Astro.redirect('/404');
+
+// Try fetching as a license first
+let entry: CollectionEntry<'licenses'> | null = await getEntry('licenses', slug);
+
+if (!entry) {
+  // Handle other types of previews (e.g., blog) if needed
+  return Astro.redirect('/404');
+}
+
+const { Content } = await entry.render();
+---
+
+<LicenseLayout license={entry}>
+  <div class="preview-banner">
+    ⚠️ PREVIEW MODE - This content is unpublished.
+  </div>
+  <Content />
+</LicenseLayout>
+
+<style>
+  .preview-banner {
+    background: #ff0000;
+    color: white;
+    text-align: center;
+    padding: 0.5rem;
+    font-weight: bold;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+  }
+</style>

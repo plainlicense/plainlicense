@@ -6,39 +6,27 @@ I strived to avoid hardcoding any license text in the codebase. For the most par
 
 ## Adding a License
 
-1.  **The License**. License files consist of YAML frontmatter within a (usually empty) markdown file. The template is [LICENSE_TEMPLATE.md](./LICENSE_TEMPLATE.md). Instructions for this part are in the file itself and [docs/helping/craft.md](./docs/helping/craft.md).
+1.  **The License**. License files consist of YAML frontmatter within a (usually empty) markdown file. The template is [LICENSE_TEMPLATE.md](./LICENSE_TEMPLATE.md). Instructions for this part are in the file itself and the [crafting guide](/helping/craft).
 
-2.  **The License File Location**. The license file should be placed in the `docs/licenses/{category}/{spdx-id}/index.md` directory, where:
+2.  **The License File Location**. The license file should be placed at `content/licenses/{category}/{spdx-id}.md`, where:
 
     - `{category}` is the category of the license (one of: `permissive`, `copyleft`, `source-available`, `public-domain`, `proprietary`).
     - `{spdx-id}` is the SPDX identifier for the license in lower case (e.g., `mit`, `gpl-3.0`). All spdx-ids are in the [license-list-data submodule](./external/license-list-data/json/licenses.json) or at [spdx.org](https://spdx.org/licenses/).
     - If a license is a Plain License original, the spdx-id should be prefixed with and follow the SPDX convention for naming (e.g., `plain-public-domain`). Don't include a version number in version IDs for Plain License originals -- we're constantly iterating.
 
-3.  **The License File Name**. The license file should be named `index.md` (e.g., `/licenses/permissive/mit/`).
+3.  **The License File Name**. The license file should be named `{spdx-id}.md` (e.g., `content/licenses/permissive/mit.md`). The canonical URL will be `/licenses/{category}/{spdx-id}` (e.g., `/licenses/permissive/mit`).
 
-4.  **Linking the License File**. The license file must be referenced and linked in the root [`mkdocs.yml`](./mkdocs.yml) in the `nav` section. Currently the licenses are linked under `our licenses` -> category -> spdx-id. For example, the MIT license is linked as follows:
+4.  **URL Routing is Automatic**. No manual routing configuration is needed. When the site is built, short-slug redirects are automatically generated from the `content/licenses/` directory structure:
+    - `/licenses/{spdx-id}` → `/licenses/{category}/{spdx-id}` (e.g., `/licenses/mit` → `/licenses/permissive/mit`)
+    - `/{spdx-id}` → `/licenses/{category}/{spdx-id}` (e.g., `/mit` → `/licenses/permissive/mit`)
 
-    ```yaml
-    nav:
-      # stuff
-      - our licenses:
-          # more stuff
-          - permissive licenses:
-              - licenses/permissive/index.md
-              - MIT: licenses/permissive/mit/index.md # <-- this is the link to the MIT license
-    ```
+    This happens in `astro.config.mjs` via `getLicenseRedirects()`, which reads all `.md` files from `content/licenses/` at build time.
 
-5.  **Updating the Category Index**. If you're adding a new license, you should also update the category index file (e.g., `docs/licenses/permissive/index.md` for the permissive category) to include a link to your new license and a brief description. For convenience, here are the index files for each category:
-
-    - [permissive](./docs/licenses/permissive/index.md)
-    - [copyleft](./docs/licenses/copyleft/index.md)
-    - [source-available](./docs/licenses/source-available/index.md)
-    - [public-domain](./docs/licenses/public-domain/index.md)
-    - [proprietary](./docs/licenses/proprietary/index.md)
+5.  **Updating the Category Index**. If you're adding a new license, you should also update the relevant category index page in `src/pages/licenses/` (if one exists) to include a link to your new license and a brief description.
 
 6.  **Add a Package to the Workspace**. After adding the license, you should add a package to the workspace. Steps:
 
-    1. Create a new directory in `./packages/` that is the same name that you used for the license file's directory (based on the spdx-id).
+    1. Create a new directory in `./packages/` that is the same name as you used for the license file's directory (based on the spdx-id).
     2. Copy the `.license_package_template.json` file from the `./packages/` directory to the new directory you created. (copy it, don't move it). Like so: `cp ./packages/.license_package_template.json ./packages/{spdx-id}/package.json`.
     3. The new name should be `package.json` (not `.license_package_template.json`).
     4. Update the `package.json` file. Literally just find and replace the `{{ SPDX_ID }}` placeholders with the actual SPDX ID for the license you added (or the plain license original approximation), or run: `sed -i 's/{{ SPDX_ID }}/{spdx-id}/g' ./packages/{spdx-id}/package.json` (replace `{spdx-id}` with the actual spdx-id without the curly brackets). So for the MIT license, it would be `sed -i 's/{{ SPDX_ID }}/mit/g' ./packages/mit/package.json`.
@@ -52,12 +40,12 @@ I strived to avoid hardcoding any license text in the codebase. For the most par
     }
     ```
 
-8.  **Commit and Push**. After making all the changes, commit your changes in the [commit format](./docs/helping/commit.md) and push them to the repository. For the Apache 2.0 license, the commit message would look like this:
+7.  **Commit and Push**. After making all the changes, commit your changes in the [commit format](./docs/helping/commit.md) and push them to the repository. For the Apache 2.0 license, the commit message would look like this:
 
     ```git
     new(apache-2.0): add Plain Apache 2.0 license
     ```
 
-    This indicates that you are adding a new license (Apache 2.0) to the repository. The `new` type indicates a new license, and the `apache-2.0` scope indicates the specific license being added. This allows our automated release system to version each license separately (that was the part where you added the workspace package in step 6).
+    This indicates you are adding a new license (Apache 2.0) to the repository. The `new` type indicates a new license, and the `apache-2.0` scope indicates the specific license being added. This allows our automated release system to version each license separately (the part where you added the workspace package in step 6).
 
-9.  **Create a Pull Request**. After pushing your changes, create a pull request to merge your changes into the main branch of the repository. Use the [`new-license`](.github/PULL_REQUEST_TEMPLATE/2-new-license.md) PR template.
+8.  **Create a Pull Request**. After pushing your changes, create a pull request to merge your changes into the main branch of the repository. Use the [`new-license`](.github/PULL_REQUEST_TEMPLATE/2-new-license.md) PR template.

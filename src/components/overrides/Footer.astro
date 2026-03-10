@@ -1,0 +1,48 @@
+---
+import type { Props } from '@astrojs/starlight/props';
+import Default from '@astrojs/starlight/components/Footer.astro';
+---
+
+<footer class="plain-footer">
+  <div class="footer-content">
+    <p>
+      Plain License's authors dedicate all original content to the public domain. 
+      <strong>We reserve NO rights.</strong>
+    </p>
+    <nav class="footer-links">
+      <a href="/about">About</a>
+      <a href="/blog">Blog</a>
+      <a href="https://github.com/plainlicense/plainlicense" target="_blank" rel="noopener">GitHub</a>
+    </nav>
+  </div>
+  <Default {...Astro.props}><slot /></Default>
+</footer>
+
+<style>
+  .plain-footer {
+    border-top: 1px solid var(--sl-color-gray-5);
+    padding: 2rem 0;
+    margin-top: 3rem;
+  }
+  .footer-content {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    font-size: var(--sl-text-sm);
+    color: var(--sl-color-gray-3);
+  }
+  .footer-links {
+    display: flex;
+    gap: 1.5rem;
+  }
+  .footer-links a {
+    color: var(--sl-color-text-accent);
+    text-decoration: none;
+  }
+  .footer-links a:hover {
+    text-decoration: underline;
+  }
+</style>

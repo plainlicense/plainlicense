@@ -2,14 +2,14 @@
 	path = external/license-list-data
 	url = https://github.com/spdx/license-list-data.git
 	branch = main
-        ignore = all
-[submodule "external/mkdocs-material"]
-	path = external/mkdocs-material
-	url = https://github.com/squidfunk/mkdocs-material.git
-	branch = master
-	ignore = all
+  ignore = all
 [submodule "external/choosealicense.com"]
 	path = external/choosealicense.com
 	url = https://github.com/github/choosealicense.com.git
 	branch = gh-pages
 	ignore = all
+[submodule "external/license-list-XML"]
+	path = external/license-list-XML
+	url = https://www.github.com/spdx/license-list-XML.git
+  branch = main
+  ignore = all

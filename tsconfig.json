@@ -2,13 +2,14 @@
   "compilerOptions": {
     "allowImportingTsExtensions": false,
     "allowSyntheticDefaultImports": true,
+    "allowArbitraryExtensions": true,
     "alwaysStrict": true,
     "baseUrl": "./",
     "esModuleInterop": true,
     "isolatedModules": true,
     "jsx": "react",
     "jsxFactory": "h",
-    "lib": ["DOM", "DOM.Iterable", "WebWorker", "es2018", "es2020", "esnext"],
+    "lib": ["DOM", "DOM.Iterable", "WebWorker", "esnext"],
     "module": "ESNext",
     "moduleResolution": "Bundler",
     "noEmit": false,
@@ -20,41 +21,37 @@
     "noUnusedParameters": true,
     "outDir": "docs/assets/",
     "paths": {
-      "_/*": ["./external/mkdocs-material/material/overrides/assets/javascripts/*"],
-      "@/*": ["./external/mkdocs-material/src/templates/assets/javascripts/*"],
-      "~/*": [
-        "./src/assets/javascripts/*",
-        "./external/mkdocs-material/src/templates/assets/javascripts/*"
-      ],
       "~assets/*": ["./src/assets/*"],
-      "~external/*": ["./typings"]
+      "~spdx/*": ["./external/license-list-data/json/*", "./external/license-list-XML/src/*"],
+      "~cal/*": ["./external/choosealicense.com/_data/*", "./external/choosealicense.com/_licenses/*"],
     },
-    "removeComments": false,
+    "removeComments": true,
     "skipLibCheck": true,
-    "sourceMap": true,
+    "sourceMap": false,
     "strict": true,
     "strictBindCallApply": true,
     "strictFunctionTypes": true,
     "strictNullChecks": true,
     "strictPropertyInitialization": true,
     "stripInternal": true,
-    "target": "es2020",
-    "verbatimModuleSyntax": false
+    "target": "esnext",
+    "verbatimModuleSyntax": false,
+    "plugins": [
+      {
+        "name": "@astrojs/ts-plugin"
+      }
+    ]
   },
-  "exclude": ["src/build/*.ts", "./commitlint.config.ts"],
-  "extends": "@tsconfig/bun/tsconfig.json",
+  "exclude": ["./commitlint.config.ts", "dist"],
+  "extends": ["astro/tsconfigs/strict"],
   "include": [
+    ".astro/types.d.ts",
     "src/**/*.ts",
-    "./external/mkdocs-material/typings",
-    "./external/mkdocs-material/material/src/templates/assets/javascripts/bundle.ts",
-    "./external/mkdocs-material/material/src/templates/assets/javascripts/**/*.ts",
-    "./external/mkdocs-material/material/src/overrides/assets/javascripts/**/*.ts",
-    "src/cacheWorker.ts"
+    "src/**/*.d.ts",
+    "src/**/*.tsx",
+    "src/**/*.astro",
   ],
   "references": [
-    {
-      "path": "./tsconfig.build.json"
-    },
     {
       "path": "./tsconfig.commitlint.json"
     }
