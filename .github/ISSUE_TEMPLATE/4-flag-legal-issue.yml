@@ -14,7 +14,7 @@ body:
           required: true
         - label: My contribution is for informational purposes only and is not legal advice.
           required: true
-        - label: I am not creating or participating in an lawyer-client relationship with Plain License, its contributors, or its users through my contribution.
+        - label: I am not creating or participating in a lawyer-client relationship with Plain License, its contributors, or its users through my contribution.
           required: true
         - label: My contribution is based on general principles and may not apply to all situations or jurisdictions.
           required: true

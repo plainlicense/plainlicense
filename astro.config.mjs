@@ -237,7 +237,7 @@ export default defineConfig({
       ]
     }),
     sitemap({
-      filter: (page) => { !/\^\/(?!cdn-cgi\/)/.test(page) },
+      filter: (page) => { return !/\^\/(?!cdn-cgi\/)/.test(page); },
       changefreq: 'weekly',
       lastmod: new Date(),
       namespaces: {
@@ -245,7 +245,7 @@ export default defineConfig({
         video: false,
       },
     }),
-    ,
+
     favicons({
       name: 'Plain License',
       short_name: 'PlainLicense',
