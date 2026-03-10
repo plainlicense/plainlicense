@@ -11,7 +11,7 @@ const chooseALicenseDetailsSchema = z.object({
   conditions: z.array(z.string()).optional(),
   permissions: z.array(z.string()).optional(),
   limitations: z.array(z.string()).optional(),
-  using: z.array(z.record(z.string())).max(3).optional(),
+  using: z.array(z.record(z.string(), z.string().url())).max(3).optional(),
   hidden: z.boolean().default(false),
   nickname: z.string().optional(),
   featured: z.boolean().default(false),
