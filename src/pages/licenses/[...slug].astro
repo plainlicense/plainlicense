@@ -8,14 +8,49 @@ import ComparisonToggle from "../../components/ComparisonToggle.astro";
 import ComparisonModal from "../../components/ComparisonModal.astro";
 import { parseComponentPlaceholders } from "../../utils/component-parser";
 import ComponentRegistry from "../../components/reactive/ComponentRegistry.astro";
+import { getLicenseSlug } from "../../utils/collections";
 import { marked } from "marked";
+
+/**
+ * Render markdown content, correctly handling <div id="..."> wrappers.
+ *
+ * CommonMark treats <div> as an HTML block and does NOT process markdown
+ * inside it. This function splits on those wrappers, renders the inner
+ * markdown independently, then re-wraps in the original <div id="...">.
+ * This preserves the element IDs that MappingViewer needs.
+ */
+function renderMarkdownWithDivs(md: string): string {
+  // Regex: <div id="X"> ... </div>  (non-nested, one per section)
+  const divPattern = /<div id="([^"]+)">([\s\S]*?)<\/div>/g;
+  let result = "";
+  let lastIndex = 0;
+  let match: RegExpExecArray | null;
+
+  while ((match = divPattern.exec(md)) !== null) {
+    // Render any content before this div block
+    if (match.index > lastIndex) {
+      result += marked.parse(md.slice(lastIndex, match.index)) as string;
+    }
+    // Render the inner markdown and wrap in the div with its ID
+    const innerHtml = marked.parse(match[2].trim()) as string;
+    result += `<div id="${match[1]}">${innerHtml}</div>\n`;
+    lastIndex = match.index + match[0].length;
+  }
+
+  // Render any trailing content after the last div
+  if (lastIndex < md.length) {
+    result += marked.parse(md.slice(lastIndex)) as string;
+  }
+
+  return result;
+}
 
 export async function getStaticPaths() {
   const licenses = await getCollection("licenses");
   console.log("Generating paths for", licenses.length, "licenses");
 
   return licenses.map((license) => {
-    const slug = license.slug || license.id;
+    const slug = getLicenseSlug(license);
     console.log(" - Path:", `/licenses/${slug}`);
     return {
       params: { slug },
@@ -74,7 +109,7 @@ const fullProcessedBody = (
           {
             contentParts.map((part, index) => (
               <>
-                <div set:html={marked.parse(part)} />
+                <div set:html={renderMarkdownWithDivs(part)} />
                 {placeholders[index] && (
                   <ComponentRegistry
                     type={placeholders[index].type}
@@ -93,7 +128,7 @@ const fullProcessedBody = (
         <h2>{data.original_version_name}</h2>
         <div
           class="license-content prose"
-          set:html={marked.parse(originalBody)}
+          set:html={renderMarkdownWithDivs(originalBody)}
         />
       </div>
     </div>

@@ -1,5 +1,6 @@
 ---
-title: MIT License (Plain Language)
+title: Plain MIT License
+plain_name: Plain MIT License
 spdx_id: MIT
 version: 0.2.1
 original_version: '2024'

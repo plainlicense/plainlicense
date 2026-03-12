@@ -18,6 +18,36 @@ import Default from '@astrojs/starlight/components/Footer.astro';
   <Default {...Astro.props}><slot /></Default>
 </footer>
 
+<button id="scroll-to-top" aria-label="Scroll to top" title="Scroll to top">
+  <svg viewBox="0 0 24 24" aria-hidden="true">
+    <polyline points="18 15 12 9 6 15"></polyline>
+  </svg>
+</button>
+
+<script>
+(function () {
+  const btn = document.getElementById('scroll-to-top');
+  if (!btn) return;
+  const threshold = Math.max(document.documentElement.clientHeight * 0.3, 200);
+  function onScroll() {
+    if (window.scrollY > threshold) {
+      btn.classList.add('visible');
+    } else {
+      btn.classList.remove('visible');
+    }
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  btn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+  document.addEventListener('astro:page-load', () => {
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+  });
+  document.addEventListener('astro:before-preparation', () => {
+    window.removeEventListener('scroll', onScroll);
+  });
+})();
+</script>
+
 <style>
   .plain-footer {
     border-top: 1px solid var(--sl-color-gray-5);

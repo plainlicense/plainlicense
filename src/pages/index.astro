@@ -2,6 +2,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { getCollection } from 'astro:content';
 import Search from '../components/Search.astro';
+import { getLicenseSlug } from '../utils/collections';
 
 const licenses = await getCollection('licenses');
 const featuredLicenses = licenses.filter(l => l.data.featured);
@@ -21,8 +22,8 @@ const featuredLicenses = licenses.filter(l => l.data.featured);
       <h2>Featured Licenses</h2>
       <div class="grid">
         {featuredLicenses.map(license => (
-          <a href={`/licenses/${license.slug || license.id}/`} class="card">
-            <h3>{license.data.title}</h3>
+          <a href={`/licenses/${getLicenseSlug(license)}/`} class="card">
+            <h3>{license.data.plain_name}</h3>
             <p>{license.data.description}</p>
           </a>
         ))}
@@ -34,7 +35,7 @@ const featuredLicenses = licenses.filter(l => l.data.featured);
       <ul>
         {licenses.map(license => (
           <li>
-            <a href={`/licenses/${license.slug || license.id}/`}>{license.data.title}</a>
+            <a href={`/licenses/${getLicenseSlug(license)}/`}>{license.data.plain_name}</a>
           </li>
         ))}
       </ul>
