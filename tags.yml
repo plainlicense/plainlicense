@@ -1,3 +1,6 @@
+# Tag definitions for the starlight-tags plugin.
+# Each key is the tag slug used in blog post frontmatter.
+# See: https://github.com/HiDeoo/starlight-tags
 tags:
   announcements:
     label: "Announcements"

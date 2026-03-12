@@ -18,6 +18,9 @@ import { marked } from "marked";
  * inside it. This function splits on those wrappers, renders the inner
  * markdown independently, then re-wraps in the original <div id="...">.
  * This preserves the element IDs that MappingViewer needs.
+ *
+ * Limitation: the regex matches non-nested <div id="..."> blocks only.
+ * Nested divs are not supported and should not appear in license content.
  */
 function renderMarkdownWithDivs(md: string): string {
   // Regex: <div id="X"> ... </div>  (non-nested, one per section)
@@ -104,7 +107,6 @@ const fullProcessedBody = (
 
     <div class="license-layout">
       <div class="license-column plain-version">
-        <h2>{data.plain_name}</h2>
         <div class="license-content prose">
           {
             contentParts.map((part, index) => (

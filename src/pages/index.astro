@@ -1,94 +1,292 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
-import { getCollection } from 'astro:content';
-import Search from '../components/Search.astro';
-import { getLicenseSlug } from '../utils/collections';
+import { getCollection } from "astro:content";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { getLicenseSlug } from "../utils/collections";
 
-const licenses = await getCollection('licenses');
-const featuredLicenses = licenses.filter(l => l.data.featured);
+const licenses = await getCollection("licenses");
+const featuredLicenses = licenses.filter((l) => l.data.featured);
 ---
 
-<BaseLayout title="Home">
-  <header class="hero">
-    <h1>Plain License</h1>
-    <p>Simplified, human-readable versions of popular software licenses.</p>
-    <div class="search-box">
-      <Search />
-    </div>
-  </header>
-
-  <main class="container">
-    <section class="featured">
-      <h2>Featured Licenses</h2>
-      <div class="grid">
-        {featuredLicenses.map(license => (
-          <a href={`/licenses/${getLicenseSlug(license)}/`} class="card">
-            <h3>{license.data.plain_name}</h3>
-            <p>{license.data.description}</p>
-          </a>
-        ))}
+<BaseLayout
+  title="Home"
+  description="Plain License — simplified, human-readable versions of popular software licenses."
+>
+  <div class="hero">
+    <div class="hero-inner">
+      <h1>Licenses you can actually understand</h1>
+      <p class="hero-sub">
+        Plain language rewrites of popular software licenses — clear, accurate,
+        and free to use.
+      </p>
+      <div class="hero-cta">
+        <a href="/licenses/" class="btn-primary">Browse Licenses</a>
+        <a href="/about/" class="btn-secondary">Learn more</a>
       </div>
-    </section>
+    </div>
+  </div>
 
-    <section class="all-licenses">
-      <h2>All Licenses</h2>
-      <ul>
+  <div class="home-content">
+    {featuredLicenses.length > 0 && (
+      <section class="section">
+        <h2 class="section-title">Featured Licenses</h2>
+        <div class="card-grid">
+          {featuredLicenses.map(license => (
+            <a href={`/licenses/${getLicenseSlug(license)}/`} class="card" key={license.data.spdx_id}>
+              <div class="card-badges">
+                <span class="spdx-badge">{license.data.spdx_id}</span>
+                {license.data.is_osi_approved && <span class="osi-badge">OSI ✓</span>}
+              </div>
+              <h3>{license.data.plain_name}</h3>
+              <p>{license.data.description}</p>
+            </a>
+          ))}
+        </div>
+      </section>
+    )}
+
+    <section class="section">
+      <div class="all-licenses-header">
+        <h2 class="section-title">All Licenses</h2>
+        <a href="/licenses/" class="see-all">View all →</a>
+      </div>
+      <ul class="license-list">
         {licenses.map(license => (
-          <li>
-            <a href={`/licenses/${getLicenseSlug(license)}/`}>{license.data.plain_name}</a>
+          <li key={license.data.spdx_id}>
+            <a href={`/licenses/${getLicenseSlug(license)}/`}>
+              <span class="list-name">{license.data.plain_name}</span>
+              <span class="list-spdx">{license.data.spdx_id}</span>
+            </a>
           </li>
         ))}
       </ul>
     </section>
-  </main>
+  </div>
 </BaseLayout>
 
 <style>
-  .hero {
-    text-align: center;
-    padding: 4rem 2rem;
-    background: linear-gradient(rgba(136, 58, 234, 0.1), transparent);
-  }
-  .container {
-    max-width: 1000px;
-    margin: 0 auto;
-    padding: 2rem;
-  }
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 2rem;
-    margin-top: 2rem;
-  }
-  .card {
-    padding: 1.5rem;
-    background: #1a1c23;
-    border: 1px solid #333;
-    border-radius: 12px;
-    text-decoration: none;
-    color: white;
-    transition: transform 0.2s;
-  }
-  .card:hover {
-    transform: translateY(-4px);
-    border-color: #883aea;
-  }
-  .card h3 {
-    margin-top: 0;
-    color: #883aea;
-  }
-  ul {
-    list-style: none;
-    padding: 0;
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 1rem;
-  }
-  li a {
-    color: #aaa;
-    text-decoration: none;
-  }
-  li a:hover {
-    color: white;
-  }
+.hero {
+  padding: 5rem 1.5rem 4rem;
+  text-align: center;
+  background: radial-gradient(
+    ellipse 80% 50% at 50% -10%,
+    rgba(21, 219, 149, 0.12),
+    transparent
+  );
+  border-bottom: 1px solid var(--bg-border, #242836);
+}
+
+.hero-inner {
+  max-width: 48rem;
+  margin: 0 auto;
+}
+
+.hero h1 {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+  margin: 0 0 1rem;
+  color: var(--text, #e8eaf0);
+}
+
+.hero-sub {
+  font-size: 1.2rem;
+  color: var(--text-muted, #8b90a0);
+  margin: 0 0 2rem;
+  line-height: 1.6;
+}
+
+.hero-cta {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.7rem 1.5rem;
+  border-radius: 8px;
+  background: rgb(21, 219, 149);
+  color: #0d0f15;
+  font-weight: 700;
+  font-size: 0.95rem;
+  text-decoration: none;
+  transition:
+    background 0.15s,
+    transform 0.15s;
+}
+
+.btn-primary:hover {
+  background: rgb(106, 241, 194);
+  color: #0d0f15;
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.7rem 1.5rem;
+  border-radius: 8px;
+  background: transparent;
+  border: 1px solid var(--bg-border, #242836);
+  color: var(--text-muted, #8b90a0);
+  font-weight: 600;
+  font-size: 0.95rem;
+  text-decoration: none;
+  transition:
+    border-color 0.15s,
+    color 0.15s;
+}
+
+.btn-secondary:hover {
+  border-color: rgb(21, 219, 149);
+  color: rgb(21, 219, 149);
+}
+
+.home-content {
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: 3rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 3.5rem;
+}
+
+.section-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0 0 1.5rem;
+  color: var(--text, #e8eaf0);
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.25rem;
+}
+
+.card {
+  display: block;
+  padding: 1.5rem;
+  background: var(--bg-surface, #161923);
+  border: 1px solid var(--bg-border, #242836);
+  border-radius: 10px;
+  text-decoration: none;
+  color: var(--text, #e8eaf0);
+  transition:
+    border-color 0.15s,
+    transform 0.15s,
+    box-shadow 0.15s;
+}
+
+.card:hover {
+  border-color: rgb(21, 219, 149);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(21, 219, 149, 0.1);
+  color: var(--text, #e8eaf0);
+}
+
+.card-badges {
+  display: flex;
+  gap: 0.4rem;
+  margin-bottom: 0.75rem;
+}
+
+.spdx-badge {
+  font-family: "Source Code Pro", monospace;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: rgba(21, 219, 149, 0.12);
+  color: rgb(21, 219, 149);
+  border: 1px solid rgba(21, 219, 149, 0.3);
+  border-radius: 4px;
+  padding: 0.15em 0.5em;
+}
+
+.osi-badge {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #60a5fa;
+  background: rgba(96, 165, 250, 0.1);
+  border: 1px solid rgba(96, 165, 250, 0.3);
+  border-radius: 4px;
+  padding: 0.15em 0.4em;
+}
+
+.card h3 {
+  margin: 0 0 0.5rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: rgb(21, 219, 149);
+}
+
+.card p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-muted, #8b90a0);
+  line-height: 1.5;
+}
+
+.all-licenses-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.all-licenses-header .section-title {
+  margin-bottom: 0;
+}
+
+.see-all {
+  font-size: 0.9rem;
+  color: rgb(21, 219, 149);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.see-all:hover {
+  text-decoration: underline;
+  color: rgb(106, 241, 194);
+}
+
+.license-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 0.5rem;
+}
+
+.license-list li a {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.6rem 0.75rem;
+  border-radius: 6px;
+  background: var(--bg-surface, #161923);
+  border: 1px solid var(--bg-border, #242836);
+  text-decoration: none;
+  transition: border-color 0.15s;
+}
+
+.license-list li a:hover {
+  border-color: rgb(21, 219, 149);
+  color: var(--text, #e8eaf0);
+}
+
+.list-name {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text, #e8eaf0);
+}
+
+.list-spdx {
+  font-family: "Source Code Pro", monospace;
+  font-size: 0.7rem;
+  color: var(--text-muted, #8b90a0);
+}
 </style>

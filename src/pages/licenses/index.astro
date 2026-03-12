@@ -1,0 +1,208 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getLicenseSlug } from "../../utils/collections";
+
+const licenses = await getCollection("licenses");
+
+const byCategory = licenses.reduce<Record<string, typeof licenses>>(
+  (acc, l) => {
+    const cat = l.data.license_type;
+    if (!acc[cat]) acc[cat] = [];
+    acc[cat].push(l);
+    return acc;
+  },
+  {},
+);
+
+const categoryOrder = [
+  "permissive",
+  "copyleft",
+  "source-available",
+  "public-domain",
+];
+const categoryLabels: Record<string, string> = {
+  permissive: "Permissive",
+  copyleft: "Copyleft",
+  "source-available": "Source Available",
+  "public-domain": "Public Domain",
+};
+const categoryDescriptions: Record<string, string> = {
+  permissive: "Few restrictions — use freely in almost any project.",
+  copyleft: "Share-alike — changes must stay under the same license.",
+  "source-available": "Source visible but with usage restrictions.",
+  "public-domain": "No rights reserved — use any way you want.",
+};
+---
+
+<BaseLayout
+  title="All Licenses"
+  description="Browse all Plain License plain-language rewrites of popular software licenses."
+>
+  <div class="licenses-page">
+    <header class="page-header">
+      <h1>All Licenses</h1>
+      <p class="lead">
+        Plain-language rewrites of popular software licenses, organized by type.
+      </p>
+    </header>
+
+    <div class="categories">
+      {categoryOrder.filter(cat => byCategory[cat]?.length).map(cat => (
+        <section class="category-section" id={cat} key={cat}>
+          <div class="category-header">
+            <h2>{categoryLabels[cat]}</h2>
+            <p>{categoryDescriptions[cat]}</p>
+          </div>
+          <div class="license-grid">
+            {byCategory[cat].map(license => (
+              <a href={`/licenses/${getLicenseSlug(license)}/`} class="license-card" key={license.data.spdx_id}>
+                <div class="card-top">
+                  <span class="spdx-badge">{license.data.spdx_id}</span>
+                  {license.data.is_osi_approved && <span class="osi-badge" title="OSI Approved">OSI ✓</span>}
+                </div>
+                <h3>{license.data.plain_name}</h3>
+                <p>{license.data.description}</p>
+                {license.data.summary && (
+                  <p class="summary">{license.data.summary}</p>
+                )}
+              </a>
+            ))}
+          </div>
+        </section>
+      ))}
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+.licenses-page {
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: 3rem 1.5rem;
+}
+
+.page-header {
+  margin-bottom: 3rem;
+  border-bottom: 1px solid var(--bg-border, #242836);
+  padding-bottom: 2rem;
+}
+
+.page-header h1 {
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin: 0 0 0.75rem;
+  color: var(--text, #e8eaf0);
+}
+
+.lead {
+  font-size: 1.15rem;
+  color: var(--text-muted, #8b90a0);
+  margin: 0;
+}
+
+.categories {
+  display: flex;
+  flex-direction: column;
+  gap: 3.5rem;
+}
+
+.category-header {
+  margin-bottom: 1.5rem;
+}
+
+.category-header h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0 0 0.4rem;
+  color: var(--text, #e8eaf0);
+}
+
+.category-header p {
+  margin: 0;
+  color: var(--text-muted, #8b90a0);
+  font-size: 0.95rem;
+}
+
+.license-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.25rem;
+}
+
+.license-card {
+  display: block;
+  padding: 1.5rem;
+  background: var(--bg-surface, #161923);
+  border: 1px solid var(--bg-border, #242836);
+  border-radius: 10px;
+  text-decoration: none;
+  color: var(--text, #e8eaf0);
+  transition:
+    border-color 0.15s,
+    transform 0.15s,
+    box-shadow 0.15s;
+}
+
+.license-card:hover {
+  border-color: rgb(var(--accent, 21, 219, 149));
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(21, 219, 149, 0.1);
+  color: var(--text, #e8eaf0);
+}
+
+.card-top {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.spdx-badge {
+  font-family: "Source Code Pro", monospace;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: rgba(21, 219, 149, 0.12);
+  color: rgb(21, 219, 149);
+  border: 1px solid rgba(21, 219, 149, 0.3);
+  border-radius: 4px;
+  padding: 0.15em 0.5em;
+}
+
+.osi-badge {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #60a5fa;
+  background: rgba(96, 165, 250, 0.1);
+  border: 1px solid rgba(96, 165, 250, 0.3);
+  border-radius: 4px;
+  padding: 0.15em 0.4em;
+}
+
+.license-card h3 {
+  margin: 0 0 0.5rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: rgb(var(--accent, 21, 219, 149));
+}
+
+.license-card p {
+  margin: 0 0 0.5rem;
+  font-size: 0.9rem;
+  color: var(--text-muted, #8b90a0);
+  line-height: 1.5;
+}
+
+.license-card p:last-child {
+  margin-bottom: 0;
+}
+
+.license-card p.summary {
+  font-style: italic;
+  font-size: 0.875rem;
+  border-top: 1px solid var(--bg-border, #242836);
+  padding-top: 0.5rem;
+  margin-top: 0.5rem;
+  margin-bottom: 0;
+}
+</style>

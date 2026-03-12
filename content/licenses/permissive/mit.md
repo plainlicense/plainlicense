@@ -45,7 +45,7 @@ plain_gunning_fog: 14.81
 shame_words_count: 1
 ---
 
-# MIT License (Plain Language)
+# Plain MIT License
 
 Copyright Notice: (c) {{ year }} `[copyright holders]`
 

@@ -1,63 +1,117 @@
 ---
-import BaseLayout from './BaseLayout.astro';
+import BaseLayout from "./BaseLayout.astro";
 
 const { frontmatter } = Astro.props;
 ---
 
 <BaseLayout title={frontmatter.title} description={frontmatter.description}>
-  <main class="content-page">
+  <div class="content-page astro-page">
     <div class="container">
       <header class="page-header">
         <h1>{frontmatter.title}</h1>
         {frontmatter.description && <p class="description">{frontmatter.description}</p>}
       </header>
-      
-      <article class="prose">
-        <slot />
-      </article>
+
+      <article class="prose"><slot /></article>
     </div>
-  </main>
+  </div>
 </BaseLayout>
 
 <style>
-  .content-page {
-    padding: 4rem 0;
-  }
-  .container {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 0 2rem;
-  }
-  .page-header {
-    margin-bottom: 3rem;
-    border-bottom: 1px solid #333;
-    padding-bottom: 2rem;
-  }
-  h1 {
-    font-size: 3rem;
-    margin: 0 0 1rem 0;
-  }
-  .description {
-    font-size: 1.25rem;
-    color: #aaa;
-  }
-  .prose {
-    line-height: 1.8;
-    color: #eee;
-  }
-  /* Style markdown content */
-  .prose :global(h2) {
-    margin-top: 2.5rem;
-    color: #883aea;
-  }
-  .prose :global(p) {
-    margin-bottom: 1.5rem;
-  }
-  .prose :global(ul) {
-    margin-bottom: 1.5rem;
-    padding-left: 1.5rem;
-  }
-  .prose :global(li) {
-    margin-bottom: 0.5rem;
-  }
+.content-page {
+  padding: 3rem 0 4rem;
+}
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+.page-header {
+  margin-bottom: 2.5rem;
+  border-bottom: 1px solid var(--bg-border, #242836);
+  padding-bottom: 1.5rem;
+}
+h1 {
+  font-size: 2.25rem;
+  font-weight: 800;
+  margin: 0 0 0.75rem;
+  color: var(--text, #e8eaf0);
+  letter-spacing: -0.02em;
+}
+.description {
+  font-size: 1.1rem;
+  color: var(--text-muted, #8b90a0);
+  margin: 0;
+  line-height: 1.6;
+}
+.prose {
+  line-height: 1.8;
+  color: var(--text, #e8eaf0);
+}
+.prose :global(h2) {
+  font-size: 1.35rem;
+  font-weight: 700;
+  margin: 2.5rem 0 0.75rem;
+  color: var(--text, #e8eaf0);
+  border-bottom: 1px solid var(--bg-border, #242836);
+  padding-bottom: 0.4rem;
+}
+.prose :global(h3) {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 1.75rem 0 0.5rem;
+  color: var(--text, #e8eaf0);
+}
+.prose :global(p) {
+  margin-bottom: 1.25rem;
+}
+.prose :global(ul),
+.prose :global(ol) {
+  margin-bottom: 1.25rem;
+  padding-left: 1.5rem;
+}
+.prose :global(li) {
+  margin-bottom: 0.4rem;
+}
+.prose :global(table) {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1.5rem;
+  font-size: 0.9rem;
+}
+.prose :global(th),
+.prose :global(td) {
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--bg-border, #242836);
+  text-align: left;
+}
+.prose :global(th) {
+  background: var(--bg-surface, #161923);
+  font-weight: 600;
+}
+.prose :global(blockquote) {
+  border-left: 3px solid rgb(21, 219, 149);
+  margin-left: 0;
+  padding-left: 1.25rem;
+  color: var(--text-muted, #8b90a0);
+}
+.prose :global(a) {
+  color: rgb(21, 219, 149);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.prose :global(a:hover) {
+  color: rgb(106, 241, 194);
+}
+.prose :global(strong) {
+  color: var(--text, #e8eaf0);
+}
+.prose :global(code) {
+  background: var(--bg-surface, #161923);
+  border: 1px solid var(--bg-border, #242836);
+  border-radius: 4px;
+  padding: 0.1em 0.35em;
+  font-size: 0.875em;
+  font-family: "Source Code Pro", monospace;
+}
 </style>
