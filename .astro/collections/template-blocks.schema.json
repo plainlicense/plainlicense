@@ -7,15 +7,28 @@
         "title": {
           "type": "string"
         },
+        "blockId": {
+          "type": "string",
+          "pattern": "^[a-z0-9-]+$"
+        },
         "category": {
           "type": "string",
           "enum": [
             "warranty",
             "permission",
-            "condition"
+            "condition",
+            "disclaimer",
+            "notice"
           ]
         },
         "description": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "blockTitle": {
           "type": "string"
         },
         "$schema": {
@@ -24,7 +37,9 @@
       },
       "required": [
         "title",
-        "category"
+        "blockId",
+        "category",
+        "version"
       ],
       "additionalProperties": false
     }
