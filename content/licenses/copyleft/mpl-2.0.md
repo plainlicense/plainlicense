@@ -1,31 +1,47 @@
 ---
 title: Plain MPL
+plain_name: Plain MPL
 spdx_id: MPL-2.0
-version: 0.1.0
-original_version: '2.0'
+plain_version: 0.1.0
 description: The MPL is a weak copyleft license requiring sharing source materials for its parts. It includes a patent grant and is compatible with GPL/LGPL.
-license_type: copyleft
-is_osi_approved: true
-is_fsf_approved: true
+license_family: copyleft
+is_dedication: false
 status: published
-summary: The MPL is a weak copyleft license requiring sharing source materials for its parts.
-permissions:
-  - commercial-use
-  - modifications
-  - distribution
-  - patent-use
-  - private-use
-conditions:
-  - disclose-source
-  - include-copyright
-  - same-license--file
-limitations:
-  - liability
-  - trademark-use
-  - warranty
-canonical_url: 'https://www.mozilla.org/en-US/MPL/2.0/'
+tldr:
+  - You can use, copy, change, and share this work, including commercially.
+  - You must share source materials for any files you modify under this license.
+  - Keep all copyright notices and include a copy of this license with any copy you share.
+  - No warranty is provided. Use at your own risk.
+attribution_required: false
+fair_code: false
 plain_gunning_fog: 12.36
 shame_words_count: 12
+original:
+  name: Mozilla Public License 2.0
+  spdx_id: MPL-2.0
+  version: '2.0'
+  version_display: Mozilla Public License 2.0
+  organization: Mozilla Foundation
+  has_official_source: true
+  canonical_url: 'https://www.mozilla.org/en-US/MPL/2.0/'
+  link_in_original: false
+  is_deprecated: false
+  is_osi_approved: true
+  is_fsf_approved: true
+  permissions:
+    - commercial-use
+    - modifications
+    - distribution
+    - patent-use
+    - private-use
+  conditions:
+    - disclose-source
+    - include-copyright
+    - same-license--file
+  limitations:
+    - liability
+    - trademark-use
+    - warranty
 ---
 # Plain MPL
 

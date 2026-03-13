@@ -1,7 +1,7 @@
 ---
 title: Standard No Warranty Block
-blockId: standard-no-warranty
-blockTitle: We Offer No Warranty
+block_id: standard-no-warranty
+block_title: We Offer No Warranty
 category: warranty
 description: Common plain language warranty disclaimer
 version: 1.0.0

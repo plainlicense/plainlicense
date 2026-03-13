@@ -90,7 +90,7 @@ const fullProcessedBody = (
       </div>
 
       <div class="license-column original-version">
-        <h2>{data.original_version_name}</h2>
+        <h2>{data.original?.name}</h2>
         <div
           class="license-content prose"
           set:html={marked.parse(originalBody)}

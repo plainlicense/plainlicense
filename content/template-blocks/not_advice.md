@@ -1,10 +1,10 @@
 ---
 title: Standard Not Advice Block
-blockId: standard-not-advice
+block_id: standard-not-advice
 category: disclaimer
 description: Common plain language "not advice" disclaimer
 version: 1.0.0
-blockTitle: This isn't Legal Advice
+block_title: This isn't Legal Advice
 ---
 We are not lawyers. This is not legal advice. If you need legal advice, talk to a lawyer. You use this license at your own risk.
 
