@@ -41,11 +41,13 @@ const { plain_name, original } = Astro.props as Props;
     <div class="example-list">
       <div class="example-item">
         <div class="example-context">In a source file header</div>
-        <pre class="example-code"><code>// Copyright (c) 2025 Your Name. {plain_name}.{'\n'}// Keep the copyright notice and this license with any copy you share.</code></pre>
+        <pre class="example-code"><code>{`// Copyright (c) 2025 Your Name. ${plain_name}.
+// Keep the copyright notice and this license with any copy you share.`}</code></pre>
       </div>
       <div class="example-item">
         <div class="example-context">In a README or document</div>
-        <pre class="example-code"><code>This project is licensed under the {plain_name}.{'\n'}See LICENSE for details.</code></pre>
+        <pre class="example-code"><code>{`This project is licensed under the ${plain_name}.
+See LICENSE for details.`}</code></pre>
       </div>
       <div class="example-item">
         <div class="example-context">On a website or app</div>
