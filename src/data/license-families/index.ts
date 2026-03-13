@@ -93,7 +93,12 @@ const FAMILY_DATA: Record<string, FamilyBlocks> = {
 };
 
 export function getFamilyData(family: string): FamilyBlocks {
-  return FAMILY_DATA[family] ?? permissiveFamily;
+  const data = FAMILY_DATA[family];
+  if (!data) {
+    console.warn(`[license-families] Unknown license family: "${family}". Falling back to permissive defaults.`);
+    return permissiveFamily;
+  }
+  return data;
 }
 
 export const FAMILY_LABELS: Record<string, string> = {

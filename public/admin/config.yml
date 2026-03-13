@@ -16,7 +16,7 @@ collections:
     folder: content/licenses
     path: '{{category}}/{{slug}}'
     create: true
-    identifier_field: plain_name
+    identifier_field: spdx_id
     fields:
       # Zone 1 — Identity
       - {label: "Title", name: "title", widget: "string"}
