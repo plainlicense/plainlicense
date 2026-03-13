@@ -1,9 +1,8 @@
 ---
-import { getCollection } from "astro:content";
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import { getLicenseSlug } from "../../utils/collections";
+import { getLicenseSlug, getPublishedLicenses } from "../../utils/collections";
 
-const licenses = await getCollection("licenses");
+const licenses = await getPublishedLicenses();
 
 const byCategory = licenses.reduce<Record<string, typeof licenses>>(
   (acc, l) => {

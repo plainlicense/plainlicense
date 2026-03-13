@@ -166,3 +166,5 @@ remote-debug-profile/
 !.gitattributes
 playwright-report/
 tests-results/
+# Astro generated artifacts (environment-specific, do not commit)
+.astro/

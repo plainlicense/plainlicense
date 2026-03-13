@@ -1,15 +1,15 @@
 ---
 import { getCollection } from "astro:content";
-import BaseLayout from "../../layouts/BaseLayout.astro";
-import LicenseSummary from "../../components/LicenseSummary.astro";
-import DownloadOptions from "../../components/DownloadOptions.astro";
-import VersionHistory from "../../components/VersionHistory.astro";
-import ComparisonToggle from "../../components/ComparisonToggle.astro";
-import ComparisonModal from "../../components/ComparisonModal.astro";
-import { parseComponentPlaceholders } from "../../utils/component-parser";
-import ComponentRegistry from "../../components/reactive/ComponentRegistry.astro";
-import { getLicenseSlug } from "../../utils/collections";
 import { marked } from "marked";
+import ComparisonModal from "../../components/ComparisonModal.astro";
+import ComparisonToggle from "../../components/ComparisonToggle.astro";
+import DownloadOptions from "../../components/DownloadOptions.astro";
+import LicenseSummary from "../../components/LicenseSummary.astro";
+import ComponentRegistry from "../../components/reactive/ComponentRegistry.astro";
+import VersionHistory from "../../components/VersionHistory.astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getLicenseSlug, getPublishedLicenses } from "../../utils/collections";
+import { parseComponentPlaceholders } from "../../utils/component-parser";
 
 /**
  * Render markdown content, correctly handling <div id="..."> wrappers.
@@ -49,7 +49,7 @@ function renderMarkdownWithDivs(md: string): string {
 }
 
 export async function getStaticPaths() {
-  const licenses = await getCollection("licenses");
+  const licenses = await getPublishedLicenses();
   console.log("Generating paths for", licenses.length, "licenses");
 
   return licenses.map((license) => {
@@ -108,8 +108,7 @@ const fullProcessedBody = (
     <div class="license-layout">
       <div class="license-column plain-version">
         <div class="license-content prose">
-          {
-            contentParts.map((part, index) => (
+          {contentParts.map((part, index) => (
               <>
                 <div set:html={renderMarkdownWithDivs(part)} />
                 {placeholders[index] && (
@@ -121,8 +120,7 @@ const fullProcessedBody = (
                   />
                 )}
               </>
-            ))
-          }
+            ))}
         </div>
       </div>
 
@@ -144,97 +142,97 @@ const fullProcessedBody = (
 <script>
   import { initMappingViewer } from "../../components/MappingViewer";
 
-  const container = document.querySelector(".license-container") as HTMLElement;
-  const spdxId = container?.dataset.spdxId;
+const container = document.querySelector(".license-container") as HTMLElement;
+const spdxId = container?.dataset.spdxId;
 
-  if (spdxId) {
-    fetch(`/mappings/${spdxId}-mapping.json`)
-      .then((res) => res.json())
-      .then((mappingData) => {
-        initMappingViewer(container, mappingData);
-      })
-      .catch(() => {
-        console.log(`No mapping found for ${spdxId}`);
-      });
-  }
+if (spdxId) {
+  fetch(`/mappings/${spdxId}-mapping.json`)
+    .then((res) => res.json())
+    .then((mappingData) => {
+      initMappingViewer(container, mappingData);
+    })
+    .catch(() => {
+      console.log(`No mapping found for ${spdxId}`);
+    });
+}
 </script>
 
 <style>
   .license-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 2rem;
-    transition: max-width 0.3s ease;
-  }
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  transition: max-width 0.3s ease;
+}
 
+.license-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.original-version {
+  display: none;
+  opacity: 0.6;
+  transition: opacity 0.3s;
+}
+
+.original-version:hover {
+  opacity: 1;
+}
+
+@media (min-width: 1024px) {
   .license-layout {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 2rem;
-    margin-top: 2rem;
+    gap: 4rem;
   }
 
-  .original-version {
-    display: none;
-    opacity: 0.6;
-    transition: opacity 0.3s;
+  .comparison-active .license-layout {
+    grid-template-columns: 1fr 1fr;
   }
 
-  .original-version:hover {
-    opacity: 1;
+  .comparison-active .original-version {
+    display: block;
   }
 
-  @media (min-width: 1024px) {
-    .license-layout {
-      gap: 4rem;
-    }
-
-    .comparison-active .license-layout {
-      grid-template-columns: 1fr 1fr;
-    }
-
-    .comparison-active .original-version {
-      display: block;
-    }
-
-    .comparison-active.license-container {
-      max-width: 1400px;
-    }
+  .comparison-active.license-container {
+    max-width: 1400px;
   }
+}
 
-  .license-content {
-    line-height: 1.6;
-  }
+.license-content {
+  line-height: 1.6;
+}
 
-  /* Interactive Mapped Sections */
-  .comparison-active .license-content [id] {
-    cursor: pointer;
-    position: relative;
-    border-radius: 4px;
-    transition: background-color 0.2s;
-  }
+/* Interactive Mapped Sections */
+.comparison-active .license-content [id] {
+  cursor: pointer;
+  position: relative;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
 
-  @media (max-width: 1023px) {
-    .comparison-active .license-content [id]:active {
-      background-color: rgba(var(--sl-color-accent-rgb), 0.1);
-    }
-  }
-
-  .comparison-active .license-content [id]:hover {
-    background-color: rgba(var(--sl-color-accent-rgb), 0.05);
-  }
-
-  :global(.highlight-active) {
-    background-color: rgba(var(--sl-color-accent-rgb), 0.2);
-    border-radius: 4px;
-    box-shadow: 0 0 0 4px rgba(var(--sl-color-accent-rgb), 0.2);
-    transition: all 0.2s ease;
-  }
-
-  :global(.highlight-match) {
+@media (max-width: 1023px) {
+  .comparison-active .license-content [id]:active {
     background-color: rgba(var(--sl-color-accent-rgb), 0.1);
-    border-radius: 4px;
-    box-shadow: 0 0 0 4px rgba(var(--sl-color-accent-rgb), 0.1);
-    transition: all 0.2s ease;
   }
+}
+
+.comparison-active .license-content [id]:hover {
+  background-color: rgba(var(--sl-color-accent-rgb), 0.05);
+}
+
+:global(.highlight-active) {
+  background-color: rgba(var(--sl-color-accent-rgb), 0.2);
+  border-radius: 4px;
+  box-shadow: 0 0 0 4px rgba(var(--sl-color-accent-rgb), 0.2);
+  transition: all 0.2s ease;
+}
+
+:global(.highlight-match) {
+  background-color: rgba(var(--sl-color-accent-rgb), 0.1);
+  border-radius: 4px;
+  box-shadow: 0 0 0 4px rgba(var(--sl-color-accent-rgb), 0.1);
+  transition: all 0.2s ease;
+}
 </style>

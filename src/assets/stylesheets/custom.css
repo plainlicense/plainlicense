@@ -8,8 +8,12 @@
   --sl-color-accent-high: var(--aquamarine);
 
   /* Typography */
-  --sl-font: "Inter", "Noto Sans", "Open Sans", Lato, Helvetica, Arial, system-ui, sans-serif;
-  --sl-font-mono: "Source Code Pro", "Fira Code", "Inconsolata", "Monaco", "Consolas", "Courier New", monospace;
+  --sl-font:
+    "Inter", "Noto Sans", "Open Sans", Lato, Helvetica, Arial, system-ui,
+    sans-serif;
+  --sl-font-mono:
+    "Source Code Pro", "Fira Code", "Inconsolata", "Monaco", "Consolas",
+    "Courier New", monospace;
 }
 
 /* Header Brand Styling */
@@ -35,12 +39,12 @@
   color: var(--zaffre);
 }
 
-[data-theme='dark'] .sl-markdown-content h1,
-[data-theme='dark'] .sl-markdown-content h2,
-[data-theme='dark'] .sl-markdown-content h3,
-[data-theme='dark'] .sl-markdown-content h4,
-[data-theme='dark'] .sl-markdown-content h5,
-[data-theme='dark'] .sl-markdown-content h6 {
+[data-theme="dark"] .sl-markdown-content h1,
+[data-theme="dark"] .sl-markdown-content h2,
+[data-theme="dark"] .sl-markdown-content h3,
+[data-theme="dark"] .sl-markdown-content h4,
+[data-theme="dark"] .sl-markdown-content h5,
+[data-theme="dark"] .sl-markdown-content h6 {
   color: var(--emerald);
 }
 
@@ -92,15 +96,23 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  /* Hidden by default: remove from tab order and hit-testing */
   opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
   transform: translateY(1rem);
-  transition: opacity 0.25s, transform 0.25s;
+  transition:
+    opacity 0.25s,
+    transform 0.25s,
+    visibility 0.25s;
   z-index: 100;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 #scroll-to-top.visible {
   opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
   transform: translateY(0);
 }
 
@@ -117,4 +129,3 @@
   stroke-linecap: round;
   stroke-linejoin: round;
 }
-
