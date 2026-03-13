@@ -114,7 +114,7 @@ export const CONDITION_WHY: Record<string, string> = {
 export const LIMITATION_WHY: Record<string, string> = {
   'liability':      'So contributors are not held responsible for how the work is used.',
   'warranty':       'So contributors are not obligated to fix problems in the work.',
-  'trademark-use':  'So the creators\' brand and reputation are not misrepresented.',
+  'trademark-use':  "So the creators' brand and reputation are not misrepresented.",
   'patent-use':     'So the creators are not exposed to patent lawsuits from users.',
 };
 
