@@ -1,27 +1,18 @@
 
 # non-public working files
-.workbench/*
 .workbench/
 .devenv/
-.devenv/*
-.testbuild
-.testbuild/*
-.testbuild/**/*
-.history
-
-# mkdocs
-.cache
-!.cache/uv/
+.testbuild/
 
 # Leave launch.json public
 !.vscode/launch.json
 
 # Playwright
-logs
+logs/
 _.log
 report.[0-9]_[0-9]_[0-9]_[0-9]_.json
-out
-dist
+out/
+dist/
 *.tgz
 coverage
 *.lcov
@@ -32,27 +23,16 @@ playwright-report
 .env.production.local
 .env.local
 .eslintcache
-.cache
-!.cache/uv/
 *.tsbuildinfo
 
 # venv
-**/__pycache__/
-**/.pytest_cache/
-**/.venv
-.venv/
+__pycache__/
+.pytest_cache/
+
 
 # node
-node_modules
 node_modules/
-node_modules/**
-**/node_modules/**
 
-__pycache__/
-.gitattributes
-.pytest_cache
-
-dist/
 *.tar
 *.tar.*
 *.jar
@@ -67,11 +47,9 @@ dist/
 .DS_Store
 *.swp
 
-
 # Installer logs
 pip-log.txt
 pip-delete-this-directory.txt
-
 
 # Tran
 .eslintcache
@@ -160,11 +138,13 @@ bower_components/
 
 # Local History for Visual Studio Code
 .history/
-lib64
+lib64/
 remote-debug-profile/
 
 !.gitattributes
+!.gitmodules
 playwright-report/
 tests-results/
-# Astro generated artifacts (environment-specific, do not commit)
+
 .astro/
+.wrangler/
