@@ -25,7 +25,7 @@ describe('SC-005: Export Generation Success', () => {
         if (data.status === 'published') {
           totalPublished++;
           const slug = data.spdx_id.trim().toLowerCase();
-          const version = data.version.trim();
+          const version = data.plain_version.trim();
           const exportDir = path.resolve(`public/exports/${slug}/v${version}`);
           
           const expectedFormats = [

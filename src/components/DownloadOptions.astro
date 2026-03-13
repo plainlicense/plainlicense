@@ -12,7 +12,7 @@ const { data } = license;
 const clipboardContent = processedBody || license.body;
 
 // Paths to exported files (generated at build time)
-const exportBase = `/exports/${data.spdx_id.toLowerCase()}/v${data.version}/`;
+const exportBase = `/exports/${data.spdx_id.toLowerCase()}/v${data.plain_version}/`;
 const formats = [
   { name: 'Markdown (GFM)', ext: '.gfm.md', path: `${exportBase}${data.spdx_id}.gfm.md` },
   { name: 'Markdown (CommonMark)', ext: '.cm.md', path: `${exportBase}${data.spdx_id}.cm.md` },

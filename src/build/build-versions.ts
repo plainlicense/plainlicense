@@ -28,17 +28,17 @@ async function buildVersionsManifest() {
       } catch {}
 
       // Check if current version already exists in manifest
-      const exists = existingVersions.some((v: any) => v.version === data.version);
+      const exists = existingVersions.some((v: any) => v.version === data.plain_version);
       
       if (!exists) {
         existingVersions.unshift({
-          version: data.version,
-          date: data.last_modified || new Date().toISOString().split('T')[0],
-          changelog: `Published version ${data.version}`
+          version: data.plain_version,
+          date: new Date().toISOString().split('T')[0],
+          changelog: `Published version ${data.plain_version}`
         });
         
         await fs.writeFile(versionsFile, JSON.stringify(existingVersions, null, 2));
-        console.log(`Updated version manifest for ${slug}: v${data.version}`);
+        console.log(`Updated version manifest for ${slug}: v${data.plain_version}`);
       }
     }
   }

@@ -1,0 +1,166 @@
+---
+/**
+ * Zone 7: Legal interpretation
+ * Always collapsed. Links the plain version back to the original license.
+ * For public domain dedications, uses a shorter variant.
+ */
+
+interface Props {
+  plain_name: string;
+  license_family: string;
+  is_dedication?: boolean;
+  original?: {
+    name?: string;
+    version_display?: string;
+    canonical_url?: string;
+  };
+}
+
+const {
+  plain_name,
+  license_family,
+  is_dedication = false,
+  original,
+} = Astro.props as Props;
+
+const licenseKind = is_dedication ? 'dedication' : 'license';
+const originalVersionDisplay = original?.version_display ?? original?.name ?? 'the original license';
+const originalName = original?.name ?? 'the original';
+const canonicalUrl = original?.canonical_url;
+const isOriginal = !original; // PlainLicense original (no original object)
+---
+
+<details class="zone zone-interpretation">
+  <summary class="interpretation-summary">
+    <span class="summary-icon" aria-hidden="true">⚖️</span>
+    <span class="summary-heading">Legal interpretation</span>
+    <span class="summary-arrow" aria-hidden="true">▾</span>
+  </summary>
+  <div class="interpretation-body">
+    {isOriginal ? (
+      <div class="interpretation-content">
+        <p>
+          The {plain_name} is an original plain language {licenseKind} published by PlainLicense.
+          It is not derived from any other license.
+        </p>
+        <p>
+          If a court finds that any part of this {licenseKind} can't be enforced,
+          the rest of the {licenseKind}'s rules still apply.
+        </p>
+        <p class="repo-link-text">
+          Source and full history: <a href="https://github.com/plainlicense/plainlicense" target="_blank" rel="noopener noreferrer">github.com/plainlicense/plainlicense</a>
+        </p>
+      </div>
+    ) : (
+      <div class="interpretation-content">
+        <p>
+          The {plain_name} is a plain language version of the{' '}
+          {canonicalUrl ? (
+            <a href={canonicalUrl} target="_blank" rel="noopener noreferrer">{originalVersionDisplay}</a>
+          ) : (
+            <strong>{originalVersionDisplay}</strong>
+          )}.
+          We wrote it to make the {originalVersionDisplay} more accessible and understandable,
+          without changing its legal intent.
+        </p>
+        <p>
+          If precise legal language matters for your situation — for example, if you're in a
+          dispute or reviewing compliance — refer to the official{' '}
+          {canonicalUrl ? (
+            <a href={canonicalUrl} target="_blank" rel="noopener noreferrer">{originalName}</a>
+          ) : (
+            <strong>{originalName}</strong>
+          )}.
+        </p>
+        <p>
+          If a court finds that any part of this {licenseKind} can't be enforced,
+          the rest of the {licenseKind}'s rules still apply.
+        </p>
+      </div>
+    )}
+  </div>
+</details>
+
+<style>
+  .zone-interpretation {
+    background: var(--sl-color-gray-6);
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    overflow: hidden;
+  }
+
+  .interpretation-summary {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.9rem 1.25rem;
+    cursor: pointer;
+    list-style: none;
+    user-select: none;
+    color: var(--sl-color-gray-1);
+    font-weight: 600;
+    font-size: var(--sl-text-sm);
+  }
+
+  .interpretation-summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .interpretation-summary:hover {
+    background: var(--sl-color-gray-5);
+  }
+
+  .summary-icon {
+    font-size: 1rem;
+  }
+
+  .summary-heading {
+    flex: 1;
+    font-weight: 700;
+  }
+
+  .summary-arrow {
+    font-size: 0.8rem;
+    color: var(--sl-color-gray-3);
+    transition: transform 0.2s;
+  }
+
+  details[open] .summary-arrow {
+    transform: rotate(180deg);
+  }
+
+  .interpretation-body {
+    padding: 0 1.25rem 1.25rem;
+    border-top: 1px solid var(--sl-color-gray-5);
+  }
+
+  .interpretation-content {
+    margin-top: 1rem;
+    font-size: var(--sl-text-sm);
+    color: var(--sl-color-gray-2);
+    line-height: 1.6;
+  }
+
+  .interpretation-content p {
+    margin: 0 0 0.75rem 0;
+  }
+
+  .interpretation-content p:last-child {
+    margin-bottom: 0;
+  }
+
+  .interpretation-content a {
+    color: var(--sl-color-accent);
+    text-underline-offset: 3px;
+  }
+
+  .interpretation-content strong {
+    color: var(--sl-color-gray-1);
+  }
+
+  .repo-link-text {
+    font-size: var(--sl-text-xs);
+    color: var(--sl-color-gray-3);
+  }
+</style>

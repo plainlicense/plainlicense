@@ -9,8 +9,8 @@ import { describe, expect, it } from 'vitest'
 const licenseSchema = z.object({
   title: z.string(),
   spdx_id: z.string(),
-  version: z.string(),
-  license_type: z.enum(['permissive', 'copyleft', 'source-available', 'public-domain' as any]),
+  plain_version: z.string(),
+  license_family: z.enum(['permissive', 'copyleft', 'source-available', 'public-domain', 'proprietary']),
   status: z.enum(['draft', 'published']),
   plain_gunning_fog: z.number().optional(),
   shame_words_count: z.number().optional(),

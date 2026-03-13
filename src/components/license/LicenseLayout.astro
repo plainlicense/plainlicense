@@ -1,0 +1,129 @@
+---
+/**
+ * LicenseLayout: Orchestrates the seven-zone anatomy for every plain license.
+ *
+ * Zone 1: Identity & orientation  — always visible
+ * Zone 2: What you can do         — always visible
+ * Zone 3: What you must do        — visible if conditions exist
+ * Zone 4: How to give credit      — visible if attribution_required
+ * ── fold line ──────────────────────────────────────────────────────────
+ * Zone 5: What you cannot do      — collapsed (above fold for source-available)
+ * Zone 6: Standard protections    — collapsed
+ * Zone 7: Legal interpretation    — collapsed
+ *
+ * Exception: source-available licenses surface Zone 5 above the fold.
+ */
+import type { CollectionEntry } from 'astro:content';
+import ZoneIdentity from './zones/ZoneIdentity.astro';
+import ZonePermissions from './zones/ZonePermissions.astro';
+import ZoneConditions from './zones/ZoneConditions.astro';
+import ZoneCredit from './zones/ZoneCredit.astro';
+import ZoneRestrictions from './zones/ZoneRestrictions.astro';
+import ZoneProtections from './zones/ZoneProtections.astro';
+import ZoneInterpretation from './zones/ZoneInterpretation.astro';
+import { getFamilyData } from '../../data/license-families/index';
+
+interface Props {
+  license: CollectionEntry<'licenses'>;
+}
+
+const { license } = Astro.props;
+const { data } = license;
+
+const family = getFamilyData(data.license_family);
+const sourceAvailable = data.license_family === 'source-available';
+
+const permissions = data.original?.permissions ?? [];
+const conditions = data.original?.conditions ?? [];
+const limitations = data.original?.limitations ?? [];
+---
+
+<article class="plain-license" data-family={data.license_family} data-spdx={data.spdx_id}>
+
+  <!-- Zone 1: Identity & orientation -->
+  <ZoneIdentity
+    plain_name={data.plain_name}
+    license_family={data.license_family}
+    description={data.description}
+    tldr={data.tldr}
+    is_dedication={data.is_dedication}
+    original={data.original}
+  />
+
+  <!-- Zone 2: What you can do -->
+  <ZonePermissions permissions={permissions} />
+
+  <!-- Zone 5 (source-available only): above the fold -->
+  {sourceAvailable && limitations.length > 0 && (
+    <ZoneRestrictions limitations={limitations} aboveFold={true} />
+  )}
+
+  <!-- Zone 3: What you must do -->
+  {conditions.length > 0 && (
+    <ZoneConditions conditions={conditions} />
+  )}
+
+  <!-- Zone 4: How to give credit -->
+  {data.attribution_required && (
+    <ZoneCredit
+      plain_name={data.plain_name}
+      original={data.original}
+    />
+  )}
+
+  <!-- Below-fold divider -->
+  <div class="fold-divider" aria-hidden="true">
+    <span class="fold-label">Less commonly needed</span>
+  </div>
+
+  <!-- Zone 5 (non-source-available): collapsed below fold -->
+  {!sourceAvailable && limitations.length > 0 && (
+    <ZoneRestrictions limitations={limitations} aboveFold={false} />
+  )}
+
+  <!-- Zone 6: Standard protections -->
+  <ZoneProtections protections={family.protections} />
+
+  <!-- Zone 7: Legal interpretation -->
+  <ZoneInterpretation
+    plain_name={data.plain_name}
+    license_family={data.license_family}
+    is_dedication={data.is_dedication}
+    original={data.original}
+  />
+
+  <!-- Optional slot for exceptional MDX body content -->
+  <slot name="outro" />
+
+</article>
+
+<style>
+  .plain-license {
+    container-type: inline-size;
+  }
+
+  .fold-divider {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin: 2.5rem 0 1.5rem;
+    color: var(--sl-color-gray-3);
+  }
+
+  .fold-divider::before,
+  .fold-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--sl-color-gray-5);
+  }
+
+  .fold-label {
+    font-size: var(--sl-text-xs);
+    white-space: nowrap;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 0 0.5rem;
+  }
+</style>
