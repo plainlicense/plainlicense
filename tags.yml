@@ -1,0 +1,43 @@
+# Tag definitions for the starlight-tags plugin.
+# Each key is the tag slug used in blog post frontmatter.
+# See: https://github.com/HiDeoo/starlight-tags
+tags:
+  announcements:
+    label: "Announcements"
+    description: "News and updates about Plain License"
+    color: "#883aea"
+
+  astro:
+    label: "Astro"
+    description: "Posts related to the Astro framework"
+    color: "#ff5d01"
+
+  cms:
+    label: "CMS"
+    description: "Content management system topics"
+    color: "#4f9cf9"
+
+  licenses:
+    label: "Licenses"
+    description: "Posts about software licenses"
+    color: "#22c55e"
+
+  permissive:
+    label: "Permissive"
+    description: "Permissive open source licenses"
+    color: "#22c55e"
+
+  copyleft:
+    label: "Copyleft"
+    description: "Copyleft open source licenses"
+    color: "#f59e0b"
+
+  source-available:
+    label: "Source Available"
+    description: "Source available licenses"
+    color: "#ef4444"
+
+  public-domain:
+    label: "Public Domain"
+    description: "Public domain dedications"
+    color: "#8b5cf6"

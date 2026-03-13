@@ -1,5 +1,5 @@
 ---
-title: MIT License (Plain Language)
+title: Plain MIT License
 plain_name: Plain MIT License
 spdx_id: MIT
 plain_version: 0.2.1
@@ -46,7 +46,7 @@ original:
     - warranty
 ---
 
-# MIT License (Plain Language)
+# Plain MIT License
 
 Copyright Notice: (c) {{ year }} `[copyright holders]`
 
