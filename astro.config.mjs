@@ -13,7 +13,6 @@ import starlightBlog from 'starlight-blog';
 import starlightContextualMenu from 'starlight-contextual-menu';
 import starlightHeadingBadges from 'starlight-heading-badges';
 import starlightLLMsTxt from 'starlight-llms-txt';
-import starlightScrollToTop from 'starlight-scroll-to-top';
 import starlightTags from 'starlight-tags';
 import { searchForWorkspaceRoot } from 'vite';
 
@@ -233,7 +232,6 @@ export default defineConfig({
         starlightTags({
           onInlineTagsNotFound: 'warn',
         }),
-        starlightScrollToTop(),
       ]
     }),
     sitemap({

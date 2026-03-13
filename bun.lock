@@ -67,7 +67,6 @@
         "starlight-contextual-menu": "^0.1.5",
         "starlight-heading-badges": "^0.6.1",
         "starlight-llms-txt": "^0.7.0",
-        "starlight-scroll-to-top": "0.4.0",
         "starlight-tags": "^0.4.0",
         "svgo": "^4.0.1",
         "ts-node": "^10.9.2",
@@ -2512,8 +2511,6 @@
     "starlight-llms-txt": ["starlight-llms-txt@0.7.0", "", { "dependencies": { "@astrojs/mdx": "^4.3.13", "@types/hast": "^3.0.4", "@types/micromatch": "^4.0.10", "github-slugger": "^2.0.0", "hast-util-select": "^6.0.4", "micromatch": "^4.0.8", "rehype-parse": "^9.0.1", "rehype-remark": "^10.0.1", "remark-gfm": "^4.0.1", "remark-stringify": "^11.0.0", "unified": "^11.0.5", "unist-util-remove": "^4.0.0" }, "peerDependencies": { "@astrojs/starlight": ">=0.31", "astro": "^5.15.9" } }, "sha512-KAay6JLXqB0GiNQ481z3Z/h/y4xeAU55TUGLz+npjxcRvN3h/7rDxjmyLiphZF8xfoqqSTduQPanl5Ct4Je6kA=="],
 
     "starlight-markdown": ["starlight-markdown@0.1.5", "", { "peerDependencies": { "astro": "^5.0.0" } }, "sha512-23LXRaZp7pyE+r/HP6rxHfwic8HfvUBT4EImECA6encs/eTtrF0Z+7svANofdtfbiNt31D5q26i03B6FtcSmGg=="],
-
-    "starlight-scroll-to-top": ["starlight-scroll-to-top@0.4.0", "", { "peerDependencies": { "@astrojs/starlight": ">=0.35" } }, "sha512-lxsW5Sv+oKCI8CYZQ6Ue957cExiHMozK73LmmbsvpBKWryW+AKU4OXmX/1bTQNx+mVLZcpm2qTwKa1KX5VdEaQ=="],
 
     "starlight-tags": ["starlight-tags@0.4.0", "", { "dependencies": { "js-yaml": "^4.1.1" }, "peerDependencies": { "@astrojs/starlight": ">=0.35.0" } }, "sha512-CX8Wh9J2rT+SzlPwKlWtb/qvyqIDxHgjgA7VYt/Vj8iSujgDXMMjQ2GyqERWz0i6PuINXSnVVUGqDrJuwh4p5A=="],
 
