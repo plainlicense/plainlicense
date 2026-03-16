@@ -148,3 +148,4 @@ tests-results/
 
 .astro/
 .wrangler/
+package-lock.json

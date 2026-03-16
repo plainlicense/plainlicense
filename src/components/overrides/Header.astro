@@ -1,33 +1,33 @@
 ---
-import type { Props } from '@astrojs/starlight/props';
-import Default from '@astrojs/starlight/components/Header.astro';
+import Default from "@astrojs/starlight/components/Header.astro";
+import type { Props } from "@astrojs/starlight/props";
 ---
 
 <div class="header-container">
   <Default {...Astro.props}><slot /></Default>
-  <span class="beta-badge">BETA</span>
+  <span class="beta-badge" aria-hidden="true">BETA</span>
 </div>
 
 <style>
-  .header-container {
-    display: contents;
-  }
+.header-container {
+  display: contents;
+}
+.beta-badge {
+  position: absolute;
+  top: 1rem;
+  left: 11.5rem; /* Adjust based on logo/title width */
+  background-color: var(--sl-color-accent);
+  color: var(--sl-color-gray-6);
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  font-size: 0.6rem;
+  font-weight: 700;
+  pointer-events: none;
+  z-index: 100;
+}
+@media (max-width: 50rem) {
   .beta-badge {
-    position: absolute;
-    top: 1rem;
-    left: 11.5rem; /* Adjust based on logo/title width */
-    background-color: var(--sl-color-accent);
-    color: var(--sl-color-gray-6);
-    padding: 0.1rem 0.4rem;
-    border-radius: 4px;
-    font-size: 0.6rem;
-    font-weight: 700;
-    pointer-events: none;
-    z-index: 100;
+    display: none;
   }
-  @media (max-width: 50rem) {
-    .beta-badge {
-      display: none;
-    }
-  }
+}
 </style>
