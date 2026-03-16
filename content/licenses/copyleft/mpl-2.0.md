@@ -1,5 +1,6 @@
 ---
 title: Plain MPL
+plain_name: Plain MPL
 spdx_id: MPL-2.0
 version: 0.1.0
 original_version: '2.0'

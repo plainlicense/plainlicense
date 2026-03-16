@@ -1,48 +1,96 @@
 ---
-import type { Props } from '@astrojs/starlight/props';
-import Default from '@astrojs/starlight/components/Footer.astro';
+import Default from "@astrojs/starlight/components/Footer.astro";
+import type { Props } from "@astrojs/starlight/props";
 ---
 
 <footer class="plain-footer">
   <div class="footer-content">
     <p>
-      Plain License's authors dedicate all original content to the public domain. 
-      <strong>We reserve NO rights.</strong>
+      Plain License's authors dedicate all original content to the public
+      domain. <strong>We reserve NO rights.</strong>
     </p>
     <nav class="footer-links">
       <a href="/about">About</a>
       <a href="/blog">Blog</a>
-      <a href="https://github.com/plainlicense/plainlicense" target="_blank" rel="noopener">GitHub</a>
+      <a
+        href="https://github.com/plainlicense/plainlicense"
+        target="_blank"
+        rel="noopener"
+        >GitHub</a
+      >
     </nav>
   </div>
   <Default {...Astro.props}><slot /></Default>
 </footer>
 
+<button
+  type="button"
+  id="scroll-to-top"
+  aria-label="Scroll to top"
+  title="Scroll to top"
+>
+  <svg viewBox="0 0 24 24" aria-hidden="true">
+    <polyline points="18 15 12 9 6 15"></polyline>
+  </svg>
+</button>
+
+<script>
+(() => {
+  const btn = document.getElementById("scroll-to-top");
+  if (!btn) return;
+  const threshold = Math.max(document.documentElement.clientHeight * 0.3, 200);
+  function onScroll() {
+    if (window.scrollY > threshold) {
+      btn.classList.add("visible");
+    } else {
+      btn.classList.remove("visible");
+    }
+  }
+  window.addEventListener("scroll", onScroll, { passive: true });
+  btn.addEventListener("click", () => {
+    const prefersReducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+    window.scrollTo({
+      top: 0,
+      behavior: prefersReducedMotion ? "auto" : "smooth",
+    });
+  });
+  document.addEventListener("astro:page-load", () => {
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+  });
+  document.addEventListener("astro:before-preparation", () => {
+    window.removeEventListener("scroll", onScroll);
+  });
+})();
+</script>
+
 <style>
-  .plain-footer {
-    border-top: 1px solid var(--sl-color-gray-5);
-    padding: 2rem 0;
-    margin-top: 3rem;
-  }
-  .footer-content {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    align-items: center;
-    gap: 1rem;
-    margin-bottom: 1rem;
-    font-size: var(--sl-text-sm);
-    color: var(--sl-color-gray-3);
-  }
-  .footer-links {
-    display: flex;
-    gap: 1.5rem;
-  }
-  .footer-links a {
-    color: var(--sl-color-text-accent);
-    text-decoration: none;
-  }
-  .footer-links a:hover {
-    text-decoration: underline;
-  }
+.plain-footer {
+  border-top: 1px solid var(--sl-color-gray-5);
+  padding: 2rem 0;
+  margin-top: 3rem;
+}
+.footer-content {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  font-size: var(--sl-text-sm);
+  color: var(--sl-color-gray-3);
+}
+.footer-links {
+  display: flex;
+  gap: 1.5rem;
+}
+.footer-links a {
+  color: var(--sl-color-text-accent);
+  text-decoration: none;
+}
+.footer-links a:hover {
+  text-decoration: underline;
+}
 </style>
