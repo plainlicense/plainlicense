@@ -1,4 +1,4 @@
-import { getEntry, type CollectionEntry } from 'astro:content'
+import { getEntry } from 'astro:content'
 
 /**
  * Injects template blocks into license content.
@@ -14,7 +14,7 @@ export async function injectTemplateBlocks(
     if (block) {
       const placeholder = `{{block:${blockId}}}`;
       if (content.includes(placeholder)) {
-        content = content.replace(placeholder, block.body);
+        content = content.replaceAll(placeholder, block.body);
       }
     }
   }

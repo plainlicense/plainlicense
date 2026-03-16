@@ -52,7 +52,7 @@ const OriginalLicenseSchema = z.object({
   version_display: z.string().optional(),
   organization: z.string().optional(),
   has_official_source: z.boolean().default(false),
-  canonical_url: z.string().url(),
+  canonical_url: z.string().url().optional(),
   link_in_original: z.boolean().default(false),
   is_deprecated: z.boolean().default(false),
   is_osi_approved: z.boolean().optional(),
@@ -77,6 +77,7 @@ const licensesCollection = defineCollection({
     status: z.enum(['draft', 'published']).default('draft'),
 
     // === Description ===
+    title: z.string(),
     description: z.string().min(1).max(300),
     tldr: z.array(z.string().max(200)).min(2).max(4),
 
