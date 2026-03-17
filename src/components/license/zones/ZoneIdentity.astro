@@ -46,7 +46,7 @@ const isSourceAvailable = license_family === 'source-available';
   <p class="license-description">{description}</p>
 
   {isSourceAvailable && (
-    <div class="callout callout--important" role="alert">
+    <div class="callout callout--important" role="region" aria-label="Important notice">
       <span class="callout-icon" aria-hidden="true">⚠️</span>
       <strong>Important:</strong> This license has significant commercial restrictions.
       Read <em>What you cannot do</em> before assuming this is a permissive license.

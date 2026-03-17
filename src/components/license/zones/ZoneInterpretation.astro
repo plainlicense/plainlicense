@@ -48,7 +48,7 @@ const isOriginal = !original; // PlainLicense original (no original object)
           the rest of the {licenseKind}'s rules still apply.
         </p>
         <p class="repo-link-text">
-          Source and full history: <a href="https://github.com/plainlicense/plainlicense" target="_blank" rel="noopener noreferrer">github.com/plainlicense/plainlicense</a>
+          Source and full history: <a href="https://github.com/plainlicense/plainlicense" target="_blank" rel="noopener noreferrer">github.com/plainlicense/plainlicense<span class="sr-only"> (opens in new tab)</span></a>
         </p>
       </div>
     ) : (
@@ -56,7 +56,7 @@ const isOriginal = !original; // PlainLicense original (no original object)
         <p>
           The {plain_name} is a plain language version of the{' '}
           {canonicalUrl ? (
-            <a href={canonicalUrl} target="_blank" rel="noopener noreferrer">{originalVersionDisplay}</a>
+            <a href={canonicalUrl} target="_blank" rel="noopener noreferrer">{originalVersionDisplay}<span class="sr-only"> (opens in new tab)</span></a>
           ) : (
             <strong>{originalVersionDisplay}</strong>
           )}.
@@ -67,7 +67,7 @@ const isOriginal = !original; // PlainLicense original (no original object)
           If precise legal language matters for your situation — for example, if you're in a
           dispute or reviewing compliance — refer to the official{' '}
           {canonicalUrl ? (
-            <a href={canonicalUrl} target="_blank" rel="noopener noreferrer">{originalName}</a>
+            <a href={canonicalUrl} target="_blank" rel="noopener noreferrer">{originalName}<span class="sr-only"> (opens in new tab)</span></a>
           ) : (
             <strong>{originalName}</strong>
           )}.

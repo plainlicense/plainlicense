@@ -53,7 +53,7 @@ const cards = limitations
           <div class="restriction-card" data-tag={card.tag}>
             <div class="card-header">
               <span class="card-icon" aria-hidden="true">{card.icon}</span>
-              <span class="card-label">{card.label}</span>
+              <h3 class="card-label">{card.label}</h3>
             </div>
             <p class="card-description">{card.description}</p>
             {card.why && (
@@ -79,7 +79,7 @@ const cards = limitations
             <div class="restriction-card" data-tag={card.tag}>
               <div class="card-header">
                 <span class="card-icon" aria-hidden="true">{card.icon}</span>
-                <span class="card-label">{card.label}</span>
+                <h3 class="card-label">{card.label}</h3>
               </div>
               <p class="card-description">{card.description}</p>
               {card.why && (
@@ -216,6 +216,8 @@ const cards = limitations
     font-weight: 600;
     font-size: var(--sl-text-sm);
     color: var(--sl-color-white);
+    margin: 0;
+    line-height: inherit;
   }
 
   .card-description {
