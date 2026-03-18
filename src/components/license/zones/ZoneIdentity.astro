@@ -1,0 +1,245 @@
+---
+/**
+ * Zone 1: Identity & orientation
+ * Shows license name, family tag, description, TL;DR, and copyright block.
+ */
+import { FAMILY_LABELS } from '../../../data/license-families/index';
+
+interface Props {
+  plain_name: string;
+  license_family: string;
+  description: string;
+  tldr: string[];
+  is_dedication?: boolean;
+  original?: {
+    name?: string;
+    version_display?: string;
+  };
+}
+
+const {
+  plain_name,
+  license_family,
+  description,
+  tldr,
+  is_dedication = false,
+  original,
+} = Astro.props as Props;
+
+const familyLabel = FAMILY_LABELS[license_family] ?? license_family;
+const isSourceAvailable = license_family === 'source-available';
+---
+
+<section class="zone zone-identity" aria-label="License identity">
+  <div class="zone-header">
+    <h1 class="license-title">{plain_name}</h1>
+    <span class={`family-badge family-badge--${license_family}`} aria-label={`License family: ${familyLabel}`}>
+      {familyLabel}
+    </span>
+    {is_dedication && (
+      <span class="dedication-badge" aria-label="Public domain dedication">
+        Dedication
+      </span>
+    )}
+  </div>
+
+  <p class="license-description">{description}</p>
+
+  {isSourceAvailable && (
+    <div class="callout callout--important" role="region" aria-label="Important notice">
+      <span class="callout-icon" aria-hidden="true">⚠️</span>
+      <strong>Important:</strong> This license has significant commercial restrictions.
+      Read <em>What you cannot do</em> before assuming this is a permissive license.
+    </div>
+  )}
+
+  <div class="tldr-block" role="note" aria-label="Quick summary">
+    <div class="tldr-header">
+      <span class="tldr-icon" aria-hidden="true">📋</span>
+      <strong>The short version:</strong>
+    </div>
+    <ul class="tldr-list">
+      {tldr.map((bullet) => (
+        <li>{bullet}</li>
+      ))}
+    </ul>
+  </div>
+
+  <div class="copyright-block">
+    <p class="copyright-label">Copyright notice — replace the bracketed text with your own details:</p>
+    <code class="copyright-template">
+      Copyright &copy; <span class="placeholder" data-placeholder="year">[Year]</span>{' '}
+      <span class="placeholder" data-placeholder="holder">[Copyright holder name]</span>
+    </code>
+  </div>
+</section>
+
+<style>
+  .zone-identity {
+    margin-bottom: 2.5rem;
+  }
+
+  .zone-header {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+
+  .license-title {
+    font-size: clamp(1.5rem, 4vw, 2.25rem);
+    font-weight: 800;
+    margin: 0;
+    color: var(--sl-color-white);
+    line-height: 1.2;
+  }
+
+  .family-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 99px;
+    font-size: var(--sl-text-xs);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    white-space: nowrap;
+  }
+
+  .family-badge--permissive {
+    background: rgba(21, 219, 149, 0.15);
+    color: rgb(21, 219, 149);
+    border: 1px solid rgba(21, 219, 149, 0.3);
+  }
+
+  .family-badge--copyleft {
+    background: rgba(13, 25, 163, 0.15);
+    color: rgb(100, 120, 240);
+    border: 1px solid rgba(100, 120, 240, 0.3);
+  }
+
+  .family-badge--public-domain {
+    background: rgba(228, 197, 129, 0.15);
+    color: rgb(228, 197, 129);
+    border: 1px solid rgba(228, 197, 129, 0.3);
+  }
+
+  .family-badge--source-available {
+    background: rgba(234, 100, 58, 0.15);
+    color: rgb(234, 140, 58);
+    border: 1px solid rgba(234, 140, 58, 0.3);
+  }
+
+  .family-badge--proprietary {
+    background: rgba(220, 50, 50, 0.15);
+    color: rgb(220, 80, 80);
+    border: 1px solid rgba(220, 80, 80, 0.3);
+  }
+
+  .dedication-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 99px;
+    font-size: var(--sl-text-xs);
+    font-weight: 600;
+    background: rgba(228, 197, 129, 0.1);
+    color: rgb(228, 197, 129);
+    border: 1px solid rgba(228, 197, 129, 0.2);
+  }
+
+  .license-description {
+    font-size: var(--sl-text-lg);
+    color: var(--sl-color-gray-2);
+    margin: 0 0 1.5rem 0;
+    line-height: 1.6;
+  }
+
+  .callout {
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+    padding: 1rem 1.25rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    font-size: var(--sl-text-sm);
+    line-height: 1.5;
+  }
+
+  .callout--important {
+    background: rgba(234, 140, 58, 0.1);
+    border: 1px solid rgba(234, 140, 58, 0.3);
+    color: var(--sl-color-gray-1);
+  }
+
+  .callout-icon {
+    font-size: 1.1rem;
+    flex-shrink: 0;
+    margin-top: 0.1rem;
+  }
+
+  .tldr-block {
+    background: var(--sl-color-gray-6);
+    border: 1px solid var(--sl-color-gray-5);
+    border-left: 4px solid var(--sl-color-accent);
+    border-radius: 0 8px 8px 0;
+    padding: 1rem 1.25rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .tldr-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+    font-size: var(--sl-text-sm);
+    color: var(--sl-color-gray-2);
+  }
+
+  .tldr-icon {
+    font-size: 1rem;
+  }
+
+  .tldr-list {
+    margin: 0;
+    padding-left: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .tldr-list li {
+    font-size: var(--sl-text-sm);
+    color: var(--sl-color-gray-1);
+    line-height: 1.5;
+  }
+
+  .copyright-block {
+    background: var(--sl-color-gray-7, var(--sl-color-black));
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+    margin-top: 1rem;
+  }
+
+  .copyright-label {
+    font-size: var(--sl-text-xs);
+    color: var(--sl-color-gray-3);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin: 0 0 0.5rem 0;
+  }
+
+  .copyright-template {
+    font-family: var(--sl-font-mono, monospace);
+    font-size: var(--sl-text-sm);
+    color: var(--sl-color-gray-1);
+    display: block;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  .placeholder {
+    color: var(--sl-color-accent);
+    font-style: italic;
+  }
+</style>

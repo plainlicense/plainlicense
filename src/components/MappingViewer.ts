@@ -46,9 +46,9 @@ export function initMappingViewer(container: HTMLElement, mappingData: any) {
         });
 
         // Mobile/Tablet Click Logic (Overlay)
-        plainEl.addEventListener('click', () => {
+        plainEl.addEventListener('click', (e) => {
           if (window.innerWidth >= 1024 || !container.classList.contains('comparison-active')) return;
-          showMobileModal(originalEls);
+          showMobileModal(originalEls, e.currentTarget as HTMLElement);
         });
       });
 
@@ -85,11 +85,10 @@ export function initMappingViewer(container: HTMLElement, mappingData: any) {
   window.addEventListener('scroll', handleUpdate);
 }
 
-function showMobileModal(originalEls: HTMLElement[]) {
-  const modal = document.getElementById('comparison-modal');
+function showMobileModal(originalEls: HTMLElement[], trigger?: HTMLElement) {
   const modalBody = document.getElementById('modal-body');
-  
-  if (!modal || !modalBody) return;
+
+  if (!modalBody) return;
 
   // Clone content from original elements to preserve formatting
   modalBody.innerHTML = '';
@@ -100,9 +99,21 @@ function showMobileModal(originalEls: HTMLElement[]) {
     modalBody.appendChild(clone);
   });
 
-  modal.classList.add('open');
-  modal.setAttribute('aria-hidden', 'false');
-  document.body.style.overflow = 'hidden'; // Prevent background scrolling
+  // Use the exposed openModal function so focus management (trap + restore) runs
+  const openModal = (window as Record<string, unknown>).__openComparisonModal as
+    | ((trigger?: HTMLElement) => void)
+    | undefined;
+
+  if (typeof openModal === 'function') {
+    openModal(trigger);
+  } else {
+    // Fallback: direct DOM manipulation if the function isn't available yet
+    const modal = document.getElementById('comparison-modal');
+    if (!modal) return;
+    modal.classList.add('open');
+    modal.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+  }
 }
 
 function createSVGOverlay(container: HTMLElement): SVGSVGElement {

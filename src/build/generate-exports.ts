@@ -38,7 +38,7 @@ async function generateAllExports() {
         const fileContent = await fs.readFile(fullPath, 'utf8');
         let { data, content } = matter(fileContent);
         
-        if (!data.spdx_id || !data.version) {
+        if (!data.spdx_id || !data.plain_version) {
           console.warn(`Skipping ${entry.name} due to missing metadata.`);
           continue;
         }
@@ -48,11 +48,11 @@ async function generateAllExports() {
           return templateBlocks[id] || match;
         });
 
-        const outputDir = path.join(baseOutputDir, data.spdx_id.toLowerCase(), `v${data.version}`);
+        const outputDir = path.join(baseOutputDir, data.spdx_id.toLowerCase(), `v${data.plain_version}`);
         
         const ctx: ExportContext = {
           licenseId: data.spdx_id,
-          version: data.version,
+          version: data.plain_version,
           content: content,
           metadata: data,
           outputDir: outputDir

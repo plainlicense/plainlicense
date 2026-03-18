@@ -2,38 +2,19 @@
 title: Plain MIT License
 plain_name: Plain MIT License
 spdx_id: MIT
-version: 0.2.1
-original_version: '2024'
+plain_version: 0.2.1
 description: >-
   A short, permissive software license. Lets people do almost anything they want
   with your project.
-license_type: permissive
-is_osi_approved: true
-is_fsf_approved: true
-fair_code: false
+license_family: permissive
+is_dedication: false
 status: published
-summary: You can do almost anything as long as you include the copyright notice.
-use_cases:
-  - Open source software projects
-  - Personal creative projects
-permissions:
-  - commercial-use
-  - modifications
-  - distribution
-  - private-use
-conditions:
-  - include-copyright
-limitations:
-  - liability
-  - warranty
-restrictions:
-  commercial_use: false
-  attribution_required: true
-  share_alike: false
-canonical_url: 'https://opensource.org/licenses/MIT'
-created_date: '2026-01-30'
-last_modified: '2026-01-30'
-author: Plain License Team
+tldr:
+  - You can use, copy, change, and share this work for any reason, including commercially.
+  - You must keep the copyright notice and this license with any copy you share.
+  - No warranty is provided. Use at your own risk.
+attribution_required: true
+fair_code: false
 meta_description: Plain language MIT license for all creative works
 og_image: /images/licenses/mit-og.png
 has_mapping: true
@@ -43,6 +24,26 @@ show_shame_counter: true
 featured: true
 plain_gunning_fog: 14.81
 shame_words_count: 1
+original:
+  name: MIT License
+  spdx_id: MIT
+  version_display: MIT License (1988)
+  has_official_source: false
+  canonical_url: 'https://opensource.org/licenses/MIT'
+  link_in_original: false
+  is_deprecated: false
+  is_osi_approved: true
+  is_fsf_approved: true
+  permissions:
+    - commercial-use
+    - distribution
+    - modifications
+    - private-use
+  conditions:
+    - include-copyright
+  limitations:
+    - liability
+    - warranty
 ---
 
 # Plain MIT License

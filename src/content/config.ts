@@ -30,72 +30,103 @@ const spdxDetailsSchema = z.object({
   seeAlso: z.array(z.string().url()).optional(),
 });
 
+// Choosealicense.com tag enums (data layer — display tags live in tagMappings.ts)
+const PermissionTag = z.enum([
+  'commercial-use', 'distribution', 'modifications', 'patent-use', 'private-use', 'revokable',
+]);
+
+const ConditionTag = z.enum([
+  'disclose-source', 'document-changes', 'include-copyright', 'include-copyright--source',
+  'network-use-disclose', 'same-license', 'same-license--file', 'same-license--library',
+]);
+
+const LimitationTag = z.enum([
+  'liability', 'patent-use', 'trademark-use', 'warranty',
+]);
+
+// Original license subschema (present for adaptations, omit for PlainLicense originals)
+const OriginalLicenseSchema = z.object({
+  name: z.string(),
+  spdx_id: z.string().regex(/^[A-Za-z0-9.-]+$/).optional(),
+  version: z.string().optional(),
+  version_display: z.string().optional(),
+  organization: z.string().optional(),
+  has_official_source: z.boolean().default(false),
+  canonical_url: z.string().url().optional(),
+  link_in_original: z.boolean().default(false),
+  is_deprecated: z.boolean().default(false),
+  is_osi_approved: z.boolean().optional(),
+  is_fsf_approved: z.boolean().optional(),
+  permissions: z.array(PermissionTag).optional(),
+  conditions: z.array(ConditionTag).optional(),
+  limitations: z.array(LimitationTag).optional(),
+  gunning_fog: z.number().optional(),
+  choose_a_license_details: chooseALicenseDetailsSchema.optional(),
+});
+
 // License collection schema
 const licensesCollection = defineCollection({
   type: 'content',
   schema: z.object({
-    // === Required Fields ===
+    // === Identity ===
     plain_name: z.string().min(1).max(100),
-    spdx_id: z.string().regex(/^[A-Za-z0-9.-]+$|^plain-[a-z0-9-]+$/),
-    version: z.string().regex(/^\d+\.\d+\.\d+$/),
-    description: z.string().min(1).max(300),
-    changelog: z.string().optional(),
-    license_type: z.enum(['permissive', 'copyleft', 'source-available', 'public-domain', 'proprietary']),
-
+    spdx_id: z.string().regex(/^[A-Za-z0-9.-]+$|^Plain-[A-Za-z0-9.-]+$/),
+    plain_version: z.string().regex(/^\d+\.\d+\.\d+$/),
+    license_family: z.enum(['public-domain', 'permissive', 'copyleft', 'source-available', 'proprietary']),
+    is_dedication: z.boolean().default(false),
     status: z.enum(['draft', 'published']).default('draft'),
 
-    // === Readability Metrics ===
+    // === Description ===
+    title: z.string(),
+    description: z.string().min(1).max(300),
+    tldr: z.array(z.string().max(200)).min(2).max(4),
+
+    // === Content flags ===
+    attribution_required: z.boolean().default(false),
+    fair_code: z.boolean().default(false),
+
+    // === License-specific how-to additions (family default is a component) ===
+    extra_how: z.string().optional(),
+
+    // === Clause mapping ===
+    has_mapping: z.boolean().default(false),
+    mapping_version: z.string().regex(/^\d+\.\d+\.\d+$/).optional(),
+
+    // === Readability metrics (computed at build time) ===
     plain_gunning_fog: z.number().optional(),
     shame_words_count: z.number().optional(),
 
-    // === Optional Fields ===
-    // these pertain to the original license that the plain language version is based on, not the plain language version itself, until osi/fsf knows we exist and approves our plain language versions as well
-    is_osi_approved: z.boolean().optional(),
-    is_fsf_approved: z.boolean().optional(),
-    original_version: z.string().optional(),
-    // version of the original license that the plain language version is based on (e.g. '2.0' for Apache-2.0)
-    original_version_name: z.string().optional(),
-    original_version_version: z.string().regex(/^\d+(\.\d+)?(\.\d+)?$/).optional(),
-    // not all commonly used licenses have a single official version, MIT is a prime example
-    has_official_original: z.boolean().optional(),
-    original_organization: z.string().optional(),
-    fair_code: z.boolean().optional().default(false),
-    summary: z.string().optional(),
-    use_cases: z.array(z.string()).optional(),
-    restrictions: z.object({
-      commercial_use: z.boolean().optional(),
-      attribution_required: z.boolean().optional(),
-      share_alike: z.boolean().optional(),
-    }).optional(),
-    canonical_url: z.string().url().optional(),
-    created_date: z.string().optional(),
-    last_modified: z.string().optional(),
-    authors: z.array(z.string()).optional(),
-    meta_description: z.string().optional(),
-    og_image: z.string().optional(),
-    has_mapping: z.boolean().optional().default(false),
-    mapping_version: z.string().regex(/^\d+\.\d+\.\d+$/).optional(),
-    show_original_comparison: z.boolean().optional().default(true),
-    show_shame_counter: z.boolean().optional().default(true),
-    featured: z.boolean().optional().default(false),
+    // === Display controls ===
+    show_original_comparison: z.boolean().default(true),
+    show_shame_counter: z.boolean().default(true),
+    featured: z.boolean().default(false),
 
-    // auto-populated fields (not required in frontmatter, but will be added during build)
-    original_gunning_fog: z.number().optional(),
+    // === SEO / metadata ===
+    meta_description: z.string().max(160).optional(),
+    og_image: z.string().optional(),
+    authors: z.array(z.string()).optional(),
+    changelog: z.string().optional(),
+
+    // === Original license (omit for PlainLicense originals) ===
+    original: OriginalLicenseSchema.optional(),
+
+    // === Auto-populated build-time fields (do not author in frontmatter) ===
     spdx_details: spdxDetailsSchema.optional(),
     spdx_license: LicenseSchema.optional(),
     choose_a_license_details: chooseALicenseDetailsSchema.optional(),
 
   }).refine(
-    (data) => {
-      // If fair_code is true, license_type must be source-available
-      if (data.fair_code && data.license_type !== 'source-available') {
-        return false;
-      }
-      return true;
-    },
-    {
-      message: "fair_code licenses must have license_type 'source-available'",
-    }
+    (data) => !(data.fair_code && data.license_family !== 'source-available'),
+    { message: "fair_code must be false unless license_family is 'source-available'" }
+  ).refine(
+    (data) => !(data.is_dedication && data.license_family !== 'public-domain'),
+    { message: "is_dedication must be false unless license_family is 'public-domain'" }
+  ).refine(
+    (data) => !(data.has_mapping && !data.mapping_version),
+    { message: "mapping_version is required when has_mapping is true" }
+  ).refine(
+    (data) => !(data.original?.has_official_source && !data.original?.canonical_url),
+    { message: "original.canonical_url is required when original.has_official_source is true" }
   )
 });
 
@@ -105,11 +136,14 @@ const templateBlocksCollection = defineCollection({
   type: 'content',
   schema: z.object({
     title: z.string(),
-    blockId: z.string().regex(/^[a-z0-9-]+$/),
+    block_id: z.string().regex(/^[a-z0-9-]+$/),
     category: z.enum(['warranty', 'permission', 'condition', 'disclaimer', 'notice']),
+    families: z.array(z.enum([
+      'public-domain', 'permissive', 'copyleft', 'source-available', 'proprietary',
+    ])).optional(),
     description: z.string().optional(),
     version: z.string().regex(/^\d+\.\d+\.\d+$/),
-    blockTitle: z.string().optional(),
+    block_title: z.string().optional(),
   }),
 });
 

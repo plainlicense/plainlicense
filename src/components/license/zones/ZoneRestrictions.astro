@@ -1,0 +1,243 @@
+---
+/**
+ * Zone 5: What you cannot do
+ * Renders restriction/limitation cards from choosealicense.com tags.
+ * By default this zone is collapsed (below the fold).
+ * For source-available licenses, aboveFold=true moves it above the fold.
+ */
+import {
+  LIMITATION_LABELS,
+  LIMITATION_ICONS,
+  LIMITATION_WHY,
+  TAG_DESCRIPTIONS,
+  LIMITATION_MAP,
+} from '../../../data/tagMappings';
+
+interface Props {
+  limitations?: string[];
+  aboveFold?: boolean;
+}
+
+const { limitations = [], aboveFold = false } = Astro.props as Props;
+
+// Deduplicate
+const seen = new Set<string>();
+const cards = limitations
+  .filter((tag) => {
+    const display = LIMITATION_MAP[tag as keyof typeof LIMITATION_MAP];
+    if (!display || seen.has(display)) return false;
+    seen.add(display);
+    return true;
+  })
+  .map((tag) => {
+    const display = LIMITATION_MAP[tag as keyof typeof LIMITATION_MAP] ?? tag;
+    return {
+      tag,
+      label: LIMITATION_LABELS[tag] ?? tag,
+      icon: LIMITATION_ICONS[tag] ?? '✗',
+      description: TAG_DESCRIPTIONS[display] ?? '',
+      why: LIMITATION_WHY[tag] ?? '',
+    };
+  });
+---
+
+{cards.length > 0 && (
+  aboveFold ? (
+    <section class="zone zone-restrictions zone-restrictions--above-fold" aria-label="What you cannot do">
+      <h2 class="zone-heading zone-heading--restrictions">
+        <span class="zone-heading-icon" aria-hidden="true">🚫</span>
+        What you cannot do
+      </h2>
+      <div class="restriction-list">
+        {cards.map((card) => (
+          <div class="restriction-card" data-tag={card.tag}>
+            <div class="card-header">
+              <span class="card-icon" aria-hidden="true">{card.icon}</span>
+              <h3 class="card-label">{card.label}</h3>
+            </div>
+            <p class="card-description">{card.description}</p>
+            {card.why && (
+              <p class="card-why">
+                <strong>Why:</strong> {card.why}
+              </p>
+            )}
+          </div>
+        ))}
+      </div>
+    </section>
+  ) : (
+    <details class="zone zone-restrictions zone-restrictions--collapsed">
+      <summary class="restrictions-summary">
+        <span class="summary-icon" aria-hidden="true">🚫</span>
+        <span class="summary-heading">What you cannot do</span>
+        <span class="summary-count">({cards.length} restriction{cards.length !== 1 ? 's' : ''})</span>
+        <span class="summary-arrow" aria-hidden="true">▾</span>
+      </summary>
+      <div class="restrictions-body">
+        <div class="restriction-list">
+          {cards.map((card) => (
+            <div class="restriction-card" data-tag={card.tag}>
+              <div class="card-header">
+                <span class="card-icon" aria-hidden="true">{card.icon}</span>
+                <h3 class="card-label">{card.label}</h3>
+              </div>
+              <p class="card-description">{card.description}</p>
+              {card.why && (
+                <p class="card-why">
+                  <strong>Why:</strong> {card.why}
+                </p>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+    </details>
+  )
+)}
+
+<style>
+  .zone-restrictions {
+    margin-bottom: 1.5rem;
+  }
+
+  .zone-heading {
+    font-size: var(--sl-text-xl);
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1.25rem;
+    color: var(--sl-color-white);
+  }
+
+  .zone-heading--restrictions {
+    color: rgb(234, 100, 80);
+  }
+
+  .zone-heading-icon {
+    font-size: 1.1rem;
+  }
+
+  /* Collapsed (below-fold) variant */
+  .zone-restrictions--collapsed {
+    background: var(--sl-color-gray-6);
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .restrictions-summary {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.9rem 1.25rem;
+    cursor: pointer;
+    list-style: none;
+    user-select: none;
+    color: var(--sl-color-gray-1);
+    font-weight: 600;
+    font-size: var(--sl-text-sm);
+  }
+
+  .restrictions-summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .restrictions-summary:hover {
+    background: var(--sl-color-gray-5);
+  }
+
+  .summary-icon {
+    font-size: 1rem;
+  }
+
+  .summary-heading {
+    flex: 1;
+  }
+
+  .summary-count {
+    font-size: var(--sl-text-xs);
+    color: var(--sl-color-gray-3);
+    font-weight: normal;
+  }
+
+  .summary-arrow {
+    font-size: 0.8rem;
+    color: var(--sl-color-gray-3);
+    transition: transform 0.2s;
+  }
+
+  details[open] .summary-arrow {
+    transform: rotate(180deg);
+  }
+
+  .restrictions-body {
+    padding: 0 1.25rem 1.25rem;
+    border-top: 1px solid var(--sl-color-gray-5);
+  }
+
+  .restriction-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-top: 1rem;
+  }
+
+  .restriction-card {
+    background: var(--sl-color-gray-6, rgba(0,0,0,0.2));
+    border: 1px solid var(--sl-color-gray-5);
+    border-left: 4px solid rgba(234, 100, 80, 0.5);
+    border-radius: 0 8px 8px 0;
+    padding: 0.9rem 1.1rem;
+    transition: border-color 0.2s;
+  }
+
+  .zone-restrictions--above-fold .restriction-card {
+    background: var(--sl-color-gray-6);
+  }
+
+  .restriction-card:hover {
+    border-left-color: rgb(234, 100, 80);
+  }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.4rem;
+  }
+
+  .card-icon {
+    font-size: 1.1rem;
+    flex-shrink: 0;
+  }
+
+  .card-label {
+    font-weight: 600;
+    font-size: var(--sl-text-sm);
+    color: var(--sl-color-white);
+    margin: 0;
+    line-height: inherit;
+  }
+
+  .card-description {
+    font-size: var(--sl-text-sm);
+    color: var(--sl-color-gray-1);
+    margin: 0 0 0.4rem 0;
+    line-height: 1.5;
+  }
+
+  .card-why {
+    font-size: var(--sl-text-xs);
+    color: var(--sl-color-gray-2);
+    margin: 0;
+    padding: 0.4rem 0.6rem;
+    background: rgba(234, 100, 80, 0.08);
+    border-radius: 4px;
+    line-height: 1.4;
+  }
+
+  .card-why strong {
+    color: rgb(234, 140, 100);
+  }
+</style>

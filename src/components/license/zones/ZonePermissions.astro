@@ -1,0 +1,134 @@
+---
+/**
+ * Zone 2: What you can do
+ * Renders permission cards from choosealicense.com tags.
+ */
+import {
+  PERMISSION_LABELS,
+  PERMISSION_ICONS,
+  TAG_DESCRIPTIONS,
+  PERMISSION_MAP,
+} from '../../../data/tagMappings';
+
+interface Props {
+  permissions?: string[];
+}
+
+const { permissions = [] } = Astro.props as Props;
+
+// Deduplicate and resolve display info for each permission tag
+const seen = new Set<string>();
+const cards = permissions
+  .filter((tag) => {
+    const display = PERMISSION_MAP[tag as keyof typeof PERMISSION_MAP];
+    if (!display || seen.has(display)) return false;
+    seen.add(display);
+    return true;
+  })
+  .map((tag) => {
+    const display = PERMISSION_MAP[tag as keyof typeof PERMISSION_MAP] ?? tag;
+    return {
+      tag,
+      label: PERMISSION_LABELS[tag] ?? tag,
+      icon: PERMISSION_ICONS[tag] ?? '✓',
+      description: TAG_DESCRIPTIONS[display] ?? '',
+    };
+  });
+---
+
+{cards.length > 0 && (
+  <section id="plain-permissions" class="zone zone-permissions" aria-label="What you can do">
+    <h2 class="zone-heading zone-heading--permissions">
+      <span class="zone-heading-icon" aria-hidden="true">✅</span>
+      What you can do
+    </h2>
+    <div class="permission-grid">
+      {cards.map((card) => (
+        <div class="permission-card" data-tag={card.tag}>
+          <div class="card-header">
+            <span class="card-icon" aria-hidden="true">{card.icon}</span>
+            <h3 class="card-label">{card.label}</h3>
+          </div>
+          <p class="card-description">{card.description}</p>
+        </div>
+      ))}
+    </div>
+  </section>
+)}
+
+<style>
+  .zone-permissions {
+    margin-bottom: 2.5rem;
+  }
+
+  .zone-heading {
+    font-size: var(--sl-text-xl);
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1.25rem;
+    color: var(--sl-color-white);
+  }
+
+  .zone-heading--permissions {
+    color: rgb(21, 219, 149);
+  }
+
+  .zone-heading-icon {
+    font-size: 1.1rem;
+  }
+
+  .permission-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+  }
+
+  .permission-card {
+    background: var(--sl-color-gray-6);
+    border: 1px solid var(--sl-color-gray-5);
+    border-top: 3px solid rgba(21, 219, 149, 0.5);
+    border-radius: 8px;
+    padding: 1rem;
+    transition: border-color 0.2s, transform 0.15s;
+  }
+
+  .permission-card:hover {
+    border-top-color: rgb(21, 219, 149);
+    transform: translateY(-1px);
+  }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .card-icon {
+    font-size: 1.25rem;
+    flex-shrink: 0;
+  }
+
+  .card-label {
+    font-weight: 600;
+    font-size: var(--sl-text-sm);
+    color: var(--sl-color-white);
+    margin: 0;
+    line-height: inherit;
+  }
+
+  .card-description {
+    font-size: var(--sl-text-xs);
+    color: var(--sl-color-gray-2);
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  @media (max-width: 640px) {
+    .permission-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+</style>

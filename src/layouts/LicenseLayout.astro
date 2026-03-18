@@ -18,15 +18,14 @@ try {
 } catch (e) {}
 ---
 
-<BaseLayout title={data.title || data.spdx_id} description={data.description}>
+<BaseLayout title={data.plain_name || data.spdx_id} description={data.description}>
   <main class="license-page" data-spdx-id={data.spdx_id}>
     <header>
-      <h1>{data.title}</h1>
-      {data.plain_name && <p class="plain-name">{data.plain_name}</p>}
+      <h1>{data.plain_name}</h1>
       <div class="metadata">
         <span class="spdx-id">{data.spdx_id}</span>
-        <span class="category">{data.category}</span>
-        {data.current_version && <span class="version">v{data.current_version}</span>}
+        <span class="category">{data.license_family}</span>
+        {data.plain_version && <span class="version">v{data.plain_version}</span>}
       </div>
     </header>
 
@@ -40,22 +39,22 @@ try {
       </article>
 
       <aside class="sidebar">
-        {data.permissions && (
+        {data.original?.permissions && (
           <section>
             <h3>Permissions</h3>
-            <ul>{data.permissions.map(p => <li>{p}</li>)}</ul>
+            <ul>{data.original.permissions.map(p => <li>{p}</li>)}</ul>
           </section>
         )}
-        {data.conditions && (
+        {data.original?.conditions && (
           <section>
             <h3>Conditions</h3>
-            <ul>{data.conditions.map(c => <li>{c}</li>)}</ul>
+            <ul>{data.original.conditions.map(c => <li>{c}</li>)}</ul>
           </section>
         )}
-        {data.limitations && (
+        {data.original?.limitations && (
           <section>
             <h3>Limitations</h3>
-            <ul>{data.limitations.map(l => <li>{l}</li>)}</ul>
+            <ul>{data.original.limitations.map(l => <li>{l}</li>)}</ul>
           </section>
         )}
       </aside>

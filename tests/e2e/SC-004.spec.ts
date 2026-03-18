@@ -13,8 +13,8 @@ test.describe('SC-004: Interaction Latency', () => {
     await expect(toggle).toBeVisible();
     await toggle.click();
 
-    // 2. Find a mappable element
-    const plainElement = page.locator('#plain-perm-use');
+    // 2. Find the permissions zone (zone-based architecture uses section ids)
+    const plainElement = page.locator('#plain-permissions');
     await expect(plainElement).toBeVisible();
 
     // 3. Measure time to show connection
@@ -42,7 +42,7 @@ test.describe('SC-004: Interaction Latency', () => {
         // Timeout
         setTimeout(() => resolve(999), 1000);
       });
-    }, 'plain-perm-use');
+    }, 'plain-permissions');
 
     console.log(`Mapping interaction latency: ${latency.toFixed(2)}ms`);
     
