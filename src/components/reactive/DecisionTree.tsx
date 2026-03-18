@@ -95,7 +95,15 @@ export default function DecisionTree({
               View {result} on Plain License
             </a>
             <p class="result-actions">
-              <button type="button" class="back-btn" onClick={goBack}>
+              <button
+                type="button"
+                class="back-btn"
+                onClick={() => {
+                  setResult(null);
+                  setHistory([]);
+                  setCurrentStepId(initialStep);
+                }}
+              >
                 ← Start over
               </button>
             </p>
