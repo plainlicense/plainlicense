@@ -2,29 +2,44 @@
 title: Plain Elastic License
 plain_name: Plain Elastic License
 spdx_id: Elastic-2.0
-version: 0.1.0
-original_version: '2.0'
+plain_version: 0.1.0
 description: The Elastic License 2.0 allows use, copying, and changes but prohibits offering the work as a managed service. You must keep notices and may lose patent rights if you sue.
-license_type: source-available
-is_osi_approved: false
-is_fsf_approved: false
+license_family: source-available
+is_dedication: false
 status: published
-summary: The Elastic License 2.0 allows most uses but prohibits managed service offerings.
-permissions:
-  - distribution
-  - modifications
-  - patent-use
-  - private-use
-conditions:
-  - include-copyright
-  - same-license--file
-limitations:
-  - liability
-  - trademark-use
-  - warranty
-canonical_url: 'https://www.elastic.co/licensing/elastic-license'
+tldr:
+  - You can use, copy, change, and share this work for most purposes.
+  - You cannot offer this work or its features as a managed service to others.
+  - Keep all copyright, license, and trademark notices with any copy you share.
+  - No warranty is provided. Use at your own risk.
+attribution_required: false
+fair_code: true
 plain_gunning_fog: 11.76
 shame_words_count: 1
+original:
+  name: Elastic License 2.0
+  spdx_id: Elastic-2.0
+  version: '2.0'
+  version_display: Elastic License 2.0
+  organization: Elastic NV
+  has_official_source: true
+  canonical_url: 'https://www.elastic.co/licensing/elastic-license'
+  link_in_original: false
+  is_deprecated: false
+  is_osi_approved: false
+  is_fsf_approved: false
+  permissions:
+    - distribution
+    - modifications
+    - patent-use
+    - private-use
+  conditions:
+    - include-copyright
+    - same-license--file
+  limitations:
+    - liability
+    - trademark-use
+    - warranty
 ---
 # Plain Elastic License
 

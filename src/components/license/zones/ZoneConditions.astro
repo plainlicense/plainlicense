@@ -1,0 +1,149 @@
+---
+/**
+ * Zone 3: What you must do
+ * Renders condition cards from choosealicense.com tags.
+ * The "why" for each condition is always visible (mandatory per spec).
+ */
+import {
+  CONDITION_LABELS,
+  CONDITION_ICONS,
+  CONDITION_WHY,
+  TAG_DESCRIPTIONS,
+  CONDITION_MAP,
+} from '../../../data/tagMappings';
+
+interface Props {
+  conditions?: string[];
+}
+
+const { conditions = [] } = Astro.props as Props;
+
+// Deduplicate by display tag (e.g. include-copyright and include-copyright--source → same card)
+const seen = new Set<string>();
+const cards = conditions
+  .filter((tag) => {
+    const display = CONDITION_MAP[tag as keyof typeof CONDITION_MAP];
+    if (!display || seen.has(display)) return false;
+    seen.add(display);
+    return true;
+  })
+  .map((tag) => {
+    const display = CONDITION_MAP[tag as keyof typeof CONDITION_MAP] ?? tag;
+    return {
+      tag,
+      label: CONDITION_LABELS[tag] ?? tag,
+      icon: CONDITION_ICONS[tag] ?? '!',
+      description: TAG_DESCRIPTIONS[display] ?? '',
+      why: CONDITION_WHY[tag] ?? '',
+    };
+  });
+---
+
+{cards.length > 0 && (
+  <section id="plain-conditions" class="zone zone-conditions" aria-label="What you must do">
+    <h2 class="zone-heading zone-heading--conditions">
+      <span class="zone-heading-icon" aria-hidden="true">📋</span>
+      What you must do
+    </h2>
+    <div class="condition-list">
+      {cards.map((card) => (
+        <div class="condition-card" data-tag={card.tag}>
+          <div class="card-header">
+            <span class="card-icon" aria-hidden="true">{card.icon}</span>
+            <h3 class="card-label">{card.label}</h3>
+          </div>
+          <p class="card-description">{card.description}</p>
+          {card.why && (
+            <p class="card-why">
+              <strong>Why:</strong> {card.why}
+            </p>
+          )}
+        </div>
+      ))}
+    </div>
+  </section>
+)}
+
+<style>
+  .zone-conditions {
+    margin-bottom: 2.5rem;
+  }
+
+  .zone-heading {
+    font-size: var(--sl-text-xl);
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1.25rem;
+    color: var(--sl-color-white);
+  }
+
+  .zone-heading--conditions {
+    color: rgb(228, 197, 129);
+  }
+
+  .zone-heading-icon {
+    font-size: 1.1rem;
+  }
+
+  .condition-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .condition-card {
+    background: var(--sl-color-gray-6);
+    border: 1px solid var(--sl-color-gray-5);
+    border-left: 4px solid rgba(228, 197, 129, 0.5);
+    border-radius: 0 8px 8px 0;
+    padding: 1rem 1.25rem;
+    transition: border-color 0.2s;
+  }
+
+  .condition-card:hover {
+    border-left-color: rgb(228, 197, 129);
+  }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .card-icon {
+    font-size: 1.15rem;
+    flex-shrink: 0;
+  }
+
+  .card-label {
+    font-weight: 600;
+    font-size: var(--sl-text-sm);
+    color: var(--sl-color-white);
+    margin: 0;
+    line-height: inherit;
+  }
+
+  .card-description {
+    font-size: var(--sl-text-sm);
+    color: var(--sl-color-gray-1);
+    margin: 0 0 0.5rem 0;
+    line-height: 1.5;
+  }
+
+  .card-why {
+    font-size: var(--sl-text-xs);
+    color: var(--sl-color-gray-2);
+    margin: 0;
+    padding: 0.5rem 0.75rem;
+    background: var(--sl-color-gray-5);
+    border-radius: 4px;
+    line-height: 1.5;
+  }
+
+  .card-why strong {
+    color: rgb(228, 197, 129);
+  }
+</style>

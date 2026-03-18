@@ -12,7 +12,7 @@ const { data } = license;
 <div class="at-a-glance">
   <h2>At a Glance</h2>
   <div class="summary-content">
-    <p>{data.summary || data.description}</p>
+    <p>{data.description}</p>
   </div>
   {(data.plain_gunning_fog !== undefined || data.shame_words_count !== undefined) && (
     <dl class="readability-stats">

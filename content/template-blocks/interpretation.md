@@ -1,7 +1,7 @@
 ---
 title: Standard Legal Interpretation Block
-blockId: standard-legal-interpretation
-blockTitle: How to Interpret This License
+block_id: standard-legal-interpretation
+block_title: How to Interpret This License
 category: notice
 description: Common plain language legal interpretation notice, aka 'fallback' provision
 version: 1.0.0

@@ -1,15 +1,14 @@
 ---
 import { getCollection } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import LicenseSummary from "../../components/LicenseSummary.astro";
+import LicenseLayout from "../../components/license/LicenseLayout.astro";
 import { marked } from "marked";
 import ComparisonModal from "../../components/ComparisonModal.astro";
 import ComparisonToggle from "../../components/ComparisonToggle.astro";
 import DownloadOptions from "../../components/DownloadOptions.astro";
-import LicenseSummary from "../../components/LicenseSummary.astro";
-import ComponentRegistry from "../../components/reactive/ComponentRegistry.astro";
 import VersionHistory from "../../components/VersionHistory.astro";
-import BaseLayout from "../../layouts/BaseLayout.astro";
 import { getLicenseSlug, getPublishedLicenses } from "../../utils/collections";
-import { parseComponentPlaceholders } from "../../utils/component-parser";
 
 /**
  * Render markdown content, correctly handling <div id="..."> wrappers.
@@ -65,16 +64,13 @@ export async function getStaticPaths() {
 const { license } = Astro.props;
 const { data } = license;
 
-// Template Block Injection Logic
-const templateBlocks = await getCollection("template-blocks");
-
-// Split into plain and original parts
+// Extract original license text from markdown body (after separator)
 const bodyParts = license.body.split(/---[\s\n]+# Original License Text/i);
-const plainBody = bodyParts[0];
 const originalBody = bodyParts.length > 1 ? bodyParts[1] : "";
 
-// Replace {{block:id}} markers in plainBody globally and robustly
-const finalPlainBody = plainBody.replace(
+// Build processed body for clipboard/export (plain text from body + original text)
+const templateBlocks = await getCollection("template-blocks");
+const plainBody = bodyParts[0].replace(
   /{{block:([a-z0-9-]+)}}/g,
   (_match, blockId) => {
     const block = templateBlocks.find(
@@ -85,15 +81,8 @@ const finalPlainBody = plainBody.replace(
     return block ? block.body : `[Missing Block: ${blockId}]`;
   },
 );
-
-// Component parsing for plain body
-const placeholders = parseComponentPlaceholders(finalPlainBody);
-const contentParts = finalPlainBody.split(/{{component:[a-z-]+.*?}}/g);
-
-// Full processed body for clipboard/exports (replaces blocks but keeps original text if present)
-// Also strip component markers as they are for interactive UI only
 const fullProcessedBody = (
-  finalPlainBody +
+  plainBody +
   (originalBody ? "\n\n---\n\n# Original License Text\n" + originalBody : "")
 )
   .replace(/{{component:[a-z-]+.*?}}/g, "")
@@ -106,31 +95,34 @@ const fullProcessedBody = (
     <LicenseSummary license={license} />
 
     <div class="license-layout">
+      <!-- Plain version: rendered via zone components -->
       <div class="license-column plain-version">
-        <div class="license-content prose">
-          {contentParts.map((part, index) => (
-              <>
-                <div set:html={renderMarkdownWithDivs(part)} />
-                {placeholders[index] && (
-                  <ComponentRegistry
-                    type={placeholders[index].type}
-                    id={placeholders[index].id}
-                    props={placeholders[index].props}
-                    licenseData={data}
-                  />
-                )}
-              </>
-            ))}
-        </div>
+        <LicenseLayout license={license} />
+        <!--
+          Hidden mapping anchors: the plain markdown body preserves clause-level
+          <div id="..."> elements (e.g. plain-perm-use) that MappingViewer needs
+          to attach hover handlers. Visually hidden; aria-hidden so screen readers
+          skip duplicated content.
+        -->
+        {data.has_mapping && (
+          <div
+            class="mapping-anchors"
+            aria-hidden="true"
+            set:html={renderMarkdownWithDivs(plainBody)}
+          />
+        )}
       </div>
 
-      <div class="license-column original-version">
-        <h2>{data.original_version_name}</h2>
-        <div
-          class="license-content prose"
-          set:html={renderMarkdownWithDivs(originalBody)}
-        />
-      </div>
+      <!-- Original license text: shown only when comparison is active -->
+      {data.show_original_comparison !== false && originalBody && (
+        <div class="license-column original-version">
+          <h2 class="original-heading">{data.original?.name ?? "Original License"}</h2>
+          <div
+            class="license-content prose"
+            set:html={renderMarkdownWithDivs(originalBody)}
+          />
+        </div>
+      )}
     </div>
 
     <DownloadOptions license={license} processedBody={fullProcessedBody} />
@@ -202,6 +194,25 @@ if (spdxId) {
 
 .license-content {
   line-height: 1.6;
+}
+
+/* Mapping anchors: hidden from view, present in DOM for MappingViewer */
+.mapping-anchors {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+  pointer-events: none;
+}
+
+/* When comparison is active, mapping anchors get hover events from MappingViewer
+   but should not visually show; the zone components receive the highlight classes */
+.comparison-active .mapping-anchors [id].highlight-active,
+.comparison-active .mapping-anchors [id].highlight-match {
+  /* no visual change; zone elements get highlight instead */
 }
 
 /* Interactive Mapped Sections */

@@ -20,9 +20,9 @@ describe('SC-001: Editor Workflow Integrity', () => {
     
     // Critical fields from Zod schema
     const requiredFields = [
-      'title', 'spdx_id', 'version', 'original_version', 'description', 
-      'license_type', 'is_osi_approved', 'is_fsf_approved', 'status',
-      'fair_code', 'restrictions', 'has_mapping', 'body'
+      'title', 'spdx_id', 'plain_version', 'description',
+      'license_family', 'status',
+      'fair_code', 'has_mapping', 'body'
     ];
     
     for (const field of requiredFields) {

@@ -8,7 +8,7 @@ interface Props {
 }
 
 const { license } = Astro.props;
-const { license_type, spdx_id } = license.data;
+const { license_family, spdx_id } = license.data;
 
 // Look for versions.json in the content directory
 const category = license_type || "permissive";
@@ -26,13 +26,11 @@ try {
   versions = JSON.parse(content);
 } catch (e) {
   // Fallback to current version if versions.json doesn't exist
-  versions = [
-    {
-      version: license.data.version,
-      date: license.data.last_modified || "unknown",
-      changelog: "Initial release",
-    },
-  ];
+  versions = [{
+    version: license.data.plain_version,
+    date: 'unknown',
+    changelog: 'Initial release'
+  }];
 }
 ---
 
