@@ -1,8 +1,8 @@
 ---
-import type { CollectionEntry } from 'astro:content';
+import type { CollectionEntry } from "astro:content";
 
 interface Props {
-  license: CollectionEntry<'licenses'>;
+  license: CollectionEntry<"licenses">;
 }
 
 const { license } = Astro.props;
@@ -14,53 +14,54 @@ const { data } = license;
   <div class="summary-content">
     <p>{data.description}</p>
   </div>
-  <div class="readability-stats">
-    {data.plain_gunning_fog && (
-      <div class="stat">
-        <span class="label">Readability (Gunning Fog)</span>
-        <span class="value">{data.plain_gunning_fog}</span>
-      </div>
-    )}
-    {data.shame_words_count !== undefined && (
-      <div class="stat">
-        <span class="label">Shame Words</span>
-        <span class="value">{data.shame_words_count}</span>
-      </div>
-    )}
-  </div>
+  {(data.plain_gunning_fog !== undefined || data.shame_words_count !== undefined) && (
+    <dl class="readability-stats">
+      {data.plain_gunning_fog !== undefined && (
+        <>
+          <dt class="label">Readability (Gunning Fog)</dt>
+          <dd class="value">{data.plain_gunning_fog}</dd>
+        </>
+      )}
+      {data.shame_words_count !== undefined && (
+        <>
+          <dt class="label">Shame Words</dt>
+          <dd class="value">{data.shame_words_count}</dd>
+        </>
+      )}
+    </dl>
+  )}
 </div>
 
 <style>
-  .at-a-glance {
-    background: var(--sl-color-gray-6);
-    padding: 1.5rem;
-    border-radius: 8px;
-    margin-bottom: 2rem;
-    border-left: 4px solid var(--sl-color-accent);
-  }
-  h2 {
-    margin-top: 0;
-    font-size: 1.25rem;
-    color: var(--sl-color-white);
-  }
-  .readability-stats {
-    display: flex;
-    gap: 2rem;
-    margin-top: 1rem;
-    padding-top: 1rem;
-    border-top: 1px solid var(--sl-color-gray-5);
-  }
-  .stat {
-    display: flex;
-    flex-direction: column;
-  }
-  .label {
-    font-size: var(--sl-text-xs);
-    color: var(--sl-color-gray-3);
-  }
-  .value {
-    font-size: var(--sl-text-lg);
-    font-weight: bold;
-    color: var(--sl-color-accent);
-  }
+.at-a-glance {
+  background: var(--sl-color-gray-6);
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+  border-left: 4px solid var(--sl-color-accent);
+}
+h2 {
+  margin-top: 0;
+  font-size: 1.25rem;
+  color: var(--sl-color-white);
+}
+.readability-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 2rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--sl-color-gray-5);
+}
+dt.label {
+  font-size: var(--sl-text-xs);
+  color: var(--sl-color-gray-3);
+  width: 100%;
+}
+dd.value {
+  font-size: var(--sl-text-lg);
+  font-weight: bold;
+  color: var(--sl-color-accent);
+  margin: 0 0 0.75rem 0;
+}
 </style>

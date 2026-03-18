@@ -1,8 +1,8 @@
 ---
-import type { CollectionEntry } from 'astro:content';
+import type { CollectionEntry } from "astro:content";
 
 interface Props {
-  license: CollectionEntry<'licenses'>;
+  license: CollectionEntry<"licenses">;
   processedBody?: string;
 }
 
@@ -14,94 +14,155 @@ const clipboardContent = processedBody || license.body;
 // Paths to exported files (generated at build time)
 const exportBase = `/exports/${data.spdx_id.toLowerCase()}/v${data.plain_version}/`;
 const formats = [
-  { name: 'Markdown (GFM)', ext: '.gfm.md', path: `${exportBase}${data.spdx_id}.gfm.md` },
-  { name: 'Markdown (CommonMark)', ext: '.cm.md', path: `${exportBase}${data.spdx_id}.cm.md` },
-  { name: 'Plaintext', ext: '.txt', path: `${exportBase}${data.spdx_id}.txt` },
-  { name: 'PDF', ext: '.pdf', path: `${exportBase}${data.spdx_id}.pdf` },
-  { name: 'SPDX XML', ext: '.xml', path: `${exportBase}${data.spdx_id}.xml` },
+  {
+    name: "Markdown (GFM)",
+    ext: ".gfm.md",
+    path: `${exportBase}${data.spdx_id}.gfm.md`,
+  },
+  {
+    name: "Markdown (CommonMark)",
+    ext: ".cm.md",
+    path: `${exportBase}${data.spdx_id}.cm.md`,
+  },
+  { name: "Plaintext", ext: ".txt", path: `${exportBase}${data.spdx_id}.txt` },
+  { name: "PDF", ext: ".pdf", path: `${exportBase}${data.spdx_id}.pdf` },
+  { name: "SPDX XML", ext: ".xml", path: `${exportBase}${data.spdx_id}.xml` },
 ];
 ---
 
-<section class="download-section">
-  <h3>Download License</h3>
+<section class="download-section" aria-labelledby="download-heading">
+  <h3 id="download-heading">Download License</h3>
   <div class="download-grid">
     {formats.map(format => (
-      <a href={format.path} class="download-card" download>
+      <a
+        key={format.ext}
+        href={format.path}
+        class="download-card"
+        download
+        aria-label={`Download ${data.spdx_id} as ${format.name} (${format.ext})`}
+      >
         <span class="format-name">{format.name}</span>
         <span class="format-ext">{format.ext}</span>
       </a>
     ))}
   </div>
-  <button id="copy-clipboard" class="copy-button" data-content={clipboardContent}>
+  <button
+    id="copy-clipboard"
+    type="button"
+    class="copy-button"
+    data-content={clipboardContent}
+    aria-label="Copy license text to clipboard"
+  >
     Copy to Clipboard
   </button>
+  <div
+    id="copy-status"
+    role="status"
+    aria-live="polite"
+    aria-atomic="true"
+    class="sr-only"
+  ></div>
 </section>
 
 <script>
-  const button = document.getElementById('copy-clipboard');
-  if (button) {
-    button.addEventListener('click', () => {
-      const content = button.dataset.content || '';
-      navigator.clipboard.writeText(content).then(() => {
+const button = document.getElementById("copy-clipboard");
+const statusEl = document.getElementById("copy-status");
+if (button) {
+  button.addEventListener("click", () => {
+    const content = button.dataset.content || "";
+    navigator.clipboard
+      .writeText(content)
+      .then(() => {
         const originalText = button.textContent;
-        button.textContent = 'Copied!';
-        button.classList.add('success');
+        button.textContent = "Copied!";
+        button.classList.add("success");
+        if (statusEl)
+          statusEl.textContent = "License text copied to clipboard.";
         setTimeout(() => {
           button.textContent = originalText;
-          button.classList.remove('success');
+          button.classList.remove("success");
+          if (statusEl) statusEl.textContent = "";
         }, 2000);
+      })
+      .catch(() => {
+        if (statusEl) statusEl.textContent = "Copy failed. Please try again.";
       });
-    });
-  }
+  });
+}
 </script>
 
 <style>
-  .download-section {
-    margin-top: 4rem;
-    padding: 2rem;
-    background: var(--sl-color-gray-6);
-    border: 1px solid var(--sl-color-gray-5);
-    border-radius: 12px;
-  }
-  h3 { margin-top: 0; color: var(--sl-color-white); }
-  .download-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 1rem;
-    margin-bottom: 2rem;
-  }
-  .download-card {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 1rem;
-    background: var(--sl-color-gray-5);
-    border: 1px solid var(--sl-color-gray-4);
-    border-radius: 8px;
-    text-decoration: none;
-    color: var(--sl-color-gray-1);
-    transition: all 0.2s;
-  }
-  .download-card:hover {
-    background: var(--sl-color-gray-4);
-    border-color: var(--sl-color-accent);
-    transform: translateY(-2px);
-    color: var(--sl-color-accent);
-  }
-  .format-name { font-size: 0.9rem; font-weight: bold; }
-  .format-ext { font-size: 0.75rem; color: var(--sl-color-gray-3); margin-top: 0.2rem; }
-  .copy-button {
-    width: 100%;
-    padding: 1rem;
-    background: var(--sl-color-accent);
-    color: var(--sl-color-black);
-    border: none;
-    border-radius: 8px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background 0.2s;
-  }
-  .copy-button:hover { background: var(--sl-color-accent-high); }
-  .copy-button.success { background: #28a745; }
+.download-section {
+  margin-top: 4rem;
+  padding: 2rem;
+  background: var(--sl-color-gray-6);
+  border: 1px solid var(--sl-color-gray-5);
+  border-radius: 12px;
+}
+h3 {
+  margin-top: 0;
+  color: var(--sl-color-white);
+}
+.download-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+.download-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: var(--sl-color-gray-5);
+  border: 1px solid var(--sl-color-gray-4);
+  border-radius: 8px;
+  text-decoration: none;
+  color: var(--sl-color-gray-1);
+  transition: all 0.2s;
+}
+.download-card:hover {
+  background: var(--sl-color-gray-4);
+  border-color: var(--sl-color-accent);
+  transform: translateY(-2px);
+  color: var(--sl-color-accent);
+}
+.format-name {
+  font-size: 0.9rem;
+  font-weight: bold;
+}
+.format-ext {
+  font-size: 0.75rem;
+  color: var(--sl-color-gray-3);
+  margin-top: 0.2rem;
+}
+.copy-button {
+  width: 100%;
+  padding: 1rem;
+  background: var(--sl-color-accent);
+  color: var(--sl-color-black);
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.copy-button:hover {
+  background: var(--sl-color-accent-high);
+}
+.copy-button.success {
+  background: #28a745;
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
 </style>

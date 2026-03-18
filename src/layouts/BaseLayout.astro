@@ -20,6 +20,7 @@ const currentPath = Astro.url.pathname;
     <title>{title} | Plain License</title>
   </head>
   <body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
     <header class="site-header">
       <div class="header-inner">
         <a href="/" class="site-brand" aria-label="Plain License home">
@@ -54,8 +55,8 @@ const currentPath = Astro.url.pathname;
             href="https://github.com/plainlicense/plainlicense"
             class="nav-link nav-github"
             target="_blank"
-            rel="noopener"
-            aria-label="GitHub repository"
+            rel="noopener noreferrer"
+            aria-label="GitHub repository (opens in new tab)"
           >
             <svg
               viewBox="0 0 24 24"
@@ -111,7 +112,7 @@ const currentPath = Astro.url.pathname;
         >
       </nav>
     </header>
-    <main class="page-main"><slot /></main>
+    <main class="page-main" id="main-content"><slot /></main>
     <footer class="site-footer">
       <div class="footer-inner">
         <p class="footer-copy">
@@ -125,7 +126,8 @@ const currentPath = Astro.url.pathname;
           <a
             href="https://github.com/plainlicense/plainlicense"
             target="_blank"
-            rel="noopener"
+            rel="noopener noreferrer"
+            aria-label="GitHub (opens in new tab)"
             >GitHub</a
           >
         </nav>
@@ -175,7 +177,12 @@ html {
   font-family: "Inter", "Noto Sans", system-ui, sans-serif;
   background: var(--bg);
   color: var(--text);
-  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
 }
 
 body {
@@ -187,6 +194,37 @@ body {
 
 .page-main {
   flex: 1;
+}
+
+/* ── Skip Link ──────────────────────────────────────────── */
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: 1rem;
+  z-index: 9999;
+  background: rgb(var(--accent));
+  color: #0d0f15;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  text-decoration: none;
+  transition: top 0.1s;
+}
+
+.skip-link:focus {
+  top: 0.5rem;
+}
+
+/* ── Global Focus Styles ─────────────────────────────────── */
+:focus-visible {
+  outline: 2px solid rgb(var(--accent));
+  outline-offset: 2px;
+}
+
+/* Remove default outline only when :focus-visible is used */
+:focus:not(:focus-visible) {
+  outline: none;
 }
 
 code {
