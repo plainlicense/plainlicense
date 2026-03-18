@@ -26,47 +26,113 @@ export function initMappingViewer(container: HTMLElement, mappingData: any) {
     const originalEls = originalClauses.map((c: any) => document.getElementById(c.id)).filter(Boolean);
 
     if (plainEls.length > 0 && originalEls.length > 0) {
+      // Cache the combined array once to avoid repeated allocations during events
+      const allMappedEls = [...plainEls, ...originalEls];
+
+      // Shared helpers for activating/deactivating this mapping
+      const activateFromPlain = () => {
+        originalEls.forEach((o: HTMLElement) => o.classList.add('highlight-match'));
+        plainEls.forEach((p: HTMLElement) => p.classList.add('highlight-active'));
+        activeMapping = { sources: plainEls, targets: originalEls };
+        drawConnections(svg, plainEls, originalEls);
+      };
+
+      const activateFromOriginal = () => {
+        plainEls.forEach((p: HTMLElement) => p.classList.add('highlight-match'));
+        originalEls.forEach((o: HTMLElement) => o.classList.add('highlight-active'));
+        activeMapping = { sources: plainEls, targets: originalEls };
+        drawConnections(svg, plainEls, originalEls);
+      };
+
+      // Removes all highlight classes from every element in the mapping group
+      const deactivate = () => {
+        allMappedEls.forEach((el: HTMLElement) => {
+          el.classList.remove('highlight-match', 'highlight-active');
+        });
+        activeMapping = null;
+        clearConnections(svg);
+      };
+
+      const handleBlur = () => {
+        // Delay until focus has settled so tabbing between mapped elements stays highlighted
+        requestAnimationFrame(() => {
+          const focused = document.activeElement;
+          const isInMapping = allMappedEls.some(
+            (el) => el === focused || el.contains(focused)
+          );
+          if (!isInMapping) deactivate();
+        });
+      };
+
       // Add interaction logic for mapped elements
       plainEls.forEach((plainEl: HTMLElement) => {
+        // Make element focusable for keyboard users
+        if (!plainEl.getAttribute('tabindex')) {
+          plainEl.setAttribute('tabindex', '0');
+        }
+
         // Desktop Hover Effects
         plainEl.addEventListener('mouseenter', () => {
           if (window.innerWidth < 1024 || !container.classList.contains('comparison-active')) return;
-          originalEls.forEach((o: HTMLElement) => o.classList.add('highlight-match'));
-          plainEls.forEach((p: HTMLElement) => p.classList.add('highlight-active'));
-          activeMapping = { sources: plainEls, targets: originalEls };
-          drawConnections(svg, plainEls, originalEls);
-        });
-        
-        plainEl.addEventListener('mouseleave', () => {
-          if (window.innerWidth < 1024) return;
-          originalEls.forEach((o: HTMLElement) => o.classList.remove('highlight-match'));
-          plainEls.forEach((p: HTMLElement) => p.classList.remove('highlight-active'));
-          activeMapping = null;
-          clearConnections(svg);
+          activateFromPlain();
         });
 
-        // Mobile/Tablet Click Logic (Overlay)
+        plainEl.addEventListener('mouseleave', () => {
+          if (window.innerWidth < 1024) return;
+          deactivate();
+        });
+
+        // Keyboard focus equivalents (desktop)
+        plainEl.addEventListener('focus', () => {
+          if (window.innerWidth < 1024 || !container.classList.contains('comparison-active')) return;
+          activateFromPlain();
+        });
+
+        plainEl.addEventListener('blur', () => {
+          if (window.innerWidth < 1024) return;
+          handleBlur();
+        });
+
+        // Mobile/Tablet Click + keyboard activate (Overlay)
         plainEl.addEventListener('click', (e) => {
           if (window.innerWidth >= 1024 || !container.classList.contains('comparison-active')) return;
           showMobileModal(originalEls, e.currentTarget as HTMLElement);
+        });
+
+        plainEl.addEventListener('keydown', (e: KeyboardEvent) => {
+          if ((e.key === 'Enter' || e.key === ' ') && window.innerWidth < 1024 && container.classList.contains('comparison-active')) {
+            e.preventDefault();
+            showMobileModal(originalEls, plainEl);
+          }
         });
       });
 
       // Original elements hover (Desktop only)
       originalEls.forEach((originalEl: HTMLElement) => {
+        // Make element focusable for keyboard users
+        if (!originalEl.getAttribute('tabindex')) {
+          originalEl.setAttribute('tabindex', '0');
+        }
+
         originalEl.addEventListener('mouseenter', () => {
           if (window.innerWidth < 1024 || !container.classList.contains('comparison-active')) return;
-          plainEls.forEach((p: HTMLElement) => p.classList.add('highlight-match'));
-          originalEls.forEach((o: HTMLElement) => o.classList.add('highlight-active'));
-          activeMapping = { sources: plainEls, targets: originalEls };
-          drawConnections(svg, plainEls, originalEls);
+          activateFromOriginal();
         });
+
         originalEl.addEventListener('mouseleave', () => {
           if (window.innerWidth < 1024) return;
-          originalEls.forEach((o: HTMLElement) => o.classList.remove('highlight-match'));
-          plainEls.forEach((p: HTMLElement) => p.classList.remove('highlight-active'));
-          activeMapping = null;
-          clearConnections(svg);
+          deactivate();
+        });
+
+        // Keyboard focus equivalents (desktop)
+        originalEl.addEventListener('focus', () => {
+          if (window.innerWidth < 1024 || !container.classList.contains('comparison-active')) return;
+          activateFromOriginal();
+        });
+
+        originalEl.addEventListener('blur', () => {
+          if (window.innerWidth < 1024) return;
+          handleBlur();
         });
       });
     }
