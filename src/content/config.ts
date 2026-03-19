@@ -1,3 +1,4 @@
+import { docsLoader } from '@astrojs/starlight/loaders'
 import { docsSchema } from '@astrojs/starlight/schema'
 import { defineCollection, z } from 'astro:content'
 import { blogSchema } from 'starlight-blog/schema'
@@ -151,5 +152,8 @@ const templateBlocksCollection = defineCollection({
 export const collections = {
   'licenses': licensesCollection,
   'template-blocks': templateBlocksCollection,
-  'docs': defineCollection({ schema: docsSchema({ extend: (context) => blogSchema(context) }) }),
+  'docs': defineCollection({
+    loader: docsLoader(),
+    schema: docsSchema({ extend: (context) => blogSchema(context) }),
+  }),
 };
