@@ -3,6 +3,18 @@
  * Includes readability scoring and shame word counting.
  */
 
+/**
+ * Extract only the plain-language portion of a license body.
+ * License markdown files contain the plain rewrite followed by a `---` separator
+ * and then the original license text. Metrics should only cover the plain section.
+ */
+export function extractPlainSection(body: string): string {
+  // The original license text starts after a horizontal rule (---) followed by
+  // a heading like "# Original License Text". Split on a standalone --- line.
+  const parts = body.split(/\n---\n/);
+  return parts[0] ?? body;
+}
+
 // Gunning Fog Index calculation
 export function calculateGunningFog(text: string): number {
   const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0).length;

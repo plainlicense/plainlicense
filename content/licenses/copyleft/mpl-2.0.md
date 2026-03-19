@@ -15,7 +15,7 @@ tldr:
 attribution_required: false
 fair_code: false
 plain_gunning_fog: 12.36
-shame_words_count: 12
+shame_words_count: 0
 original:
   name: Mozilla Public License 2.0
   spdx_id: MPL-2.0
@@ -116,7 +116,7 @@ You can still share a version of the work people can’t change or edit (like a 
 - The new license can't stop people from easily getting the source materials of the parts under this license.
 - You must provide a practical way for them to get the source materials.
 
-## We Offer No Warranty and Limit Our Liability
+## We Offer No Warranty and Accept No Blame
 
 Use the work at your own risk.
 

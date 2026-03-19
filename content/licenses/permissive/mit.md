@@ -23,7 +23,7 @@ show_original_comparison: true
 show_shame_counter: true
 featured: true
 plain_gunning_fog: 14.81
-shame_words_count: 1
+shame_words_count: 0
 original:
   name: MIT License
   spdx_id: MIT
