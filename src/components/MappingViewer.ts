@@ -31,8 +31,22 @@ export function initMappingViewer(container: HTMLElement, mappingData: any) {
       // Cache the combined array once to avoid repeated allocations during events
       const allMappedEls = [...plainEls, ...originalEls];
 
+      // Clear any previously active mapping group's highlights and SVG connections
+      const clearPreviousActiveMapping = () => {
+        if (!activeMapping) return;
+        activeMapping.sources.forEach((el: HTMLElement) => {
+          el.classList.remove('highlight-match', 'highlight-active');
+        });
+        activeMapping.targets.forEach((el: HTMLElement) => {
+          el.classList.remove('highlight-match', 'highlight-active');
+        });
+        clearConnections(svg);
+        activeMapping = null;
+      };
+
       // Shared helpers for activating/deactivating this mapping
       const activateFromPlain = () => {
+        clearPreviousActiveMapping();
         originalEls.forEach((o: HTMLElement) => o.classList.add('highlight-match'));
         plainEls.forEach((p: HTMLElement) => p.classList.add('highlight-active'));
         activeMapping = { sources: plainEls, targets: originalEls, token: plainEls };
@@ -40,6 +54,7 @@ export function initMappingViewer(container: HTMLElement, mappingData: any) {
       };
 
       const activateFromOriginal = () => {
+        clearPreviousActiveMapping();
         plainEls.forEach((p: HTMLElement) => p.classList.add('highlight-match'));
         originalEls.forEach((o: HTMLElement) => o.classList.add('highlight-active'));
         activeMapping = { sources: plainEls, targets: originalEls, token: plainEls };
@@ -71,6 +86,8 @@ export function initMappingViewer(container: HTMLElement, mappingData: any) {
       };
 
       // Add interaction logic for mapped elements
+      const allMappedEls: HTMLElement[] = [...plainEls, ...originalEls];
+
       plainEls.forEach((plainEl: HTMLElement) => {
         // Skip making elements focusable when they are inside visually-hidden / aria-hidden containers
         const isInHiddenContainer = !!plainEl.closest('.mapping-anchors, [aria-hidden="true"]');
@@ -108,6 +125,10 @@ export function initMappingViewer(container: HTMLElement, mappingData: any) {
 
         plainEl.addEventListener('mouseleave', () => {
           if (window.innerWidth < 1024) return;
+          const activeEl = document.activeElement as HTMLElement | null;
+          if (activeEl && allMappedEls.includes(activeEl)) {
+            return;
+          }
           deactivate();
         });
 
@@ -132,6 +153,10 @@ export function initMappingViewer(container: HTMLElement, mappingData: any) {
 
         originalEl.addEventListener('mouseleave', () => {
           if (window.innerWidth < 1024) return;
+          const activeEl = document.activeElement as HTMLElement | null;
+          if (activeEl && allMappedEls.includes(activeEl)) {
+            return;
+          }
           deactivate();
         });
 
