@@ -11,7 +11,7 @@ const { license } = Astro.props;
 const { license_family, spdx_id } = license.data;
 
 // Look for versions.json in the content directory
-const category = license_type || "permissive";
+const category = license_family || "permissive";
 const slug =
   spdx_id?.toLowerCase() || license.id.split("/").pop()?.replace(/\.md$/, "");
 const versionsPath = path.resolve(
@@ -32,35 +32,21 @@ try {
     changelog: 'Initial release'
   }];
 }
+
+function getDatetime(date: string): string | undefined {
+  return /^\d{4}-\d{2}-\d{2}/.test(date) ? date : undefined;
+}
 ---
 
 <section class="version-history" aria-labelledby="version-history-heading">
   <h3 id="version-history-heading">Version History</h3>
   <div class="timeline">
-    {versions.map((v: { version: string; date: string; changelog: string }) => (
-      <div class="version-item" key={v.version}>
+    {versions.map((v) => (
+      <div class="version-item">
         <div class="version-badge">v{v.version}</div>
         <div class="version-details">
-          <time datetime={v.date && /^\d{4}-\d{2}-\d{2}/.test(v.date) ? v.date : undefined}>{v.date}</time>
+          <time datetime={getDatetime(v.date)}>{v.date}</time>
           <p>{v.changelog}</p>
-          <div class="version-downloads">
-            <span class="download-label" aria-hidden="true">Downloads:</span>
-            <a
-              href={`/exports/${slug}/v${v.version}/${spdx_id}.pdf`}
-              class="download-link"
-              aria-label={`Download ${spdx_id} v${v.version} as PDF`}
-            >PDF</a>
-            <a
-              href={`/exports/${slug}/v${v.version}/${spdx_id}.txt`}
-              class="download-link"
-              aria-label={`Download ${spdx_id} v${v.version} as plain text`}
-            >TXT</a>
-            <a
-              href={`/exports/${slug}/v${v.version}/${spdx_id}.gfm.md`}
-              class="download-link"
-              aria-label={`Download ${spdx_id} v${v.version} as Markdown`}
-            >MD</a>
-          </div>
         </div>
       </div>
     ))}
@@ -104,27 +90,5 @@ try {
   margin: 0;
   font-size: var(--sl-text-sm);
   color: var(--sl-color-gray-2);
-}
-.version-downloads {
-  margin-top: 0.75rem;
-  display: flex;
-  gap: 0.75rem;
-  align-items: center;
-}
-.download-label {
-  font-size: 0.75rem;
-  color: var(--sl-color-gray-4);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-.download-link {
-  font-size: 0.75rem;
-  color: var(--sl-color-accent);
-  text-decoration: none;
-  border-bottom: 1px solid transparent;
-  transition: border-color 0.2s;
-}
-.download-link:hover {
-  border-bottom-color: var(--sl-color-accent);
 }
 </style>

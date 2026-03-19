@@ -15,7 +15,7 @@ tldr:
 attribution_required: false
 fair_code: true
 plain_gunning_fog: 11.76
-shame_words_count: 1
+shame_words_count: 0
 original:
   name: Elastic License 2.0
   spdx_id: Elastic-2.0

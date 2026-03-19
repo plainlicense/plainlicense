@@ -27,6 +27,11 @@ const formats = [
   { name: "Plaintext", ext: ".txt", path: `${exportBase}${data.spdx_id}.txt` },
   { name: "PDF", ext: ".pdf", path: `${exportBase}${data.spdx_id}.pdf` },
   { name: "SPDX XML", ext: ".xml", path: `${exportBase}${data.spdx_id}.xml` },
+  {
+    name: "Embed HTML",
+    ext: "-embed.html",
+    path: `${exportBase}${data.spdx_id}-embed.html`,
+  },
 ];
 ---
 
@@ -35,7 +40,6 @@ const formats = [
   <div class="download-grid">
     {formats.map(format => (
       <a
-        key={format.ext}
         href={format.path}
         class="download-card"
         download

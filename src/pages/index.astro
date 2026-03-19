@@ -2,7 +2,13 @@
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { getLicenseSlug, getPublishedLicenses } from "../utils/collections";
 
-const licenses = await getPublishedLicenses();
+const CATEGORY_ORDER = ['permissive', 'copyleft', 'source-available', 'public-domain'];
+const allLicenses = await getPublishedLicenses();
+const licenses = [...allLicenses].sort((a, b) => {
+  const aIdx = CATEGORY_ORDER.indexOf(a.data.license_family);
+  const bIdx = CATEGORY_ORDER.indexOf(b.data.license_family);
+  return (aIdx === -1 ? 99 : aIdx) - (bIdx === -1 ? 99 : bIdx);
+});
 const featuredLicenses = licenses.filter((l) => l.data.featured);
 ---
 
@@ -30,7 +36,7 @@ const featuredLicenses = licenses.filter((l) => l.data.featured);
         <h2 class="section-title">Featured Licenses</h2>
         <div class="card-grid">
           {featuredLicenses.map(license => (
-            <a href={`/licenses/${getLicenseSlug(license)}/`} class="card" key={license.data.spdx_id}>
+            <a href={`/licenses/${getLicenseSlug(license)}/`} class="card">
               <div class="card-badges">
                 <span class="spdx-badge">{license.data.spdx_id}</span>
                 {license.data.is_osi_approved && <span class="osi-badge">OSI ✓</span>}
@@ -50,7 +56,7 @@ const featuredLicenses = licenses.filter((l) => l.data.featured);
       </div>
       <ul class="license-list">
         {licenses.map(license => (
-          <li key={license.data.spdx_id}>
+          <li>
             <a href={`/licenses/${getLicenseSlug(license)}/`}>
               <span class="list-name">{license.data.plain_name}</span>
               <span class="list-spdx">{license.data.spdx_id}</span>

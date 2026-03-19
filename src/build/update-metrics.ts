@@ -1,7 +1,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import matter from 'gray-matter';
-import { calculateGunningFog, countShameWords } from '../utils/content.ts';
+import { calculateGunningFog, countShameWords, extractPlainSection } from '../utils/content.ts';
 
 /**
  * Updates readability metrics (Gunning Fog, shame words) in license frontmatter.
@@ -21,8 +21,10 @@ async function updateMetrics() {
         const fileContent = await fs.readFile(fullPath, 'utf8');
         const { data, content } = matter(fileContent);
         
-        const newPlainFog = calculateGunningFog(content);
-        const newShameCount = countShameWords(content);
+        // Only measure the plain-language section, not the original license text
+        const plainContent = extractPlainSection(content);
+        const newPlainFog = calculateGunningFog(plainContent);
+        const newShameCount = countShameWords(plainContent);
         
         if (data.plain_gunning_fog !== newPlainFog || data.shame_words_count !== newShameCount) {
           data.plain_gunning_fog = newPlainFog;
