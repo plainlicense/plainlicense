@@ -10,8 +10,18 @@
  * If no `---` separator is found, the entire body is returned.
  */
 export function extractPlainSection(body: string): string {
-  const parts = body.split(/\n---\n/);
-  return parts[0] ?? body;
+  // Align boundary detection with rendering/export logic:
+  // find the '---' line that directly precedes the '# Original License Text' heading.
+  const boundaryRegex = /(^|\n)---\s*\n(?=\s*# Original License Text\b)/;
+  const match = boundaryRegex.exec(body);
+
+  if (!match) {
+    // If no specific boundary is found, treat the entire body as plain text.
+    return body;
+  }
+
+  // Return everything before the boundary marker.
+  return body.slice(0, match.index);
 }
 
 // Gunning Fog Index calculation
