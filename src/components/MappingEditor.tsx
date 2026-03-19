@@ -102,53 +102,69 @@ export default function MappingEditor({ licenseId, plainText, originalText }: { 
     a.click();
   };
 
-  if (loading) return <div style={{padding: '2rem', textAlign: 'center'}}>Processing text and generating hashes...</div>;
+  if (loading) return <div role="status" style={{padding: '2rem', textAlign: 'center'}}>Processing text and generating hashes...</div>;
 
   return (
     <div class="mapping-editor-ui">
       <header class="editor-controls">
         <h2>Mapping Editor: {licenseId}</h2>
         <div class="actions">
-          <button onClick={addMapping} disabled={selectedPlains.length === 0 || selectedOriginals.length === 0}>Create Mapping</button>
-          <button onClick={downloadJSON} class="save-btn">Download Mapping JSON</button>
+          <button type="button" onClick={addMapping} disabled={selectedPlains.length === 0 || selectedOriginals.length === 0}>Create Mapping</button>
+          <button type="button" onClick={downloadJSON} class="save-btn">Download Mapping JSON</button>
         </div>
       </header>
 
       <div class="panes">
-        <section class="pane plain-pane">
+        <section class="pane plain-pane" aria-label="Plain Language clauses">
           <h3>Plain Language</h3>
-          {plainClauses.map(c => (
-            <div 
-              class={`clause-card ${selectedPlains.find(x => x.id === c.id) ? 'selected' : ''}`}
-              onClick={() => togglePlain(c)}
-            >
-              {c.content}
-            </div>
-          ))}
+          {plainClauses.map(c => {
+            const isSelected = !!selectedPlains.find(x => x.id === c.id);
+            return (
+              <button
+                key={c.id}
+                type="button"
+                class={`clause-card ${isSelected ? 'selected' : ''}`}
+                onClick={() => togglePlain(c)}
+                aria-pressed={isSelected}
+              >
+                {c.content}
+              </button>
+            );
+          })}
         </section>
 
-        <section class="pane original-pane">
+        <section class="pane original-pane" aria-label="Original Text clauses">
           <h3>Original Text</h3>
-          {originalClauses.map(c => (
-            <div 
-              class={`clause-card ${selectedOriginals.find(x => x.id === c.id) ? 'selected' : ''}`}
-              onClick={() => toggleOriginal(c)}
-            >
-              {c.content}
-            </div>
-          ))}
+          {originalClauses.map(c => {
+            const isSelected = !!selectedOriginals.find(x => x.id === c.id);
+            return (
+              <button
+                key={c.id}
+                type="button"
+                class={`clause-card ${isSelected ? 'selected' : ''}`}
+                onClick={() => toggleOriginal(c)}
+                aria-pressed={isSelected}
+              >
+                {c.content}
+              </button>
+            );
+          })}
         </section>
 
-        <section class="pane mappings-pane">
-          <h3>Active Mappings ({mappings.length})</h3>
+        <section class="pane mappings-pane" aria-label="Active Mappings">
+          <h3>Active Mappings (<span aria-live="polite" aria-atomic="true">{mappings.length}</span>)</h3>
           <div class="mapping-list">
             {mappings.map(m => (
-              <div class="mapping-item">
+              <div key={m.id} class="mapping-item">
                 <div class="mapping-summary">
                   <strong>{m.plain_clauses.length}</strong> ↔ <strong>{m.original_clauses.length}</strong>
                   <br/><small>{m.type}</small>
                 </div>
-                <button onClick={() => setMappings(mappings.filter(x => x.id !== m.id))}>Delete</button>
+                <button
+                  type="button"
+                  onClick={() => setMappings(prev => prev.filter(x => x.id !== m.id))}
+                  aria-label={`Delete mapping: ${m.plain_clauses.length} plain clause${m.plain_clauses.length !== 1 ? 's' : ''} ↔ ${m.original_clauses.length} original clause${m.original_clauses.length !== 1 ? 's' : ''}`}
+                >Delete</button>
               </div>
             ))}
           </div>
@@ -191,7 +207,15 @@ export default function MappingEditor({ licenseId, plainText, originalText }: { 
           padding-bottom: 1rem;
           color: var(--sl-color-accent);
         }
-        .clause-card {
+        button.clause-card {
+          /* Reset button defaults */
+          appearance: none;
+          -webkit-appearance: none;
+          width: 100%;
+          text-align: left;
+          font-family: inherit;
+          color: inherit;
+          /* Card styles */
           padding: 1rem;
           background: var(--sl-color-gray-6);
           border: 1px solid var(--sl-color-gray-5);
@@ -201,10 +225,14 @@ export default function MappingEditor({ licenseId, plainText, originalText }: { 
           font-size: 0.9rem;
           transition: all 0.2s;
         }
-        .clause-card:hover {
+        button.clause-card:hover {
           border-color: var(--sl-color-accent);
         }
-        .clause-card.selected {
+        button.clause-card:focus-visible {
+          outline: 2px solid var(--sl-color-accent);
+          outline-offset: 2px;
+        }
+        button.clause-card.selected {
           border-color: var(--sl-color-accent);
           background: var(--sl-color-accent-low);
         }
