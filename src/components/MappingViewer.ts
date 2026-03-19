@@ -85,9 +85,6 @@ export function initMappingViewer(container: HTMLElement, mappingData: any) {
         });
       };
 
-      // Add interaction logic for mapped elements
-      const allMappedEls: HTMLElement[] = [...plainEls, ...originalEls];
-
       plainEls.forEach((plainEl: HTMLElement) => {
         // Skip making elements focusable when they are inside visually-hidden / aria-hidden containers
         const isInHiddenContainer = !!plainEl.closest('.mapping-anchors, [aria-hidden="true"]');
