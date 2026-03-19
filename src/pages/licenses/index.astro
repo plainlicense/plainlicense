@@ -6,7 +6,7 @@ const licenses = await getPublishedLicenses();
 
 const byCategory = licenses.reduce<Record<string, typeof licenses>>(
   (acc, l) => {
-    const cat = l.data.license_type;
+    const cat = l.data.license_family;
     if (!acc[cat]) acc[cat] = [];
     acc[cat].push(l);
     return acc;
