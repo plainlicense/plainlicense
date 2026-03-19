@@ -15,7 +15,9 @@ export function initMappingViewer(container: HTMLElement, mappingData: any) {
   const mappings = mappingData.mappings || [];
   
   // Track active elements to redraw on resize/scroll
-  let activeMapping: { sources: HTMLElement[], targets: HTMLElement[] } | null = null;
+  // token identifies which mapping group is currently active, guarding against
+  // stale blur-deferred deactivations racing with a newly focused group.
+  let activeMapping: { sources: HTMLElement[], targets: HTMLElement[], token: HTMLElement[] } | null = null;
 
   mappings.forEach((mapping: any) => {
     // ... support both old and new mapping structure ...
@@ -33,19 +35,23 @@ export function initMappingViewer(container: HTMLElement, mappingData: any) {
       const activateFromPlain = () => {
         originalEls.forEach((o: HTMLElement) => o.classList.add('highlight-match'));
         plainEls.forEach((p: HTMLElement) => p.classList.add('highlight-active'));
-        activeMapping = { sources: plainEls, targets: originalEls };
+        activeMapping = { sources: plainEls, targets: originalEls, token: plainEls };
         drawConnections(svg, plainEls, originalEls);
       };
 
       const activateFromOriginal = () => {
         plainEls.forEach((p: HTMLElement) => p.classList.add('highlight-match'));
         originalEls.forEach((o: HTMLElement) => o.classList.add('highlight-active'));
-        activeMapping = { sources: plainEls, targets: originalEls };
+        activeMapping = { sources: plainEls, targets: originalEls, token: plainEls };
         drawConnections(svg, plainEls, originalEls);
       };
 
-      // Removes all highlight classes from every element in the mapping group
+      // Removes highlight classes and clears global state, but only if this
+      // mapping group is still the active one. Guards against stale blur events
+      // firing after focus has already moved to a different mapping group whose
+      // focus handler ran first and set a new activeMapping.
       const deactivate = () => {
+        if (activeMapping?.token !== plainEls) return;
         allMappedEls.forEach((el: HTMLElement) => {
           el.classList.remove('highlight-match', 'highlight-active');
         });
