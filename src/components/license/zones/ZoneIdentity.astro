@@ -65,13 +65,15 @@ const isSourceAvailable = license_family === 'source-available';
     </ul>
   </div>
 
-  <div class="copyright-block">
-    <p class="copyright-label">Copyright notice — replace the bracketed text with your own details:</p>
-    <code class="copyright-template">
-      Copyright &copy; <span class="placeholder" data-placeholder="year">[Year]</span>{' '}
-      <span class="placeholder" data-placeholder="holder">[Copyright holder name]</span>
-    </code>
-  </div>
+  {!is_dedication && (
+    <div class="copyright-block">
+      <p class="copyright-label">Copyright notice — replace the bracketed text with your own details:</p>
+      <code class="copyright-template">
+        Copyright &copy; <span class="placeholder" data-placeholder="year">[Year]</span>{' '}
+        <span class="placeholder" data-placeholder="holder">[Copyright holder name]</span>
+      </code>
+    </div>
+  )}
 </section>
 
 <style>

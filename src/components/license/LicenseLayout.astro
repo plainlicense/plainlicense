@@ -35,7 +35,10 @@ const sourceAvailable = data.license_family === 'source-available';
 
 const permissions = data.original?.permissions ?? [];
 const conditions = data.original?.conditions ?? [];
-const limitations = data.original?.limitations ?? [];
+// Filter out warranty/liability from limitations — they are licensor protections (Zone 6),
+// not user restrictions (Zone 5). Only trademark-use and patent-use are true restrictions.
+const PROTECTION_TAGS = new Set(['liability', 'warranty']);
+const limitations = (data.original?.limitations ?? []).filter(tag => !PROTECTION_TAGS.has(tag));
 ---
 
 <article class="plain-license" data-family={data.license_family} data-spdx={data.spdx_id} aria-label={data.plain_name}>

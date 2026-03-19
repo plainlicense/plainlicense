@@ -8,12 +8,14 @@
 
 ## Summary
 
-The new Plain License site has a strong structural foundation. The seven-zone license anatomy is implemented and coherent. The dark design is visually clean and consistent on the pages that work. However, two critical bugs were found and fixed during this review, and a further set of significant correctness, UX, and cross-page consistency issues require attention before this site should be considered production-ready.
+The new Plain License site has a strong structural foundation. The seven-zone license anatomy is implemented and coherent. The dark design is visually clean and consistent on the pages that work.
 
-**Bugs fixed during this review:**
+**Bugs fixed in initial review commit:**
 - `VersionHistory.astro`: `license_type` → `license_family` (undefined variable; caused a compile error)
 - `VersionHistory.astro`: TypeScript inline type annotation in `.map()` callback inside Astro template (caused "Syntax error 'h'" compile crash, blocking ALL pages)
 - `licenses/index.astro`: `l.data.license_type` → `l.data.license_family` (wrong field name; caused all licenses to be lost when grouping by category)
+
+**Issues fixed in follow-up commit (15 of 18 issues addressed):**
 
 ---
 

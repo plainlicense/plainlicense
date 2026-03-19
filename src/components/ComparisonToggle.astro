@@ -2,56 +2,81 @@
 /**
  * A toggle component to enable/disable interactive comparison mode.
  * Persists preference in localStorage.
+ * Hidden when no mapping data is available for this license.
  */
+interface Props {
+  hasMapping?: boolean;
+}
+
+const { hasMapping = false } = Astro.props;
 ---
 
-<div class="comparison-toggle-container">
-  <button
-    id="comparison-toggle"
-    type="button"
-    class="toggle-btn"
-    aria-pressed="false"
-  >
-    <span class="toggle-icon">🔍</span>
-    <span class="toggle-text">Enable Interactive Comparison</span>
-  </button>
-  <p class="toggle-hint">
-    Hover or focus on sections to see connections to the original
-  </p>
-</div>
+{hasMapping ? (
+  <div class="comparison-toggle-container">
+    <button
+      id="comparison-toggle"
+      type="button"
+      class="toggle-btn"
+      aria-pressed="false"
+    >
+      <span class="toggle-icon">🔍</span>
+      <span class="toggle-text">Enable Interactive Comparison</span>
+    </button>
+    <p class="toggle-hint">
+      Hover or focus on sections to see connections to the original
+    </p>
+  </div>
+) : (
+  <div class="comparison-toggle-container comparison-toggle--unavailable">
+    <button
+      type="button"
+      class="toggle-btn toggle-btn--disabled"
+      disabled
+      aria-disabled="true"
+    >
+      <span class="toggle-icon">🔍</span>
+      <span class="toggle-text">Side-by-side comparison coming soon</span>
+    </button>
+    <p class="toggle-hint">
+      Interactive comparison is not yet available for this license
+    </p>
+  </div>
+)}
 
 <script>
 const toggleBtn = document.getElementById(
   "comparison-toggle",
-) as HTMLButtonElement;
+) as HTMLButtonElement | null;
 const container = document.querySelector(".license-container") as HTMLElement;
 const STORAGE_KEY = "pl-comparison-mode";
 
-function updateUI(isActive: boolean) {
-  if (isActive) {
-    container?.classList.add("comparison-active");
-    toggleBtn.setAttribute("aria-pressed", "true");
-    toggleBtn.classList.add("active");
-    toggleBtn.querySelector(".toggle-text")!.textContent =
-      "Disable Interactive Comparison";
-  } else {
-    container?.classList.remove("comparison-active");
-    toggleBtn.setAttribute("aria-pressed", "false");
-    toggleBtn.classList.remove("active");
-    toggleBtn.querySelector(".toggle-text")!.textContent =
-      "Enable Interactive Comparison";
+if (toggleBtn) {
+  function updateUI(isActive: boolean) {
+    if (isActive) {
+      container?.classList.add("comparison-active");
+      toggleBtn!.setAttribute("aria-pressed", "true");
+      toggleBtn!.classList.add("active");
+      toggleBtn!.querySelector(".toggle-text")!.textContent =
+        "Disable Interactive Comparison";
+    } else {
+      container?.classList.remove("comparison-active");
+      toggleBtn!.setAttribute("aria-pressed", "false");
+      toggleBtn!.classList.remove("active");
+      toggleBtn!.querySelector(".toggle-text")!.textContent =
+        "Enable Interactive Comparison";
+    }
   }
+
+  // Load preference
+  const savedPreference = localStorage.getItem(STORAGE_KEY) === "true";
+  updateUI(savedPreference);
+
+  toggleBtn.addEventListener("click", () => {
+    const isNowActive = !container.classList.contains("comparison-active");
+    localStorage.setItem(STORAGE_KEY, String(isNowActive));
+    updateUI(isNowActive);
+  });
 }
-
-// Load preference
-const savedPreference = localStorage.getItem(STORAGE_KEY) === "true";
-updateUI(savedPreference);
-
-toggleBtn.addEventListener("click", () => {
-  const isNowActive = !container.classList.contains("comparison-active");
-  localStorage.setItem(STORAGE_KEY, String(isNowActive));
-  updateUI(isNowActive);
-});
 </script>
 
 <style>
@@ -86,6 +111,16 @@ toggleBtn.addEventListener("click", () => {
 .toggle-btn.active {
   background: var(--sl-color-accent);
   color: var(--sl-color-black);
+}
+.toggle-btn--disabled {
+  border-color: var(--sl-color-gray-4);
+  color: var(--sl-color-gray-3);
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+.toggle-btn--disabled:hover {
+  background: var(--sl-color-black);
+  color: var(--sl-color-gray-3);
 }
 .toggle-hint {
   font-size: var(--sl-text-xs);

@@ -110,6 +110,15 @@ const currentPath = Astro.url.pathname;
           class:list={["nav-link", { active: currentPath.startsWith("/blog/") }]}
           >Blog</a
         >
+        <a
+          href="https://github.com/plainlicense/plainlicense"
+          class="nav-link"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="GitHub repository (opens in new tab)"
+        >
+          GitHub
+        </a>
       </nav>
     </header>
     <main class="page-main" id="main-content"><slot /></main>
@@ -121,6 +130,8 @@ const currentPath = Astro.url.pathname;
           <strong>We reserve NO rights.</strong>
         </p>
         <nav class="footer-nav" aria-label="Footer navigation">
+          <a href="/licenses/">Licenses</a>
+          <a href="/faq/">FAQ</a>
           <a href="/about/">About</a>
           <a href="/blog/">Blog</a>
           <a

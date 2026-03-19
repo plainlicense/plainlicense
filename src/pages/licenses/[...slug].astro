@@ -87,11 +87,17 @@ const fullProcessedBody = (
 )
   .replace(/{{component:[a-z-]+.*?}}/g, "")
   .trim();
+
+// Strip template directives from plainBody for mapping anchors (they serve no purpose in aria-hidden divs)
+function stripTemplatePlaceholders(text: string): string {
+  return text.replace(/\{\{(?:component|block):[^}]*\}\}/g, '');
+}
+const cleanPlainBody = stripTemplatePlaceholders(plainBody);
 ---
 
 <BaseLayout title={data.plain_name}>
   <div class="license-container" data-spdx-id={data.spdx_id}>
-    <ComparisonToggle />
+    <ComparisonToggle hasMapping={!!data.has_mapping} />
     <LicenseSummary license={license} />
 
     <div class="license-layout">
@@ -108,7 +114,7 @@ const fullProcessedBody = (
           <div
             class="mapping-anchors"
             aria-hidden="true"
-            set:html={renderMarkdownWithDivs(plainBody)}
+            set:html={renderMarkdownWithDivs(cleanPlainBody)}
           />
         )}
       </div>
