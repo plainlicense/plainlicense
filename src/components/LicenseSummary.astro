@@ -51,8 +51,11 @@ const originalLevel = originalFog !== undefined ? readabilityScoreToLevel(origin
       )}
       {data.shame_words_count !== undefined && (
         <>
-          <dt class="label" title="Count of complex legal terms our editors are working to simplify">
+          <dt class="label" aria-describedby="jargon-help">
             Legal jargon remaining
+            <span id="jargon-help" class="help-text">
+              Count of complex legal terms our editors are working to simplify
+            </span>
           </dt>
           <dd class="value">{data.shame_words_count}</dd>
         </>
@@ -122,5 +125,12 @@ dd.value {
 }
 .fog-original-level {
   font-weight: normal;
+}
+.help-text {
+  display: block;
+  font-weight: normal;
+  font-size: var(--sl-text-2xs, 0.6875rem);
+  color: var(--sl-color-gray-4);
+  margin-top: 0.15rem;
 }
 </style>
