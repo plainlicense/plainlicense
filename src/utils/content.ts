@@ -7,10 +7,9 @@
  * Extract only the plain-language portion of a license body.
  * License markdown files contain the plain rewrite followed by a `---` separator
  * and then the original license text. Metrics should only cover the plain section.
+ * If no `---` separator is found, the entire body is returned.
  */
 export function extractPlainSection(body: string): string {
-  // The original license text starts after a horizontal rule (---) followed by
-  // a heading like "# Original License Text". Split on a standalone --- line.
   const parts = body.split(/\n---\n/);
   return parts[0] ?? body;
 }

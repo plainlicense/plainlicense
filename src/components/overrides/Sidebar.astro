@@ -24,6 +24,11 @@ const isBlogPage = route.slug.startsWith("blog");
   </div>
 )}
 
+{/* Set data-is-blog on <html> synchronously so CSS applies before first paint */}
+{isBlogPage && (
+  <script is:inline>document.documentElement.dataset.isBlog = '';</script>
+)}
+
 <script>
 const searchInput = document.getElementById(
   "sidebar-search",
@@ -42,11 +47,6 @@ if (searchInput) {
       }
     });
   });
-}
-
-// Mark blog pages on the document element for CSS targeting
-if (document.querySelector('.sidebar-wrapper--blog')) {
-  document.documentElement.dataset.isBlog = '';
 }
 </script>
 
