@@ -162,7 +162,7 @@ export default function MappingEditor({ licenseId, plainText, originalText }: { 
                 </div>
                 <button
                   type="button"
-                  onClick={() => setMappings(mappings.filter(x => x.id !== m.id))}
+                  onClick={() => setMappings(prev => prev.filter(x => x.id !== m.id))}
                   aria-label={`Delete mapping: ${m.plain_clauses.length} plain clause${m.plain_clauses.length !== 1 ? 's' : ''} ↔ ${m.original_clauses.length} original clause${m.original_clauses.length !== 1 ? 's' : ''}`}
                 >Delete</button>
               </div>
@@ -207,7 +207,7 @@ export default function MappingEditor({ licenseId, plainText, originalText }: { 
           padding-bottom: 1rem;
           color: var(--sl-color-accent);
         }
-        .clause-card {
+        button.clause-card {
           /* Reset button defaults */
           appearance: none;
           -webkit-appearance: none;
@@ -225,14 +225,14 @@ export default function MappingEditor({ licenseId, plainText, originalText }: { 
           font-size: 0.9rem;
           transition: all 0.2s;
         }
-        .clause-card:hover {
+        button.clause-card:hover {
           border-color: var(--sl-color-accent);
         }
-        .clause-card:focus-visible {
+        button.clause-card:focus-visible {
           outline: 2px solid var(--sl-color-accent);
           outline-offset: 2px;
         }
-        .clause-card.selected {
+        button.clause-card.selected {
           border-color: var(--sl-color-accent);
           background: var(--sl-color-accent-low);
         }
