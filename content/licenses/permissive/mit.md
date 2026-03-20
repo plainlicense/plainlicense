@@ -12,7 +12,7 @@ status: published
 tldr:
   - You can use, copy, change, and share this work for any reason, including commercially.
   - You must keep the copyright notice and this license with any copy you share.
-  - No warranty is provided. Use at your own risk.
+  - There's no warranty. Use at your own risk.
 attribution_required: true
 fair_code: false
 meta_description: Plain language MIT license for all creative works
