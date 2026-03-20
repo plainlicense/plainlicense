@@ -3,22 +3,21 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import matter from 'gray-matter';
 import { spawnSync } from 'node:child_process';
-import { derivePlainId } from '../../src/utils/plain-id.ts';
+
+const distExports = path.resolve('dist/exports');
+const hasBuildOutput = await fs.access(distExports).then(() => true).catch(() => false);
 
 /**
  * SC-006: Professional PDF Generation.
  * Verification: PDF files exist and contain expected branding/attribution.
  *
- * NOTE: Requires `mise run build` to have been run first.
+ * Requires `mise run build` to have been run first.
  */
 describe('SC-006: PDF Generation Quality', () => {
-  it('generated PDF files contain expected keywords', async () => {
+  it.skipIf(!hasBuildOutput)('generated PDF files contain expected keywords', async () => {
     const pdfPath = path.resolve('dist/exports/mit/0.2.1/Plain-MIT-0.2.1.pdf');
     const exists = await fs.access(pdfPath).then(() => true).catch(() => false);
-    if (!exists) {
-      console.warn('dist/exports/mit/0.2.1/Plain-MIT-0.2.1.pdf not found — run `mise run build` first. Skipping.');
-      return;
-    }
+    expect(exists).toBe(true);
 
     const result = spawnSync('strings', [pdfPath]);
     const output = result.stdout.toString();
@@ -26,14 +25,7 @@ describe('SC-006: PDF Generation Quality', () => {
     expect(output).toContain('Plain MIT License');
   });
 
-  it('all published licenses have a PDF export', async () => {
-    const distExports = path.resolve('dist/exports');
-    const distExists = await fs.access(distExports).then(() => true).catch(() => false);
-    if (!distExists) {
-      console.warn('dist/exports/ not found — run `mise run build` first. Skipping.');
-      return;
-    }
-
+  it.skipIf(!hasBuildOutput)('all published licenses have a PDF export', async () => {
     const baseDir = path.resolve('content/licenses');
     const categories = await fs.readdir(baseDir);
 
@@ -50,6 +42,7 @@ describe('SC-006: PDF Generation Quality', () => {
         const version = data.plain_version.trim();
         const exportDir = path.resolve(`dist/exports/${slug}/${version}`);
         const dirExists = await fs.access(exportDir).then(() => true).catch(() => false);
+        expect(dirExists).toBe(true);
 
         if (dirExists) {
           const exportFiles = await fs.readdir(exportDir);

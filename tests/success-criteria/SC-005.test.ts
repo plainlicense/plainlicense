@@ -4,21 +4,17 @@ import path from 'node:path';
 import matter from 'gray-matter';
 import { derivePlainId } from '../../src/utils/plain-id.ts';
 
+const distExports = path.resolve('dist/exports');
+const hasBuildOutput = await fs.access(distExports).then(() => true).catch(() => false);
+
 /**
  * SC-005: Export format success rate.
  * Verification: 100% of published licenses have all export formats.
  *
- * NOTE: Requires `mise run build` to have been run first.
+ * Requires `mise run build` to have been run first.
  */
 describe('SC-005: Export Generation Success', () => {
-  it('all published licenses have a complete set of export files', async () => {
-    const distExports = path.resolve('dist/exports');
-    const distExists = await fs.access(distExports).then(() => true).catch(() => false);
-    if (!distExists) {
-      console.warn('dist/exports/ not found — run `mise run build` first. Skipping.');
-      return;
-    }
-
+  it.skipIf(!hasBuildOutput)('all published licenses have a complete set of export files', async () => {
     const baseDir = path.resolve('content/licenses');
     const categories = await fs.readdir(baseDir);
     let totalPublished = 0;

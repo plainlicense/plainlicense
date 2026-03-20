@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
+shopt -s globstar nullglob
 
 # Compare license content between HEAD and base branch.
 # Fails if content changed but package version did not.

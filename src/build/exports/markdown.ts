@@ -13,8 +13,11 @@ export async function generateMarkdown(ctx: ExportContext) {
   // GFM Version (includes metadata header)
   const gfmFileName = `${baseName}.gfm.md`;
   const gfmFilePath = path.join(outputDir, gfmFileName);
+  const slug = metadata.license_family
+    ? `${metadata.license_family}/${ctx.licenseId.toLowerCase()}`
+    : ctx.licenseId.toLowerCase();
   const gfmHeader = `<!-- Plain License: ${plainId} ${version} -->\n` +
-                 `<!-- Attribution: https://plainlicense.org/licenses/${metadata.slug || ctx.licenseId.toLowerCase()} -->\n\n`;
+                 `<!-- Attribution: https://plainlicense.org/licenses/${slug} -->\n\n`;
   const gfmContent = gfmHeader + content;
 
   // CommonMark Version (No comments, cleaner)

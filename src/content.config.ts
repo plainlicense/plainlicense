@@ -73,7 +73,7 @@ const licensesCollection = defineCollection({
     // === Identity ===
     plain_name: z.string().min(1).max(100),
     spdx_id: z.string().regex(/^[A-Za-z0-9.-]+$|^Plain-[A-Za-z0-9.-]+$/),
-    plain_id: z.string().regex(/^Plain-[A-Za-z0-9]+$/).optional(),
+    plain_id: z.string().regex(/^Plain-[A-Za-z0-9.-]+$/).optional(),
     plain_version: z.string().regex(/^\d+\.\d+\.\d+$/),
     license_family: z.enum(['public-domain', 'permissive', 'copyleft', 'source-available', 'proprietary']),
     is_dedication: z.boolean().default(false),

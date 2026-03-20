@@ -19,8 +19,11 @@ export async function generatePlaintext(ctx: ExportContext) {
     .replace(/\*(.*?)\*/g, '$1')
     .replace(/\[(.*?)\]\(.*?\)/g, '$1');
 
+  const slug = metadata.license_family
+    ? `${metadata.license_family}/${ctx.licenseId.toLowerCase()}`
+    : ctx.licenseId.toLowerCase();
   const header = `Plain License: ${plainId} ${version}\n` +
-                 `Attribution: https://plainlicense.org/licenses/${metadata.slug}\n\n` +
+                 `Attribution: https://plainlicense.org/licenses/${slug}\n\n` +
                  `========================================\n\n`;
 
   const fullContent = header + text;

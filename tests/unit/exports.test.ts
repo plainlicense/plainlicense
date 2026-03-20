@@ -44,13 +44,16 @@ describe('Export Generators', () => {
       );
     });
 
-    it('should write CommonMark markdown file', async () => {
+    it('should write CommonMark markdown file without GFM header', async () => {
       await generateMarkdown(ctx);
 
-      expect(fs.writeFile).toHaveBeenCalledWith(
-        path.join(ctx.outputDir, 'Plain-MIT-1.0.0.cm.md'),
-        expect.stringContaining('Content here.')
+      const cmCall = (fs.writeFile as any).mock.calls.find(
+        ([filePath]: [string]) => filePath === path.join(ctx.outputDir, 'Plain-MIT-1.0.0.cm.md')
       );
+      expect(cmCall).toBeDefined();
+      const [, cmContent] = cmCall as [string, string];
+      expect(cmContent).toContain('Content here.');
+      expect(cmContent).not.toContain('Plain License:');
     });
   });
 
