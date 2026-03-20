@@ -21,7 +21,7 @@ export default defineConfig({
         'dist/**',
         '**/*.d.ts',
         'tests/**',
-        'src/content/config.ts',
+        'src/content.config.ts',
         'astro.config.mjs',
       ],
     },
