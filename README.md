@@ -127,6 +127,10 @@ Dev scopes: `content`, `ui`, `infra`, `deps`, `scripts`, `blog`
 
 Use `mise run commit "<message>"` to stage, format, and commit in one step.
 
+#### Too complicated? Don't worry, we've got you
+
+Commit message formats shouldn't keep you from contributing! We have a custom agent that corrects commits to our format.
+
 ---
 
 ## Plain Language Standards
@@ -140,6 +144,10 @@ All license writing targets an **8th-grade reading level**. Key conventions:
 - Headers use empowering framing: *"You are Free to..."*
 
 ---
+
+## License
+
+**You can use, reuse, or share PlainLicense.org's site however you want -- it is licensed under the [PlainUnlicense](https://plainlicense.org/unlicense).**
 
 ## ⚠️ Disclaimer
 
