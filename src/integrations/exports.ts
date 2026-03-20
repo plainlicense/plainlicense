@@ -177,7 +177,7 @@ export default function exportsIntegration(): AstroIntegration {
         const manifest: Record<string, ManifestEntry> = {};
 
         // Walk content/licenses/ and generate exports
-        async function walk(dir: string) {
+        const walk = async (dir: string) => {
           const entries = await fs.readdir(dir, { withFileTypes: true });
 
           for (const entry of entries) {
@@ -253,7 +253,7 @@ export default function exportsIntegration(): AstroIntegration {
               );
             }
           }
-        }
+        };
 
         logger.info("Generating license exports...");
         await walk(contentDir);
