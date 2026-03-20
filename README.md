@@ -27,7 +27,7 @@ More licenses are on the way — contributions welcome!
 
 ## Tech Stack
 
-- **[Astro 5](https://astro.build)** — static-first site framework, statically generated and deployed to Cloudflare Pages
+- **[Astro 6](https://astro.build)** — static-first site framework, statically generated and deployed to Cloudflare Pages
 - **[Starlight](https://starlight.astro.build)** — Astro documentation theme
 - **[Preact](https://preactjs.com)** — interactive UI components (decision tree, comparison table)
 - **[Bun](https://bun.sh)** — package manager and workspace tooling
