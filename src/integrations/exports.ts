@@ -9,6 +9,26 @@ import {
 import { getFileAtCommit, getTaggedVersions } from "../utils/git-versions.ts";
 import { derivePlainId } from "../utils/plain-id.ts";
 
+/**
+ * Resolves {{var:...}} placeholders in content using license frontmatter.
+ */
+function resolveTemplateVars(
+  content: string,
+  data: Record<string, any>,
+): string {
+  const vars: Record<string, string> = {
+    plain_name: data.plain_name || "",
+    original_name: data.original?.name || "",
+    original_version_name:
+      data.original?.version_display || data.original?.name || "",
+    license_type: data.is_dedication ? "dedication" : "license",
+  };
+
+  return content.replace(/\{\{var:([a-z_]+)\}\}/g, (_match, key) => {
+    return vars[key] ?? `{{var:${key}}}`;
+  });
+}
+
 export default function exportsIntegration(): AstroIntegration {
   return {
     name: "plainlicense-exports",
@@ -65,13 +85,14 @@ export default function exportsIntegration(): AstroIntegration {
                 continue;
               }
 
-              // Inject template blocks
+              // Inject template blocks and resolve variables
               content = content.replace(
                 /\{\{block:([a-z0-9-]+)\}\}/g,
                 (match, id) => {
                   return templateBlocks[id] || match;
                 },
               );
+              content = resolveTemplateVars(content, data);
 
               const plainId = data.plain_id || derivePlainId(data.spdx_id);
               const spdxLower = data.spdx_id.toLowerCase();
@@ -133,13 +154,14 @@ export default function exportsIntegration(): AstroIntegration {
 
                 let { data: pastData, content: pastBody } = matter(pastContent);
 
-                // Inject template blocks (use current blocks — past blocks may not exist)
+                // Inject template blocks and resolve variables (use current blocks — past blocks may not exist)
                 pastBody = pastBody.replace(
                   /\{\{block:([a-z0-9-]+)\}\}/g,
                   (match, id) => {
                     return templateBlocks[id] || match;
                   },
                 );
+                pastBody = resolveTemplateVars(pastBody, pastData);
 
                 const pastPlainId =
                   pastData.plain_id || derivePlainId(data.spdx_id);

@@ -209,6 +209,8 @@ You may use the work under the [Plain MPL](https://plainlicense.org/{{ plain_url
 
 :    The materials covered by this license
 
+{{block:interpretation}}
+
 ---
 
 # Original License Text

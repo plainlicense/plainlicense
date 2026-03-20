@@ -79,6 +79,8 @@ You can do any of these things with the work, **if you follow these two rules**:
 
 {{block:warranty}}
 
+{{block:interpretation}}
+
 {{component:faq id="mit-faq"}}
 
 ---

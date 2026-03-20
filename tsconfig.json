@@ -46,6 +46,7 @@
   "extends": ["astro/tsconfigs/strict"],
   "include": [
     ".astro/types.d.ts",
+    "./worker-configuration.d.ts",
     "src/**/*.ts",
     "src/**/*.d.ts",
     "src/**/*.tsx",

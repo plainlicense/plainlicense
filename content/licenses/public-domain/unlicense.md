@@ -66,6 +66,8 @@ In places that follow copyright laws, we give up all our rights to the work. Eve
 - We are not responsible for any problems or damages caused by using the work.
 - We don't have to fix any problems you find.
 
+{{block:interpretation}}
+
 ---
 
 # Original License Text

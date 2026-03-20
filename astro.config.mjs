@@ -201,7 +201,9 @@ export default defineConfig({
           authors: {
             adam: {
               name: 'Adam Poulemanos',
-              url: 'https://github.com/knitli',
+              url: 'https://github.com/bashandbone',
+              picture: 'https://avatars.githubusercontent.com/u/89049923?v=4',
+              title: 'Founder'
             },
           },
           metrics: {
@@ -233,7 +235,7 @@ export default defineConfig({
       ]
     }),
     sitemap({
-      filter: (page) => { return !/\^\/(?!cdn-cgi\/)/.test(page); },
+      filter: (page) => { return !/\^\/(?!(cdn-cgi|admin)\/)/.test(page); },
       changefreq: 'weekly',
       lastmod: new Date(),
       namespaces: {
