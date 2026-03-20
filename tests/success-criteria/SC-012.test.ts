@@ -8,7 +8,7 @@ import { spawnSync } from 'node:child_process';
  * NOTE: This test runs a full production build and is intentionally skipped in the
  * standard unit-test suite. It requires mise and Typst to be installed, takes
  * >30 s, and belongs in a dedicated build-validation workflow step.
- * Run it explicitly with: `bunx vitest run tests/success-criteria/SC-012.test.ts`
+ * Run it explicitly with: `RUN_BUILD_TESTS=true bunx vitest run tests/success-criteria/SC-012.test.ts`
  */
 const RUN_BUILD_TEST = process.env.RUN_BUILD_TESTS === 'true';
 

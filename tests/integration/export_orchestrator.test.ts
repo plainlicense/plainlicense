@@ -21,6 +21,7 @@ describe('ExportOrchestrator Integration', () => {
   });
 
   afterEach(async () => {
+    vi.restoreAllMocks();
     try {
       await fs.rm(path.resolve('tests/tmp'), { recursive: true, force: true });
     } catch {}
@@ -59,6 +60,5 @@ describe('ExportOrchestrator Integration', () => {
     const consoleSpy = vi.spyOn(console, 'log');
     await orchestrator.generateAll(mockCtx);
     expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('Skipping exports'));
-    consoleSpy.mockRestore();
   });
 });
