@@ -52,7 +52,7 @@ export class ExportOrchestrator {
     const staticCtx = { ...ctx, content: staticContent, licenseId, version };
 
     // In parallel for performance
-    const results = await Promise.allSettled([
+    const [markdown, plaintext, pdf, spdx, embed] = await Promise.allSettled([
       generateMarkdown(staticCtx),
       generatePlaintext(staticCtx),
       generatePDF(staticCtx),
@@ -60,10 +60,16 @@ export class ExportOrchestrator {
       this.generateEmbed(staticCtx)
     ]);
 
-    const failures = results.filter(r => r.status === 'rejected');
+    const allResults = { markdown, plaintext, pdf, spdx, embed };
+    const failures = Object.entries(allResults).filter(([, r]) => r.status === 'rejected');
     if (failures.length > 0) {
       console.error(`Some exports failed for ${licenseId}:`, failures);
-    } else {
+    }
+    // Update manifest as long as the core text formats succeeded.
+    // PDF is considered optional (requires Typst to be installed).
+    const coreSucceeded = [markdown, plaintext, spdx, embed]
+      .every(r => r.status === 'fulfilled');
+    if (coreSucceeded) {
       await this.updateManifest(licenseId, version, contentHash);
     }
   }

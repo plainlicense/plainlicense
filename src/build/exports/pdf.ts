@@ -31,12 +31,17 @@ export async function generatePDF(ctx: ExportContext) {
     child.stderr.on('data', (data) => {
       stderr += data.toString();
     });
+    child.on('error', async (err) => {
+      // Clean up .typ file if it exists
+      await fs.unlink(typPath).catch(() => {});
+      reject(err);
+    });
     child.on('close', async (code) => {
       if (code !== 0) {
         console.error(`Typst error output for ${licenseId}: ${stderr}`);
       }
       // Clean up .typ file
-      await fs.unlink(typPath);
+      await fs.unlink(typPath).catch(() => {});
       if (code === 0) {
         console.log(`Generated PDF export: ${filePath}`);
         resolve();
