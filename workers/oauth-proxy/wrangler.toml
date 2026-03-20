@@ -1,0 +1,24 @@
+# Cloudflare Worker: OAuth 2.0 proxy for GitHub authentication.
+# Handles code exchange, JWT session tokens, and CORS.
+#
+# Required secrets (set via `wrangler secret put`):
+#   GITHUB_CLIENT_ID     — GitHub OAuth App client ID
+#   GITHUB_CLIENT_SECRET — GitHub OAuth App client secret
+#   JWT_SECRET           — Random 32+ char string for signing JWTs
+#
+# Deploy:
+#   cd workers/oauth-proxy && npx wrangler deploy
+
+name = "plainlicense-oauth-proxy"
+main = "index.ts"
+compatibility_date = "2025-03-01"
+account_id = "1bb2d128ac96f8ee9dc75e99a54e9260"
+
+[vars]
+ALLOWED_ORIGINS = "https://plainlicense.org"
+
+[env.staging]
+name = "plainlicense-oauth-proxy-staging"
+
+[env.staging.vars]
+ALLOWED_ORIGINS = "https://staging.plainlicense.org,http://localhost:4321"
