@@ -9,7 +9,7 @@ is_dedication: true
 status: published
 tldr:
   - You can do whatever you want with this work — no restrictions, no required notices.
-  - No warranty is provided. Use at your own risk.
+  - There's no warranty. Use at your own risk.
 attribution_required: false
 fair_code: false
 plain_gunning_fog: 12.2
