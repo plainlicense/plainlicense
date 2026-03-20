@@ -13,6 +13,7 @@ _.log
 report.[0-9]_[0-9]_[0-9]_[0-9]_.json
 out/
 dist/
+public/exports/
 *.tgz
 coverage
 *.lcov

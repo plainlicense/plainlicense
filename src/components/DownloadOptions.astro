@@ -1,5 +1,6 @@
 ---
 import type { CollectionEntry } from "astro:content";
+import { derivePlainId } from "~/utils/plain-id";
 
 interface Props {
   license: CollectionEntry<"licenses">;
@@ -11,26 +12,29 @@ const { data } = license;
 
 const clipboardContent = processedBody || license.body;
 
-// Paths to exported files (generated at build time)
-const exportBase = `/exports/${data.spdx_id.toLowerCase()}/v${data.plain_version}/`;
+const plainId = data.plain_id || derivePlainId(data.spdx_id);
+const version = data.plain_version;
+const baseName = `${plainId}-${version}`;
+const exportBase = `/exports/${data.spdx_id.toLowerCase()}/${version}/`;
+
 const formats = [
   {
     name: "Markdown (GFM)",
     ext: ".gfm.md",
-    path: `${exportBase}${data.spdx_id}.gfm.md`,
+    path: `${exportBase}${baseName}.gfm.md`,
   },
   {
     name: "Markdown (CommonMark)",
     ext: ".cm.md",
-    path: `${exportBase}${data.spdx_id}.cm.md`,
+    path: `${exportBase}${baseName}.cm.md`,
   },
-  { name: "Plaintext", ext: ".txt", path: `${exportBase}${data.spdx_id}.txt` },
-  { name: "PDF", ext: ".pdf", path: `${exportBase}${data.spdx_id}.pdf` },
-  { name: "SPDX XML", ext: ".xml", path: `${exportBase}${data.spdx_id}.xml` },
+  { name: "Plaintext", ext: ".txt", path: `${exportBase}${baseName}.txt` },
+  { name: "PDF", ext: ".pdf", path: `${exportBase}${baseName}.pdf` },
+  { name: "SPDX XML", ext: ".xml", path: `${exportBase}${baseName}.xml` },
   {
     name: "Embed HTML",
     ext: "-embed.html",
-    path: `${exportBase}${data.spdx_id}-embed.html`,
+    path: `${exportBase}${baseName}-embed.html`,
   },
 ];
 ---

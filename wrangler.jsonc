@@ -3,10 +3,11 @@
   // The @astrojs/cloudflare adapter reads this file at build time and merges
   // its own generated settings (e.g. the Worker entry-point) with what is
   // defined here.  Any binding you declare here takes precedence over the
-  // adapter's auto-generated defaults, so you can customise names or add
+  // adapter's auto-generated defaults, so you can customize names or add
   // extra namespaces/bindings as needed.
   "$schema": "./node_modules/wrangler/config-schema.json",
   "name": "plainlicense",
+  "account_id": "1bb2d128ac96f8ee9dc75e99a54e9260",
   "compatibility_date": "2025-03-01",
 
   // ── Static assets ──────────────────────────────────────────────────────────

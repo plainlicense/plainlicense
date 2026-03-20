@@ -8,6 +8,7 @@ import ComparisonModal from "../../components/ComparisonModal.astro";
 import ComparisonToggle from "../../components/ComparisonToggle.astro";
 import DownloadOptions from "../../components/DownloadOptions.astro";
 import VersionHistory from "../../components/VersionHistory.astro";
+import NotLegalAdvice from "../../components/NotLegalAdvice.astro";
 import { getLicenseSlug, getPublishedLicenses } from "../../utils/collections";
 
 export const prerender = true;
@@ -82,8 +83,20 @@ const plainBody = bodyParts[0].replace(
     return block ? block.body : `[Missing Block: ${blockId}]`;
   },
 );
+// Resolve {{var:...}} placeholders from frontmatter
+const templateVars: Record<string, string> = {
+  plain_name: data.plain_name || "",
+  original_name: data.original?.name || "",
+  original_version_name: data.original?.version_display || data.original?.name || "",
+  license_type: data.is_dedication ? "dedication" : "license",
+};
+const resolvedBody = plainBody.replace(
+  /\{\{var:([a-z_]+)\}\}/g,
+  (_m, key) => templateVars[key] ?? "",
+);
+
 const fullProcessedBody = (
-  plainBody +
+  resolvedBody +
   (originalBody ? "\n\n---\n\n# Original License Text\n" + originalBody : "")
 )
   .replace(/{{component:[a-z-]+.*?}}/g, "")
@@ -134,6 +147,7 @@ const cleanPlainBody = stripTemplatePlaceholders(plainBody);
 
     <DownloadOptions license={license} processedBody={fullProcessedBody} />
     <VersionHistory license={license} />
+    <NotLegalAdvice />
     <ComparisonModal />
   </div>
 </BaseLayout>

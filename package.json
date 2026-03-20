@@ -20,7 +20,7 @@
     "@astrojs/node": "^10.0.3",
     "@astrojs/preact": "^5.0.2",
     "@astrojs/starlight": "^0.38.1",
-    "@sveltia/cms": "^0.144.5",
+    "@sveltia/cms": "^0.147.2",
     "plain-license-elastic-2.0": "workspace:plain-license-elastic-2.0",
     "plain-license-mit": "workspace:plain-license-mit",
     "plain-license-mpl-2.0": "workspace:plain-license-mpl-2.0",
@@ -66,11 +66,12 @@
     "globby": "^16.1.1",
     "gray-matter": "^4.0.3",
     "issue-parser": "^7.0.1",
+    "js-yaml": "^4.1.1",
     "markdownlint-cli2": "^0.21.0",
     "marked": "^17.0.4",
     "playwright": "^1.53.0",
     "preact": "^10.28.4",
-    "satori": "^0.25.0",
+    "satori": "^0.26.0",
     "semantic-release": "^25.0.3",
     "semantic-release-cli": "^5.4.6",
     "semantic-release-monorepo": "^8.0.2",
@@ -78,8 +79,8 @@
     "starlight-auto-drafts": "^0.3.0",
     "starlight-blog": "^0.26.1",
     "starlight-contextual-menu": "^0.1.5",
-    "starlight-heading-badges": "^0.6.1",
-    "starlight-llms-txt": "^0.7.0",
+    "starlight-heading-badges": "^0.7.0",
+    "starlight-llms-txt": "^0.8.0",
     "starlight-tags": "^0.4.0",
     "svgo": "^4.0.1",
     "ts-node": "^10.9.2",
@@ -105,7 +106,7 @@
     "submodules": "external"
   },
   "engines": {
-    "node": ">= 22.12.0"
+    "node": ">= 24.0.0"
   },
   "keywords": [
     "legal",
@@ -239,7 +240,7 @@
     "@parcel/watcher",
     "@swc/core"
   ],
-  "version": "0.1.0",
+  "version": "0.2.0",
   "workspaces": [
     "packages/*"
   ]

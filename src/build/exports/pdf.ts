@@ -9,10 +9,11 @@ import type { ExportContext } from './index.ts';
  * Uses custom Typst templates for legal document formatting.
  */
 export async function generatePDF(ctx: ExportContext) {
-  const { licenseId, version, content, metadata, outputDir } = ctx;
-  const fileName = `${licenseId}.pdf`;
+  const { plainId, version, content, metadata, outputDir } = ctx;
+  const baseName = `${plainId}-${version}`;
+  const fileName = `${baseName}.pdf`;
   const filePath = path.join(outputDir, fileName);
-  const typPath = path.join(outputDir, `${licenseId}.typ`);
+  const typPath = path.join(outputDir, `${baseName}.typ`);
 
   const typstDoc = generateTypst(content, metadata, version);
 
@@ -21,7 +22,7 @@ export async function generatePDF(ctx: ExportContext) {
 
   // LOG FOR DEBUG/TESTING (We can check this in integration tests)
   if (process.env.DEBUG_TYPST) {
-    console.log(`Typst source for ${licenseId} contains interactive: ${typstDoc.includes('interactive')}`);
+    console.log(`Typst source for ${plainId} contains interactive: ${typstDoc.includes('interactive')}`);
   }
 
   // Compile with Typst
@@ -38,7 +39,7 @@ export async function generatePDF(ctx: ExportContext) {
     });
     child.on('close', async (code) => {
       if (code !== 0) {
-        console.error(`Typst error output for ${licenseId}: ${stderr}`);
+        console.error(`Typst error output for ${plainId}: ${stderr}`);
       }
       // Clean up .typ file
       await fs.unlink(typPath).catch(() => {});
@@ -46,7 +47,7 @@ export async function generatePDF(ctx: ExportContext) {
         console.log(`Generated PDF export: ${filePath}`);
         resolve();
       } else {
-        reject(new Error(`Typst failed with code ${code} for ${licenseId}`));
+        reject(new Error(`Typst failed with code ${code} for ${plainId}`));
       }
     });
   });

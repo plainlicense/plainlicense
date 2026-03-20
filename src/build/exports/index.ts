@@ -13,6 +13,7 @@ import path from 'node:path';
 
 export interface ExportContext {
   licenseId: string;
+  plainId: string;
   version: string;
   content: string;
   metadata: any;
@@ -49,7 +50,7 @@ export class ExportOrchestrator {
     
     // Process reactive components for static formats
     const staticContent = this.processReactiveComponents(content);
-    const staticCtx = { ...ctx, content: staticContent, licenseId, version };
+    const staticCtx = { ...ctx, content: staticContent, licenseId, version, plainId: ctx.plainId };
 
     // In parallel for performance
     const [markdown, plaintext, pdf, spdx, embed] = await Promise.allSettled([
@@ -134,13 +135,13 @@ export class ExportOrchestrator {
   }
 
   private async generateSPDX(ctx: ExportContext) {
-    const { licenseId, version, outputDir } = ctx;
-    const fileName = `${licenseId}.xml`;
+    const { plainId, version, licenseId, outputDir } = ctx;
+    const fileName = `${plainId}-${version}.xml`;
     const filePath = path.join(outputDir, fileName);
 
     const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <spdx:License xmlns:spdx="http://spdx.org/rdf/terms#" spdxId="${licenseId}">
-  <spdx:name>${licenseId} (Plain Language)</spdx:name>
+  <spdx:name>${plainId}</spdx:name>
   <spdx:version>${version}</spdx:version>
 </spdx:License>`;
 
@@ -150,8 +151,8 @@ export class ExportOrchestrator {
   }
 
   private async generateEmbed(ctx: ExportContext) {
-    const { licenseId, version, metadata, outputDir } = ctx;
-    const fileName = `${licenseId}-embed.html`;
+    const { plainId, version, licenseId, metadata, outputDir } = ctx;
+    const fileName = `${plainId}-${version}-embed.html`;
     const filePath = path.join(outputDir, fileName);
 
     const html = `<div class="pl-embed" data-license="${licenseId}" data-version="${version}">

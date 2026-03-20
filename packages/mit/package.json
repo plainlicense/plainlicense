@@ -68,15 +68,15 @@
         {
           "assets": [
             {
-              "path": "../../public/exports/mit/v${nextRelease.version}/MIT.md",
+              "path": "../../dist/exports/mit/${nextRelease.version}/Plain-MIT-${nextRelease.version}.gfm.md",
               "label": "Plain MIT License (Markdown)"
             },
             {
-              "path": "../../public/exports/mit/v${nextRelease.version}/MIT.pdf",
+              "path": "../../dist/exports/mit/${nextRelease.version}/Plain-MIT-${nextRelease.version}.pdf",
               "label": "Plain MIT License (PDF)"
             },
             {
-              "path": "../../public/exports/mit/v${nextRelease.version}/MIT.txt",
+              "path": "../../dist/exports/mit/${nextRelease.version}/Plain-MIT-${nextRelease.version}.txt",
               "label": "Plain MIT License (Plaintext)"
             }
           ]

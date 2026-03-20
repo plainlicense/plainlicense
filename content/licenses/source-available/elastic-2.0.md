@@ -128,6 +128,8 @@ When you use the work in any way, you agree to follow these rules. **If you don'
 
 [^1]: You *can* build a product or service using the work, including a product or service for your company or customers. It just can't be a service where others use the work's features directly.
 
+{{block:interpretation}}
+
 ---
 
 # Original License Text

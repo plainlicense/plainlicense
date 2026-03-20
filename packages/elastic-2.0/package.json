@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "description": "Plain language version of Elastic License 2.0",
-  "main": "../../docs/licenses/source-available/elastic-2.0/index.md",
+  "main": "../../content/licenses/source-available/elastic-2.0.md",
   "scripts": {
     "release": "semantic-release"
   },
@@ -12,9 +12,9 @@
       "+([0-9])?(.{+([0-9]),x}).x",
       "main",
       {
-        "channel": "pre/rc",
         "name": "dev",
-        "prerelease": true
+        "prerelease": true,
+        "channel": "pre/rc"
       }
     ],
     "plugins": [
@@ -23,24 +23,24 @@
         {
           "releaseRules": [
             {
-              "release": "major",
-              "type": "stable"
+              "type": "stable",
+              "release": "major"
             },
             {
-              "release": "minor",
-              "type": "new"
+              "type": "new",
+              "release": "minor"
             },
             {
-              "release": "minor",
-              "type": "subs"
+              "type": "subs",
+              "release": "minor"
             },
             {
-              "release": "patch",
-              "type": "admin"
+              "type": "admin",
+              "release": "patch"
             },
             {
-              "release": false,
-              "type": "bot"
+              "type": "bot",
+              "release": false
             }
           ]
         }
@@ -48,7 +48,7 @@
       [
         "@semantic-release/changelog",
         {
-          "changelogFile": "../changelogs/unlicense.md",
+          "changelogFile": "../changelogs/elastic-2.0.md",
           "changelogTitle": "Plain Elastic 2.0 Changelog"
         }
       ],
@@ -68,8 +68,16 @@
         {
           "assets": [
             {
-              "label": "Plain Elastic License 2.0",
-              "path": "../../docs/licenses/source-available/elastic-2.0/index.md"
+              "path": "../../dist/exports/elastic-2.0/${nextRelease.version}/Plain-Elastic-${nextRelease.version}.gfm.md",
+              "label": "Plain Elastic License 2.0 (Markdown)"
+            },
+            {
+              "path": "../../dist/exports/elastic-2.0/${nextRelease.version}/Plain-Elastic-${nextRelease.version}.pdf",
+              "label": "Plain Elastic License 2.0 (PDF)"
+            },
+            {
+              "path": "../../dist/exports/elastic-2.0/${nextRelease.version}/Plain-Elastic-${nextRelease.version}.txt",
+              "label": "Plain Elastic License 2.0 (Plaintext)"
             }
           ]
         }
