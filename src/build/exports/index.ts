@@ -63,7 +63,12 @@ export class ExportOrchestrator {
     const failures = results.filter(r => r.status === 'rejected');
     if (failures.length > 0) {
       console.error(`Some exports failed for ${licenseId}:`, failures);
-    } else {
+    }
+    // Update manifest as long as at least the core text formats succeeded.
+    // PDF is considered optional (requires Typst to be installed).
+    const coreSucceeded = [results[0], results[1], results[3], results[4]]
+      .every(r => r.status === 'fulfilled');
+    if (coreSucceeded) {
       await this.updateManifest(licenseId, version, contentHash);
     }
   }
