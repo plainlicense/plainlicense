@@ -10,6 +10,7 @@ import DownloadOptions from "../../components/DownloadOptions.astro";
 import VersionHistory from "../../components/VersionHistory.astro";
 import { getLicenseSlug, getPublishedLicenses } from "../../utils/collections";
 
+export const prerender = true;
 /**
  * Render markdown content, correctly handling <div id="..."> wrappers.
  *

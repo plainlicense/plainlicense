@@ -1,0 +1,36 @@
+{
+  // Cloudflare Workers / Pages deployment configuration for Plain License.
+  // The @astrojs/cloudflare adapter reads this file at build time and merges
+  // its own generated settings (e.g. the Worker entry-point) with what is
+  // defined here.  Any binding you declare here takes precedence over the
+  // adapter's auto-generated defaults, so you can customise names or add
+  // extra namespaces/bindings as needed.
+
+  "name": "plainlicense",
+  "compatibility_date": "2025-03-01",
+
+  // ── Static assets ──────────────────────────────────────────────────────────
+  // The ASSETS binding exposes the site's static files to the Worker so that
+  // it can serve them via `env.ASSETS.fetch(request)`.  The adapter defaults
+  // to the binding name "ASSETS"; declaring it here makes the configuration
+  // explicit and avoids any auto-provisioning surprises.
+  "assets": {
+    "binding": "ASSETS",
+    "directory": "./dist/client"
+  },
+
+  // ── Session storage (Cloudflare KV) ────────────────────────────────────────
+  // Astro v6 provides a first-class session API.  The @astrojs/cloudflare
+  // adapter automatically wires sessions to a KV namespace whose binding name
+  // defaults to "SESSION".  Declaring the namespace here keeps everything in
+  // one place and lets Cloudflare auto-provision the namespace on first deploy
+  // (see https://developers.cloudflare.com/workers/wrangler/configuration/#automatic-provisioning).
+  "kv_namespaces": [
+    {
+      "binding": "SESSION"
+      // "id" and "preview_id" are populated by `wrangler kv namespace create`
+      // or by Cloudflare's automatic provisioning on deploy.
+      // Add them here once the namespaces exist in your Cloudflare account.
+    }
+  ]
+}

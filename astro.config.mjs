@@ -85,11 +85,11 @@ export default defineConfig({
   redirects: getLicenseRedirects(),
   site: 'https://plainlicense.org',
   base: '/',
-  output: 'static',
+  output: 'server',
   adapter: cloudflare({
     imageService: 'compile',
-    environment: process.env.NODE_ENV === 'development' ? 'local' : undefined,
-}),
+    prerenderEnvironment: 'workerd',
+  }),
   favicon: join(__dirname, 'assets/images/logo_only_color_transp.svg'),
   // Image optimization
   image: {
@@ -136,17 +136,7 @@ export default defineConfig({
       cssCodeSplit: true,
       cssMinify: 'lightningcss',
       rollupOptions: {
-        output: {
-          experimental: {
-            integrations: true,
-            nativeMagicString: true,
-          },
-        },
         treeshake: "smallest",
-        optimization: {
-          inlineConst: "smart"
-        },
-        ssr: false,
       },
     },
     css: {
