@@ -4,7 +4,7 @@ import preact from '@astrojs/preact';
 import sitemap from '@astrojs/sitemap';
 import starlight from '@astrojs/starlight';
 import favicons from 'astro-favicons';
-import { defineConfig } from 'astro/config';
+import { defineConfig, fontProviders } from 'astro/config';
 import { readdirSync, statSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -85,11 +85,47 @@ export default defineConfig({
   redirects: getLicenseRedirects(),
   site: 'https://plainlicense.org',
   base: '/',
-  output: 'server',
+  output: 'static',
   adapter: cloudflare({
     imageService: 'compile',
     prerenderEnvironment: 'workerd',
+    configPath: join(__dirname, 'wrangler.jsonc'),
+    sessionKVBindingName: 'SESSION'
   }),
+  compressHTML: true,
+  fonts: [
+    {
+      name: 'Inter',
+      provider: fontProviders.google,
+      cssVariable: '--sl-font',
+      fallbacks: ['Noto Sans', 'Open Sans', 'Lato', 'Helvetica Neue', 'Helvetica', 'system-ui', 'sans-serif'],
+      weights: [500, 700],
+      styles: ["normal", "italic", "bold"],
+      formats: ['woff2', 'woff'],
+      subsets: ['latin', 'latin-ext'],
+      
+    },
+    {
+      name: 'Source Code Pro',
+      provider: fontProviders.google,
+      cssVariable: '--sl-font-mono',
+      fallbacks: ['Fira Code Mono', 'Inconsolata', 'Monaco', 'Consolas', 'Courier New', 'monospace'],
+      weights: [500, 700],
+      styles: ["normal", "italic", "bold"],
+      formats: ['woff2', 'woff'],
+      subsets: ['latin', 'latin-ext'],
+    },
+    {
+      name: "Raleway",
+      provider: fontProviders.google,
+      cssVariable: "--font-raleway",
+      fallbacks: ['Montserrat', 'Noto Sans', 'Open Sans', 'Lato', 'Helvetica Neue', 'Helvetica', 'system-ui', 'sans-serif'],
+      weights: [500, 700],
+      styles: ["normal", "bold"],
+      formats: ['woff2', 'woff'],
+      subsets: ['latin']
+    }
+  ],
   favicon: join(__dirname, 'assets/images/logo_only_color_transp.svg'),
   // Image optimization
   image: {
