@@ -40,8 +40,8 @@ jobs:
       - name: Check license version bumps
         if: github.event_name == 'pull_request'
         env:
-          BASE_REF: ${{ github.base_ref }}
-        run: bash scripts/check-license-versions.sh "origin/$BASE_REF"
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: bash scripts/check-license-versions.sh "$BASE_SHA"
       - name: Setup Mise
         uses: jdx/mise-action@3bc85396a273ed82bba5e53a15174bbf9dba095c
         with:

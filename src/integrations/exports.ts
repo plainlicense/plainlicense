@@ -214,12 +214,16 @@ export default function exportsIntegration(): AstroIntegration {
                 version,
               );
 
+              const slug = data.license_family
+                ? `${data.license_family}/${spdxLower}`
+                : spdxLower;
+
               const ctx: ExportContext = {
                 licenseId: data.spdx_id,
                 plainId,
                 version,
                 content,
-                metadata: data,
+                metadata: { ...data, slug },
                 outputDir: exportDir,
               };
 
