@@ -2,6 +2,7 @@
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { getLicenseSlug, getPublishedLicenses } from "../../utils/collections";
 
+export const prerender = true;
 const licenses = await getPublishedLicenses();
 
 const byCategory = licenses.reduce<Record<string, typeof licenses>>(

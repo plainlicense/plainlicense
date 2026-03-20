@@ -1,8 +1,9 @@
+import { glob } from 'astro/loaders'
 import { docsLoader } from '@astrojs/starlight/loaders'
 import { docsSchema } from '@astrojs/starlight/schema'
 import { defineCollection, z } from 'astro:content'
 import { blogSchema } from 'starlight-blog/schema'
-import { LicenseSchema } from './licenseXmlSchema'
+import { LicenseSchema } from './content/licenseXmlSchema'
 
 const chooseALicenseDetailsSchema = z.object({
   title: z.string(),
@@ -67,7 +68,7 @@ const OriginalLicenseSchema = z.object({
 
 // License collection schema
 const licensesCollection = defineCollection({
-  type: 'content',
+  loader: glob({ pattern: '**/*.md', base: './content/licenses' }),
   schema: z.object({
     // === Identity ===
     plain_name: z.string().min(1).max(100),
@@ -134,7 +135,7 @@ const licensesCollection = defineCollection({
 
 // Template Block collection schema
 const templateBlocksCollection = defineCollection({
-  type: 'content',
+  loader: glob({ pattern: '**/*.md', base: './content/template-blocks' }),
   schema: z.object({
     title: z.string(),
     block_id: z.string().regex(/^[a-z0-9-]+$/),

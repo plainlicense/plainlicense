@@ -2,16 +2,16 @@
 title: Plain MPL
 plain_name: Plain MPL
 spdx_id: MPL-2.0
-plain_version: 0.1.0
+plain_version: 0.1.1
 description: The MPL is a weak copyleft license requiring sharing source materials for its parts. It includes a patent grant and is compatible with GPL/LGPL.
 license_family: copyleft
 is_dedication: false
 status: published
 tldr:
   - You can use, copy, change, and share this work, including commercially.
-  - You must share source materials for any files you modify under this license.
+  - You must share source materials for any changes you make under this license.
   - Keep all copyright notices and include a copy of this license with any copy you share.
-  - No warranty is provided. Use at your own risk.
+  - There's no warranty. Use at your own risk.
 attribution_required: false
 fair_code: false
 plain_gunning_fog: 12.36
