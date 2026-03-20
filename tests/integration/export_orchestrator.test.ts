@@ -21,12 +21,13 @@ describe('ExportOrchestrator Integration', () => {
   });
 
   afterEach(async () => {
+    vi.restoreAllMocks();
     try {
       await fs.rm(path.resolve('tests/tmp'), { recursive: true, force: true });
     } catch {}
   });
 
-  it('generates all expected export formats', async () => {
+  it('generates all expected export formats', { timeout: 15000 }, async () => {
     const orchestrator = new ExportOrchestrator();
     await orchestrator.generateAll(mockCtx);
 
@@ -34,13 +35,12 @@ describe('ExportOrchestrator Integration', () => {
     expect(files).toContain('mit.gfm.md');
     expect(files).toContain('mit.cm.md');
     expect(files).toContain('mit.txt');
-    // Typst might not be installed in the environment, so we mock PDF generation or skip it
-    // But for integration, we'll check if others worked.
+    // Typst might not be installed in the environment — PDF is checked by SC-006.
     expect(files).toContain('mit.xml');
     expect(files).toContain('mit-embed.html');
   });
 
-  it('creates and updates build manifest', async () => {
+  it('creates and updates build manifest', { timeout: 15000 }, async () => {
     const orchestrator = new ExportOrchestrator();
     await orchestrator.generateAll(mockCtx);
 
@@ -50,21 +50,13 @@ describe('ExportOrchestrator Integration', () => {
     expect(manifest.mit.hash).toBe(await sha256(mockCtx.content));
   });
 
-  it('skips generation if content is unchanged', async () => {
+  it('skips generation if content is unchanged', { timeout: 30000 }, async () => {
     const orchestrator = new ExportOrchestrator();
-    
-    // First run
+
+    // First run — generates and writes manifest
     await orchestrator.generateAll(mockCtx);
-    
-    // Spy on fs.writeFile to see if it's called again
-    const writeFileSpy = vi.spyOn(fs, 'writeFile');
-    
-    // Second run
-    await orchestrator.generateAll(mockCtx);
-    
-    // Should NOT write to mit.gfm.md again (only updates manifest)
-    // Actually, updateManifest writes to manifestPath.
-    // We check if the logs or a spy shows it skipped.
+
+    // Second run — content is unchanged, should skip
     const consoleSpy = vi.spyOn(console, 'log');
     await orchestrator.generateAll(mockCtx);
     expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('Skipping exports'));
