@@ -15,6 +15,7 @@ import starlightHeadingBadges from 'starlight-heading-badges';
 import starlightLLMsTxt from 'starlight-llms-txt';
 import starlightTags from 'starlight-tags';
 import { searchForWorkspaceRoot } from 'vite';
+import exportsIntegration from './src/integrations/exports.ts';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -114,7 +115,10 @@ export default defineConfig({
     assets: '_astro',
   },
   markdown: {
-    shikiConfig: { theme: 'github-dark' },
+    shikiConfig: { themes: {
+      light: 'github-light-high-contrast',
+      dark: 'ayu-dark'
+    }},
   },
   vite: {
     server: {
@@ -178,6 +182,10 @@ export default defineConfig({
       customCss: [
         './src/assets/stylesheets/custom.css',
       ],
+      expressiveCode: {
+        themes: ["ayu-dark", "github-light-high-contrast"],
+        useStarlightDarkModeSwitch: true,
+      },
       sidebar: [
         {
           label: 'Licenses',
@@ -244,5 +252,6 @@ export default defineConfig({
     }),
     preact(),
     mdx(),
+    exportsIntegration(),
   ],
 });

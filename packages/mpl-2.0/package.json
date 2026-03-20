@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "description": "Plain language version of MPL 2.0",
-  "main": "../../docs/licenses/copyleft/mpl-2.0/index.md",
+  "main": "../../content/licenses/copyleft/mpl-2.0.md",
   "scripts": {
     "release": "semantic-release"
   },
@@ -68,8 +68,16 @@
         {
           "assets": [
             {
-              "path": "../../docs/licenses/copyleft/mpl-2.0/index.md",
-              "label": "Plain MPL 2.0 License"
+              "path": "../../dist/exports/mpl-2.0/${nextRelease.version}/Plain-MPL-${nextRelease.version}.gfm.md",
+              "label": "Plain MPL 2.0 License (Markdown)"
+            },
+            {
+              "path": "../../dist/exports/mpl-2.0/${nextRelease.version}/Plain-MPL-${nextRelease.version}.pdf",
+              "label": "Plain MPL 2.0 License (PDF)"
+            },
+            {
+              "path": "../../dist/exports/mpl-2.0/${nextRelease.version}/Plain-MPL-${nextRelease.version}.txt",
+              "label": "Plain MPL 2.0 License (Plaintext)"
             }
           ]
         }

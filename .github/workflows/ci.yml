@@ -36,6 +36,12 @@ jobs:
         uses: actions/checkout@v6
         with:
           submodules: recursive
+          fetch-depth: 0
+      - name: Check license version bumps
+        if: github.event_name == 'pull_request'
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        run: bash scripts/check-license-versions.sh "origin/$BASE_REF"
       - name: Setup Mise
         uses: jdx/mise-action@3bc85396a273ed82bba5e53a15174bbf9dba095c
         with:

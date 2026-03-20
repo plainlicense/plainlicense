@@ -1,7 +1,15 @@
+# Default headers for all pages
 /*
-  Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
-  X-Frame-Options: DENY
+  X-Frame-Options: SAMEORIGIN
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://github.com; connect-src 'self' https://auth.plainlicense.org https://api.github.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self';
+
+# Allow embed HTML exports to be iframed on external sites
+/exports/*-embed.html
+  X-Frame-Options: !
+  Content-Security-Policy: default-src 'none'; style-src 'unsafe-inline'; frame-ancestors *
+
+# Allow Cloudflare Web Analytics beacon
+/
+  Content-Security-Policy: default-src 'self'; script-src 'self'; connect-src 'self'; img-src 'self' data: avatars.githubusercontent.com ui-avatars.com; style-src 'self' 'unsafe-inline' fonts.googleapis.com; font-src 'self' fonts.gstatic.com; frame-ancestors 'none'

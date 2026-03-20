@@ -5,11 +5,12 @@ import path from 'node:path';
 import { sha256 } from '../../src/utils/hash.ts';
 
 describe('ExportOrchestrator Integration', () => {
-  const testOutputDir = path.resolve('tests/tmp/exports/mit/v0.2.1');
+  const testOutputDir = path.resolve('tests/tmp/exports/mit/0.2.1');
   const manifestPath = path.resolve('tests/tmp/exports/build-manifest.json');
 
   const mockCtx: ExportContext = {
     licenseId: 'mit',
+    plainId: 'Plain-MIT',
     version: '0.2.1',
     content: '# MIT License\n\nCopyright {{ year }} [holders]',
     metadata: { slug: 'mit', title: 'MIT License' },
@@ -32,12 +33,12 @@ describe('ExportOrchestrator Integration', () => {
     await orchestrator.generateAll(mockCtx);
 
     const files = await fs.readdir(testOutputDir);
-    expect(files).toContain('mit.gfm.md');
-    expect(files).toContain('mit.cm.md');
-    expect(files).toContain('mit.txt');
+    expect(files).toContain('Plain-MIT-0.2.1.gfm.md');
+    expect(files).toContain('Plain-MIT-0.2.1.cm.md');
+    expect(files).toContain('Plain-MIT-0.2.1.txt');
     // Typst might not be installed in the environment — PDF is checked by SC-006.
-    expect(files).toContain('mit.xml');
-    expect(files).toContain('mit-embed.html');
+    expect(files).toContain('Plain-MIT-0.2.1.xml');
+    expect(files).toContain('Plain-MIT-0.2.1-embed.html');
   });
 
   it('creates and updates build manifest', { timeout: 15000 }, async () => {

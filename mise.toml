@@ -405,7 +405,6 @@ fi
 tools.bun = "latest"
 run = '''
 bunx astro build
-bun run src/build/generate-exports.ts
 bun run src/build/generate-og-images.ts
 bun run src/build/generate-versions.ts
 '''

@@ -3,7 +3,7 @@
   "version": "0.2.0",
   "private": true,
   "description": "Plain language version of the Unlicense",
-  "main": "../../docs/licenses/public-domain/unlicense/index.md",
+  "main": "../../content/licenses/public-domain/unlicense.md",
   "scripts": {
     "release": "semantic-release"
   },
@@ -12,9 +12,9 @@
       "+([0-9])?(.{+([0-9]),x}).x",
       "main",
       {
-        "channel": "pre/rc",
         "name": "dev",
-        "prerelease": true
+        "prerelease": true,
+        "channel": "pre/rc"
       }
     ],
     "plugins": [
@@ -23,43 +23,29 @@
         {
           "releaseRules": [
             {
-              "release": "major",
-              "type": "stable"
+              "type": "stable",
+              "release": "major"
             },
             {
-              "release": "minor",
-              "type": "new"
+              "type": "new",
+              "release": "minor"
             },
             {
-              "release": "minor",
-              "type": "subs"
+              "type": "subs",
+              "release": "minor"
             },
             {
-              "release": "patch",
-              "type": "admin"
+              "type": "admin",
+              "release": "patch"
             },
             {
-              "release": false,
-              "type": "bot"
+              "type": "bot",
+              "release": false
             }
           ]
         }
       ],
       [
-        [
-          "@semantic-release/release-notes-generator"
-        ],
-        [
-          "@semantic-release/github"
-        ],
-        {
-          "assets": [
-            {
-              "path": "../../docs/licenses/public-domain/unlicense/index.md",
-              "label": "Plain Unlicense License"
-            }
-          ]
-        },
         "@semantic-release/changelog",
         {
           "changelogFile": "../changelogs/unlicense.md",
@@ -71,6 +57,28 @@
         {
           "assets": [
             "../changelogs/unlicense.md"
+          ]
+        }
+      ],
+      [
+        "@semantic-release/release-notes-generator"
+      ],
+      [
+        "@semantic-release/github",
+        {
+          "assets": [
+            {
+              "path": "../../dist/exports/unlicense/${nextRelease.version}/Plain-Unlicense-${nextRelease.version}.gfm.md",
+              "label": "Plain Unlicense (Markdown)"
+            },
+            {
+              "path": "../../dist/exports/unlicense/${nextRelease.version}/Plain-Unlicense-${nextRelease.version}.pdf",
+              "label": "Plain Unlicense (PDF)"
+            },
+            {
+              "path": "../../dist/exports/unlicense/${nextRelease.version}/Plain-Unlicense-${nextRelease.version}.txt",
+              "label": "Plain Unlicense (Plaintext)"
+            }
           ]
         }
       ]
