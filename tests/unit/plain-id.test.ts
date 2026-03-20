@@ -23,4 +23,9 @@ describe('derivePlainId', () => {
     expect(derivePlainId('Unlicense')).toBe('Plain-Unlicense');
     expect(derivePlainId('0BSD')).toBe('Plain-0BSD');
   });
+
+  it('does not double-prefix IDs already starting with Plain-', () => {
+    expect(derivePlainId('Plain-MIT')).toBe('Plain-MIT');
+    expect(derivePlainId('Plain-GPL3')).toBe('Plain-GPL3');
+  });
 });

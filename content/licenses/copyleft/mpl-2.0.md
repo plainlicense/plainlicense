@@ -178,7 +178,7 @@ Include this notice **or** the [Same-License Notice](#same-license-notice--optio
 
 ```markdown
 
-You may use this work under the terms of the [Plain MPL](https://plainlicense.org/{{ plain_url | trim('" ') }}) or the [Mozilla Public License 2.0]({{ original_url | trim('" ') }}). If you didn't get a copy of the Plain MPL with this work, you can find it at: [plainlicense.org](https://plainlicense.org).
+You may use this work under the terms of the [Plain MPL](https://plainlicense.org/licenses/copyleft/mpl-2.0) or the [Mozilla Public License 2.0](https://www.mozilla.org/en-US/MPL/2.0/). If you didn't get a copy of the Plain MPL with this work, you can find it at: [plainlicense.org](https://plainlicense.org).
 
 ```
 
@@ -188,7 +188,7 @@ If you want to share the work under the Plain MPL **and** not allow people to sh
 
 ```markdown
 
-You may use the work under the [Plain MPL](https://plainlicense.org/{{ plain_url | trim('" ') }}), or the [Mozilla Public License 2.0]({{ original_url | trim('" ') }}). You can't change the work's license; the authors require you share the work and any changes you make to it under the Plain MPL or the Mozilla Public License 2.0. If you didn't get a copy of the Plain MPL with this work, you can find it at: [plainlicense.org](https://plainlicense.org).
+You may use the work under the [Plain MPL](https://plainlicense.org/licenses/copyleft/mpl-2.0), or the [Mozilla Public License 2.0](https://www.mozilla.org/en-US/MPL/2.0/). You can't change the work's license; the authors require you share the work and any changes you make to it under the Plain MPL or the Mozilla Public License 2.0. If you didn't get a copy of the Plain MPL with this work, you can find it at: [plainlicense.org](https://plainlicense.org).
 
 ```
 

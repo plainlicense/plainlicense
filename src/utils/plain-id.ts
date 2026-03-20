@@ -4,6 +4,7 @@
  * and prepends "Plain-".
  */
 export function derivePlainId(spdxId: string): string {
+  if (spdxId.startsWith("Plain-")) return spdxId;
   const base = spdxId.replace(/-\d+\.\d+(-only|-or-later)?$/i, "");
   return `Plain-${base}`;
 }

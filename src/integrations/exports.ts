@@ -144,7 +144,8 @@ function updateManifest(
     plainId,
     currentVersion,
     versions: allVersions,
-    formats: ["gfm.md", "cm.md", "txt", "pdf", "xml", "-embed.html"],
+    // Each format is the filename suffix after "{plainId}-{version}"
+    formats: [".gfm.md", ".cm.md", ".txt", ".pdf", ".xml", "-embed.html"],
   };
 }
 
