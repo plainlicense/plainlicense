@@ -85,26 +85,28 @@ those explicitly granted.`,
 };
 
 const FAMILY_DATA: Record<string, FamilyBlocks> = {
-  'permissive': permissiveFamily,
-  'copyleft': copyleftFamily,
-  'public-domain': publicDomainFamily,
-  'source-available': sourceAvailableFamily,
-  'proprietary': proprietaryFamily,
+  permissive: permissiveFamily,
+  copyleft: copyleftFamily,
+  "public-domain": publicDomainFamily,
+  "source-available": sourceAvailableFamily,
+  proprietary: proprietaryFamily,
 };
 
 export function getFamilyData(family: string): FamilyBlocks {
   const data = FAMILY_DATA[family];
   if (!data) {
-    console.warn(`[license-families] Unknown license family: "${family}". Falling back to permissive defaults.`);
+    console.warn(
+      `[license-families] Unknown license family: "${family}". Falling back to permissive defaults.`,
+    );
     return permissiveFamily;
   }
   return data;
 }
 
 export const FAMILY_LABELS: Record<string, string> = {
-  'permissive': 'Permissive',
-  'copyleft': 'Copyleft',
-  'public-domain': 'Public Domain',
-  'source-available': 'Source Available',
-  'proprietary': 'Proprietary',
+  permissive: "Permissive",
+  copyleft: "Copyleft",
+  "public-domain": "Public Domain",
+  "source-available": "Source Available",
+  proprietary: "Proprietary",
 };

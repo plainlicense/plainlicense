@@ -1,8 +1,8 @@
-import { spawn } from 'node:child_process';
-import fs from 'node:fs/promises';
-import path from 'node:path';
-import { marked } from 'marked';
-import type { ExportContext } from './index.ts';
+import { spawn } from "node:child_process";
+import fs from "node:fs/promises";
+import path from "node:path";
+import { marked } from "marked";
+import type { ExportContext } from "./index.ts";
 
 /**
  * Generates PDF exports using Typst.
@@ -22,22 +22,24 @@ export async function generatePDF(ctx: ExportContext) {
 
   // LOG FOR DEBUG/TESTING (We can check this in integration tests)
   if (process.env.DEBUG_TYPST) {
-    console.log(`Typst source for ${plainId} contains interactive: ${typstDoc.includes('interactive')}`);
+    console.log(
+      `Typst source for ${plainId} contains interactive: ${typstDoc.includes("interactive")}`,
+    );
   }
 
   // Compile with Typst
   return new Promise<void>((resolve, reject) => {
-    const child = spawn('typst', ['compile', typPath, filePath]);
-    let stderr = '';
-    child.stderr.on('data', (data) => {
+    const child = spawn("typst", ["compile", typPath, filePath]);
+    let stderr = "";
+    child.stderr.on("data", (data) => {
       stderr += data.toString();
     });
-    child.on('error', async (err) => {
+    child.on("error", async (err) => {
       // Clean up .typ file if it exists
       await fs.unlink(typPath).catch(() => {});
       reject(err);
     });
-    child.on('close', async (code) => {
+    child.on("close", async (code) => {
       if (code !== 0) {
         console.error(`Typst error output for ${plainId}: ${stderr}`);
       }
@@ -53,54 +55,75 @@ export async function generatePDF(ctx: ExportContext) {
   });
 }
 
-function generateTypst(markdown: string, metadata: any, version: string): string {
+function generateTypst(
+  markdown: string,
+  metadata: any,
+  version: string,
+): string {
   const tokens = marked.lexer(markdown);
-  let body = '';
+  let body = "";
 
   function processTokens(tokens: any[]): string {
-    let result = '';
+    let result = "";
     for (const token of tokens) {
       switch (token.type) {
-        case 'heading':
-          result += '='.repeat(token.depth) + ' ' + processTokens(token.tokens) + '\n\n';
+        case "heading":
+          result +=
+            "=".repeat(token.depth) +
+            " " +
+            processTokens(token.tokens) +
+            "\n\n";
           break;
-        case 'paragraph':
-          result += processTokens(token.tokens) + '\n\n';
+        case "paragraph":
+          result += `${processTokens(token.tokens)}\n\n`;
           break;
-        case 'text':
+        case "text":
           result += token.tokens ? processTokens(token.tokens) : token.text;
           break;
-        case 'strong':
-          result += '*' + processTokens(token.tokens) + '*';
+        case "strong":
+          result += `*${processTokens(token.tokens)}*`;
           break;
-        case 'em':
-          result += '_' + processTokens(token.tokens) + '_';
+        case "em":
+          result += `_${processTokens(token.tokens)}_`;
           break;
-        case 'list':
-          result += token.items.map((item: any) => {
-            const bullet = token.ordered ? '+ ' : '- ';
-            return bullet + processTokens(item.tokens).trim().replace(/\n/g, '\n  ');
-          }).join('\n') + '\n\n';
+        case "list":
+          result += `${token.items
+            .map((item: any) => {
+              const bullet = token.ordered ? "+ " : "- ";
+              return (
+                bullet +
+                processTokens(item.tokens).trim().replace(/\n/g, "\n  ")
+              );
+            })
+            .join("\n")}\n\n`;
           break;
-        case 'link':
-          if (token.href.startsWith('http')) {
+        case "link":
+          if (token.href.startsWith("http")) {
             result += `#link("${token.href}")[${processTokens(token.tokens)}]`;
           } else {
             result += processTokens(token.tokens);
           }
           break;
-        case 'codespan':
-          result += '`' + token.text + '`';
+        case "codespan":
+          result += `\`${token.text}\``;
           break;
-        case 'code':
-          result += '```' + (token.lang || '') + '\n' + token.text + '\n```\n\n';
+        case "code":
+          result += `\`\`\`${token.lang || ""}\n${token.text}\n\`\`\`\n\n`;
           break;
-        case 'blockquote':
-          result += '#quote(block: true)[' + processTokens(token.tokens) + ']\n\n';
+        case "blockquote":
+          result += `#quote(block: true)[${processTokens(token.tokens)}]\n\n`;
           break;
-        case 'table':
-          const header = token.header.map((h: any) => `[*${processTokens(h.tokens)}*]`).join(', ');
-          const rows = token.rows.map((row: any) => row.map((cell: any) => `[${processTokens(cell.tokens)}]`).join(', ')).join(',\n    ');
+        case "table": {
+          const header = token.header
+            .map((h: any) => `[*${processTokens(h.tokens)}*]`)
+            .join(", ");
+          const rows = token.rows
+            .map((row: any) =>
+              row
+                .map((cell: any) => `[${processTokens(cell.tokens)}]`)
+                .join(", "),
+            )
+            .join(",\n    ");
           result += `#table(
   columns: ${token.header.length},
   inset: 10pt,
@@ -109,19 +132,20 @@ function generateTypst(markdown: string, metadata: any, version: string): string
   ${rows}
 )\n\n`;
           break;
-        case 'hr':
-          result += '#line(length: 100%, stroke: 0.5pt + gray)\n\n';
+        }
+        case "hr":
+          result += "#line(length: 100%, stroke: 0.5pt + gray)\n\n";
           break;
-        case 'br':
-          result += ' \\ ';
+        case "br":
+          result += " \\ ";
           break;
-        case 'space':
+        case "space":
           break;
-        case 'html':
+        case "html":
           // Ignore HTML divs used for mapping
           break;
         default:
-          result += token.text || '';
+          result += token.text || "";
       }
     }
     return result;
@@ -162,4 +186,3 @@ ${body}
 *Canonical URL:* https://plainlicense.org/licenses/${metadata.slug}
   `;
 }
-

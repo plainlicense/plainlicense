@@ -1,6 +1,6 @@
 ---
 import type { CollectionEntry } from "astro:content";
-import { derivePlainId } from "~/utils/plain-id";
+import { derivePlainId } from "../utils/plain-id";
 
 interface Props {
   license: CollectionEntry<"licenses">;
@@ -42,17 +42,18 @@ const formats = [
 <section class="download-section" aria-labelledby="download-heading">
   <h3 id="download-heading">Download License</h3>
   <div class="download-grid">
-    {formats.map(format => (
-      <a
-        href={format.path}
-        class="download-card"
-        download
-        aria-label={`Download ${data.spdx_id} as ${format.name} (${format.ext})`}
-      >
-        <span class="format-name">{format.name}</span>
-        <span class="format-ext">{format.ext}</span>
-      </a>
-    ))}
+    {formats.map((format) => (
+        <a
+          key={format.ext}
+          href={format.path}
+          class="download-card"
+          download
+          aria-label={`Download ${data.spdx_id} as ${format.name} (${format.ext})`}
+        >
+          <span class="format-name">{format.name}</span>
+          <span class="format-ext">{format.ext}</span>
+        </a>
+      ))}
   </div>
   <button
     id="copy-clipboard"

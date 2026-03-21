@@ -1,6 +1,6 @@
-import fs from 'node:fs/promises';
-import path from 'node:path';
-import type { ExportContext } from './index.ts';
+import fs from "node:fs/promises";
+import path from "node:path";
+import type { ExportContext } from "./index.ts";
 
 /**
  * Generates GitHub-flavored and CommonMark markdown exports.
@@ -16,8 +16,9 @@ export async function generateMarkdown(ctx: ExportContext) {
   const slug = metadata.license_family
     ? `${metadata.license_family}/${ctx.licenseId.toLowerCase()}`
     : ctx.licenseId.toLowerCase();
-  const gfmHeader = `<!-- Plain License: ${plainId} ${version} -->\n` +
-                 `<!-- Attribution: https://plainlicense.org/licenses/${slug} -->\n\n`;
+  const gfmHeader =
+    `<!-- Plain License: ${plainId} ${version} -->\n` +
+    `<!-- Attribution: https://plainlicense.org/licenses/${slug} -->\n\n`;
   const gfmContent = gfmHeader + content;
 
   // CommonMark Version (No comments, cleaner)

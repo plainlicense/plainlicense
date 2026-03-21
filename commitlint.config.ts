@@ -1,8 +1,12 @@
-import { RuleConfigSeverity, type Plugin, type UserConfig } from "@commitlint/types";
-import selectiveScope from "commitlint-plugin-selective-scope";
-import { globby } from "globby";
 import * as fs from "node:fs";
 import * as path from "node:path";
+import {
+  type Plugin,
+  RuleConfigSeverity,
+  type UserConfig,
+} from "@commitlint/types";
+import selectiveScope from "commitlint-plugin-selective-scope";
+import { globby } from "globby";
 
 interface SpdxLicense {
   reference: URL;
@@ -28,7 +32,12 @@ type DevTypeT = "fix" | "new" | "refactor" | "chore" | "bot";
 type DevScopeT = "content" | "ui" | "infra" | "deps" | "scripts" | "blog";
 
 const spdxFilename = "licenses.json";
-const spdxJsonPath = path.join("external", "license-list-data", "json", spdxFilename);
+const spdxJsonPath = path.join(
+  "external",
+  "license-list-data",
+  "json",
+  spdxFilename,
+);
 const PLAIN_LICENSE_PATTERN = /^plain-[-.a-z0-9]+$/;
 
 /**
@@ -45,7 +54,10 @@ function readSpdxLicenseList(): string[] {
 }
 
 async function getExistingLicenses(): Promise<(string | undefined)[]> {
-  const possiblePaths = await globby("docs/licenses/*/*", { onlyDirectories: true, unique: true });
+  const possiblePaths = await globby("docs/licenses/*/*", {
+    onlyDirectories: true,
+    unique: true,
+  });
   return possiblePaths.map((path: string) => path.split("/").pop());
 }
 
@@ -54,14 +66,18 @@ const getExistingLicenseScopes = async () => {
   return licenses.map((license) => license?.toLowerCase().trim());
 };
 
-const existingLicenseScopes = Promise.resolve(getExistingLicenseScopes()).then((scopes) => scopes);
+const existingLicenseScopes = Promise.resolve(getExistingLicenseScopes()).then(
+  (scopes) => scopes,
+);
 
 const possibleLicenseScopes = async () => {
   const scopes = [readSpdxLicenseList(), PLAIN_LICENSE_PATTERN];
   const existingScopes = await existingLicenseScopes;
   return scopes.filter((scope) => {
     if (
-      (typeof scope === "string" && scope !== "" && !existingScopes.includes(scope)) ||
+      (typeof scope === "string" &&
+        scope !== "" &&
+        !existingScopes.includes(scope)) ||
       scope instanceof RegExp
     ) {
       return true;
@@ -72,12 +88,19 @@ const possibleLicenseScopes = async () => {
 
 const licenseTypes: LicenseTypeT[] = ["new", "subs", "admin", "bot", "stable"];
 const devTypes: DevTypeT[] = ["fix", "new", "refactor", "chore", "bot"];
-const devScopes: DevScopeT[] = ["content", "ui", "infra", "deps", "scripts", "blog"];
+const devScopes: DevScopeT[] = [
+  "content",
+  "ui",
+  "infra",
+  "deps",
+  "scripts",
+  "blog",
+];
 
 const licenseTypedScopes = licenseTypes.map((type) =>
-  type !== "new" ?
-    { type: existingLicenseScopes.then((scopes) => scopes) }
-  : { type: possibleLicenseScopes },
+  type !== "new"
+    ? { type: existingLicenseScopes.then((scopes) => scopes) }
+    : { type: possibleLicenseScopes },
 );
 const devTypedScopes = devTypes.map(() => ({ type: devScopes }));
 
@@ -93,7 +116,11 @@ const Configuration: UserConfig = {
     "type-empty": [RuleConfigSeverity.Error, "never"],
     "scope-empty": [RuleConfigSeverity.Error, "never"],
     "subject-empty": [RuleConfigSeverity.Error, "never"],
-    "type-enum": [RuleConfigSeverity.Error, "always", [...licenseTypes, ...devTypes]],
+    "type-enum": [
+      RuleConfigSeverity.Error,
+      "always",
+      [...licenseTypes, ...devTypes],
+    ],
     "selective-scope": [RuleConfigSeverity.Error, "always", allTypedScopes],
   },
   helpUrl: "https://plainlicense.org/helping/commit.md",
@@ -113,12 +140,14 @@ const Configuration: UserConfig = {
             emoji: "✨",
           },
           subs: {
-            description: "LICENSE ONLY: A substantive edit to an existing license",
+            description:
+              "LICENSE ONLY: A substantive edit to an existing license",
             title: "Substantive Edit (Licenses)",
             emoji: "📝",
           },
           admin: {
-            description: "LICENSE ONLY: An administrative/minor edit to a license",
+            description:
+              "LICENSE ONLY: An administrative/minor edit to a license",
             title: "Administrative Edit (Licenses)",
             emoji: "🔧",
           },
@@ -145,7 +174,8 @@ const Configuration: UserConfig = {
             emoji: "🤖",
           },
           stable: {
-            description: "A stable release of the site or a license. Both are extremely rare. 🦄🦄",
+            description:
+              "A stable release of the site or a license. Both are extremely rare. 🦄🦄",
             title: "Stable/Major Release",
             emoji: "🚀",
           },
@@ -158,7 +188,8 @@ const Configuration: UserConfig = {
                 For everything else, use one of the following scopes: ${devScopes.join(", ")}.`,
       },
       subject: {
-        description: "(required) Write a short lower-case description of the change:",
+        description:
+          "(required) Write a short lower-case description of the change:",
       },
       body: {
         description:

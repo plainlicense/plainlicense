@@ -3,7 +3,7 @@
  * Zone 6: Standard protections (warranty disclaimer + liability)
  * Collapsed by default. Content is identical across all licenses in a family.
  */
-import { marked } from 'marked';
+import { marked } from "marked";
 
 interface Props {
   protections: string;
@@ -26,80 +26,80 @@ const protectionsHtml = await marked.parse(protections);
 </details>
 
 <style>
-  .zone-protections {
-    background: var(--sl-color-gray-6);
-    border: 1px solid var(--sl-color-gray-5);
-    border-radius: 8px;
-    margin-bottom: 1rem;
-    overflow: hidden;
-  }
+.zone-protections {
+  background: var(--sl-color-gray-6);
+  border: 1px solid var(--sl-color-gray-5);
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  overflow: hidden;
+}
 
-  .protections-summary {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.9rem 1.25rem;
-    cursor: pointer;
-    list-style: none;
-    user-select: none;
-    color: var(--sl-color-gray-1);
-    font-weight: 600;
-    font-size: var(--sl-text-sm);
-  }
+.protections-summary {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.9rem 1.25rem;
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+  color: var(--sl-color-gray-1);
+  font-weight: 600;
+  font-size: var(--sl-text-sm);
+}
 
-  .protections-summary::-webkit-details-marker {
-    display: none;
-  }
+.protections-summary::-webkit-details-marker {
+  display: none;
+}
 
-  .protections-summary:hover {
-    background: var(--sl-color-gray-5);
-  }
+.protections-summary:hover {
+  background: var(--sl-color-gray-5);
+}
 
-  .summary-icon {
-    font-size: 1rem;
-  }
+.summary-icon {
+  font-size: 1rem;
+}
 
-  .summary-heading {
-    font-weight: 700;
-  }
+.summary-heading {
+  font-weight: 700;
+}
 
-  .summary-note {
-    font-size: var(--sl-text-xs);
-    color: var(--sl-color-gray-3);
-    font-weight: normal;
-  }
+.summary-note {
+  font-size: var(--sl-text-xs);
+  color: var(--sl-color-gray-3);
+  font-weight: normal;
+}
 
-  .summary-arrow {
-    margin-left: auto;
-    font-size: 0.8rem;
-    color: var(--sl-color-gray-3);
-    transition: transform 0.2s;
-  }
+.summary-arrow {
+  margin-left: auto;
+  font-size: 0.8rem;
+  color: var(--sl-color-gray-3);
+  transition: transform 0.2s;
+}
 
-  details[open] .summary-arrow {
-    transform: rotate(180deg);
-  }
+details[open] .summary-arrow {
+  transform: rotate(180deg);
+}
 
-  .protections-body {
-    padding: 0 1.25rem 1.25rem;
-    border-top: 1px solid var(--sl-color-gray-5);
-  }
+.protections-body {
+  padding: 0 1.25rem 1.25rem;
+  border-top: 1px solid var(--sl-color-gray-5);
+}
 
-  .protections-content {
-    margin-top: 1rem;
-    font-size: var(--sl-text-sm);
-    color: var(--sl-color-gray-2);
-    line-height: 1.6;
-  }
+.protections-content {
+  margin-top: 1rem;
+  font-size: var(--sl-text-sm);
+  color: var(--sl-color-gray-2);
+  line-height: 1.6;
+}
 
-  .protections-content :global(h3) {
-    font-size: var(--sl-text-base);
-    color: var(--sl-color-gray-1);
-    margin-top: 1rem;
-    margin-bottom: 0.35rem;
-  }
+.protections-content :global(h3) {
+  font-size: var(--sl-text-base);
+  color: var(--sl-color-gray-1);
+  margin-top: 1rem;
+  margin-bottom: 0.35rem;
+}
 
-  .protections-content :global(p) {
-    margin: 0 0 0.5rem 0;
-  }
+.protections-content :global(p) {
+  margin: 0 0 0.5rem 0;
+}
 </style>

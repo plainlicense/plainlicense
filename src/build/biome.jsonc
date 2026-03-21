@@ -1,4 +1,5 @@
 {
+  "root": false,
   "$schema": "https://biomejs.dev/schemas/2.4.6/schema.json",
   // since we extend the base, we are only defining differences
   "extends": ["../../biome.jsonc"],
@@ -11,8 +12,11 @@
       "correctness": {
         "noNodejsModules": "off"
       },
-      "style": {
-      }
+      "suspicious": {
+        // it's a build script, so we need to allow any types
+        "noExplicitAny": "off"
+      },
+      "style": {}
     }
   }
 }

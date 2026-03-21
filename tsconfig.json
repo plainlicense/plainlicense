@@ -19,11 +19,17 @@
     "noImplicitThis": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "outDir": "docs/assets/",
+    "outDir": "./dist",
     "paths": {
       "~assets/*": ["./src/assets/*"],
-      "~spdx/*": ["./external/license-list-data/json/*", "./external/license-list-XML/src/*"],
-      "~cal/*": ["./external/choosealicense.com/_data/*", "./external/choosealicense.com/_licenses/*"],
+      "~spdx/*": [
+        "./external/license-list-data/json/*",
+        "./external/license-list-XML/src/*"
+      ],
+      "~cal/*": [
+        "./external/choosealicense.com/_data/*",
+        "./external/choosealicense.com/_licenses/*"
+      ]
     },
     "removeComments": true,
     "skipLibCheck": true,
@@ -50,7 +56,7 @@
     "src/**/*.ts",
     "src/**/*.d.ts",
     "src/**/*.tsx",
-    "src/**/*.astro",
+    "src/**/*.astro"
   ],
   "references": [
     {

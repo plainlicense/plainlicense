@@ -1,0 +1,12 @@
+/admin/*
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()
+  Content-Security-Policy: 'self';
+  font-src 'self';
+  img-src 'self';
+  media-src 'self';
+  frame-src 'self';
+  script-src 'self';
+  connect-src 'self' https://github.com https://gitlab.com https://*.plainlicense.org https://plainlicense.org https://*.cloudflare.com;

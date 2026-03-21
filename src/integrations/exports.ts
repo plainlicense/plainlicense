@@ -10,12 +10,28 @@ import {
 import { getFileAtCommit, getTaggedVersions } from "../utils/git-versions.ts";
 import { derivePlainId } from "../utils/plain-id.ts";
 
+interface LicenseFrontmatter {
+  plain_name?: string;
+  spdx_id?: string;
+  plain_version?: string;
+  plain_id?: string;
+  license_family?: string;
+  status?: string;
+  slug?: string;
+  is_dedication?: boolean;
+  original?: {
+    name?: string;
+    version_display?: string;
+  };
+  [key: string]: unknown;
+}
+
 /**
  * Resolves {{var:...}} placeholders in content using license frontmatter.
  */
 function resolveTemplateVars(
   content: string,
-  data: Record<string, any>,
+  data: LicenseFrontmatter,
 ): string {
   const vars: Record<string, string> = {
     plain_name: data.plain_name || "",
@@ -65,7 +81,7 @@ async function createLatestAliases(
  */
 async function generateHistoricalExports(
   licensePath: string,
-  data: Record<string, any>,
+  data: LicenseFrontmatter,
   templateBlocks: Record<string, string>,
   orchestrator: ExportOrchestrator,
   outDir: string,

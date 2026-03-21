@@ -1,4 +1,4 @@
-import { z } from 'astro:content'
+import { z } from "astro:content";
 
 // ---------------------------------------------------------------------------
 // Primitives
@@ -41,11 +41,15 @@ type AltParagraphNode =
   | { type: "titleText"; content: AltParagraphNode[] }
   | { type: "copyrightText"; content: AltParagraphNode[] }
   | { type: "optional"; spacing?: string; content: AltParagraphNode[] }
-  | { type: "alt"; name: string; match: string; spacing?: string; content: AltParagraphNode[] };
+  | {
+      type: "alt";
+      name: string;
+      match: string;
+      spacing?: string;
+      content: AltParagraphNode[];
+    };
 
-type AltTextNode =
-  | AltParagraphNode
-  | { type: "list"; items: AltTextNode[][] };
+type AltTextNode = AltParagraphNode | { type: "list"; items: AltTextNode[][] };
 
 type AltSLHTextNode =
   | { type: "text"; value: string }
@@ -55,7 +59,13 @@ type AltSLHTextNode =
   | { type: "titleText"; content: AltParagraphNode[] }
   | { type: "copyrightText"; content: AltParagraphNode[] }
   | { type: "optional"; spacing?: string; content: AltSLHTextNode[] }
-  | { type: "alt"; name: string; match: string; spacing?: string; content: AltSLHTextNode[] }
+  | {
+      type: "alt";
+      name: string;
+      match: string;
+      spacing?: string;
+      content: AltSLHTextNode[];
+    }
   | { type: "list"; items: AltSLHTextNode[][] }
   | { type: "standardLicenseHeader"; content: AltSLHTextNode[] };
 
@@ -64,12 +74,21 @@ type AltSLHTextNode =
 const FixedParagraphNodeSchema: z.ZodType<FixedParagraphNode> = z.lazy(() =>
   z.discriminatedUnion("type", [
     z.object({ type: z.literal("text"), value: z.string() }),
-    z.object({ type: z.literal("p"), content: z.array(FixedParagraphNodeSchema) }),
+    z.object({
+      type: z.literal("p"),
+      content: z.array(FixedParagraphNodeSchema),
+    }),
     z.object({ type: z.literal("bullet"), value: z.string() }),
     z.object({ type: z.literal("br") }),
-    z.object({ type: z.literal("titleText"), content: z.array(FixedParagraphNodeSchema) }),
-    z.object({ type: z.literal("copyrightText"), content: z.array(FixedParagraphNodeSchema) }),
-  ])
+    z.object({
+      type: z.literal("titleText"),
+      content: z.array(FixedParagraphNodeSchema),
+    }),
+    z.object({
+      type: z.literal("copyrightText"),
+      content: z.array(FixedParagraphNodeSchema),
+    }),
+  ]),
 );
 
 // --- Fixed text (allows lists, no alt/optional) ---------------------------
@@ -81,13 +100,25 @@ type FixedTextNode =
 const FixedTextNodeSchema: z.ZodType<FixedTextNode> = z.lazy(() =>
   z.discriminatedUnion("type", [
     z.object({ type: z.literal("text"), value: z.string() }),
-    z.object({ type: z.literal("p"), content: z.array(FixedParagraphNodeSchema) }),
+    z.object({
+      type: z.literal("p"),
+      content: z.array(FixedParagraphNodeSchema),
+    }),
     z.object({ type: z.literal("bullet"), value: z.string() }),
     z.object({ type: z.literal("br") }),
-    z.object({ type: z.literal("titleText"), content: z.array(FixedParagraphNodeSchema) }),
-    z.object({ type: z.literal("copyrightText"), content: z.array(FixedParagraphNodeSchema) }),
-    z.object({ type: z.literal("list"), items: z.array(z.array(FixedTextNodeSchema)) }),
-  ])
+    z.object({
+      type: z.literal("titleText"),
+      content: z.array(FixedParagraphNodeSchema),
+    }),
+    z.object({
+      type: z.literal("copyrightText"),
+      content: z.array(FixedParagraphNodeSchema),
+    }),
+    z.object({
+      type: z.literal("list"),
+      items: z.array(z.array(FixedTextNodeSchema)),
+    }),
+  ]),
 );
 
 // --- Alt paragraph (alt/optional allowed, no lists) ----------------------
@@ -95,11 +126,20 @@ const FixedTextNodeSchema: z.ZodType<FixedTextNode> = z.lazy(() =>
 const AltParagraphNodeSchema: z.ZodType<AltParagraphNode> = z.lazy(() =>
   z.discriminatedUnion("type", [
     z.object({ type: z.literal("text"), value: z.string() }),
-    z.object({ type: z.literal("p"), content: z.array(AltParagraphNodeSchema) }),
+    z.object({
+      type: z.literal("p"),
+      content: z.array(AltParagraphNodeSchema),
+    }),
     z.object({ type: z.literal("bullet"), value: z.string() }),
     z.object({ type: z.literal("br") }),
-    z.object({ type: z.literal("titleText"), content: z.array(AltParagraphNodeSchema) }),
-    z.object({ type: z.literal("copyrightText"), content: z.array(AltParagraphNodeSchema) }),
+    z.object({
+      type: z.literal("titleText"),
+      content: z.array(AltParagraphNodeSchema),
+    }),
+    z.object({
+      type: z.literal("copyrightText"),
+      content: z.array(AltParagraphNodeSchema),
+    }),
     z.object({
       type: z.literal("optional"),
       spacing: SpacingSchema.optional(),
@@ -112,7 +152,7 @@ const AltParagraphNodeSchema: z.ZodType<AltParagraphNode> = z.lazy(() =>
       spacing: SpacingSchema.optional(),
       content: z.array(AltParagraphNodeSchema),
     }),
-  ])
+  ]),
 );
 
 // --- Alt text (alt/optional + lists — most permissive non-SLH) -----------
@@ -120,11 +160,20 @@ const AltParagraphNodeSchema: z.ZodType<AltParagraphNode> = z.lazy(() =>
 const AltTextNodeSchema: z.ZodType<AltTextNode> = z.lazy(() =>
   z.discriminatedUnion("type", [
     z.object({ type: z.literal("text"), value: z.string() }),
-    z.object({ type: z.literal("p"), content: z.array(AltParagraphNodeSchema) }),
+    z.object({
+      type: z.literal("p"),
+      content: z.array(AltParagraphNodeSchema),
+    }),
     z.object({ type: z.literal("bullet"), value: z.string() }),
     z.object({ type: z.literal("br") }),
-    z.object({ type: z.literal("titleText"), content: z.array(AltParagraphNodeSchema) }),
-    z.object({ type: z.literal("copyrightText"), content: z.array(AltParagraphNodeSchema) }),
+    z.object({
+      type: z.literal("titleText"),
+      content: z.array(AltParagraphNodeSchema),
+    }),
+    z.object({
+      type: z.literal("copyrightText"),
+      content: z.array(AltParagraphNodeSchema),
+    }),
     z.object({
       type: z.literal("optional"),
       spacing: SpacingSchema.optional(),
@@ -137,8 +186,11 @@ const AltTextNodeSchema: z.ZodType<AltTextNode> = z.lazy(() =>
       spacing: SpacingSchema.optional(),
       content: z.array(AltParagraphNodeSchema),
     }),
-    z.object({ type: z.literal("list"), items: z.array(z.array(AltTextNodeSchema)) }),
-  ])
+    z.object({
+      type: z.literal("list"),
+      items: z.array(z.array(AltTextNodeSchema)),
+    }),
+  ]),
 );
 
 // --- Alt SLH text (same as AltText + standardLicenseHeader) --------------
@@ -147,11 +199,20 @@ const AltTextNodeSchema: z.ZodType<AltTextNode> = z.lazy(() =>
 const AltSLHTextNodeSchema: z.ZodType<AltSLHTextNode> = z.lazy(() =>
   z.discriminatedUnion("type", [
     z.object({ type: z.literal("text"), value: z.string() }),
-    z.object({ type: z.literal("p"), content: z.array(AltParagraphNodeSchema) }),
+    z.object({
+      type: z.literal("p"),
+      content: z.array(AltParagraphNodeSchema),
+    }),
     z.object({ type: z.literal("bullet"), value: z.string() }),
     z.object({ type: z.literal("br") }),
-    z.object({ type: z.literal("titleText"), content: z.array(AltParagraphNodeSchema) }),
-    z.object({ type: z.literal("copyrightText"), content: z.array(AltParagraphNodeSchema) }),
+    z.object({
+      type: z.literal("titleText"),
+      content: z.array(AltParagraphNodeSchema),
+    }),
+    z.object({
+      type: z.literal("copyrightText"),
+      content: z.array(AltParagraphNodeSchema),
+    }),
     z.object({
       type: z.literal("optional"),
       spacing: SpacingSchema.optional(),
@@ -164,12 +225,15 @@ const AltSLHTextNodeSchema: z.ZodType<AltSLHTextNode> = z.lazy(() =>
       spacing: SpacingSchema.optional(),
       content: z.array(AltParagraphNodeSchema),
     }),
-    z.object({ type: z.literal("list"), items: z.array(z.array(AltSLHTextNodeSchema)) }),
+    z.object({
+      type: z.literal("list"),
+      items: z.array(z.array(AltSLHTextNodeSchema)),
+    }),
     z.object({
       type: z.literal("standardLicenseHeader"),
       content: z.array(AltSLHTextNodeSchema),
     }),
-  ])
+  ]),
 );
 
 // ---------------------------------------------------------------------------
@@ -313,7 +377,7 @@ export const SPDXLicenseCollectionSchema = z.object({
       z.discriminatedUnion("kind", [
         z.object({ kind: z.literal("license"), license: LicenseSchema }),
         z.object({ kind: z.literal("exception"), exception: ExceptionSchema }),
-      ])
+      ]),
     )
     .min(1),
 });
@@ -325,6 +389,9 @@ export type SPDXLicenseCollection = z.infer<typeof SPDXLicenseCollectionSchema>;
 // ---------------------------------------------------------------------------
 
 export type {
-    AltParagraphNode, AltSLHTextNode, AltTextNode, FixedParagraphNode,
-    FixedTextNode
-}
+  AltParagraphNode,
+  AltSLHTextNode,
+  AltTextNode,
+  FixedParagraphNode,
+  FixedTextNode,
+};

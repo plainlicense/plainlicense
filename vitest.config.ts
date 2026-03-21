@@ -1,15 +1,15 @@
-import { defineConfig } from 'vitest/config';
-import path from 'node:path';
+import path from "node:path";
+import { defineConfig } from "vitest/config";
 
 export default defineConfig({
   test: {
-    environment: 'node',
+    environment: "node",
     globals: true,
-    include: ['tests/**/*.{test,spec}.{ts,tsx}'],
-    exclude: ['tests/e2e/**'],
+    include: ["tests/**/*.{test,spec}.{ts,tsx}"],
+    exclude: ["tests/e2e/**"],
     coverage: {
-      provider: 'v8',
-      reporter: ['text', 'json', 'html'],
+      provider: "v8",
+      reporter: ["text", "json", "html"],
       thresholds: {
         lines: 80,
         functions: 80,
@@ -17,16 +17,16 @@ export default defineConfig({
         statements: 80,
       },
       exclude: [
-        'node_modules/**',
-        'dist/**',
-        '**/*.d.ts',
-        'tests/**',
-        'src/content.config.ts',
-        'astro.config.mjs',
+        "node_modules/**",
+        "dist/**",
+        "**/*.d.ts",
+        "tests/**",
+        "src/content.config.ts",
+        "astro.config.mjs",
       ],
     },
     alias: {
-      '~': path.resolve(__dirname, './src'),
+      "~": path.resolve(__dirname, "./src"),
     },
   },
 });

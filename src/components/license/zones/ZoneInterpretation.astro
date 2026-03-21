@@ -23,9 +23,10 @@ const {
   original,
 } = Astro.props as Props;
 
-const licenseKind = is_dedication ? 'dedication' : 'license';
-const originalVersionDisplay = original?.version_display ?? original?.name ?? 'the original license';
-const originalName = original?.name ?? 'the original';
+const licenseKind = is_dedication ? "dedication" : "license";
+const originalVersionDisplay =
+  original?.version_display ?? original?.name ?? "the original license";
+const originalName = original?.name ?? "the original";
 const canonicalUrl = original?.canonical_url;
 const isOriginal = !original; // PlainLicense original (no original object)
 ---
@@ -82,85 +83,85 @@ const isOriginal = !original; // PlainLicense original (no original object)
 </details>
 
 <style>
-  .zone-interpretation {
-    background: var(--sl-color-gray-6);
-    border: 1px solid var(--sl-color-gray-5);
-    border-radius: 8px;
-    margin-bottom: 1rem;
-    overflow: hidden;
-  }
+.zone-interpretation {
+  background: var(--sl-color-gray-6);
+  border: 1px solid var(--sl-color-gray-5);
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  overflow: hidden;
+}
 
-  .interpretation-summary {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.9rem 1.25rem;
-    cursor: pointer;
-    list-style: none;
-    user-select: none;
-    color: var(--sl-color-gray-1);
-    font-weight: 600;
-    font-size: var(--sl-text-sm);
-  }
+.interpretation-summary {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.9rem 1.25rem;
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+  color: var(--sl-color-gray-1);
+  font-weight: 600;
+  font-size: var(--sl-text-sm);
+}
 
-  .interpretation-summary::-webkit-details-marker {
-    display: none;
-  }
+.interpretation-summary::-webkit-details-marker {
+  display: none;
+}
 
-  .interpretation-summary:hover {
-    background: var(--sl-color-gray-5);
-  }
+.interpretation-summary:hover {
+  background: var(--sl-color-gray-5);
+}
 
-  .summary-icon {
-    font-size: 1rem;
-  }
+.summary-icon {
+  font-size: 1rem;
+}
 
-  .summary-heading {
-    flex: 1;
-    font-weight: 700;
-  }
+.summary-heading {
+  flex: 1;
+  font-weight: 700;
+}
 
-  .summary-arrow {
-    font-size: 0.8rem;
-    color: var(--sl-color-gray-3);
-    transition: transform 0.2s;
-  }
+.summary-arrow {
+  font-size: 0.8rem;
+  color: var(--sl-color-gray-3);
+  transition: transform 0.2s;
+}
 
-  details[open] .summary-arrow {
-    transform: rotate(180deg);
-  }
+details[open] .summary-arrow {
+  transform: rotate(180deg);
+}
 
-  .interpretation-body {
-    padding: 0 1.25rem 1.25rem;
-    border-top: 1px solid var(--sl-color-gray-5);
-  }
+.interpretation-body {
+  padding: 0 1.25rem 1.25rem;
+  border-top: 1px solid var(--sl-color-gray-5);
+}
 
-  .interpretation-content {
-    margin-top: 1rem;
-    font-size: var(--sl-text-sm);
-    color: var(--sl-color-gray-2);
-    line-height: 1.6;
-  }
+.interpretation-content {
+  margin-top: 1rem;
+  font-size: var(--sl-text-sm);
+  color: var(--sl-color-gray-2);
+  line-height: 1.6;
+}
 
-  .interpretation-content p {
-    margin: 0 0 0.75rem 0;
-  }
+.interpretation-content p {
+  margin: 0 0 0.75rem 0;
+}
 
-  .interpretation-content p:last-child {
-    margin-bottom: 0;
-  }
+.interpretation-content p:last-child {
+  margin-bottom: 0;
+}
 
-  .interpretation-content a {
-    color: var(--sl-color-accent);
-    text-underline-offset: 3px;
-  }
+.interpretation-content a {
+  color: var(--sl-color-accent);
+  text-underline-offset: 3px;
+}
 
-  .interpretation-content strong {
-    color: var(--sl-color-gray-1);
-  }
+.interpretation-content strong {
+  color: var(--sl-color-gray-1);
+}
 
-  .repo-link-text {
-    font-size: var(--sl-text-xs);
-    color: var(--sl-color-gray-3);
-  }
+.repo-link-text {
+  font-size: var(--sl-text-xs);
+  color: var(--sl-color-gray-3);
+}
 </style>

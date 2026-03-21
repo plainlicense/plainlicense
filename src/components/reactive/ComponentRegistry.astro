@@ -1,13 +1,13 @@
 ---
-import FAQ from './FAQ.astro';
-import ComparisonTable from './ComparisonTable.astro';
-import DecisionTree from './DecisionTree.tsx';
+import ComparisonTable from "./ComparisonTable.astro";
+import DecisionTree from "./DecisionTree.tsx";
+import FAQ from "./FAQ.astro";
 
 interface Props {
   type: string;
   id?: string;
-  props?: Record<string, any>;
-  licenseData?: any;
+  props?: Record<string, unknown>;
+  licenseData?: unknown;
 }
 
 const { type, id, props = {}, licenseData } = Astro.props;
@@ -16,17 +16,20 @@ const { type, id, props = {}, licenseData } = Astro.props;
 const processedProps = { ...props };
 
 // Data flow enhancement: if props are missing data, try to pull from license frontmatter
-if (type === 'faq' && !processedProps.items && licenseData?.faq) {
-  processedProps.items = licenseData.faq[id || 'default'];
-} else if (type === 'table' && !processedProps.data && licenseData?.tables) {
-  processedProps.data = licenseData.tables[id || 'default'];
-} else if (type === 'tree' && !processedProps.steps && licenseData?.trees) {
-  processedProps.steps = licenseData.trees[id || 'default'];
+if (type === "faq" && !processedProps.items && licenseData?.faq) {
+  processedProps.items = licenseData.faq[id || "default"];
+} else if (type === "table" && !processedProps.data && licenseData?.tables) {
+  processedProps.data = licenseData.tables[id || "default"];
+} else if (type === "tree" && !processedProps.steps && licenseData?.trees) {
+  processedProps.steps = licenseData.trees[id || "default"];
 }
 
 for (const key in processedProps) {
   const val = processedProps[key];
-  if (typeof val === 'string' && (val.trim().startsWith('[') || val.trim().startsWith('{'))) {
+  if (
+    typeof val === "string" &&
+    (val.trim().startsWith("[") || val.trim().startsWith("{"))
+  ) {
     try {
       processedProps[key] = JSON.parse(val);
     } catch (e) {

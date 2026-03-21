@@ -1,6 +1,6 @@
-import fs from 'node:fs/promises';
-import path from 'node:path';
-import type { ExportContext } from './index.ts';
+import fs from "node:fs/promises";
+import path from "node:path";
+import type { ExportContext } from "./index.ts";
 
 /**
  * Generates plaintext exports.
@@ -13,18 +13,19 @@ export async function generatePlaintext(ctx: ExportContext) {
 
   // Simple markdown to text conversion
   // Remove bold/italic, convert headers to uppercase, etc.
-  let text = content
-    .replace(/^#+ (.*)$/gm, (match, p1) => p1.toUpperCase())
-    .replace(/\*\*(.*?)\*\*/g, '$1')
-    .replace(/\*(.*?)\*/g, '$1')
-    .replace(/\[(.*?)\]\(.*?\)/g, '$1');
+  const text = content
+    .replace(/^#+ (.*)$/gm, (_match, p1) => p1.toUpperCase())
+    .replace(/\*\*(.*?)\*\*/g, "$1")
+    .replace(/\*(.*?)\*/g, "$1")
+    .replace(/\[(.*?)\]\(.*?\)/g, "$1");
 
   const slug = metadata.license_family
     ? `${metadata.license_family}/${ctx.licenseId.toLowerCase()}`
     : ctx.licenseId.toLowerCase();
-  const header = `Plain License: ${plainId} ${version}\n` +
-                 `Attribution: https://plainlicense.org/licenses/${slug}\n\n` +
-                 `========================================\n\n`;
+  const header =
+    `Plain License: ${plainId} ${version}\n` +
+    `Attribution: https://plainlicense.org/licenses/${slug}\n\n` +
+    `========================================\n\n`;
 
   const fullContent = header + text;
 

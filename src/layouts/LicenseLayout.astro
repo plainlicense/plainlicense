@@ -1,9 +1,9 @@
 ---
-import BaseLayout from './BaseLayout.astro';
-import type { CollectionEntry } from 'astro:content';
+import type { CollectionEntry } from "astro:content";
+import BaseLayout from "./BaseLayout.astro";
 
 interface Props {
-  license: CollectionEntry<'licenses'>;
+  license: CollectionEntry<"licenses">;
 }
 
 const { license } = Astro.props;
@@ -18,7 +18,10 @@ try {
 } catch (e) {}
 ---
 
-<BaseLayout title={data.plain_name || data.spdx_id} description={data.description}>
+<BaseLayout
+  title={data.plain_name || data.spdx_id}
+  description={data.description}
+>
   <main class="license-page" data-spdx-id={data.spdx_id}>
     <header>
       <h1>{data.plain_name}</h1>
@@ -34,9 +37,7 @@ try {
     </section>
 
     <div class="content-wrapper">
-      <article class="prose">
-        <slot />
-      </article>
+      <article class="prose"><slot /></article>
 
       <aside class="sidebar">
         {data.original?.permissions && (
@@ -63,72 +64,72 @@ try {
 </BaseLayout>
 
 <script>
-  import { initMappingViewer } from '../components/MappingViewer';
-  
-  async function loadMappings() {
-    const main = document.querySelector('.license-page');
-    const spdxId = main?.getAttribute('data-spdx-id');
-    
-    if (spdxId) {
-      try {
-        // In prototype, we try to fetch the local JSON
-        const response = await fetch(`/mappings/${spdxId}-mapping.json`);
-        if (response.ok) {
-          const mappingData = await response.json();
-          initMappingViewer(main as HTMLElement, mappingData);
-        }
-      } catch (e) {
-        console.warn('Mapping data not found for:', spdxId);
+import { initMappingViewer } from "../components/MappingViewer";
+
+async function loadMappings() {
+  const main = document.querySelector(".license-page");
+  const spdxId = main?.getAttribute("data-spdx-id");
+
+  if (spdxId) {
+    try {
+      // In prototype, we try to fetch the local JSON
+      const response = await fetch(`/mappings/${spdxId}-mapping.json`);
+      if (response.ok) {
+        const mappingData = await response.json();
+        initMappingViewer(main as HTMLElement, mappingData);
       }
+    } catch (e) {
+      console.warn("Mapping data not found for:", spdxId);
     }
   }
+}
 
-  loadMappings();
+loadMappings();
 </script>
 
 <style>
-  .license-page {
-    max-width: 1000px;
-    margin: 0 auto;
-    padding: 2rem;
-  }
-  header {
-    margin-bottom: 2rem;
-    border-bottom: 1px solid #333;
-    padding-bottom: 1rem;
-  }
-  .plain-name {
-    font-size: 1.5rem;
-    color: #aaa;
-  }
-  .metadata {
-    display: flex;
-    gap: 1rem;
-    font-size: 0.9rem;
-    color: #888;
-  }
-  .content-wrapper {
-    display: grid;
-    grid-template-columns: 1fr 250px;
-    gap: 3rem;
-  }
-  .prose {
-    line-height: 1.6;
-  }
-  aside section {
-    margin-bottom: 1.5rem;
-  }
-  h3 {
-    font-size: 1.1rem;
-    margin-bottom: 0.5rem;
-    color: #888;
-  }
-  ul {
-    list-style: none;
-    padding: 0;
-  }
-  li {
-    font-size: 0.9rem;
-    margin-bottom: 0.3rem;
-  }
+.license-page {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+header {
+  margin-bottom: 2rem;
+  border-bottom: 1px solid #333;
+  padding-bottom: 1rem;
+}
+.plain-name {
+  font-size: 1.5rem;
+  color: #aaa;
+}
+.metadata {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.9rem;
+  color: #888;
+}
+.content-wrapper {
+  display: grid;
+  grid-template-columns: 1fr 250px;
+  gap: 3rem;
+}
+.prose {
+  line-height: 1.6;
+}
+aside section {
+  margin-bottom: 1.5rem;
+}
+h3 {
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+  color: #888;
+}
+ul {
+  list-style: none;
+  padding: 0;
+}
+li {
+  font-size: 0.9rem;
+  margin-bottom: 0.3rem;
+}
 </style>

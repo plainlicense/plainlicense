@@ -3,13 +3,13 @@
  * Coordinates markdown, plaintext, PDF, SPDX XML, and embed HTML generation.
  */
 
-import { generateMarkdown } from './markdown.ts';
-import { generatePlaintext } from './plaintext.ts';
-import { generatePDF } from './pdf.ts';
-import { parseComponentPlaceholders } from '../../utils/component-parser.ts';
-import { sha256 } from '../../utils/hash.ts';
-import fs from 'node:fs/promises';
-import path from 'node:path';
+import fs from "node:fs/promises";
+import path from "node:path";
+import { parseComponentPlaceholders } from "../../utils/component-parser";
+import { sha256 } from "../../utils/hash";
+import { generateMarkdown } from "./markdown";
+import { generatePDF } from "./pdf";
+import { generatePlaintext } from "./plaintext";
 
 export interface ExportContext {
   licenseId: string;
@@ -20,23 +20,28 @@ export interface ExportContext {
   outputDir: string;
 }
 
-export type ExportFormat = 'markdown' | 'plaintext' | 'pdf' | 'spdx' | 'embed';
+export type ExportFormat = "markdown" | "plaintext" | "pdf" | "spdx" | "embed";
 
 export class ExportOrchestrator {
-  private formats: ExportFormat[] = ['markdown', 'plaintext', 'pdf', 'spdx', 'embed'];
-  private manifestPath: string = '';
+  private manifestPath: string = "";
 
   async generateAll(ctx: ExportContext) {
     const licenseId = ctx.licenseId.trim();
     const version = ctx.version.trim();
     const { content, outputDir } = ctx;
-    
+
     // Manifest location
-    const exportsIdx = outputDir.lastIndexOf('exports');
+    const exportsIdx = outputDir.lastIndexOf("exports");
     if (exportsIdx !== -1) {
-      this.manifestPath = path.join(outputDir.substring(0, exportsIdx + 7), 'build-manifest.json');
+      this.manifestPath = path.join(
+        outputDir.substring(0, exportsIdx + 7),
+        "build-manifest.json",
+      );
     } else {
-      this.manifestPath = path.join(path.dirname(outputDir), 'build-manifest.json');
+      this.manifestPath = path.join(
+        path.dirname(outputDir),
+        "build-manifest.json",
+      );
     }
 
     const contentHash = await sha256(content);
@@ -47,10 +52,16 @@ export class ExportOrchestrator {
     }
 
     console.log(`Generating exports for ${licenseId}@${version}...`);
-    
+
     // Process reactive components for static formats
     const staticContent = this.processReactiveComponents(content);
-    const staticCtx = { ...ctx, content: staticContent, licenseId, version, plainId: ctx.plainId };
+    const staticCtx = {
+      ...ctx,
+      content: staticContent,
+      licenseId,
+      version,
+      plainId: ctx.plainId,
+    };
 
     // In parallel for performance
     const [markdown, plaintext, pdf, spdx, embed] = await Promise.allSettled([
@@ -58,26 +69,33 @@ export class ExportOrchestrator {
       generatePlaintext(staticCtx),
       generatePDF(staticCtx),
       this.generateSPDX(staticCtx),
-      this.generateEmbed(staticCtx)
+      this.generateEmbed(staticCtx),
     ]);
 
     const allResults = { markdown, plaintext, pdf, spdx, embed };
-    const failures = Object.entries(allResults).filter(([, r]) => r.status === 'rejected');
+    const failures = Object.entries(allResults).filter(
+      ([, r]) => r.status === "rejected",
+    );
     if (failures.length > 0) {
       console.error(`Some exports failed for ${licenseId}:`, failures);
     }
     // Update manifest as long as the core text formats succeeded.
     // PDF is considered optional (requires Typst to be installed).
-    const coreSucceeded = [markdown, plaintext, spdx, embed]
-      .every(r => r.status === 'fulfilled');
+    const coreSucceeded = [markdown, plaintext, spdx, embed].every(
+      (r) => r.status === "fulfilled",
+    );
     if (coreSucceeded) {
       await this.updateManifest(licenseId, version, contentHash);
     }
   }
 
-  private async isUnchanged(id: string, version: string, hash: string): Promise<boolean> {
+  private async isUnchanged(
+    id: string,
+    version: string,
+    hash: string,
+  ): Promise<boolean> {
     try {
-      const manifest = JSON.parse(await fs.readFile(this.manifestPath, 'utf8'));
+      const manifest = JSON.parse(await fs.readFile(this.manifestPath, "utf8"));
       return manifest[id]?.version === version && manifest[id]?.hash === hash;
     } catch {
       return false;
@@ -87,7 +105,7 @@ export class ExportOrchestrator {
   private async updateManifest(id: string, version: string, hash: string) {
     let manifest: any = {};
     try {
-      manifest = JSON.parse(await fs.readFile(this.manifestPath, 'utf8'));
+      manifest = JSON.parse(await fs.readFile(this.manifestPath, "utf8"));
     } catch {}
 
     manifest[id] = { version, hash, lastBuilt: new Date().toISOString() };
@@ -100,20 +118,28 @@ export class ExportOrchestrator {
     let result = content;
 
     for (const p of placeholders) {
-      let staticVersion = '';
-      if (p.type === 'faq') {
+      let staticVersion = "";
+      if (p.type === "faq") {
         const items = p.props.items ? this.safeParseJSON(p.props.items) : [];
         if (Array.isArray(items) && items.length > 0) {
-          staticVersion = '\n\n### FAQ\n\n' + items.map((i: any) => `**Q: ${i.question || i.q}**\n${i.answer || i.a}`).join('\n\n') + '\n';
+          staticVersion =
+            "\n\n### FAQ\n\n" +
+            items
+              .map(
+                (i: any) => `**Q: ${i.question || i.q}**\n${i.answer || i.a}`,
+              )
+              .join("\n\n") +
+            "\n";
         } else {
           // Try to get FAQ items from license ID or title if available
-          staticVersion = '\n\n### FAQ\n(See interactive version on website for full details)\n';
+          staticVersion =
+            "\n\n### FAQ\n(See interactive version on website for full details)\n";
         }
-      } else if (p.type === 'table') {
-        const title = p.props.title || 'Comparison Table';
+      } else if (p.type === "table") {
+        const title = p.props.title || "Comparison Table";
         staticVersion = `\n\n### ${title}\n(Detailed comparison table available on the interactive website version)\n`;
-      } else if (p.type === 'tree') {
-        const title = p.props.title || 'Decision Tree';
+      } else if (p.type === "tree") {
+        const title = p.props.title || "Decision Tree";
         staticVersion = `\n\n### ${title}\n(Interactive decision tool available on the website)\n`;
       }
       result = result.replace(p.raw, staticVersion);
@@ -125,7 +151,7 @@ export class ExportOrchestrator {
   private safeParseJSON(str: string): any {
     try {
       // If it's already an object-like string, try to parse it
-      if (str.startsWith('[') || str.startsWith('{')) {
+      if (str.startsWith("[") || str.startsWith("{")) {
         return JSON.parse(str.replace(/'/g, '"'));
       }
       return str;
