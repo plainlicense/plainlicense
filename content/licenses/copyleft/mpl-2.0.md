@@ -2,31 +2,46 @@
 title: Plain MPL
 plain_name: Plain MPL
 spdx_id: MPL-2.0
-version: 0.1.0
-original_version: '2.0'
+plain_version: 0.1.1
 description: The MPL is a weak copyleft license requiring sharing source materials for its parts. It includes a patent grant and is compatible with GPL/LGPL.
-license_type: copyleft
-is_osi_approved: true
-is_fsf_approved: true
+license_family: copyleft
+is_dedication: false
 status: published
-summary: The MPL is a weak copyleft license requiring sharing source materials for its parts.
-permissions:
-  - commercial-use
-  - modifications
-  - distribution
-  - patent-use
-  - private-use
-conditions:
-  - disclose-source
-  - include-copyright
-  - same-license--file
-limitations:
-  - liability
-  - trademark-use
-  - warranty
-canonical_url: 'https://www.mozilla.org/en-US/MPL/2.0/'
+tldr:
+  - You can use, copy, change, and share this work, including commercially.
+  - You must share source materials for any changes you make under this license.
+  - Keep all copyright notices and include a copy of this license with any copy you share.
+  - There's no warranty. Use at your own risk.
+attribution_required: false
+fair_code: false
 plain_gunning_fog: 12.36
-shame_words_count: 12
+shame_words_count: 0
+original:
+  name: Mozilla Public License 2.0
+  spdx_id: MPL-2.0
+  version: '2.0'
+  version_display: Mozilla Public License 2.0
+  organization: Mozilla Foundation
+  has_official_source: true
+  canonical_url: 'https://www.mozilla.org/en-US/MPL/2.0/'
+  link_in_original: false
+  is_deprecated: false
+  is_osi_approved: true
+  is_fsf_approved: true
+  permissions:
+    - commercial-use
+    - modifications
+    - distribution
+    - patent-use
+    - private-use
+  conditions:
+    - disclose-source
+    - include-copyright
+    - same-license--file
+  limitations:
+    - liability
+    - trademark-use
+    - warranty
 ---
 # Plain MPL
 
@@ -101,7 +116,7 @@ You can still share a version of the work people can’t change or edit (like a 
 - The new license can't stop people from easily getting the source materials of the parts under this license.
 - You must provide a practical way for them to get the source materials.
 
-## We Offer No Warranty and Limit Our Liability
+## We Offer No Warranty and Accept No Blame
 
 Use the work at your own risk.
 
@@ -163,7 +178,7 @@ Include this notice **or** the [Same-License Notice](#same-license-notice--optio
 
 ```markdown
 
-You may use this work under the terms of the [Plain MPL](https://plainlicense.org/{{ plain_url | trim('" ') }}) or the [Mozilla Public License 2.0]({{ original_url | trim('" ') }}). If you didn't get a copy of the Plain MPL with this work, you can find it at: [plainlicense.org](https://plainlicense.org).
+You may use this work under the terms of the [Plain MPL](https://plainlicense.org/licenses/copyleft/mpl-2.0) or the [Mozilla Public License 2.0](https://www.mozilla.org/en-US/MPL/2.0/). If you didn't get a copy of the Plain MPL with this work, you can find it at: [plainlicense.org](https://plainlicense.org).
 
 ```
 
@@ -173,7 +188,7 @@ If you want to share the work under the Plain MPL **and** not allow people to sh
 
 ```markdown
 
-You may use the work under the [Plain MPL](https://plainlicense.org/{{ plain_url | trim('" ') }}), or the [Mozilla Public License 2.0]({{ original_url | trim('" ') }}). You can't change the work's license; the authors require you share the work and any changes you make to it under the Plain MPL or the Mozilla Public License 2.0. If you didn't get a copy of the Plain MPL with this work, you can find it at: [plainlicense.org](https://plainlicense.org).
+You may use the work under the [Plain MPL](https://plainlicense.org/licenses/copyleft/mpl-2.0), or the [Mozilla Public License 2.0](https://www.mozilla.org/en-US/MPL/2.0/). You can't change the work's license; the authors require you share the work and any changes you make to it under the Plain MPL or the Mozilla Public License 2.0. If you didn't get a copy of the Plain MPL with this work, you can find it at: [plainlicense.org](https://plainlicense.org).
 
 ```
 
@@ -193,6 +208,8 @@ You may use the work under the [Plain MPL](https://plainlicense.org/{{ plain_url
 `the work`
 
 :    The materials covered by this license
+
+{{block:interpretation}}
 
 ---
 

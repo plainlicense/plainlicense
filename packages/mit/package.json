@@ -1,20 +1,38 @@
 {
-  "name": "plain-license-mit",
+  "name": "@plainlicense/plain-mit",
+  "displayName": "Plain MIT License",
   "version": "0.2.1",
-  "private": true,
-  "description": "Plain language version of the MIT License",
+  "description": "Plain language adaptation of MIT License",
+  "keywords": [
+    "plainlicense",
+    "plain language",
+    "license",
+    "licensing"
+  ],
+  "homepage": "https://plainlicense.org/mit/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/plainlicense/plainlicense.git",
+    "directory": "packages/mit"
+  },
+  "license": "LicenseRef-PlainUnlicense OR Unlicense",
+  "author": {
+    "name": "Adam Poulemanos",
+    "email": "adam@plainlicense.org",
+    "url": "https://plainlicense.org"
+  },
   "main": "../../content/licenses/permissive/mit.md",
   "scripts": {
-    "release": "semantic-release"
+    "release": "bunx semantic-release"
   },
   "release": {
     "branches": [
       "+([0-9])?(.{+([0-9]),x}).x",
       "main",
       {
+        "channel": "pre/rc",
         "name": "dev",
-        "prerelease": true,
-        "channel": "pre/rc"
+        "prerelease": true
       }
     ],
     "plugins": [
@@ -23,24 +41,24 @@
         {
           "releaseRules": [
             {
-              "type": "stable",
-              "release": "major"
+              "release": "major",
+              "type": "stable"
             },
             {
-              "type": "new",
-              "release": "minor"
+              "release": "minor",
+              "type": "new"
             },
             {
-              "type": "subs",
-              "release": "minor"
+              "release": "minor",
+              "type": "subs"
             },
             {
-              "type": "admin",
-              "release": "patch"
+              "release": "patch",
+              "type": "admin"
             },
             {
-              "type": "bot",
-              "release": false
+              "release": false,
+              "type": "bot"
             }
           ]
         }
@@ -68,16 +86,20 @@
         {
           "assets": [
             {
-              "path": "../../public/exports/mit/v${nextRelease.version}/MIT.md",
-              "label": "Plain MIT License (Markdown)"
+              "label": "Plain MIT License (Markdown)",
+              "path": "../../dist/exports/mit/${nextRelease.version}/Plain-MIT-${nextRelease.version}.cm.md"
             },
             {
-              "path": "../../public/exports/mit/v${nextRelease.version}/MIT.pdf",
-              "label": "Plain MIT License (PDF)"
+              "label": "Plain MIT License (GitHub Markdown)",
+              "path": "../../dist/exports/mit/${nextRelease.version}/Plain-MIT-${nextRelease.version}.gfm.md"
             },
             {
-              "path": "../../public/exports/mit/v${nextRelease.version}/MIT.txt",
-              "label": "Plain MIT License (Plaintext)"
+              "label": "Plain MIT License (PDF)",
+              "path": "../../dist/exports/mit/${nextRelease.version}/Plain-MIT-${nextRelease.version}.pdf"
+            },
+            {
+              "label": "Plain MIT License (Plaintext)",
+              "path": "../../dist/exports/mit/${nextRelease.version}/Plain-MIT-${nextRelease.version}.txt"
             }
           ]
         }
@@ -85,9 +107,14 @@
     ]
   },
   "devDependencies": {
-    "@commitlint/cli": "^19.8.1",
-    "@semantic-release/changelog": "^6.0.3",
-    "@semantic-release/commit-analyzer": "^13.0.1",
-    "@semantic-release/git": "^10.0.1"
+    "@commitlint/cli": "catalog:license-release",
+    "@semantic-release/changelog": "catalog:license-release",
+    "@semantic-release/commit-analyzer": "catalog:license-release",
+    "@semantic-release/git": "catalog:license-release",
+    "@semantic-release/github": "catalog:license-release",
+    "@semantic-release/release-notes-generator": "catalog:license-release",
+    "commitlint-plugin-selective-scope": "catalog:license-release",
+    "semantic-release": "catalog:license-release",
+    "semantic-release-cli": "catalog:license-release"
   }
 }

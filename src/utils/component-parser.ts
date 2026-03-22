@@ -10,12 +10,14 @@ export interface ComponentPlaceholder {
   props: Record<string, string>;
 }
 
-export function parseComponentPlaceholders(content: string): ComponentPlaceholder[] {
+export function parseComponentPlaceholders(
+  content: string,
+): ComponentPlaceholder[] {
   const regex = /{{component:([a-z-]+)(.*?)}}/g;
   const placeholders: ComponentPlaceholder[] = [];
-  let match;
+  let match: RegExpExecArray | null = regex.exec(content);
 
-  while ((match = regex.exec(content)) !== null) {
+  while (match !== null) {
     const [raw, type, propsString] = match;
     const props = parseAttributes(propsString);
 
@@ -23,28 +25,29 @@ export function parseComponentPlaceholders(content: string): ComponentPlaceholde
       raw,
       type,
       id: props.id,
-      props
+      props,
     });
+    match = regex.exec(content);
   }
 
   return placeholders;
 }
 
 /**
- * Robustly parses attributes from a string, supporting single, double, 
+ * Robustly parses attributes from a string, supporting single, double,
  * and escaped quotes.
  */
 function parseAttributes(attrString: string): Record<string, string> {
   const props: Record<string, string> = {};
   let i = 0;
-  
+
   while (i < attrString.length) {
     // 1. Skip whitespace
     while (i < attrString.length && /\s/.test(attrString[i])) i++;
     if (i >= attrString.length) break;
 
     // 2. Parse key
-    let keyStart = i;
+    const keyStart = i;
     while (i < attrString.length && /[a-z0-9_-]/i.test(attrString[i])) i++;
     const key = attrString.substring(keyStart, i);
 
@@ -55,36 +58,35 @@ function parseAttributes(attrString: string): Record<string, string> {
 
     // 3. Skip whitespace to =
     while (i < attrString.length && /\s/.test(attrString[i])) i++;
-    if (i >= attrString.length || attrString[i] !== '=') {
-      continue; 
+    if (i >= attrString.length || attrString[i] !== "=") {
+      continue;
     }
     i++; // Skip =
-    
+
     // 4. Skip whitespace to value
     while (i < attrString.length && /\s/.test(attrString[i])) i++;
     if (i >= attrString.length) break;
-    
+
     const quote = attrString[i];
     if (quote !== '"' && quote !== "'") {
       // Support unquoted values until next space
-      let valStart = i;
+      const valStart = i;
       while (i < attrString.length && !/\s/.test(attrString[i])) i++;
       props[key] = attrString.substring(valStart, i);
       continue;
     }
     i++; // Skip opening quote
-    
+
     let value = "";
     while (i < attrString.length) {
-      if (attrString[i] === '\\') {
+      if (attrString[i] === "\\") {
         // Lookahead to see if we're escaping the current quote type
         if (i + 1 < attrString.length && attrString[i + 1] === quote) {
           value += quote;
           i += 2;
-          continue;
         } else {
           // Keep backslash for other characters (like JSON escapes)
-          value += '\\';
+          value += "\\";
           i++;
         }
       } else if (attrString[i] === quote) {
@@ -95,10 +97,10 @@ function parseAttributes(attrString: string): Record<string, string> {
         i++;
       }
     }
-    
+
     props[key] = value;
   }
-  
+
   return props;
 }
 
@@ -107,15 +109,18 @@ function parseAttributes(attrString: string): Record<string, string> {
  * Now uses the robust parser to ensure attributes are correctly transferred.
  */
 export function markComponentPlaceholders(content: string): string {
-  return content.replace(/{{component:([a-z-]+)(.*?)}}/g, (match, type, propsString) => {
-    const props = parseAttributes(propsString);
-    const attrHtml = Object.entries(props)
-      .map(([k, v]) => {
-        const cleanValue = v.replace(/\\(.)/g, '$1').replace(/"/g, '&quot;');
-        return `data-prop-${k}="${cleanValue}"`;
-      })
-      .join(' ');
-    
-    return `<div data-pl-component="${type}" ${attrHtml}></div>`;
-  });
+  return content.replace(
+    /{{component:([a-z-]+)(.*?)}}/g,
+    (_match, type, propsString) => {
+      const props = parseAttributes(propsString);
+      const attrHtml = Object.entries(props)
+        .map(([k, v]) => {
+          const cleanValue = v.replace(/\\(.)/g, "$1").replace(/"/g, "&quot;");
+          return `data-prop-${k}="${cleanValue}"`;
+        })
+        .join(" ");
+
+      return `<div data-pl-component="${type}" ${attrHtml}></div>`;
+    },
+  );
 }

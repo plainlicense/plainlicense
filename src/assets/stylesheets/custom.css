@@ -12,7 +12,7 @@
     "Inter", "Noto Sans", "Open Sans", Lato, Helvetica, Arial, system-ui,
     sans-serif;
   --sl-font-mono:
-    "Source Code Pro", "Fira Code", "Inconsolata", "Monaco", "Consolas",
+    "Source Code Pro", "Fira Code Mono", "Inconsolata", "Monaco", "Consolas",
     "Courier New", monospace;
 }
 
@@ -35,7 +35,7 @@
 .sl-markdown-content h4,
 .sl-markdown-content h5,
 .sl-markdown-content h6 {
-  font-family: "Raleway", sans-serif;
+  font-family: var(--font-raleway);
   color: var(--zaffre);
 }
 
@@ -128,4 +128,36 @@
   stroke-width: 2.5;
   stroke-linecap: round;
   stroke-linejoin: round;
+}
+
+/* Screen-reader only utility — visually hidden, accessible to AT */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ===  Blog page layout refinements  ===
+ * Starlight blog pages use Starlight's full chrome (sidebar, TOC panel).
+ * These rules reduce the visual complexity to be closer to BaseLayout pages.
+ * Blog pages are identified by data-is-blog set via the Sidebar override script.
+ */
+html[data-is-blog] .right-sidebar-container {
+  display: none;
+}
+
+/* When TOC is hidden, let the main content area expand */
+html[data-is-blog] .main-pane {
+  --sl-content-width: 55rem;
+}
+
+/* Ensure blog content is comfortably readable */
+html[data-is-blog] .sl-markdown-content {
+  max-width: 50rem;
 }

@@ -17,6 +17,8 @@ permissions:
 
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  MISE_TRUST: 1
+  MISE_YES: 1
 
 jobs:
   ci:
@@ -31,9 +33,21 @@ jobs:
       pull-requests: read
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           submodules: recursive
+          fetch-depth: 0
+      - name: Check license version bumps
+        if: github.event_name == 'pull_request'
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: bash scripts/check-license-versions.sh "$BASE_SHA"
+      - name: Setup Mise
+        uses: jdx/mise-action@3bc85396a273ed82bba5e53a15174bbf9dba095c
+        with:
+          experimental: true
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          reshim: true
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
         with:
@@ -50,20 +64,7 @@ jobs:
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
           bun i -d --peer --optional --no-interactive &&
-          bun i --no-interactive @linthtml/linthtml stylelint eslint prettier typescript markdownlint-cli2
           export NODE_ENV=production
-      - name: setup UV
-        uses: astral-sh/setup-uv@v5
-        with:
-          version: "latest"
-          enable-cache: true
-          cache-dependency-glob: |
-            pyproject.toml
-      - run: |
-          uv python install 3.13 &&
-          uv venv --allow-existing .venv &&
-          source .venv/bin/activate &&
-          uv sync --all-extras
       - name: Run Linting
         run: |
           bun run check --no-interactive

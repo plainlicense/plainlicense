@@ -5,12 +5,7 @@
   "description": "Schema for mapping plain language license clauses to original legal text",
   "version": "1.0.0",
   "type": "object",
-  "required": [
-    "license_id",
-    "version",
-    "mapping_philosophy",
-    "mappings"
-  ],
+  "required": ["license_id", "version", "mapping_philosophy", "mappings"],
   "properties": {
     "license_id": {
       "type": "string",

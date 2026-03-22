@@ -3,6 +3,7 @@ title: "Welcome to the New Plain License Platform"
 date: 2026-03-05
 authors: adam
 description: "We've completely redesigned our platform to make software licenses even easier to understand and use."
+draft: false
 tags:
   - announcements
   - astro

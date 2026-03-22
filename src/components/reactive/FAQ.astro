@@ -12,10 +12,19 @@ interface Props {
 const { id, items = [] } = Astro.props;
 
 // Mock items if none provided for prototype
-const displayItems = items.length > 0 ? items : [
-  { question: "Is this license OSI approved?", answer: "Yes, the MIT license is OSI approved." },
-  { question: "Can I use this for commercial projects?", answer: "Yes, commercial use is permitted under this license." }
-];
+const displayItems =
+  items.length > 0
+    ? items
+    : [
+        {
+          question: "Is this license OSI approved?",
+          answer: "Yes, the MIT license is OSI approved.",
+        },
+        {
+          question: "Can I use this for commercial projects?",
+          answer: "Yes, commercial use is permitted under this license.",
+        },
+      ];
 ---
 
 <div class="faq-component" id={id}>
@@ -30,46 +39,46 @@ const displayItems = items.length > 0 ? items : [
 </div>
 
 <style>
-  .faq-component {
-    margin: 2rem 0;
-    border: 1px solid #333;
-    border-radius: 8px;
-    overflow: hidden;
-  }
-  .faq-item {
-    border-bottom: 1px solid #333;
-  }
-  .faq-item:last-child {
-    border-bottom: none;
-  }
-  summary {
-    padding: 1rem;
-    background: #1a1c23;
-    cursor: pointer;
-    font-weight: bold;
-    list-style: none;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  summary::-webkit-details-marker {
-    display: none;
-  }
-  summary::after {
-    content: '+';
-    font-size: 1.2rem;
-    color: #883aea;
-  }
-  details[open] summary::after {
-    content: '−';
-  }
-  .faq-answer {
-    padding: 1rem;
-    background: #0d0f14;
-    line-height: 1.6;
-    color: #ccc;
-  }
-  .faq-answer p {
-    margin: 0;
-  }
+.faq-component {
+  margin: 2rem 0;
+  border: 1px solid #333;
+  border-radius: 8px;
+  overflow: hidden;
+}
+.faq-item {
+  border-bottom: 1px solid #333;
+}
+.faq-item:last-child {
+  border-bottom: none;
+}
+summary {
+  padding: 1rem;
+  background: #1a1c23;
+  cursor: pointer;
+  font-weight: bold;
+  list-style: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+summary::-webkit-details-marker {
+  display: none;
+}
+summary::after {
+  content: "+";
+  font-size: 1.2rem;
+  color: #883aea;
+}
+details[open] summary::after {
+  content: "−";
+}
+.faq-answer {
+  padding: 1rem;
+  background: #0d0f14;
+  line-height: 1.6;
+  color: #ccc;
+}
+.faq-answer p {
+  margin: 0;
+}
 </style>

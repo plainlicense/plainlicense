@@ -38,7 +38,7 @@
         "title": "Permission Grant",
         "content_preview": "Permission is hereby granted, free of charge, to any person obtaining a copy..."
       },
-      "confidence": 0.90,
+      "confidence": 0.9,
       "notes": "Plain version expands 'deal in the Software without restriction' into explicit 6-item list. Also adds educational context ('for free', 'for any reason', 'Everyone else can do these things too') not literally in original but consistent with intent.",
       "expansion_type": "educational-clarification",
       "created_at": "2026-01-30T09:45:00Z"

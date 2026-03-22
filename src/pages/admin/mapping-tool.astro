@@ -1,7 +1,7 @@
 ---
-import BaseLayout from "../../layouts/BaseLayout.astro";
-import MappingEditor from "../../components/MappingEditor";
 import { getCollection } from "astro:content";
+import MappingEditor from "../../components/MappingEditor";
+import BaseLayout from "../../layouts/BaseLayout.astro";
 
 const licenses = await getCollection("licenses");
 const { searchParams } = Astro.url;
@@ -26,8 +26,7 @@ if (selectedId) {
 ---
 
 <BaseLayout title="Mapping Tool">
-  {
-    !selectedId ? (
+  {!selectedId ? (
       <div class="selection-screen container">
         <h1>Select License to Map</h1>
         <div class="license-grid">
@@ -49,32 +48,31 @@ if (selectedId) {
           />
         )}
       </div>
-    )
-  }
+    )}
 </BaseLayout>
 
 <style>
-  .container {
-    max-width: 800px;
-    margin: 4rem auto;
-    padding: 0 2rem;
-  }
-  .license-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 1.5rem;
-    margin-top: 2rem;
-  }
-  .card {
-    padding: 1.5rem;
-    background: #1a1c23;
-    border: 1px solid #333;
-    border-radius: 8px;
-    text-decoration: none;
-    color: white;
-    text-align: center;
-  }
-  .card:hover {
-    border-color: #883aea;
-  }
+.container {
+  max-width: 800px;
+  margin: 4rem auto;
+  padding: 0 2rem;
+}
+.license-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+.card {
+  padding: 1.5rem;
+  background: #1a1c23;
+  border: 1px solid #333;
+  border-radius: 8px;
+  text-decoration: none;
+  color: white;
+  text-align: center;
+}
+.card:hover {
+  border-color: #883aea;
+}
 </style>

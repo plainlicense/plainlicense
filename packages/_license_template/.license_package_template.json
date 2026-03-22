@@ -1,0 +1,90 @@
+{
+  "author": {
+    "email": "adam@plainlicense.org",
+    "name": "Adam Poulemanos",
+    "url": "https://plainlicense.org"
+  },
+  "description": "Plain language adaptation of {{LICENSE_NAME}}",
+  "devDependencies": {
+    "@commitlint/cli": "catalog:license-release",
+    "commitlint-plugin-selective-scope": "catalog:license-release",
+    "semantic-release": "catalog:license-release",
+    "@semantic-release/changelog": "catalog:license-release",
+    "semantic-release-cli": "catalog:license-release",
+    "@semantic-release/commit-analyzer": "catalog:license-release",
+    "@semantic-release/git": "catalog:license-release",
+    "@semantic-release/github": "catalog:license-release",
+    "@semantic-release/release-notes-generator": "catalog:license-release"
+  },
+  "devEngines": {
+    "packageManager": "bun"
+  },
+  "displayName": "Plain {{LICENSE_NAME}}",
+  "homepage": "https://plainlicense.org/{{SPDX_ID}}/",
+  "keywords": ["plainlicense", "plain language", "license", "licensing"],
+  "license": "LicenseRef-PlainUnlicense OR Unlicense",
+  "main": "../../content/licenses/{{category}}/{{SPDX_ID}}.md",
+  "name": "@plainlicense/plain-{{SPDX_ID}}",
+  "release": {
+    "branches": [
+      "+([0-9])?(.{+([0-9]),x}).x",
+      "main",
+      {
+        "channel": "pre/rc",
+        "name": "dev",
+        "prerelease": true
+      }
+    ],
+    "plugins": [
+      [
+        "@semantic-release/commit-analyzer",
+        {
+          "releaseRules": [
+            {
+              "release": "major",
+              "type": "stable"
+            },
+            {
+              "release": "minor",
+              "type": "new"
+            },
+            {
+              "release": "minor",
+              "type": "subs"
+            },
+            {
+              "release": "patch",
+              "type": "admin"
+            },
+            {
+              "release": false,
+              "type": "bot"
+            }
+          ]
+        }
+      ],
+      [
+        "@semantic-release/changelog",
+        {
+          "changelogFile": "../changelogs/{{SPDX_ID}}.md",
+          "changelogTitle": "Plain {{LICENSE_NAME}} Changelog"
+        }
+      ],
+      [
+        "@semantic-release/git",
+        {
+          "assets": ["../changelogs/{{SPDX_ID}}.md"]
+        }
+      ]
+    ]
+  },
+  "repository": {
+    "directory": "packages/{{SPDX_ID}}",
+    "type": "git",
+    "url": "git+https://github.com/plainlicense/plainlicense.git"
+  },
+  "scripts": {
+    "release": "bunx semantic-release"
+  },
+  "version": "0.1.0"
+}

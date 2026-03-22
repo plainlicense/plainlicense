@@ -8,6 +8,8 @@ interface Props {
   id?: string;
   props?: Record<string, unknown>;
   licenseData?: unknown;
+  props?: Record<string, unknown>;
+  licenseData?: unknown;
 }
 
 const { type, id, props = {}, licenseData } = Astro.props;
@@ -22,10 +24,20 @@ if (type === "faq" && !processedProps.items && licenseData?.faq) {
   processedProps.data = licenseData.tables[id || "default"];
 } else if (type === "tree" && !processedProps.steps && licenseData?.trees) {
   processedProps.steps = licenseData.trees[id || "default"];
+if (type === "faq" && !processedProps.items && licenseData?.faq) {
+  processedProps.items = licenseData.faq[id || "default"];
+} else if (type === "table" && !processedProps.data && licenseData?.tables) {
+  processedProps.data = licenseData.tables[id || "default"];
+} else if (type === "tree" && !processedProps.steps && licenseData?.trees) {
+  processedProps.steps = licenseData.trees[id || "default"];
 }
 
 for (const key in processedProps) {
   const val = processedProps[key];
+  if (
+    typeof val === "string" &&
+    (val.trim().startsWith("[") || val.trim().startsWith("{"))
+  ) {
   if (
     typeof val === "string" &&
     (val.trim().startsWith("[") || val.trim().startsWith("{"))

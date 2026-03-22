@@ -7,24 +7,58 @@ interface Props {
 
 const { license } = Astro.props;
 const { data } = license;
+
+/** Convert a Gunning Fog score to a human-readable reading level. */
+function readabilityScoreToLevel(score: number): string {
+  if (score <= 6) return "6th grade";
+  if (score <= 8) return "8th grade";
+  if (score <= 10) return "10th grade";
+  if (score <= 12) return "High school";
+  if (score <= 14) return "College";
+  return "Post-graduate";
+}
+
+const plainFog = data.plain_gunning_fog;
+const originalFog = data.original?.gunning_fog;
+const plainLevel =
+  plainFog !== undefined ? readabilityScoreToLevel(plainFog) : undefined;
+const originalLevel =
+  originalFog !== undefined ? readabilityScoreToLevel(originalFog) : undefined;
 ---
 
 <div class="at-a-glance">
   <h2>At a Glance</h2>
   <div class="summary-content">
-    <p>{data.summary || data.description}</p>
+    <p>{data.description}</p>
   </div>
-  {(data.plain_gunning_fog !== undefined || data.shame_words_count !== undefined) && (
+  {(plainFog !== undefined || data.shame_words_count !== undefined) && (
     <dl class="readability-stats">
-      {data.plain_gunning_fog !== undefined && (
+      {plainFog !== undefined && (
         <>
-          <dt class="label">Readability (Gunning Fog)</dt>
-          <dd class="value">{data.plain_gunning_fog}</dd>
+          <dt class="label">
+            Readability
+            {originalFog !== undefined && <span class="label-note"> (plain vs. original)</span>}
+          </dt>
+          <dd class="value readability-value">
+            <span class="fog-score">{plainFog}</span>
+            <span class="fog-level">{plainLevel}</span>
+            {originalFog !== undefined && (
+              <span class="fog-comparison">
+                vs. <span class="fog-original">{originalFog}</span>
+                <span class="fog-original-level">({originalLevel})</span>
+              </span>
+            )}
+          </dd>
         </>
       )}
       {data.shame_words_count !== undefined && (
         <>
-          <dt class="label">Shame Words</dt>
+          <dt class="label" aria-describedby="jargon-help">
+            Legal jargon remaining
+            <span id="jargon-help" class="help-text">
+              Count of complex legal terms our editors are working to simplify
+            </span>
+          </dt>
           <dd class="value">{data.shame_words_count}</dd>
         </>
       )}
@@ -58,10 +92,47 @@ dt.label {
   color: var(--sl-color-gray-3);
   width: 100%;
 }
+.label-note {
+  font-weight: normal;
+  color: var(--sl-color-gray-4);
+}
 dd.value {
   font-size: var(--sl-text-lg);
   font-weight: bold;
   color: var(--sl-color-accent);
   margin: 0 0 0.75rem 0;
+}
+.readability-value {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+.fog-score {
+  font-size: var(--sl-text-lg);
+}
+.fog-level {
+  font-size: var(--sl-text-xs);
+  font-weight: 600;
+  color: var(--sl-color-gray-2);
+}
+.fog-comparison {
+  font-size: var(--sl-text-xs);
+  font-weight: normal;
+  color: var(--sl-color-gray-3);
+}
+.fog-original {
+  font-weight: bold;
+  color: var(--sl-color-gray-2);
+}
+.fog-original-level {
+  font-weight: normal;
+}
+.help-text {
+  display: block;
+  font-weight: normal;
+  font-size: var(--sl-text-2xs, 0.6875rem);
+  color: var(--sl-color-gray-4);
+  margin-top: 0.15rem;
 }
 </style>

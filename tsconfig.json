@@ -7,8 +7,8 @@
     "baseUrl": "./",
     "esModuleInterop": true,
     "isolatedModules": true,
-    "jsx": "react",
-    "jsxFactory": "h",
+    "jsx": "react-jsx",
+    "jsxImportSource": "preact",
     "lib": ["DOM", "DOM.Iterable", "WebWorker", "esnext"],
     "module": "ESNext",
     "moduleResolution": "Bundler",
@@ -19,11 +19,18 @@
     "noImplicitThis": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "outDir": "docs/assets/",
+    "outDir": "./dist",
     "paths": {
+      "~cfg/*": ["./cmsconfig/*"],
       "~assets/*": ["./src/assets/*"],
-      "~spdx/*": ["./external/license-list-data/json/*", "./external/license-list-XML/src/*"],
-      "~cal/*": ["./external/choosealicense.com/_data/*", "./external/choosealicense.com/_licenses/*"],
+      "~spdx/*": [
+        "./external/license-list-data/json/*",
+        "./external/license-list-XML/src/*"
+      ],
+      "~cal/*": [
+        "./external/choosealicense.com/_data/*",
+        "./external/choosealicense.com/_licenses/*"
+      ]
     },
     "removeComments": true,
     "skipLibCheck": true,
@@ -46,10 +53,16 @@
   "extends": ["astro/tsconfigs/strict"],
   "include": [
     ".astro/types.d.ts",
+    "./worker-configuration.d.ts",
     "src/**/*.ts",
     "src/**/*.d.ts",
     "src/**/*.tsx",
     "src/**/*.astro",
+    "cmsconfig/**/*.ts",
+    "external/license-list-data/json/*.json",
+    "external/license-list-XML/src/*.xml",
+    "external/choosealicense.com/_data/*.yml",
+    "external/choosealicense.com/_licenses/*.txt"
   ],
   "references": [
     {

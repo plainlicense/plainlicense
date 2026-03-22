@@ -1,7 +1,27 @@
+# Default headers for all pages
 /*
   Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+  X-Frame-Options: SAMEORIGIN
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; connect-src 'self'; img-src 'self' data: avatars.githubusercontent.com ui-avatars.com; style-src 'self' 'unsafe-inline' fonts.googleapis.com; font-src 'self' fonts.gstatic.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'
+
+# Allow embed HTML exports to be iframed on external sites
+/exports/**-embed.html
+  X-Frame-Options: !
+  Content-Security-Policy: default-src 'none'; style-src 'unsafe-inline'; frame-ancestors *
+
+# Restrict admin but allow content sources
+/admin/*
   X-Frame-Options: DENY
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://github.com; connect-src 'self' https://auth.plainlicense.org https://api.github.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self';
+  Content-Security-Policy: style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+  font-src 'self' https://fonts.gstatic.com https://*.plainlicense.org https://plainlicense.org;
+  img-src 'self' https://media.plainlicense.org https://plainlicense.org blob: data: https://*.githubusercontent.com https://picsum.photos https://fastly.picsum.photos https://*.plainlicense.org https://plainlicense.org;
+  media-src 'self' https://*.plainlicense.org https://plainlicense.org blob:;
+  frame-src 'self' https://*.plainlicense.org https://plainlicense.org blob:;
+  script-src 'self' https://unpkg.com;
+  connect-src 'self' https://*.plainlicense.org https://plainlicense.org https://1bb2d128ac96f8ee9dc75e99a54e9260.r2.cloudflarestorage.com blob: data: https://unpkg.com https://api.github.com https://www.githubstatus.com https://picsum.photos https://generativelanguage.googleapis.com https://api.anthropic.com https://api.cloudflare.com https://*.plainlicense.org https://plainlicense.org https://1bb2d128ac96f8ee9dc75e99a54e9260.r2.cloudflarestorage.com;

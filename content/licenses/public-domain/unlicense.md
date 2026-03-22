@@ -2,25 +2,36 @@
 title: Plain Unlicense
 plain_name: Plain Unlicense
 spdx_id: Unlicense
-version: 0.2.0
-original_version: unknown
+plain_version: 0.2.0
 description: The Unlicense is a public domain dedication that allows you to do whatever you want with the work without restrictions or required notices.
-license_type: public-domain
-is_osi_approved: true
-is_fsf_approved: true
+license_family: public-domain
+is_dedication: true
 status: published
-summary: The Unlicense is a public domain dedication allowing any use without restrictions.
-permissions:
-  - private-use
-  - commercial-use
-  - modifications
-  - distribution
-conditions: []
-limitations:
-  - liability
-  - warranty
+tldr:
+  - You can do whatever you want with this work — no restrictions, no required notices.
+  - There's no warranty. Use at your own risk.
+attribution_required: false
+fair_code: false
 plain_gunning_fog: 12.2
-shame_words_count: 1
+shame_words_count: 0
+original:
+  name: The Unlicense
+  spdx_id: Unlicense
+  has_official_source: true
+  canonical_url: 'https://unlicense.org/'
+  link_in_original: true
+  is_deprecated: false
+  is_osi_approved: true
+  is_fsf_approved: true
+  permissions:
+    - private-use
+    - commercial-use
+    - modifications
+    - distribution
+  conditions: []
+  limitations:
+    - liability
+    - warranty
 ---
 # Plain Unlicense
 
@@ -54,6 +65,8 @@ In places that follow copyright laws, we give up all our rights to the work. Eve
 - **The work is provided "as is" with no warranties.**
 - We are not responsible for any problems or damages caused by using the work.
 - We don't have to fix any problems you find.
+
+{{block:interpretation}}
 
 ---
 

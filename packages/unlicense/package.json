@@ -1,11 +1,28 @@
 {
-  "name": "plain-license-unlicense",
-  "version": "0.2.0",
-  "private": true,
-  "description": "Plain language version of the Unlicense",
-  "main": "../../docs/licenses/public-domain/unlicense/index.md",
+  "name": "@plainlicense/plain-unlicense",
+  "displayName": "Plain Unlicense",
+  "description": "Plain language adaptation of Elastic License 2.0",
+  "keywords": [
+    "plainlicense",
+    "plain language",
+    "license",
+    "licensing"
+  ],
+  "homepage": "https://plainlicense.org/unlicense/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/plainlicense/plainlicense.git",
+    "directory": "packages/unlicense"
+  },
+  "license": "LicenseRef-PlainUnlicense OR Unlicense",
+  "author": {
+    "name": "Adam Poulemanos",
+    "email": "adam@plainlicense.org",
+    "url": "https://plainlicense.org"
+  },
+  "main": "../../content/licenses/public-domain/unlicense.md",
   "scripts": {
-    "release": "semantic-release"
+    "release": "bunx semantic-release"
   },
   "release": {
     "branches": [
@@ -46,20 +63,6 @@
         }
       ],
       [
-        [
-          "@semantic-release/release-notes-generator"
-        ],
-        [
-          "@semantic-release/github"
-        ],
-        {
-          "assets": [
-            {
-              "path": "../../docs/licenses/public-domain/unlicense/index.md",
-              "label": "Plain Unlicense License"
-            }
-          ]
-        },
         "@semantic-release/changelog",
         {
           "changelogFile": "../changelogs/unlicense.md",
@@ -73,13 +76,44 @@
             "../changelogs/unlicense.md"
           ]
         }
+      ],
+      [
+        "@semantic-release/release-notes-generator"
+      ],
+      [
+        "@semantic-release/github",
+        {
+          "assets": [
+            {
+              "label": "Plain Unlicense (GitHub Markdown)",
+              "path": "../../dist/exports/unlicense/${nextRelease.version}/Plain-Unlicense-${nextRelease.version}.gfm.md"
+            },
+            {
+              "label": "Plain Unlicense (Markdown)",
+              "path": "../../dist/exports/unlicense/${nextRelease.version}/Plain-Unlicense-${nextRelease.version}.cm.md"
+            },
+            {
+              "label": "Plain Unlicense (PDF)",
+              "path": "../../dist/exports/unlicense/${nextRelease.version}/Plain-Unlicense-${nextRelease.version}.pdf"
+            },
+            {
+              "label": "Plain Unlicense (Plaintext)",
+              "path": "../../dist/exports/unlicense/${nextRelease.version}/Plain-Unlicense-${nextRelease.version}.txt"
+            }
+          ]
+        }
       ]
     ]
   },
   "devDependencies": {
-    "@commitlint/cli": "^19.8.1",
-    "@semantic-release/changelog": "^6.0.3",
-    "@semantic-release/commit-analyzer": "^13.0.1",
-    "@semantic-release/git": "^10.0.1"
+    "@commitlint/cli": "catalog:license-release",
+    "@semantic-release/changelog": "catalog:license-release",
+    "@semantic-release/commit-analyzer": "catalog:license-release",
+    "@semantic-release/git": "catalog:license-release",
+    "@semantic-release/github": "catalog:license-release",
+    "@semantic-release/release-notes-generator": "catalog:license-release",
+    "commitlint-plugin-selective-scope": "catalog:license-release",
+    "semantic-release": "catalog:license-release",
+    "semantic-release-cli": "catalog:license-release"
   }
 }

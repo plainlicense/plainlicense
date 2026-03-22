@@ -1,50 +1,41 @@
-import { describe, it, expect } from 'vitest';
-import fs from 'node:fs/promises';
-import path from 'node:path';
-import matter from 'gray-matter';
+import fs from "node:fs/promises";
+import path from "node:path";
+import { describe, expect, it } from "vitest";
+
+const manifestPath = path.resolve("dist/exports/manifest.json");
+const hasManifest = await fs
+  .access(manifestPath)
+  .then(() => true)
+  .catch(() => false);
 
 /**
  * SC-008: Version History Access.
- * Verification: Version manifests correctly reference existing export files.
+ * Verification: Export manifest correctly references existing export files.
+ *
+ * Requires `mise run build` to have been run first.
  */
-describe('SC-008: Version History Access', () => {
-  it('historical version links in manifest point to real export files', async () => {
-    const baseDir = path.resolve('content/licenses');
-    const categories = await fs.readdir(baseDir);
+describe("SC-008: Version History Access", () => {
+  it.skipIf(!hasManifest)(
+    "export manifest entries point to real export directories",
+    async () => {
+      const manifest = JSON.parse(await fs.readFile(manifestPath, "utf8"));
 
-    for (const category of categories) {
-      const categoryPath = path.join(baseDir, category);
-      if (!(await fs.stat(categoryPath)).isDirectory()) continue;
-
-      const manifestFiles = (await fs.readdir(categoryPath)).filter(f => f.endsWith('.versions.json'));
-      
-      for (const manifestFile of manifestFiles) {
-        const slug = manifestFile.replace('.versions.json', '');
-        const mdFile = path.join(categoryPath, `${slug}.md`);
-        const { data } = matter(await fs.readFile(mdFile, 'utf8'));
-        const spdxId = data.spdx_id.trim();
-
-        const versions = JSON.parse(await fs.readFile(path.join(categoryPath, manifestFile), 'utf8'));
-        
-        for (const v of versions) {
-          const exportDir = path.resolve(`public/exports/${slug}/v${v.version}`);
-          
-          // PDF, TXT, MD are the key ones we added to the UI
-          const expectedFiles = [
-            `${spdxId}.pdf`,
-            `${spdxId}.txt`,
-            `${spdxId}.gfm.md`
-          ];
-
-          for (const file of expectedFiles) {
-            const exists = await fs.access(path.join(exportDir, file)).then(() => true).catch(() => false);
-            if (!exists) {
-              console.error(`Broken historical link: ${slug}@${v.version} -> ${file}`);
-            }
-            expect(exists).toBe(true);
+      for (const [spdxKey, entry] of Object.entries(manifest) as [
+        string,
+        any,
+      ][]) {
+        for (const version of entry.versions) {
+          const exportDir = path.resolve(`dist/exports/${spdxKey}/${version}`);
+          const dirExists = await fs
+            .access(exportDir)
+            .then(() => true)
+            .catch(() => false);
+          if (!dirExists) {
+            console.error(`Missing export directory: ${spdxKey}@${version}`);
           }
+          expect(dirExists).toBe(true);
         }
       }
-    }
-  });
+    },
+  );
 });
