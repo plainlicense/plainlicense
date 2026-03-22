@@ -6,7 +6,7 @@ category: warranty
 description: Common plain language warranty disclaimer
 version: 1.0.0
 ---
-We give you the work as it is, and with no promises or guarantees. This means:
+We give you the work as it is, with no promises or guarantees.
 
 - **"As is"**: You get the work exactly how it is. It may have problems or not work at all.
 - **No Guarantees**: We don't promise you can use the work for any specific tasks, or that it won't break any rules.

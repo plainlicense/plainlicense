@@ -1,6 +1,6 @@
+import matter from "gray-matter";
 import fs from "node:fs/promises";
 import path from "node:path";
-import matter from "gray-matter";
 
 /**
  * Validates all markdown content files in content/ directory.
@@ -10,7 +10,7 @@ async function validateAllContent() {
   const contentDir = path.resolve("content");
   let errors = 0;
 
-  async function walk(dir: string) {
+  const walk = async (dir: string) => {
     const entries = await fs.readdir(dir, { withFileTypes: true });
 
     for (const entry of entries) {
@@ -30,17 +30,18 @@ async function validateAllContent() {
             );
             errors++;
           }
-        } else if (relativePath.startsWith("blog/")) {
-          if (content.trim().length < 200) {
-            console.error(
-              `[VALIDATION ERROR] Blog post ${relativePath} body too short: ${content.length} chars (min 200)`,
-            );
-            errors++;
-          }
+        } else if (
+          relativePath.startsWith("blog/") &&
+          content.trim().length < 200
+        ) {
+          console.error(
+            `[VALIDATION ERROR] Blog post ${relativePath} body too short: ${content.length} chars (min 200)`,
+          );
+          errors++;
         }
       }
     }
-  }
+  };
 
   try {
     await walk(contentDir);

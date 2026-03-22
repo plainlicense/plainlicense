@@ -16,7 +16,7 @@ import starlightHeadingBadges from "starlight-heading-badges";
 import starlightLLMsTxt from "starlight-llms-txt";
 import starlightTags from "starlight-tags";
 import { searchForWorkspaceRoot } from "vite";
-import exportsIntegration from "./src/integrations/exports.ts";
+import exportsIntegration from "./src/integrations/exports.js";
 
 const rootDir = searchForWorkspaceRoot(process.cwd());
 if (!rootDir) {
@@ -25,6 +25,13 @@ if (!rootDir) {
   );
 }
 const __dirname = dirname(fileURLToPath(import.meta.url));
+
+type LicenseCategory =
+  | "public-domain"
+  | "permissive"
+  | "copyleft"
+  | "source-available"
+  | "proprietary";
 
 /**
  * Automatically generate short-slug redirects for all licenses.
@@ -35,13 +42,13 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
  * Adding a new license file is all that's needed — no manual config step.
  */
 function getLicenseRedirects() {
-  const redirects = {};
+  const redirects: Record<string, string> = {};
   const contentBase = join(__dirname, "content/licenses");
-  let categories;
+  let categories: LicenseCategory[];
   try {
-    categories = readdirSync(contentBase);
+    categories = readdirSync(contentBase) as LicenseCategory[];
   } catch (err) {
-    if (err && err.code === "ENOENT") {
+    if (err && (err as { code?: string }).code === "ENOENT") {
       // content/licenses does not exist; no license redirects to generate.
       return redirects;
     }
@@ -52,17 +59,17 @@ function getLicenseRedirects() {
     try {
       if (!statSync(catDir).isDirectory()) continue;
     } catch (err) {
-      if (err && err.code === "ENOENT") {
+      if (err && (err as { code?: string }).code === "ENOENT") {
         // Category directory disappeared or is missing; skip it.
         continue;
       }
       throw err;
     }
-    let files;
+    let files: string[];
     try {
       files = readdirSync(catDir);
     } catch (err) {
-      if (err && err.code === "ENOENT") {
+      if (err && (err as { code?: string }).code === "ENOENT") {
         // Category directory disappeared between checks; skip it.
         continue;
       }
@@ -164,7 +171,7 @@ export default defineConfig({
           placement: {
             mode: "smart",
           },
-          secret_store_secrets: [
+          secrets_store_secrets: [
             {
               secret_name: "GITHUB_CLIENT_ID",
               binding: "GITHUB_CLIENT_ID",
@@ -219,7 +226,7 @@ export default defineConfig({
       plugins: ["preset-default"],
     },
   },
-  favicon: join(__dirname, "assets/images/logo_only_color_transp.svg"),
+  trailingSlash: "always",
   fonts: [
     {
       cssVariable: "--sl-font",
@@ -319,18 +326,36 @@ export default defineConfig({
             identifier_field: "plain_name",
             fields: [
               // Zone 1 - Identity
-              { label: "Title", name: "title", widget: "string" },
+              // title defaults to the plain name
+              {
+                label: "Title",
+                name: "title",
+                widget: "string",
+                required: false,
+              },
               {
                 label: "Plain language name (e.g. 'Plain MIT License')",
                 name: "plain_name",
                 widget: "string",
+                pattern: "^Plain [A-Z][A-Za-z0-9 -.]+",
+                required: true,
               },
-              { label: "SPDX ID", name: "spdx_id", widget: "string" },
+              {
+                label: "SPDX ID",
+                name: "spdx_id",
+                comment:
+                  "The SPDX ID of *the plain license* if it has one (currently none do), not the original license. The original license's SPDX ID, if applicable, goes in the 'original' field.",
+                widget: "string",
+                required: false,
+              },
               {
                 label: "Version of this plain language version",
                 name: "plain_version",
-                widget: "string",
+                widget: "computed",
+                default: "0.1.0",
                 hint: "Semver, e.g. 1.0.0",
+                required: true,
+                readonly: true,
               },
               {
                 name: "license_family",
@@ -343,12 +368,21 @@ export default defineConfig({
                   "source-available",
                   "proprietary",
                 ],
+                multiple: false,
+                comment:
+                  "Family of the license. If it has no requirements at all, it's probably public domain. If it has minimal requirements, like just attribution, it's probably permissive. If it doesn't allow changes, relicensing, or sharing it's proprietary. If it allows some changes and sharing but has restrictions on how you can use it, like commercially, it's source-available (sources available but not open source). If it allows changes, sharing, and commercial use but requires you share alike, it's copyleft.",
+                required: true,
               },
               {
                 label: "Is this a public domain dedication (not a license)?",
                 name: "is_dedication",
-                widget: "boolean",
+                widget: "compute",
+                // @ts-expect-error
+                value: "{{fields.license_family}}" === "public-domain",
+
                 default: false,
+                // we can infer from license family
+                required: false,
               },
               {
                 label: "Status",
@@ -356,12 +390,14 @@ export default defineConfig({
                 widget: "select",
                 options: ["draft", "published"],
                 default: "draft",
+                required: true,
               },
               {
                 label:
                   "Description (1–3 sentences, answers 'what kind of license is this?')",
                 name: "description",
                 widget: "text",
+                required: false,
               },
               {
                 name: "tldr",
@@ -375,13 +411,14 @@ export default defineConfig({
                 label: "Requires attribution?",
                 name: "attribution_required",
                 widget: "boolean",
-                default: false,
+                default: true,
+                required: false,
               },
               {
                 label:
                   "Additional how-to instructions (leave blank for most licenses)",
                 name: "extra_how",
-                widget: "markdown",
+                widget: "richtext",
                 required: false,
               },
               // Claude mapping fields
@@ -390,13 +427,16 @@ export default defineConfig({
                 name: "has_mapping",
                 widget: "boolean",
                 default: false,
+                required: false,
               },
               {
                 label: "Clause map version",
                 name: "mapping_version",
                 widget: "string",
-                required: false,
                 hint: "Semver. Required if has_mapping is true.",
+                pattern: "^[0-9]+\\.[0-9]+\\.[0-9]+$",
+                default: "0.1.0",
+                required: false,
               },
               // Display controls
               {
@@ -404,24 +444,28 @@ export default defineConfig({
                 name: "show_original_comparison",
                 widget: "boolean",
                 default: true,
+                required: false,
               },
               {
                 label: "Show shame counter?",
                 name: "show_shame_counter",
                 widget: "boolean",
                 default: true,
+                required: false,
               },
               {
                 label: "Featured?",
                 name: "featured",
                 widget: "boolean",
                 default: false,
+                required: false,
               },
               {
                 label: "Fair Code license?",
                 name: "fair_code",
                 widget: "boolean",
                 default: false,
+                required: false,
               },
               // SEO fields (optional overrides for auto-generated values)
               {
@@ -440,13 +484,25 @@ export default defineConfig({
                 label: "Authors",
                 name: "authors",
                 widget: "list",
+                collection: "authors",
+                multiple: true,
+                display_fields: ["{{authors.*.name}}"],
+                search_fields: ["{{authors.*.name}}"],
+                value_field: "{{authors.*.uuid}}",
                 required: false,
               },
               {
                 label: "Changelog",
                 name: "changelog",
-                widget: "text",
+                widget: "richtext",
                 required: false,
+              },
+              {
+                label: "UUID",
+                name: "uuid",
+                widget: "uuid",
+                hide: true,
+                readonly: true,
               },
               // Readability metrics (computed at build time)
               {
@@ -474,6 +530,13 @@ export default defineConfig({
                     label: "Full original name (e.g. 'MIT License')",
                     name: "name",
                     widget: "string",
+                  },
+                  {
+                    label: "Alternative names (e.g. 'Expat License')",
+                    name: "alternative_names",
+                    widget: "list",
+                    field: { widget: "string" },
+                    required: false,
                   },
                   {
                     label: "SPDX identifier",
@@ -580,126 +643,309 @@ export default defineConfig({
                       "warranty",
                     ],
                   },
-                  { label: "Body", name: "body", widget: "markdown" },
+                  { label: "Body", name: "body", widget: "richtext" },
                 ],
               },
             ],
           },
           {
-            name: "blog-posts",
-            label: "Blog",
-            folder: "content/blog/posts",
+            name: "authors",
+            label: "Authors",
+            folder: "content/authors",
             create: true,
+            extension: "md",
             fields: [
-              { label: "Title", name: "title", widget: "string" },
-              { label: "Date", name: "date", widget: "datetime" },
-              { label: "Author", name: "author", widget: "string" },
-              { label: "Description", name: "description", widget: "text" },
+              { label: "Name", name: "name", widget: "string" },
+              { label: "URL", name: "url", widget: "string", required: false },
               {
-                label: "Tags",
-                name: "tags",
-                widget: "list",
-                required: false,
-              },
-              {
-                label: "Category",
-                name: "category",
-                widget: "select",
-                options: ["announcements", "tutorials", "updates"],
-                required: false,
-              },
-              {
-                label: "Featured",
-                name: "featured",
-                widget: "boolean",
-                default: false,
-                required: false,
-              },
-              {
-                label: "OG Image",
-                name: "og_image",
+                label: "Avatar",
+                name: "avatar",
                 widget: "image",
                 required: false,
               },
               {
-                label: "Related Licenses",
-                name: "related_licenses",
-                widget: "list",
-                required: false,
-              },
-              {
-                label: "Status",
-                name: "status",
-                widget: "select",
-                options: ["draft", "published"],
-                default: "draft",
-              },
-              { label: "Body", name: "body", widget: "markdown" },
-            ],
-          },
-          {
-            name: "template-blocks",
-            label: "Template Blocks",
-            folder: "content/template-blocks",
-            create: true,
-            fields: [
-              { label: "Title", name: "title", widget: "string" },
-              { label: "Block ID", name: "block_id", widget: "string" },
-              {
-                label: "Category",
-                name: "category",
-                widget: "select",
-                options: [
-                  "warranty",
-                  "permission",
-                  "condition",
-                  "disclaimer",
-                  "notice",
-                ],
-              },
-              {
-                label: "Description",
-                name: "description",
-                widget: "text",
-                required: false,
-              },
-              { label: "Version", name: "version", widget: "string" },
-              {
-                label: "Block Title",
-                name: "block_title",
+                label: "Title",
+                name: "title",
                 widget: "string",
                 required: false,
               },
-              { label: "Body", name: "body", widget: "markdown" },
+              {
+                label: "About/Bio",
+                name: "about",
+                widget: "text",
+                required: false,
+              },
+              {
+                label: "Email",
+                name: "email",
+                widget: "string",
+                required: false,
+              },
+              {
+                label: "UUID",
+                name: "uuid",
+                widget: "uuid",
+                hide: true,
+                readonly: true,
+                prefix: "author-",
+              },
+              {
+                label: "Social links",
+                name: "social_links",
+                widget: "object",
+                required: false,
+                fields: [
+                  {
+                    label: "GitHub",
+                    name: "github",
+                    widget: "string",
+                    required: false,
+                  },
+                  {
+                    label: "X/Twitter",
+                    name: "twitter",
+                    widget: "string",
+                    required: false,
+                  },
+                  {
+                    label: "LinkedIn",
+                    name: "linkedin",
+                    widget: "string",
+                    required: false,
+                  },
+                  {
+                    label: "Bluesky",
+                    name: "bluesky",
+                    widget: "string",
+                    required: false,
+                  },
+                ],
+              },
+              {
+                name: "blog-posts",
+                label: "Blog",
+                folder: "content/blog/posts",
+                create: true,
+                format: "yaml-frontmatter",
+                extension: "mdx",
+                preview_path: "",
+                thumbnail: "og_image",
+                fields: [
+                  { label: "Title", name: "title", widget: "string" },
+                  {
+                    label: "Creation Date",
+                    name: "creation_date",
+                    widget: "datetime",
+                  },
+                  {
+                    label: "Publication Date",
+                    name: "publication_date",
+                    widget: "datetime",
+                    required: false,
+                  },
+                  {
+                    label: "Last Updated",
+                    name: "last_updated",
+                    widget: "datetime",
+                  },
+                  {
+                    label: "Authors",
+                    name: "authors",
+                    widget: "list",
+                    collection: "authors",
+                    multiple: true,
+                    display_fields: ["{{authors.*.name}}"],
+                    search_fields: ["{{authors.*.name}}"],
+                    value_field: "{{authors.*.uuid}}",
+                    required: false,
+                  },
+                  {
+                    label: "Description",
+                    name: "description",
+                    widget: "text",
+                    hint: "1-3 sentences, answers 'what's this post about?'. Markdown supported.",
+                    required: false,
+                  },
+                  {
+                    label: "Tags",
+                    name: "tags",
+                    widget: "list",
+                    required: false,
+                  },
+                  {
+                    label: "Category",
+                    name: "category",
+                    widget: "select",
+                    options: [
+                      "announcements",
+                      "guides",
+                      "updates",
+                      "community",
+                      "license-talk",
+                    ],
+                    required: false,
+                  },
+                  {
+                    label: "Featured",
+                    name: "featured",
+                    widget: "boolean",
+                    default: false,
+                    required: false,
+                  },
+                  {
+                    label: "OG Image",
+                    name: "og_image",
+                    widget: "image",
+                    required: false,
+                  },
+                  {
+                    label: "Related Licenses",
+                    name: "related_licenses",
+                    widget: "relation",
+                    collection: "licenses",
+                    search_fields: [
+                      "title",
+                      "plain_name",
+                      "spdx_id",
+                      "original.name",
+                    ],
+                    value_field: "uuid",
+                    required: false,
+                  },
+                  {
+                    label: "Status",
+                    name: "status",
+                    widget: "select",
+                    options: ["draft", "published"],
+                    default: "draft",
+                  },
+                  {
+                    label: "UUID",
+                    name: "uuid",
+                    widget: "uuid",
+                    hide: true,
+                    readonly: true,
+                  },
+                  {
+                    label: "Series",
+                    name: "series",
+                    widget: "object",
+                    required: false,
+                    fields: [
+                      {
+                        label:
+                          "Name of the series (e.g. 'MIT License Explained')",
+                        name: "name",
+                        widget: "string",
+                      },
+                      {
+                        label: "Description of the series",
+                        name: "description",
+                        widget: "text",
+                      },
+                      {
+                        label: "Slug",
+                        name: "slug",
+                        hide: true,
+                        widget: "string",
+                        hint: "Used in URLs for series overview pages. Should be lowercase with hyphens, e.g. 'mit-license-explained'.",
+                      },
+                      {
+                        label: "Index",
+                        hint: "Index of this post within the series, starting at 1. Used to order posts in the series.",
+                        name: "index",
+                        widget: "number",
+                        value_type: "int",
+                        readonly: true,
+                        hide: true,
+                      },
+                      {
+                        label: "UUID",
+                        name: "uuid",
+                        widget: "uuid",
+                        hide: true,
+                        readonly: true,
+                      },
+                    ],
+                  },
+                  { label: "Body", name: "body", widget: "richtext" },
+                ],
+              },
+              {
+                name: "template-blocks",
+                label: "Template Blocks",
+                folder: "content/template-blocks",
+                create: true,
+                fields: [
+                  { label: "Title", name: "title", widget: "string" },
+                  { label: "Block ID", name: "block_id", widget: "string" },
+                  {
+                    label: "Category",
+                    name: "category",
+                    widget: "select",
+                    options: [
+                      "warranty",
+                      "permission",
+                      "condition",
+                      "disclaimer",
+                      "notice",
+                    ],
+                  },
+                  {
+                    label: "Description",
+                    name: "description",
+                    widget: "text",
+                    required: false,
+                  },
+                  {
+                    label: "Version",
+                    name: "version",
+                    widget: "string",
+                    pattern: "^[0-9]+\\.[0-9]+\\.[0-9]+$",
+                    required: true,
+                  },
+                  {
+                    label: "Block Title",
+                    name: "block_title",
+                    widget: "string",
+                    required: false,
+                  },
+                  {
+                    label: "UUID",
+                    name: "uuid",
+                    widget: "uuid",
+                    hide: true,
+                    readonly: true,
+                  },
+                  { label: "Body", name: "body", widget: "richtext" },
+                ],
+              },
             ],
           },
         ],
-      },
-      publish_mode: "editorial_workflow",
-      local_backend: true,
-      app_title: "Plain License CMS",
-      site_url: "https://plainlicense.org",
-      logout_redirect_url: "https://plainlicense.org",
-      custom_logo: {
-        src: `${__dirname}/src/assets/images/logo_only_color_transp.svg`,
-        alt: "Plain License Logo",
-        show_in_header: true,
-      },
-      media_folder: "images/",
-      media_libraries: {
-        cloudflare_r2: {
-          access_key_id: "2af46c19f417f0b062f540805412da84",
-          bucket: "plainlicense-cms",
-          account_id: "1bb2d128ac96f8ee9dc75e99a54e9260",
-          prefix: "uploads/",
-          public_url: "https://media.plainlicense.org/",
+        app_title: "Plain License CMS",
+        site_url: "https://plainlicense.org",
+        logout_redirect_url: "https://plainlicense.org",
+        logo: {
+          src: `${__dirname}/src/assets/images/logo_only_color_transp.svg`,
+          show_in_header: true,
         },
-      },
-      editor: {
-        preview: true,
-      },
-      issue_reports: {
-        url: "https://github.com/plainlicense/plainlicense/issues",
+        media_folder: "images/",
+        media_libraries: {
+          cloudflare_r2: {
+            access_key_id: "2af46c19f417f0b062f540805412da84",
+            bucket: "plainlicense-cms",
+            account_id: "1bb2d128ac96f8ee9dc75e99a54e9260",
+            prefix: "uploads/",
+            public_url: "https://media.plainlicense.org/",
+          },
+        },
+        editor: {
+          preview: true,
+        },
+        issue_reports: {
+          url: "https://github.com/plainlicense/plainlicense/issues",
+        },
       },
     }),
     starlight({
@@ -750,6 +996,7 @@ export default defineConfig({
           metrics: {
             readingTime: true,
           },
+          rss: true,
         }),
         starlightAutoDrafts(),
         starlightHeadingBadges(),
@@ -793,11 +1040,9 @@ export default defineConfig({
         video: false,
       },
     }),
-
     favicons({
       name: "Plain License",
       short_name: "PlainLicense",
-      description: "Creative licenses in plain language for everyone.",
       input: {
         favicons: [
           join(__dirname, "src/assets/images/logo_only_color_transp.svg"),
@@ -809,8 +1054,12 @@ export default defineConfig({
     exportsIntegration(),
   ],
   markdown: {
-    dark: "ayu-dark",
-    light: "github-light-high-contrast",
+    shikiConfig: {
+      themes: {
+        dark: "ayu-dark",
+        light: "github-light-high-contrast",
+      },
+    },
   },
   output: "static",
   prefetch: {
@@ -837,31 +1086,29 @@ export default defineConfig({
       cssCodeSplit: true,
       cssMinify: "lightningcss",
       minify: "esbuild",
-      rolldownOptions: {
-        treeshake: "smallest",
-        optimization: {
-          inlineConst: { mode: "smart" },
-        },
-        experimental: {
-          chunkOptimization: true,
-          nativeMagicString: true,
+      rollupOptions: {
+        external: [],
+        jsx: {
+          factory: "h",
+          fragment: "Fragment",
         },
         output: {
-          codeSplitting: true,
-          comments: false,
-          minify: true,
+          dir: `${rootDir}/dist/_astro`,
+          format: "es",
+          entryFileNames: "[name]-[hash].js",
+          chunkFileNames: "[name]-[hash].js",
+          assetFileNames: "[name]-[hash][extname]",
+          compact: true,
+          interop: "esModule",
           minifyInternalExports: true,
-          sanitizeFileName: true,
           sourcemap: false,
         },
+        treeshake: "smallest",
       },
-      css: {
-        minify: true,
-      },
-      server: {
-        fs: {
-          allow: [rootDir],
-        },
+    },
+    server: {
+      fs: {
+        allow: [rootDir],
       },
     },
   },

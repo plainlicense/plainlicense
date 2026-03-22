@@ -33,7 +33,7 @@ export async function injectTemplateBlocks(
     if (block) {
       const placeholder = `{{block:${blockId}}}`;
       if (content.includes(placeholder)) {
-        content = content.replaceAll(placeholder, block.body);
+        content = content.replaceAll(placeholder, block.body ?? "");
       }
     }
   }

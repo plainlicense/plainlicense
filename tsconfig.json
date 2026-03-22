@@ -7,8 +7,8 @@
     "baseUrl": "./",
     "esModuleInterop": true,
     "isolatedModules": true,
-    "jsx": "react",
-    "jsxFactory": "h",
+    "jsx": "react-jsx",
+    "jsxImportSource": "preact",
     "lib": ["DOM", "DOM.Iterable", "WebWorker", "esnext"],
     "module": "ESNext",
     "moduleResolution": "Bundler",
@@ -21,6 +21,7 @@
     "noUnusedParameters": true,
     "outDir": "./dist",
     "paths": {
+      "~cfg/*": ["./cmsconfig/*"],
       "~assets/*": ["./src/assets/*"],
       "~spdx/*": [
         "./external/license-list-data/json/*",
@@ -56,7 +57,12 @@
     "src/**/*.ts",
     "src/**/*.d.ts",
     "src/**/*.tsx",
-    "src/**/*.astro"
+    "src/**/*.astro",
+    "cmsconfig/**/*.ts",
+    "external/license-list-data/json/*.json",
+    "external/license-list-XML/src/*.xml",
+    "external/choosealicense.com/_data/*.yml",
+    "external/choosealicense.com/_licenses/*.txt"
   ],
   "references": [
     {
