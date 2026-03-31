@@ -1,6 +1,5 @@
 import fs from "node:fs/promises";
 import path from "node:path";
-import yaml from "js-yaml";
 import { describe, expect, it } from "vitest";
 
 /**
@@ -9,18 +8,10 @@ import { describe, expect, it } from "vitest";
  */
 describe("SC-001: Editor Workflow Integrity", () => {
   it("CMS configuration includes all required data fields for licenses", async () => {
-    const configPath = path.resolve("public/admin/config.yml");
+    const configPath = path.resolve("astro.config.ts");
     const content = await fs.readFile(configPath, "utf8");
-    const config = yaml.load(content) as any;
 
-    const licenseCollection = config.collections.find(
-      (c: any) => c.name === "licenses",
-    );
-    expect(licenseCollection).toBeDefined();
-
-    const fieldNames = licenseCollection.fields.map((f: any) => f.name);
-
-    // Critical fields from Zod schema
+    // Critical fields from Zod schema — verify they appear in the sveltia() config
     const requiredFields = [
       "title",
       "spdx_id",
@@ -34,7 +25,9 @@ describe("SC-001: Editor Workflow Integrity", () => {
     ];
 
     for (const field of requiredFields) {
-      expect(fieldNames).toContain(field);
+      expect(content, `Expected field "${field}" in astro.config.ts`).toContain(
+        `name: "${field}"`,
+      );
     }
   });
 

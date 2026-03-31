@@ -22,7 +22,7 @@ export default defineConfig({
         "**/*.d.ts",
         "tests/**",
         "src/content.config.ts",
-        "astro.config.mjs",
+        "astro.config.ts",
       ],
     },
     alias: {

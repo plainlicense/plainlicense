@@ -3,11 +3,17 @@ import ComparisonTable from "./ComparisonTable.astro";
 import FAQ from "./FAQ.astro";
 import LicenseFinderWrapper from "./LicenseFinderWrapper.astro";
 
+interface LicenseDataT {
+  faq?: Record<string, unknown>;
+  tables?: Record<string, unknown>;
+  [key: string]: unknown;
+}
+
 interface Props {
   type: string;
   id?: string;
   props?: Record<string, unknown>;
-  licenseData?: unknown;
+  licenseData?: LicenseDataT;
 }
 
 const { type, id, props = {}, licenseData } = Astro.props;

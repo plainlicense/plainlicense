@@ -384,7 +384,7 @@ flag "--unit" {
   }
 '''
 tools.bun = "latest"
-depends = ["_is_setup bun", "sync"]
+depends = ["_is-setup bun", "sync"]
 run = '''
 if [ -n "$usage_coverage" ]; then
   mise run test-cov
