@@ -14,6 +14,15 @@ tldr:
   - No warranty is provided. Use at your own risk.
 attribution_required: false
 fair_code: true
+maker_pitch: "Use and change freely, but no one can offer it as a hosted service."
+commercial_restrictions:
+  - no-managed-service
+compare_to:
+  - spdx_id: MPL-2.0
+    contrast: "Like Elastic, but without commercial restrictions and with OSI approval"
+  - spdx_id: MIT
+    contrast: "Like Elastic, but with no restrictions beyond giving credit"
+uuid: 00208272-a9cb-41b9-ad99-0bbb4078cb9a
 plain_gunning_fog: 11.76
 shame_words_count: 0
 original:

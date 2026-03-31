@@ -76,7 +76,7 @@ async function loadMappings() {
       const response = await fetch(`/mappings/${spdxId}-mapping.json`);
       if (response.ok) {
         const mappingData = await response.json();
-        initMappingViewer(main as HTMLElement, mappingData);
+        initMappingViewer(mappingData);
       }
     } catch (e) {
       console.warn("Mapping data not found for:", spdxId);

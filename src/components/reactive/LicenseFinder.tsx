@@ -1,0 +1,701 @@
+import { useCallback, useMemo, useState } from "preact/hooks";
+import { FINDER_AXES } from "../../data/finderQuestions";
+import { rankLicenses } from "../../data/finderScoring";
+import type {
+  FinderAxis,
+  FinderOption,
+  LicenseCandidate,
+} from "../../data/finderTypes";
+
+// ---------------------------------------------------------------------------
+// Props
+// ---------------------------------------------------------------------------
+
+interface Props {
+  id?: string;
+  licenses: LicenseCandidate[];
+}
+
+// ---------------------------------------------------------------------------
+// Sub-components
+// ---------------------------------------------------------------------------
+
+function ProgressBar({ current, total }: { current: number; total: number }) {
+  const pct = total === 0 ? 0 : Math.round((current / total) * 100);
+  return (
+    <div
+      class="lf-progress"
+      role="progressbar"
+      aria-valuenow={pct}
+      aria-valuemin={0}
+      aria-valuemax={100}
+    >
+      <div class="lf-progress__bar" style={{ width: `${pct}%` }} />
+      <span class="lf-progress__label">
+        Question {Math.min(current + 1, total)} of {total}
+      </span>
+    </div>
+  );
+}
+
+function QuestionCard({
+  axis,
+  onAnswer,
+  onSkip,
+}: {
+  axis: FinderAxis;
+  onAnswer: (option: FinderOption) => void;
+  onSkip: () => void;
+}) {
+  const [showExplainer, setShowExplainer] = useState(false);
+
+  return (
+    <div class="lf-question">
+      <h4 class="lf-question__text" id={`lf-q-${axis.id}`}>
+        {axis.question}
+      </h4>
+      <p class="lf-question__hint">{axis.hint}</p>
+
+      <fieldset class="lf-options" aria-labelledby={`lf-q-${axis.id}`}>
+        <legend class="sr-only">{axis.question}</legend>
+
+        {axis.options.map((option) => (
+          <button
+            key={option.label}
+            type="button"
+            class="lf-option-btn"
+            onClick={() => onAnswer(option)}
+          >
+            {option.label}
+          </button>
+        ))}
+
+        <div class="lf-secondary-actions">
+          <button type="button" class="lf-skip-btn" onClick={onSkip}>
+            I don't care
+          </button>
+          <button
+            type="button"
+            class="lf-explain-btn"
+            onClick={() => setShowExplainer(!showExplainer)}
+            aria-expanded={showExplainer}
+            aria-controls={`lf-explainer-${axis.id}`}
+          >
+            {showExplainer ? "Got it" : "I'm not sure \u2014 tell me more"}
+          </button>
+        </div>
+      </fieldset>
+
+      {showExplainer && (
+        <div id={`lf-explainer-${axis.id}`} class="lf-explainer" role="note">
+          {axis.explainer}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function AllQuestionsForm({
+  axes,
+  onComplete,
+}: {
+  axes: FinderAxis[];
+  onComplete: (answers: Map<string, FinderOption>) => void;
+}) {
+  const [selections, setSelections] = useState<
+    Map<string, FinderOption | null>
+  >(() => new Map(axes.map((a) => [a.id, null])));
+
+  const handleSelect = (axisId: string, option: FinderOption | null) => {
+    setSelections((prev) => {
+      const next = new Map(prev);
+      next.set(axisId, option);
+      return next;
+    });
+  };
+
+  const handleSubmit = () => {
+    const answers = new Map<string, FinderOption>();
+    for (const [id, opt] of selections) {
+      if (opt) answers.set(id, opt);
+    }
+    onComplete(answers);
+  };
+
+  return (
+    <div class="lf-form">
+      {axes.map((axis) => (
+        <div key={axis.id} class="lf-form-group">
+          <h4 class="lf-question__text">{axis.question}</h4>
+          <p class="lf-question__hint">{axis.hint}</p>
+          <div class="lf-form-options">
+            {axis.options.map((option) => {
+              const selected = selections.get(axis.id) === option;
+              return (
+                <button
+                  key={option.label}
+                  type="button"
+                  class={`lf-option-btn ${selected ? "lf-option-btn--selected" : ""}`}
+                  onClick={() => handleSelect(axis.id, option)}
+                  aria-pressed={selected}
+                >
+                  {option.label}
+                </button>
+              );
+            })}
+            <button
+              type="button"
+              class={`lf-skip-btn ${selections.get(axis.id) === null ? "lf-skip-btn--selected" : ""}`}
+              onClick={() => handleSelect(axis.id, null)}
+            >
+              I don't care
+            </button>
+          </div>
+        </div>
+      ))}
+
+      <button type="button" class="lf-submit-btn" onClick={handleSubmit}>
+        Find my license
+      </button>
+    </div>
+  );
+}
+
+function ResultCard({
+  license,
+  rank,
+  contrastText,
+}: {
+  license: LicenseCandidate;
+  rank: "best" | "also";
+  contrastText?: string;
+}) {
+  return (
+    <div
+      class={`lf-result ${rank === "best" ? "lf-result--best" : "lf-result--also"}`}
+    >
+      {rank === "best" && <span class="lf-result__badge">Best match</span>}
+      <h4 class="lf-result__name">{license.plain_name}</h4>
+      <p class="lf-result__pitch">
+        {rank === "also" && contrastText ? contrastText : license.maker_pitch}
+      </p>
+      <span class="lf-result__family">{license.license_family}</span>
+      <a href={license.url} class="lf-result__link">
+        Read this license
+      </a>
+    </div>
+  );
+}
+
+function Results({
+  licenses,
+  answers,
+  onReset,
+}: {
+  licenses: LicenseCandidate[];
+  answers: Map<string, FinderOption>;
+  onReset: () => void;
+}) {
+  const ranked = useMemo(
+    () => rankLicenses(licenses, answers),
+    [licenses, answers],
+  );
+
+  const best = ranked[0];
+  const alsoConsider = ranked.slice(1, 3);
+
+  // Look up contrast text from the best match's compare_to
+  const getContrast = (candidate: LicenseCandidate): string | undefined =>
+    best.compare_to.find((c) => c.spdx_id === candidate.spdx_id)?.contrast;
+
+  return (
+    <section class="lf-results" aria-label="License recommendations">
+      <span aria-live="assertive" aria-atomic="true" class="sr-only">
+        Recommended license: {best.plain_name}
+      </span>
+
+      <ResultCard license={best} rank="best" />
+
+      {alsoConsider.length > 0 && (
+        <div class="lf-also">
+          <h4 class="lf-also__heading">Also consider</h4>
+          {alsoConsider.map((l) => (
+            <ResultCard
+              key={l.spdx_id}
+              license={l}
+              rank="also"
+              contrastText={getContrast(l)}
+            />
+          ))}
+        </div>
+      )}
+
+      <button type="button" class="lf-reset-btn" onClick={onReset}>
+        Start over
+      </button>
+    </section>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Main component
+// ---------------------------------------------------------------------------
+
+export default function LicenseFinder({ id, licenses }: Props) {
+  const [mode, setMode] = useState<"wizard" | "form">("wizard");
+  const [wizardIndex, setWizardIndex] = useState(0);
+  const [answers, setAnswers] = useState<Map<string, FinderOption>>(new Map());
+  const [done, setDone] = useState(false);
+
+  // Filter axes to only those relevant for the current license set
+  const relevantAxes = useMemo(
+    () => FINDER_AXES.filter((a) => a.isRelevant(licenses)),
+    [licenses],
+  );
+
+  const currentAxis = relevantAxes[wizardIndex] as FinderAxis | undefined;
+
+  const handleWizardAnswer = useCallback(
+    (option: FinderOption) => {
+      setAnswers((prev) => {
+        const next = new Map(prev);
+        next.set(relevantAxes[wizardIndex].id, option);
+        return next;
+      });
+      if (wizardIndex + 1 >= relevantAxes.length) {
+        setDone(true);
+      } else {
+        setWizardIndex((i) => i + 1);
+      }
+    },
+    [wizardIndex, relevantAxes],
+  );
+
+  const handleWizardSkip = useCallback(() => {
+    // "I don't care" — no entry in answers map, advance
+    if (wizardIndex + 1 >= relevantAxes.length) {
+      setDone(true);
+    } else {
+      setWizardIndex((i) => i + 1);
+    }
+  }, [wizardIndex, relevantAxes]);
+
+  const handleFormComplete = useCallback(
+    (formAnswers: Map<string, FinderOption>) => {
+      setAnswers(formAnswers);
+      setDone(true);
+    },
+    [],
+  );
+
+  const handleBack = useCallback(() => {
+    if (done) {
+      setDone(false);
+      if (mode === "wizard") {
+        setWizardIndex(relevantAxes.length - 1);
+      }
+      return;
+    }
+    if (wizardIndex > 0) {
+      setWizardIndex((i) => i - 1);
+      setAnswers((prev) => {
+        const next = new Map(prev);
+        next.delete(relevantAxes[wizardIndex - 1].id);
+        return next;
+      });
+    }
+  }, [done, wizardIndex, relevantAxes, mode]);
+
+  const handleReset = useCallback(() => {
+    setAnswers(new Map());
+    setWizardIndex(0);
+    setDone(false);
+  }, []);
+
+  if (licenses.length === 0) {
+    return <p>No licenses available yet. Check back soon.</p>;
+  }
+
+  return (
+    <div class="license-finder" id={id}>
+      {/* Mode toggle */}
+      {!done && (
+        <div class="lf-mode-toggle">
+          <button
+            type="button"
+            class={`lf-mode-btn ${mode === "wizard" ? "lf-mode-btn--active" : ""}`}
+            onClick={() => {
+              setMode("wizard");
+              handleReset();
+            }}
+          >
+            Guided
+          </button>
+          <button
+            type="button"
+            class={`lf-mode-btn ${mode === "form" ? "lf-mode-btn--active" : ""}`}
+            onClick={() => {
+              setMode("form");
+              handleReset();
+            }}
+          >
+            All at once
+          </button>
+        </div>
+      )}
+
+      {/* Wizard mode */}
+      {mode === "wizard" && !done && currentAxis && (
+        <>
+          <ProgressBar current={wizardIndex} total={relevantAxes.length} />
+          {wizardIndex > 0 && (
+            <button
+              type="button"
+              class="lf-back-btn"
+              onClick={handleBack}
+              aria-label="Go back to previous question"
+            >
+              &larr; Back
+            </button>
+          )}
+          <QuestionCard
+            axis={currentAxis}
+            onAnswer={handleWizardAnswer}
+            onSkip={handleWizardSkip}
+          />
+        </>
+      )}
+
+      {/* Form mode */}
+      {mode === "form" && !done && (
+        <AllQuestionsForm axes={relevantAxes} onComplete={handleFormComplete} />
+      )}
+
+      {/* Results */}
+      {done && (
+        <Results licenses={licenses} answers={answers} onReset={handleReset} />
+      )}
+
+      <style>{`
+        .license-finder {
+          margin: 2rem 0;
+          padding: 2rem;
+          background: var(--sl-color-gray-6);
+          border: 1px solid var(--sl-color-gray-5);
+          border-radius: 12px;
+          color: var(--sl-color-white);
+        }
+
+        /* Mode toggle */
+        .lf-mode-toggle {
+          display: flex;
+          gap: 0.25rem;
+          margin-bottom: 1.5rem;
+          justify-content: center;
+        }
+        .lf-mode-btn {
+          padding: 0.4rem 1rem;
+          background: transparent;
+          border: 1px solid var(--sl-color-gray-4);
+          color: var(--sl-color-gray-2);
+          cursor: pointer;
+          font-size: var(--sl-text-sm);
+          border-radius: 6px;
+        }
+        .lf-mode-btn--active {
+          background: var(--sl-color-accent);
+          color: var(--sl-color-white);
+          border-color: var(--sl-color-accent);
+        }
+        .lf-mode-btn:hover,
+        .lf-mode-btn:focus-visible {
+          border-color: var(--sl-color-accent);
+          outline: 2px solid var(--sl-color-accent);
+          outline-offset: 2px;
+        }
+
+        /* Progress bar */
+        .lf-progress {
+          margin-bottom: 1.5rem;
+          position: relative;
+          height: 4px;
+          background: var(--sl-color-gray-5);
+          border-radius: 2px;
+          overflow: hidden;
+        }
+        .lf-progress__bar {
+          height: 100%;
+          background: var(--sl-color-accent);
+          transition: width 0.3s ease;
+        }
+        .lf-progress__label {
+          display: block;
+          text-align: center;
+          font-size: var(--sl-text-xs, 0.75rem);
+          color: var(--sl-color-gray-2);
+          margin-top: 0.5rem;
+        }
+
+        /* Back button */
+        .lf-back-btn {
+          background: none;
+          border: 1px solid var(--sl-color-gray-4);
+          color: var(--sl-color-gray-2);
+          cursor: pointer;
+          margin-bottom: 1rem;
+          font-size: var(--sl-text-sm);
+          padding: 0.35rem 0.75rem;
+          border-radius: 4px;
+        }
+        .lf-back-btn:hover,
+        .lf-back-btn:focus-visible {
+          color: var(--sl-color-white);
+          border-color: var(--sl-color-white);
+          outline: 2px solid var(--sl-color-white);
+          outline-offset: 2px;
+        }
+
+        /* Question */
+        .lf-question {
+          text-align: center;
+        }
+        .lf-question__text {
+          font-size: 1.25rem;
+          margin: 0 0 0.5rem;
+        }
+        .lf-question__hint {
+          font-size: var(--sl-text-sm);
+          color: var(--sl-color-gray-2);
+          margin: 0 0 1.5rem;
+        }
+
+        /* Options */
+        .lf-options {
+          display: flex;
+          gap: 0.75rem;
+          justify-content: center;
+          flex-wrap: wrap;
+          border: none;
+          padding: 0;
+          margin: 0 0 1rem;
+        }
+        .lf-option-btn {
+          padding: 0.85rem 1.5rem;
+          background: var(--sl-color-accent);
+          color: var(--sl-color-white);
+          border: 2px solid transparent;
+          border-radius: 8px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: background 0.2s, border-color 0.2s;
+          font-size: var(--sl-text-body, 1rem);
+        }
+        .lf-option-btn:hover,
+        .lf-option-btn:focus-visible {
+          background: var(--sl-color-accent-high);
+          outline: 2px solid var(--sl-color-accent);
+          outline-offset: 2px;
+        }
+        .lf-option-btn--selected {
+          border-color: var(--sl-color-white);
+          background: var(--sl-color-accent-high);
+        }
+
+        /* Secondary actions (I don't care / tell me more) */
+        .lf-secondary-actions {
+          display: flex;
+          gap: 1rem;
+          justify-content: center;
+          width: 100%;
+          margin-top: 0.5rem;
+        }
+        .lf-skip-btn,
+        .lf-explain-btn {
+          background: none;
+          border: none;
+          color: var(--sl-color-gray-3);
+          cursor: pointer;
+          font-size: var(--sl-text-sm);
+          text-decoration: underline;
+          text-decoration-style: dotted;
+          text-underline-offset: 3px;
+          padding: 0.25rem 0.5rem;
+        }
+        .lf-skip-btn:hover,
+        .lf-skip-btn:focus-visible,
+        .lf-explain-btn:hover,
+        .lf-explain-btn:focus-visible {
+          color: var(--sl-color-white);
+          outline: 2px solid var(--sl-color-accent);
+          outline-offset: 2px;
+          border-radius: 4px;
+        }
+        .lf-skip-btn--selected {
+          color: var(--sl-color-white);
+        }
+
+        /* Explainer panel */
+        .lf-explainer {
+          margin: 1rem auto 0;
+          max-width: 36rem;
+          padding: 1rem 1.25rem;
+          background: var(--sl-color-gray-5);
+          border-radius: 8px;
+          font-size: var(--sl-text-sm);
+          color: var(--sl-color-gray-1);
+          line-height: 1.6;
+          text-align: left;
+        }
+
+        /* Form mode */
+        .lf-form {
+          display: flex;
+          flex-direction: column;
+          gap: 2rem;
+        }
+        .lf-form-group {
+          text-align: center;
+          padding-bottom: 1.5rem;
+          border-bottom: 1px solid var(--sl-color-gray-5);
+        }
+        .lf-form-group:last-of-type {
+          border-bottom: none;
+        }
+        .lf-form-options {
+          display: flex;
+          gap: 0.5rem;
+          justify-content: center;
+          flex-wrap: wrap;
+        }
+        .lf-submit-btn {
+          display: block;
+          margin: 0 auto;
+          padding: 0.85rem 2rem;
+          background: var(--sl-color-accent);
+          color: var(--sl-color-white);
+          border: none;
+          border-radius: 8px;
+          font-weight: 600;
+          cursor: pointer;
+          font-size: var(--sl-text-body, 1rem);
+        }
+        .lf-submit-btn:hover,
+        .lf-submit-btn:focus-visible {
+          background: var(--sl-color-accent-high);
+          outline: 2px solid var(--sl-color-accent);
+          outline-offset: 2px;
+        }
+
+        /* Results */
+        .lf-results {
+          text-align: center;
+        }
+        .lf-result {
+          padding: 1.25rem 1.5rem;
+          border-radius: 8px;
+          text-align: left;
+          margin-bottom: 0.75rem;
+        }
+        .lf-result--best {
+          background: rgba(var(--sl-color-accent-rgb, 136, 58, 234), 0.15);
+          border: 1px solid var(--sl-color-accent);
+        }
+        .lf-result--also {
+          background: var(--sl-color-gray-5);
+          border: 1px solid var(--sl-color-gray-4);
+        }
+        .lf-result__badge {
+          display: inline-block;
+          font-size: var(--sl-text-xs, 0.75rem);
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+          color: var(--sl-color-accent);
+          margin-bottom: 0.35rem;
+          font-weight: 600;
+        }
+        .lf-result__name {
+          font-size: 1.35rem;
+          font-weight: 700;
+          margin: 0 0 0.35rem;
+        }
+        .lf-result__pitch {
+          margin: 0 0 0.5rem;
+          color: var(--sl-color-gray-2);
+          font-size: var(--sl-text-sm);
+          line-height: 1.5;
+        }
+        .lf-result__family {
+          display: inline-block;
+          font-size: var(--sl-text-xs, 0.75rem);
+          color: var(--sl-color-gray-3);
+          padding: 0.15rem 0.5rem;
+          border: 1px solid var(--sl-color-gray-4);
+          border-radius: 4px;
+          margin-bottom: 0.75rem;
+        }
+        .lf-result__link {
+          display: inline-block;
+          margin-left: 0.75rem;
+          padding: 0.5rem 1rem;
+          background: var(--sl-color-accent);
+          color: var(--sl-color-white);
+          text-decoration: none;
+          border-radius: 6px;
+          font-weight: 600;
+          font-size: var(--sl-text-sm);
+        }
+        .lf-result__link:hover,
+        .lf-result__link:focus-visible {
+          background: var(--sl-color-accent-high);
+          outline: 2px solid var(--sl-color-accent);
+          outline-offset: 2px;
+        }
+
+        /* Also consider section */
+        .lf-also {
+          margin-top: 1.5rem;
+        }
+        .lf-also__heading {
+          font-size: var(--sl-text-sm);
+          color: var(--sl-color-gray-3);
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+          margin: 0 0 0.75rem;
+          text-align: left;
+        }
+
+        /* Reset button */
+        .lf-reset-btn {
+          margin-top: 1.5rem;
+          background: none;
+          border: 1px solid var(--sl-color-gray-4);
+          color: var(--sl-color-gray-2);
+          cursor: pointer;
+          padding: 0.5rem 1.25rem;
+          border-radius: 6px;
+          font-size: var(--sl-text-sm);
+        }
+        .lf-reset-btn:hover,
+        .lf-reset-btn:focus-visible {
+          color: var(--sl-color-white);
+          border-color: var(--sl-color-white);
+          outline: 2px solid var(--sl-color-white);
+          outline-offset: 2px;
+        }
+
+        /* Utility */
+        .sr-only {
+          position: absolute;
+          width: 1px;
+          height: 1px;
+          padding: 0;
+          margin: -1px;
+          overflow: hidden;
+          clip: rect(0, 0, 0, 0);
+          white-space: nowrap;
+          border: 0;
+        }
+      `}</style>
+    </div>
+  );
+}

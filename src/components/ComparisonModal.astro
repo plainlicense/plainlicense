@@ -207,5 +207,5 @@ window.addEventListener("keydown", (e) => {
 });
 
 // Expose openModal for MappingViewer.ts to call with the triggering element
-(window as Record<string, unknown>).__openComparisonModal = openModal;
+(window as unknown as Record<string, unknown>).__openComparisonModal = openModal;
 </script>

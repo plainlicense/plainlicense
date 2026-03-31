@@ -81,7 +81,7 @@
     "sharp": "^0.34.5",
     "starlight-auto-drafts": "^0.3.0",
     "starlight-blog": "^0.26.1",
-    "starlight-contextual-menu": "^0.1.5",
+    "starlight-page-actions": "^0.1.0",
     "starlight-heading-badges": "^0.7.0",
     "starlight-llms-txt": "^0.8.0",
     "starlight-tags": "^0.4.0",

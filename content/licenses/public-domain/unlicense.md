@@ -12,6 +12,12 @@ tldr:
   - There's no warranty. Use at your own risk.
 attribution_required: false
 fair_code: false
+maker_pitch: "No restrictions at all. Your work belongs to everyone."
+commercial_restrictions: []
+compare_to:
+  - spdx_id: MIT
+    contrast: "Like Unlicense, but requires giving you credit"
+uuid: f7905ee1-c1c1-4e8b-9ffd-27cb7fc77de1
 plain_gunning_fog: 12.2
 shame_words_count: 0
 original:

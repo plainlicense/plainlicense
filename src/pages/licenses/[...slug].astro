@@ -159,7 +159,7 @@ if (spdxId) {
   fetch(`/mappings/${spdxId}-mapping.json`)
     .then((res) => res.json())
     .then((mappingData) => {
-      initMappingViewer(container, mappingData);
+      initMappingViewer(mappingData);
     })
     .catch(() => {
       console.log(`No mapping found for ${spdxId}`);

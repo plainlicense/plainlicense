@@ -1,0 +1,37 @@
+---
+import type { LicenseCandidate } from "../../data/finderTypes";
+/**
+ * Astro wrapper for the LicenseFinder Preact component.
+ *
+ * Fetches all published licenses at build time, maps them to the
+ * flat LicenseCandidate shape, and passes them as a JSON prop to the
+ * client-side interactive component.
+ */
+import { getLicenseSlug, getPublishedLicenses } from "../../utils/collections";
+import LicenseFinder from "./LicenseFinder";
+
+interface Props {
+  id?: string;
+}
+
+const { id } = Astro.props;
+
+const licenses = await getPublishedLicenses();
+
+const candidates: LicenseCandidate[] = licenses
+  .filter((l) => l.data.maker_pitch)
+  .map((l) => ({
+    spdx_id: l.data.spdx_id,
+    plain_name: l.data.plain_name,
+    license_family: l.data.license_family,
+    maker_pitch: l.data.maker_pitch as string,
+    url: `/licenses/${getLicenseSlug(l)}/`,
+    permissions: l.data.original?.permissions ?? [],
+    conditions: l.data.original?.conditions ?? [],
+    limitations: l.data.original?.limitations ?? [],
+    commercial_restrictions: l.data.commercial_restrictions ?? [],
+    compare_to: l.data.compare_to ?? [],
+  }));
+---
+
+<LicenseFinder id={id} licenses={candidates} client:load />

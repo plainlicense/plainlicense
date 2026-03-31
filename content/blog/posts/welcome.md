@@ -4,6 +4,7 @@ date: 2026-03-05
 authors: adam
 description: "We've completely redesigned our platform to make software licenses even easier to understand and use."
 draft: false
+uuid: 7d7fb195-ba04-444b-8bb0-4bb84e5ec777
 tags:
   - announcements
   - astro

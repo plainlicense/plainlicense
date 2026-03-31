@@ -107,6 +107,28 @@ export const licenseSchema = z
     attribution_required: z.boolean().default(false),
     fair_code: z.boolean().default(false),
 
+    // === License finder / recommendations ===
+    maker_pitch: z.string().max(120).optional(),
+    commercial_restrictions: z
+      .array(
+        z.enum([
+          "no-managed-service",
+          "no-selling",
+          "network-copyleft",
+          "time-delayed-open",
+        ]),
+      )
+      .default([]),
+    compare_to: z
+      .array(
+        z.object({
+          spdx_id: z.string().regex(/^[A-Za-z0-9.-]+$/),
+          contrast: z.string().max(200),
+        }),
+      )
+      .max(5)
+      .optional(),
+
     // === License-specific how-to additions (family default is a component) ===
     extra_how: z.string().optional(),
 

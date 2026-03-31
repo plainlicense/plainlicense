@@ -39,18 +39,19 @@ import type { Props } from "@astrojs/starlight/props";
 
 <script>
 (() => {
-  const btn = document.getElementById("scroll-to-top");
+  const btn = document.getElementById("scroll-to-top") as HTMLElement | null;
   if (!btn) return;
+  const scrollBtn: HTMLElement = btn;
   const threshold = Math.max(document.documentElement.clientHeight * 0.3, 200);
   function onScroll() {
     if (window.scrollY > threshold) {
-      btn.classList.add("visible");
+      scrollBtn.classList.add("visible");
     } else {
-      btn.classList.remove("visible");
+      scrollBtn.classList.remove("visible");
     }
   }
   window.addEventListener("scroll", onScroll, { passive: true });
-  btn.addEventListener("click", () => {
+  scrollBtn.addEventListener("click", () => {
     const prefersReducedMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)",
     ).matches;

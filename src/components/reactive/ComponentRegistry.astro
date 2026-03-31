@@ -1,13 +1,11 @@
 ---
 import ComparisonTable from "./ComparisonTable.astro";
-import DecisionTree from "./DecisionTree";
 import FAQ from "./FAQ.astro";
+import LicenseFinderWrapper from "./LicenseFinderWrapper.astro";
 
 interface Props {
   type: string;
   id?: string;
-  props?: Record<string, unknown>;
-  licenseData?: unknown;
   props?: Record<string, unknown>;
   licenseData?: unknown;
 }
@@ -22,22 +20,10 @@ if (type === "faq" && !processedProps.items && licenseData?.faq) {
   processedProps.items = licenseData.faq[id || "default"];
 } else if (type === "table" && !processedProps.data && licenseData?.tables) {
   processedProps.data = licenseData.tables[id || "default"];
-} else if (type === "tree" && !processedProps.steps && licenseData?.trees) {
-  processedProps.steps = licenseData.trees[id || "default"];
-if (type === "faq" && !processedProps.items && licenseData?.faq) {
-  processedProps.items = licenseData.faq[id || "default"];
-} else if (type === "table" && !processedProps.data && licenseData?.tables) {
-  processedProps.data = licenseData.tables[id || "default"];
-} else if (type === "tree" && !processedProps.steps && licenseData?.trees) {
-  processedProps.steps = licenseData.trees[id || "default"];
 }
 
 for (const key in processedProps) {
   const val = processedProps[key];
-  if (
-    typeof val === "string" &&
-    (val.trim().startsWith("[") || val.trim().startsWith("{"))
-  ) {
   if (
     typeof val === "string" &&
     (val.trim().startsWith("[") || val.trim().startsWith("{"))
@@ -54,7 +40,7 @@ for (const key in processedProps) {
 
 {type === 'faq' && <FAQ id={id} {...processedProps} />}
 {type === 'table' && <ComparisonTable id={id} {...processedProps} />}
-{type === 'tree' && <DecisionTree id={id} client:load {...processedProps} />}
+{type === 'tree' && <LicenseFinderWrapper id={id} />}
 
 {!['faq', 'table', 'tree'].includes(type) && (
   <div class="error">Unknown component type: {type}</div>

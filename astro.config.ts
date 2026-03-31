@@ -9,9 +9,10 @@ import { defineConfig, fontProviders, sessionDrivers } from "astro/config";
 import { readdirSync, statSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import rehypeExternalLinks from "rehype-external-links";
 import starlightAutoDrafts from "starlight-auto-drafts";
 import starlightBlog from "starlight-blog";
-import starlightContextualMenu from "starlight-contextual-menu";
+import starlightPageActions from "starlight-page-actions";
 import starlightHeadingBadges from "starlight-heading-badges";
 import starlightLLMsTxt from "starlight-llms-txt";
 import starlightTags from "starlight-tags";
@@ -314,12 +315,8 @@ export default defineConfig({
               {
                 label: "Is this a public domain dedication (not a license)?",
                 name: "is_dedication",
-                widget: "compute",
-                // @ts-expect-error
-                value: "{{fields.license_family}}" === "public-domain",
-
+                widget: "boolean",
                 default: false,
-                // we can infer from license family
                 required: false,
               },
               {
@@ -404,6 +401,46 @@ export default defineConfig({
                 widget: "boolean",
                 default: false,
                 required: false,
+              },
+              // === License finder / recommendations ===
+              {
+                label:
+                  "Maker pitch (one-liner for license finder results, max 120 chars)",
+                name: "maker_pitch",
+                widget: "string",
+                required: false,
+              },
+              {
+                name: "commercial_restrictions",
+                label: "Commercial restrictions",
+                widget: "select",
+                multiple: true,
+                required: false,
+                options: [
+                  "no-managed-service",
+                  "no-selling",
+                  "network-copyleft",
+                  "time-delayed-open",
+                ],
+              },
+              {
+                name: "compare_to",
+                label: "Compare to (for license finder 'also consider' results)",
+                widget: "list",
+                required: false,
+                fields: [
+                  {
+                    label: "SPDX ID of the license to compare against",
+                    name: "spdx_id",
+                    widget: "string",
+                  },
+                  {
+                    label:
+                      "Contrast statement (e.g. 'Like MIT, but without the credit requirement')",
+                    name: "contrast",
+                    widget: "string",
+                  },
+                ],
               },
               // SEO fields (optional overrides for auto-generated values)
               {
@@ -581,9 +618,9 @@ export default defineConfig({
                       "warranty",
                     ],
                   },
-                  { label: "Body", name: "body", widget: "richtext" },
                 ],
               },
+              { label: "Body", name: "body", widget: "richtext" },
             ],
           },
           {
@@ -659,103 +696,145 @@ export default defineConfig({
                   },
                 ],
               },
+            ],
+          },
+          {
+            name: "blog-posts",
+            label: "Blog",
+            folder: "content/blog/posts",
+            create: true,
+            format: "yaml-frontmatter",
+            extension: "mdx",
+            preview_path: "",
+            thumbnail: "og_image",
+            fields: [
+              { label: "Title", name: "title", widget: "string" },
               {
-                name: "blog-posts",
-                label: "Blog",
-                folder: "content/blog/posts",
-                create: true,
-                format: "yaml-frontmatter",
-                extension: "mdx",
-                preview_path: "",
-                thumbnail: "og_image",
+                label: "Creation Date",
+                name: "creation_date",
+                widget: "datetime",
+              },
+              {
+                label: "Publication Date",
+                name: "publication_date",
+                widget: "datetime",
+                required: false,
+              },
+              {
+                label: "Last Updated",
+                name: "last_updated",
+                widget: "datetime",
+              },
+              {
+                label: "Authors",
+                name: "authors",
+                widget: "list",
+                collection: "authors",
+                multiple: true,
+                display_fields: ["{{authors.*.name}}"],
+                search_fields: ["{{authors.*.name}}"],
+                value_field: "{{authors.*.uuid}}",
+                required: false,
+              },
+              {
+                label: "Description",
+                name: "description",
+                widget: "text",
+                hint: "1-3 sentences, answers 'what's this post about?'. Markdown supported.",
+                required: false,
+              },
+              {
+                label: "Tags",
+                name: "tags",
+                widget: "list",
+                required: false,
+              },
+              {
+                label: "Category",
+                name: "category",
+                widget: "select",
+                options: [
+                  "announcements",
+                  "guides",
+                  "updates",
+                  "community",
+                  "license-talk",
+                ],
+                required: false,
+              },
+              {
+                label: "Featured",
+                name: "featured",
+                widget: "boolean",
+                default: false,
+                required: false,
+              },
+              {
+                label: "OG Image",
+                name: "og_image",
+                widget: "image",
+                required: false,
+              },
+              {
+                label: "Related Licenses",
+                name: "related_licenses",
+                widget: "relation",
+                collection: "licenses",
+                search_fields: [
+                  "title",
+                  "plain_name",
+                  "spdx_id",
+                  "original.name",
+                ],
+                value_field: "uuid",
+                required: false,
+              },
+              {
+                label: "Status",
+                name: "status",
+                widget: "select",
+                options: ["draft", "published"],
+                default: "draft",
+              },
+              {
+                label: "UUID",
+                name: "uuid",
+                widget: "uuid",
+                hide: true,
+                readonly: true,
+              },
+              {
+                label: "Series",
+                name: "series",
+                widget: "object",
+                required: false,
                 fields: [
-                  { label: "Title", name: "title", widget: "string" },
                   {
-                    label: "Creation Date",
-                    name: "creation_date",
-                    widget: "datetime",
+                    label:
+                      "Name of the series (e.g. 'MIT License Explained')",
+                    name: "name",
+                    widget: "string",
                   },
                   {
-                    label: "Publication Date",
-                    name: "publication_date",
-                    widget: "datetime",
-                    required: false,
-                  },
-                  {
-                    label: "Last Updated",
-                    name: "last_updated",
-                    widget: "datetime",
-                  },
-                  {
-                    label: "Authors",
-                    name: "authors",
-                    widget: "list",
-                    collection: "authors",
-                    multiple: true,
-                    display_fields: ["{{authors.*.name}}"],
-                    search_fields: ["{{authors.*.name}}"],
-                    value_field: "{{authors.*.uuid}}",
-                    required: false,
-                  },
-                  {
-                    label: "Description",
+                    label: "Description of the series",
                     name: "description",
                     widget: "text",
-                    hint: "1-3 sentences, answers 'what's this post about?'. Markdown supported.",
-                    required: false,
                   },
                   {
-                    label: "Tags",
-                    name: "tags",
-                    widget: "list",
-                    required: false,
+                    label: "Slug",
+                    name: "slug",
+                    hide: true,
+                    widget: "string",
+                    hint: "Used in URLs for series overview pages. Should be lowercase with hyphens, e.g. 'mit-license-explained'.",
                   },
                   {
-                    label: "Category",
-                    name: "category",
-                    widget: "select",
-                    options: [
-                      "announcements",
-                      "guides",
-                      "updates",
-                      "community",
-                      "license-talk",
-                    ],
-                    required: false,
-                  },
-                  {
-                    label: "Featured",
-                    name: "featured",
-                    widget: "boolean",
-                    default: false,
-                    required: false,
-                  },
-                  {
-                    label: "OG Image",
-                    name: "og_image",
-                    widget: "image",
-                    required: false,
-                  },
-                  {
-                    label: "Related Licenses",
-                    name: "related_licenses",
-                    widget: "relation",
-                    collection: "licenses",
-                    search_fields: [
-                      "title",
-                      "plain_name",
-                      "spdx_id",
-                      "original.name",
-                    ],
-                    value_field: "uuid",
-                    required: false,
-                  },
-                  {
-                    label: "Status",
-                    name: "status",
-                    widget: "select",
-                    options: ["draft", "published"],
-                    default: "draft",
+                    label: "Index",
+                    hint: "Index of this post within the series, starting at 1. Used to order posts in the series.",
+                    name: "index",
+                    widget: "number",
+                    value_type: "int",
+                    readonly: true,
+                    hide: true,
                   },
                   {
                     label: "UUID",
@@ -764,100 +843,58 @@ export default defineConfig({
                     hide: true,
                     readonly: true,
                   },
-                  {
-                    label: "Series",
-                    name: "series",
-                    widget: "object",
-                    required: false,
-                    fields: [
-                      {
-                        label:
-                          "Name of the series (e.g. 'MIT License Explained')",
-                        name: "name",
-                        widget: "string",
-                      },
-                      {
-                        label: "Description of the series",
-                        name: "description",
-                        widget: "text",
-                      },
-                      {
-                        label: "Slug",
-                        name: "slug",
-                        hide: true,
-                        widget: "string",
-                        hint: "Used in URLs for series overview pages. Should be lowercase with hyphens, e.g. 'mit-license-explained'.",
-                      },
-                      {
-                        label: "Index",
-                        hint: "Index of this post within the series, starting at 1. Used to order posts in the series.",
-                        name: "index",
-                        widget: "number",
-                        value_type: "int",
-                        readonly: true,
-                        hide: true,
-                      },
-                      {
-                        label: "UUID",
-                        name: "uuid",
-                        widget: "uuid",
-                        hide: true,
-                        readonly: true,
-                      },
-                    ],
-                  },
-                  { label: "Body", name: "body", widget: "richtext" },
+                ],
+              },
+              { label: "Body", name: "body", widget: "richtext" },
+            ],
+          },
+          {
+            name: "template-blocks",
+            label: "Template Blocks",
+            folder: "content/template-blocks",
+            create: true,
+            fields: [
+              { label: "Title", name: "title", widget: "string" },
+              { label: "Block ID", name: "block_id", widget: "string" },
+              {
+                label: "Category",
+                name: "category",
+                widget: "select",
+                options: [
+                  "warranty",
+                  "permission",
+                  "condition",
+                  "disclaimer",
+                  "notice",
                 ],
               },
               {
-                name: "template-blocks",
-                label: "Template Blocks",
-                folder: "content/template-blocks",
-                create: true,
-                fields: [
-                  { label: "Title", name: "title", widget: "string" },
-                  { label: "Block ID", name: "block_id", widget: "string" },
-                  {
-                    label: "Category",
-                    name: "category",
-                    widget: "select",
-                    options: [
-                      "warranty",
-                      "permission",
-                      "condition",
-                      "disclaimer",
-                      "notice",
-                    ],
-                  },
-                  {
-                    label: "Description",
-                    name: "description",
-                    widget: "text",
-                    required: false,
-                  },
-                  {
-                    label: "Version",
-                    name: "version",
-                    widget: "string",
-                    pattern: "^[0-9]+\\.[0-9]+\\.[0-9]+$",
-                    required: true,
-                  },
-                  {
-                    label: "Block Title",
-                    name: "block_title",
-                    widget: "string",
-                    required: false,
-                  },
-                  {
-                    label: "UUID",
-                    name: "uuid",
-                    widget: "uuid",
-                    hide: true,
-                    readonly: true,
-                  },
-                  { label: "Body", name: "body", widget: "richtext" },
-                ],
+                label: "Description",
+                name: "description",
+                widget: "text",
+                required: false,
               },
+              {
+                label: "Version",
+                name: "version",
+                widget: "string",
+                pattern: "^[0-9]+\\.[0-9]+\\.[0-9]+$",
+                required: true,
+              },
+              {
+                label: "Block Title",
+                name: "block_title",
+                widget: "string",
+                required: false,
+              },
+              {
+                label: "UUID",
+                name: "uuid",
+                widget: "uuid",
+                hide: true,
+                readonly: true,
+              },
+              { label: "Body", name: "body", widget: "richtext" },
             ],
           },
         ],
@@ -910,6 +947,10 @@ export default defineConfig({
       expressiveCode: {
         themes: ["ayu-dark", "github-light-high-contrast"],
         useStarlightDarkModeSwitch: true,
+        removeUnusedThemes: true,
+        shiki: {
+          bundledLangs: ["json", "yaml", "markdown", "diff", "typescript", "javascript"]
+        },
       },
       sidebar: [
         {
@@ -938,9 +979,8 @@ export default defineConfig({
         }),
         starlightAutoDrafts(),
         starlightHeadingBadges(),
-        starlightContextualMenu({
-          actions: ["copy", "view", "claude", "chatgpt"],
-        }),
+        starlightPageActions({ baseUrl: `https://docs.knitli.com/${appName.toLowerCase()}`, actions: { claude: true, chatgpt: true, markdown: true }, share: true }),
+
         starlightLLMsTxt({
           projectName: "Plain License",
           description: `Plain License is a community project that provides creative licenses in plain language for everyone. Our mission is to make it easy for creators and users to understand their rights and obligations under various licenses, without needing a law degree.
@@ -998,6 +1038,7 @@ export default defineConfig({
         light: "github-light-high-contrast",
       },
     },
+    rehypePlugins: [rehypeExternalLinks({ content: { type: 'text', value: ' 🔗' }, rel: ['nofollow'] })],
   },
   output: "static",
   prefetch: {
