@@ -1,4 +1,16 @@
 {
+  "name": "sweet-dream-b918",
+  "version": "0.0.1",
+  "type": "module",
+  "scripts": {
+    "astro": "bunx astro",
+    "build": "bunx astro build",
+    "cf-typegen": "bunx wrangler types",
+    "deploy": "bunx astro build && bunx wrangler deploy",
+    "dev": "bunx astro dev",
+    "generate-types": "bunx wrangler types",
+    "preview": "bunx astro build && bunx astro preview"
+  },
   "dependencies": {
     "@astrojs/cloudflare": "catalog:workers",
     "astro": "catalog:workers"
@@ -16,26 +28,14 @@
     "vite-tsconfig-paths": "catalog:workers",
     "wrangler": "catalog:workers"
   },
-  "devEngines": {
-    "packageManager": {
-      "onFail": "download",
-      "name": "bun",
-      "version": "catalog:"
-    }
-  },
   "engines": {
     "node": "catalog:workers"
   },
-  "name": "sweet-dream-b918",
-  "scripts": {
-    "astro": "bunx astro",
-    "build": "bunx astro build",
-    "cf-typegen": "bunx wrangler types",
-    "deploy": "bunx astro build && bunx wrangler deploy",
-    "dev": "bunx astro dev",
-    "generate-types": "bunx wrangler types",
-    "preview": "bunx astro build && bunx astro preview"
-  },
-  "type": "module",
-  "version": "0.0.1"
+  "devEngines": {
+    "packageManager": {
+      "name": "bun",
+      "version": "catalog:",
+      "onFail": "download"
+    }
+  }
 }

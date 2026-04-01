@@ -1,101 +1,36 @@
 {
+  "name": "plain-license",
+  "version": "0.2.0",
+  "private": true,
+  "description": "Plain language versions of popular creative licenses",
+  "keywords": [
+    "legal",
+    "license",
+    "mkdocs",
+    "mit",
+    "mpl",
+    "unlicense",
+    "readability",
+    "mkdocs-material",
+    "plain-language",
+    "language"
+  ],
+  "bugs": {
+    "url": "https://github.com/plainlicense/plainlicense/issues",
+    "email": "adam@plainlicense.org"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/plainlicense/plainlicense.git"
+  },
+  "license": "LicenseRef-PlainUnlicense OR Unlicense",
   "author": {
-    "email": "adam@plainlicense.org",
-    "name": "Adam Poulemanos"
+    "name": "Adam Poulemanos",
+    "email": "adam@plainlicense.org"
   },
   "bin": {
     "install-hooks": "bin/install-hooks.sh",
     "setup-repo": "bin/setup-repo.sh"
-  },
-  "bugs": {
-    "email": "adam@plainlicense.org",
-    "url": "https://github.com/plainlicense/plainlicense/issues"
-  },
-  "config": {
-    "commitizen": {
-      "path": "@commitlint/cz-commitlint"
-    }
-  },
-  "dependencies": {
-    "@astrojs/node": "^10.0.3",
-    "@astrojs/preact": "^5.0.2",
-    "@astrojs/starlight": "^0.38.1",
-    "@plainlicense/plain-elastic": "workspace:*",
-    "@plainlicense/plain-mit": "workspace:*",
-    "@plainlicense/plain-mpl": "workspace:*",
-    "@plainlicense/plain-unlicense": "workspace:*",
-    "@sveltia/cms": "catalog:workers",
-    "astro-loader-sveltia-cms": "^0.1.3",
-    "rxjs": "^7.8.2",
-    "starlight-markdown": "^0.1.5"
-  },
-  "description": "Plain language versions of popular creative licenses",
-  "devDependencies": {
-    "@astrojs/check": "^0.9.8",
-    "@astrojs/cloudflare": "catalog:workers",
-    "@astrojs/compiler-rs": "catalog:workers",
-    "@astrojs/mdx": "catalog:workers",
-    "@astrojs/rss": "^4.0.15",
-    "@astrojs/sitemap": "^3.7.0",
-    "@axe-core/playwright": "^4.11.1",
-    "@biomejs/biome": "catalog:workers",
-    "@commitlint/cli": "catalog:license-release",
-    "@commitlint/config-conventional": "^20.4.3",
-    "@commitlint/cz-commitlint": "^20.4.3",
-    "@commitlint/types": "^20.4.3",
-    "@playwright/test": "^1.58.2",
-    "@resvg/resvg-js": "^2.6.2",
-    "@semantic-release/commit-analyzer": "catalog:license-release",
-    "@semantic-release/github": "catalog:license-release",
-    "@semantic-release/release-notes-generator": "catalog:license-release",
-    "@testing-library/preact": "^3.2.4",
-    "@tsconfig/bun": "^1.0.8",
-    "@types/bun": "^1.2.16",
-    "@types/css-modules": "^1.0.5",
-    "@types/dom-navigation": "^1.0.5",
-    "@types/node": "^24.12.0",
-    "@types/resize-observer-browser": "^0.1.11",
-    "@types/rollup-plugin-size-snapshot": "^0.10.5",
-    "@types/svgo": "^3.0.0",
-    "@vitest/coverage-v8": "^4.0.18",
-    "@vitest/ui": "^4.0.18",
-    "astro": "^6.0.7",
-    "astro-cloudflare-pages-headers": "catalog:workers",
-    "astro-favicons": "catalog:workers",
-    "autoprefixer": "^10.4.21",
-    "bun": "catalog:",
-    "commitizen": "^4.3.1",
-    "commitlint-plugin-selective-scope": "catalog:license-release",
-    "github-types": "^1.0.0",
-    "globby": "^16.1.1",
-    "gray-matter": "^4.0.3",
-    "issue-parser": "^7.0.1",
-    "js-yaml": "^4.1.1",
-    "markdownlint-cli2": "^0.22.0",
-    "marked": "^17.0.4",
-    "playwright": "^1.53.0",
-    "preact": "^10.28.4",
-    "rehype-external-links": "^3.0.0",
-    "satori": "^0.26.0",
-    "semantic-release": "catalog:license-release",
-    "semantic-release-cli": "catalog:license-release",
-    "semantic-release-monorepo": "^8.0.2",
-    "sharp": "^0.34.5",
-    "starlight-auto-drafts": "^0.3.0",
-    "starlight-blog": "^0.26.1",
-    "starlight-heading-badges": "^0.7.0",
-    "starlight-llms-txt": "^0.8.0",
-    "starlight-page-actions": "^0.5.0",
-    "starlight-tags": "^0.4.0",
-    "svgo": "^4.0.1",
-    "ts-node": "catalog:workers",
-    "tsconfig-paths": "catalog:workers",
-    "tslib": "catalog:workers",
-    "typescript": "catalog:workers",
-    "vite": "catalog:workers",
-    "vite-tsconfig-paths": "catalog:workers",
-    "vitest": "catalog:workers",
-    "wrangler": "catalog:workers"
   },
   "directories": {
     "assets": "src/assets",
@@ -111,31 +46,75 @@
     "submodules": "external",
     "workers": "workers"
   },
-  "engines": {
-    "node": "catalog:workers"
+  "workspaces": {
+    "packages": [
+      "packages/*",
+      "workers/*"
+    ],
+    "catalog": {
+      "bun": "^1.3.10"
+    },
+    "catalogs": {
+      "license-release": {
+        "@commitlint/cli": "^20.5.0",
+        "@commitlint/lint": "^20.5.0",
+        "@semantic-release/changelog": "^6.0.3",
+        "@semantic-release/commit-analyzer": "^13.0.1",
+        "@semantic-release/git": "^10.0.1",
+        "@semantic-release/github": "^12.0.6",
+        "@semantic-release/release-notes-generator": "^14.0.3",
+        "commitlint-plugin-selective-scope": "^1.0.1",
+        "semantic-release": "^25.0.3",
+        "semantic-release-cli": "^5.4.6"
+      },
+      "workers": {
+        "@astrojs/check": "^0.9.8",
+        "@astrojs/cloudflare": "^13.1.6",
+        "@astrojs/compiler-rs": "^0.1.6",
+        "@astrojs/mdx": "^5.0.2",
+        "@biomejs/biome": "^2.4.6",
+        "@sveltia/cms": "^0.152.0",
+        "@types/node": "^24.12.0",
+        "astro": "^6.1.2",
+        "astro-cloudflare-pages-headers": "^1.7.7",
+        "astro-favicons": "^3.1.6",
+        "node": "^24.12.0",
+        "ts-node": "^10.9.2",
+        "tsconfig-paths": "^4.2.0",
+        "tslib": "^2.8.1",
+        "typescript": "^6.0.2",
+        "vite": "^7.3.1",
+        "vite-tsconfig-paths": "^6.1.1",
+        "vitest": "^4.0.18",
+        "wrangler": "^4.79.0"
+      }
+    }
   },
-  "keywords": [
-    "legal",
-    "license",
-    "mkdocs",
-    "mit",
-    "mpl",
-    "unlicense",
-    "readability",
-    "mkdocs-material",
-    "plain-language",
-    "language"
-  ],
-  "license": "LicenseRef-PlainUnlicense OR Unlicense",
-  "name": "plain-license",
-  "patchedDependencies": {
-    "astro-loader-sveltia-cms@0.1.3": "node-patches/astro-loader-sveltia-cms@0.1.3.patch"
+  "scripts": {
+    "build": "mise run build",
+    "check": "mise run lint",
+    "ci": "mise run ci",
+    "commit": "mise run commit",
+    "deploy": "mise run deploy",
+    "dev": "mise run dev",
+    "format": "mise run fmt",
+    "preview": "mise run preview",
+    "release": "mise run release",
+    "serve": "mise run serve",
+    "setup": "mise run setup",
+    "sync": "mise run sync",
+    "test": "mise run test",
+    "test:coverage": "mise run test-cov",
+    "test:e2e": "mise run test --e2e",
+    "test:ui": "mise run test --ui",
+    "test:unit": "mise run test --unit",
+    "update": "mise run update"
   },
-  "peerDependencies": {
-    "@commitlint/lint": "catalog:license-release",
-    "semantic-release": "catalog:license-release"
+  "config": {
+    "commitizen": {
+      "path": "@commitlint/cz-commitlint"
+    }
   },
-  "private": true,
   "release": {
     "branches": [
       "+([0-9])?(.{+([0-9]),x}).x",
@@ -221,77 +200,98 @@
       ]
     ]
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/plainlicense/plainlicense.git"
+  "dependencies": {
+    "@astrojs/node": "^10.0.3",
+    "@astrojs/preact": "^5.0.2",
+    "@astrojs/starlight": "^0.38.1",
+    "@plainlicense/plain-elastic": "workspace:*",
+    "@plainlicense/plain-mit": "workspace:*",
+    "@plainlicense/plain-mpl": "workspace:*",
+    "@plainlicense/plain-unlicense": "workspace:*",
+    "@sveltia/cms": "catalog:workers",
+    "astro-loader-sveltia-cms": "^0.1.3",
+    "rxjs": "^7.8.2",
+    "starlight-markdown": "^0.1.5"
   },
-  "scripts": {
-    "build": "mise run build",
-    "check": "mise run lint",
-    "ci": "mise run ci",
-    "commit": "mise run commit",
-    "deploy": "mise run deploy",
-    "dev": "mise run dev",
-    "format": "mise run fmt",
-    "preview": "mise run preview",
-    "release": "mise run release",
-    "serve": "mise run serve",
-    "setup": "mise run setup",
-    "sync": "mise run sync",
-    "test": "mise run test",
-    "test:coverage": "mise run test-cov",
-    "test:e2e": "mise run test --e2e",
-    "test:ui": "mise run test --ui",
-    "test:unit": "mise run test --unit",
-    "update": "mise run update"
+  "devDependencies": {
+    "@astrojs/check": "^0.9.8",
+    "@astrojs/cloudflare": "catalog:workers",
+    "@astrojs/compiler-rs": "catalog:workers",
+    "@astrojs/mdx": "catalog:workers",
+    "@astrojs/rss": "^4.0.15",
+    "@astrojs/sitemap": "^3.7.0",
+    "@axe-core/playwright": "^4.11.1",
+    "@biomejs/biome": "catalog:workers",
+    "@commitlint/cli": "catalog:license-release",
+    "@commitlint/config-conventional": "^20.4.3",
+    "@commitlint/cz-commitlint": "^20.4.3",
+    "@commitlint/types": "^20.4.3",
+    "@playwright/test": "^1.58.2",
+    "@resvg/resvg-js": "^2.6.2",
+    "@semantic-release/commit-analyzer": "catalog:license-release",
+    "@semantic-release/github": "catalog:license-release",
+    "@semantic-release/release-notes-generator": "catalog:license-release",
+    "@testing-library/preact": "^3.2.4",
+    "@tsconfig/bun": "^1.0.8",
+    "@types/bun": "^1.2.16",
+    "@types/css-modules": "^1.0.5",
+    "@types/dom-navigation": "^1.0.5",
+    "@types/node": "^24.12.0",
+    "@types/resize-observer-browser": "^0.1.11",
+    "@types/rollup-plugin-size-snapshot": "^0.10.5",
+    "@types/svgo": "^3.0.0",
+    "@vitest/coverage-v8": "^4.0.18",
+    "@vitest/ui": "^4.0.18",
+    "astro": "^6.0.7",
+    "astro-cloudflare-pages-headers": "catalog:workers",
+    "astro-favicons": "catalog:workers",
+    "autoprefixer": "^10.4.21",
+    "bun": "catalog:",
+    "commitizen": "^4.3.1",
+    "commitlint-plugin-selective-scope": "catalog:license-release",
+    "github-types": "^1.0.0",
+    "globby": "^16.1.1",
+    "gray-matter": "^4.0.3",
+    "issue-parser": "^7.0.1",
+    "js-yaml": "^4.1.1",
+    "markdownlint-cli2": "^0.22.0",
+    "marked": "^17.0.4",
+    "playwright": "^1.53.0",
+    "preact": "^10.28.4",
+    "rehype-external-links": "^3.0.0",
+    "satori": "^0.26.0",
+    "semantic-release": "catalog:license-release",
+    "semantic-release-cli": "catalog:license-release",
+    "semantic-release-monorepo": "^8.0.2",
+    "sharp": "^0.34.5",
+    "starlight-auto-drafts": "^0.3.0",
+    "starlight-blog": "^0.26.1",
+    "starlight-heading-badges": "^0.7.0",
+    "starlight-llms-txt": "^0.8.0",
+    "starlight-page-actions": "^0.5.0",
+    "starlight-tags": "^0.4.0",
+    "svgo": "^4.0.1",
+    "ts-node": "catalog:workers",
+    "tsconfig-paths": "catalog:workers",
+    "tslib": "catalog:workers",
+    "typescript": "catalog:workers",
+    "vite": "catalog:workers",
+    "vite-tsconfig-paths": "catalog:workers",
+    "vitest": "catalog:workers",
+    "wrangler": "catalog:workers"
+  },
+  "peerDependencies": {
+    "@commitlint/lint": "catalog:license-release",
+    "semantic-release": "catalog:license-release"
+  },
+  "engines": {
+    "node": "catalog:workers"
+  },
+  "patchedDependencies": {
+    "astro-loader-sveltia-cms@0.1.3": "node-patches/astro-loader-sveltia-cms@0.1.3.patch"
   },
   "trustedDependencies": [
     "@parcel/watcher",
     "@swc/core"
-  ],
-  "version": "0.2.0",
-  "workspaces": {
-    "catalog": {
-      "bun": "^1.3.10"
-    },
-    "catalogs": {
-      "license-release": {
-        "@commitlint/cli": "^20.5.0",
-        "@commitlint/lint": "^20.5.0",
-        "@semantic-release/changelog": "^6.0.3",
-        "@semantic-release/commit-analyzer": "^13.0.1",
-        "@semantic-release/git": "^10.0.1",
-        "@semantic-release/github": "^12.0.6",
-        "@semantic-release/release-notes-generator": "^14.0.3",
-        "commitlint-plugin-selective-scope": "^1.0.1",
-        "semantic-release": "^25.0.3",
-        "semantic-release-cli": "^5.4.6"
-      },
-      "workers": {
-        "@astrojs/check": "^0.9.8",
-        "@astrojs/cloudflare": "^13.1.6",
-        "@astrojs/compiler-rs": "^0.1.6",
-        "@astrojs/mdx": "^5.0.2",
-        "@biomejs/biome": "^2.4.6",
-        "@sveltia/cms": "^0.152.0",
-        "@types/node": "^24.12.0",
-        "astro": "^6.1.2",
-        "astro-cloudflare-pages-headers": "^1.7.7",
-        "astro-favicons": "^3.1.6",
-        "node": "^24.12.0",
-        "ts-node": "^10.9.2",
-        "tsconfig-paths": "^4.2.0",
-        "tslib": "^2.8.1",
-        "typescript": "^6.0.2",
-        "vite": "^7.3.1",
-        "vite-tsconfig-paths": "^6.1.1",
-        "vitest": "^4.0.18",
-        "wrangler": "^4.79.0"
-      }
-    },
-    "packages": [
-      "packages/*",
-      "workers/*"
-    ]
-  }
+  ]
 }

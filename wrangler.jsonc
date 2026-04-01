@@ -8,6 +8,7 @@
   "$schema": "./node_modules/wrangler/config-schema.json",
   "name": "plainlicense",
   "account_id": "1bb2d128ac96f8ee9dc75e99a54e9260",
+  "main": "@astrojs/cloudflare/entrypoints/server",
   "compatibility_date": "2025-03-01",
   "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
   "observability": {
