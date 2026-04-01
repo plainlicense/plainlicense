@@ -180,7 +180,7 @@ runs: `bunx astro build`, followed by three post-build TypeScript scripts:
 - `src/build/generate-versions.ts` — writes version metadata consumed by the site
 
 URL routing for licenses is auto-generated at build time from `content/licenses/` directory
-structure (via `getLicenseRedirects()` in `astro.config.mjs`). No manual routing configuration
+structure (via `getLicenseRedirects()` in `astro.config.mts`). No manual routing configuration
 is required when adding a new license file.
 
 **Enforcement**: Build failures MUST be resolved before merge. Type errors reported by

@@ -20,7 +20,7 @@ I strived to avoid hardcoding any license text in the codebase. For the most par
     - `/licenses/{spdx-id}` → `/licenses/{category}/{spdx-id}` (e.g., `/licenses/mit` → `/licenses/permissive/mit`)
     - `/{spdx-id}` → `/licenses/{category}/{spdx-id}` (e.g., `/mit` → `/licenses/permissive/mit`)
 
-    This happens in `astro.config.mjs` via `getLicenseRedirects()`, which reads all `.md` files from `content/licenses/` at build time.
+    This happens in `astro.config.mts` via `getLicenseRedirects()`, which reads all `.md` files from `content/licenses/` at build time.
 
 5.  **Updating the Category Index**. If you're adding a new license, you should also update the relevant category index page in `src/pages/licenses/` (if one exists) to include a link to your new license and a brief description.
 

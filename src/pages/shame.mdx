@@ -1,7 +1,6 @@
 ---
 title: Hall of Shame
-description: Plain License Hall of Shame -- the price of complexity
-draft: true
+description: Plain License Hall of Shame -- the price of complexity in legal language
 layout: ../layouts/PageLayout.astro
 ---
 
@@ -10,12 +9,55 @@ export const prerender = true
 
 # Hall of Shame
 
-This page tracks examples of unnecessary complexity in traditional creative licenses.
+Legal documents are full of words that make them harder to understand. We track these words and replace them with plain alternatives in every license we recraft. We call them **shame words** — not because the people who use them should feel bad, but because these words deserve to be shamed out of existence.
 
-## Why it Matters
+## Why It Matters
 
-Complexity creates barriers to understanding and adoption. By highlighting these examples, we hope to encourage clearer, simpler legal writing.
+The average person reads at an 8th-grade level. Most legal documents are written at a college or graduate level. That gap isn't just inconvenient — it locks people out of understanding their own rights. Every confusing word is a small barrier. Add them up, and you get licenses that most people can't read, even when those licenses directly affect them.
 
-## Stay Tuned
+We think that's worth being a little rebellious about.
 
-We're currently collecting examples for the Hall of Shame. Check back soon for updates!
+## The Shame Words
+
+Here are some of the words we flag and replace in our licenses. We use an automated linter to catch them, and we replace them with plain alternatives every time.
+
+| Shame word | What we say instead | Why it's shameful |
+|-----------|--------------------|--------------------|
+| attorney | lawyer | "Attorney" sounds formal for no reason. Everyone knows what a lawyer is. |
+| utilize | use | Four syllables to say what "use" says in one. |
+| alter, alteration | change | "Change" is one of the first words children learn. |
+| modify, modification | change | Same problem as "alter" — just say "change." |
+| grant | give | "We grant you permission" sounds like a king on a throne. "We give you permission" sounds like a person. |
+| permit | allow | Simpler, friendlier, clearer. |
+| irrevocable | permanent | "Irrevocable" sends people to a dictionary. "Permanent" doesn't. |
+| in order to | to | Three extra words that add nothing. |
+| in the event that | if | Five words to say "if." |
+| with respect to | about | Just say what you mean. |
+| with regard to | about | Same thing. |
+| in the course of | during | Four words to say "during." |
+| statute | law | Everyone knows what a law is. |
+| applicable | related | Simpler and just as precise in most contexts. |
+| imply | suggest | Clearer and more conversational. |
+
+We also watch for overuse of the word "that." It's often unnecessary and clutters sentences. Compare: "We believe that this is important" vs. "We believe this is important." Same meaning, fewer words.
+
+## How We Enforce This
+
+Every license file in our repository tracks a `shame_words_count` in its metadata. Our goal is always zero. We run automated checks during our build process that flag shame words in new content. Pull requests that add new license content must keep this count as low as possible.
+
+We're not perfect — sometimes a complex word is the right choice. But we make that choice deliberately, not out of habit.
+
+## The Bigger Picture
+
+Shame words aren't just a Plain License problem. They show up everywhere: in terms of service, privacy policies, rental agreements, medical consent forms, and more. Legal writing has a long history of using complex language — sometimes for precision, but often just out of tradition.
+
+We think tradition is a poor excuse for excluding people from understanding documents that affect their lives. If a simpler word works just as well, use it.
+
+## Want to Help?
+
+If you spot a shame word in any of our content, [open an issue][issues] or submit a pull request. We'll thank you for it.
+
+If you want to learn more about writing plainly, check out our [writing guidelines][writing].
+
+[issues]: https://github.com/plainlicense/plainlicense/issues "Report a shame word"
+[writing]: /helping/write "Writing Guidelines"

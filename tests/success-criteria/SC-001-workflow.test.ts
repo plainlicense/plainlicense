@@ -8,7 +8,7 @@ import { describe, expect, it } from "vitest";
  */
 describe("SC-001: Editor Workflow Integrity", () => {
   it("CMS configuration includes all required data fields for licenses", async () => {
-    const configPath = path.resolve("astro.config.ts");
+    const configPath = path.resolve("astro.config.mts");
     const content = await fs.readFile(configPath, "utf8");
 
     // Critical fields from Zod schema — verify they appear in the sveltia() config
@@ -25,9 +25,10 @@ describe("SC-001: Editor Workflow Integrity", () => {
     ];
 
     for (const field of requiredFields) {
-      expect(content, `Expected field "${field}" in astro.config.ts`).toContain(
-        `name: "${field}"`,
-      );
+      expect(
+        content,
+        `Expected field "${field}" in astro.config.mts`,
+      ).toContain(`name: "${field}"`);
     }
   });
 

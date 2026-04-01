@@ -13,12 +13,12 @@ export function getLicenseSlug(license: LicenseEntryT): string {
   const licenseFamily: LicenseFamilyT =
     license.data?.license_family ?? "permissive";
   if (license.data?.spdx_id) {
-    return `${licenseFamily}/${license.data.spdx_id.trim().toLowerCase()}`;
+    return `${licenseFamily.toLowerCase()}/${license.data.spdx_id.trim().toLowerCase()}`;
   }
   if (license.data?.original?.spdx_id) {
-    return `${licenseFamily}/${license.data.original.spdx_id.trim().toLowerCase()}`;
+    return `${licenseFamily.toLowerCase()}/${license.data.original.spdx_id.trim().toLowerCase()}`;
   }
-  return `${licenseFamily}/${license.slug}`;
+  return `${licenseFamily.toLowerCase()}/${license.slug.toLowerCase()}`;
 }
 
 /**

@@ -1,0 +1,41 @@
+{
+  "dependencies": {
+    "@astrojs/cloudflare": "catalog:workers",
+    "astro": "catalog:workers"
+  },
+  "devDependencies": {
+    "@astrojs/check": "catalog:workers",
+    "@astrojs/compiler-rs": "catalog:workers",
+    "@astrojs/mdx": "catalog:workers",
+    "astro-favicons": "catalog:workers",
+    "ts-node": "catalog:workers",
+    "tsconfig-paths": "catalog:workers",
+    "tslib": "catalog:workers",
+    "typescript": "catalog:workers",
+    "vite": "catalog:workers",
+    "vite-tsconfig-paths": "catalog:workers",
+    "wrangler": "catalog:workers"
+  },
+  "devEngines": {
+    "packageManager": {
+      "onFail": "download",
+      "name": "bun",
+      "version": "catalog:"
+    }
+  },
+  "engines": {
+    "node": "catalog:workers"
+  },
+  "name": "sweet-dream-b918",
+  "scripts": {
+    "astro": "bunx astro",
+    "build": "bunx astro build",
+    "cf-typegen": "bunx wrangler types",
+    "deploy": "bunx astro build && bunx wrangler deploy",
+    "dev": "bunx astro dev",
+    "generate-types": "bunx wrangler types",
+    "preview": "bunx astro build && bunx astro preview"
+  },
+  "type": "module",
+  "version": "0.0.1"
+}

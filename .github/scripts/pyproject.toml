@@ -1,0 +1,14 @@
+[project]
+name = "plainlicense-ci-cd"
+version = "0.1.0"
+description = "CI/CD scripts for PlainLicense"
+license-files = [
+  "./../UNLICENSE",
+]
+
+dependencies = [
+  "ez-yaml>=2.2.0",
+  "gitignore_parser>=0.1.13",
+  "joblib>=1.5.3",
+  "rich>=14.3.3",
+]

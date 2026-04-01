@@ -3,10 +3,7 @@
   "compatibility_date": "2025-03-20",
   "main": "src/index.ts",
   "minify": true,
-  "compatibility_flags": [
-    "nodejs_compat",
-    "global_fetch_strictly_public"
-  ],
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
   "name": "plainlicense-oauth-proxy",
   "routes": [
     {
@@ -15,7 +12,7 @@
     }
   ],
   "vars": {
-    "ALLOWED_DOMAINS": "plainlicense.org,*.plainlicense.org"
+    "ALLOWED_DOMAINS": "plainlicense.org,*.plainlicense.org,github.com,*.github.com"
   },
   "observability": {
     "enabled": true
@@ -38,7 +35,7 @@
   "preview_urls": false,
   "workers_dev": false,
   "assets": {
-    "binding": "auth_proxy_assets",
+    "binding": "ASSETS",
     "directory": "./public",
     "run_worker_first": false,
     "html_handling": "auto-trailing-slash"

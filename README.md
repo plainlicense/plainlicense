@@ -92,7 +92,7 @@ plainlicense/
 ├── tests/
 │   ├── unit/                               # Vitest unit tests
 │   └── e2e/                                # Playwright end-to-end tests
-├── astro.config.mjs                        # Astro configuration + auto-routing
+├── astro.config.mts                        # Astro configuration + auto-routing
 ├── mise.toml                               # task runner + tool versions
 └── biome.jsonc                             # linter/formatter config
 ```

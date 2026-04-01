@@ -179,7 +179,7 @@ A visitor needs to read blog posts about Plain License updates, license guides, 
 **Technical Approach**:
 
 1. Initialize Astro + Starlight (T002)
-2. Configure component overrides in `astro.config.mjs` (T002a-T002d)
+2. Configure component overrides in `astro.config.mts` (T002a-T002d)
 3. Create custom page layouts using `<StarlightPage>` wrapper for consistency
 4. Define multiple content collections (licenses, blog, template-blocks) in `src/content/config.ts`
 5. Build custom license/blog components that integrate with Starlight's design system

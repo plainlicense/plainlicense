@@ -106,6 +106,9 @@
             "useJsxKeyInIterable": "off"
           }
         }
+      },
+      "formatter": {
+        "enabled": false
       }
     },
     {

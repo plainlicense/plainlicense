@@ -10,7 +10,8 @@ const supportedProviders = ["github", "gitlab"];
  * @returns {string} Escaped string.
  * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_expressions#escaping
  */
-const escapeRegExp = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+const escapeRegExp = (str: string): string =>
+  str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
 /**
  * Output HTML response that communicates with the window opener.
@@ -22,7 +23,17 @@ const escapeRegExp = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
  * Sveltia CMS.
  * @returns {Response} Response with HTML.
  */
-const outputHTML = ({ provider = "unknown", token, error, errorCode }) => {
+const outputHTML = ({
+  provider = "unknown",
+  token,
+  error,
+  errorCode,
+}: {
+  provider?: string;
+  token?: string;
+  error?: string;
+  errorCode?: string;
+}): Response => {
   const state = error ? "error" : "success";
   const content = error ? { provider, error, errorCode } : { provider, token };
 
@@ -58,7 +69,10 @@ const outputHTML = ({ provider = "unknown", token, error, errorCode }) => {
  * @param {{ [key: string]: string }} env - Environment variables.
  * @returns {Promise<Response>} HTTP response.
  */
-const handleAuth = async (request, env) => {
+const handleAuth = async (
+  request: Request,
+  env: { [key: string]: string },
+): Promise<Response> => {
   const { url } = request;
   const { origin, searchParams } = new URL(url);
   const { provider, site_id: domain } = Object.fromEntries(searchParams);
@@ -162,7 +176,10 @@ const handleAuth = async (request, env) => {
  * @param {{ [key: string]: string }} env - Environment variables.
  * @returns {Promise<Response>} HTTP response.
  */
-const handleCallback = async (request, env) => {
+const handleCallback = async (
+  request: Request,
+  env: { [key: string]: string },
+): Promise<Response> => {
   const { url, headers } = request;
   const { origin, searchParams } = new URL(url);
   const { code, state } = Object.fromEntries(searchParams);
@@ -291,7 +308,10 @@ export default {
    * @see https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps
    * @see https://docs.gitlab.com/ee/api/oauth2.html#authorization-code-flow
    */
-  async fetch(request, env) {
+  async fetch(
+    request: Request,
+    env: { [key: string]: string },
+  ): Promise<Response> {
     const { method, url } = request;
     const { pathname } = new URL(url);
 

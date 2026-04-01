@@ -1,0 +1,31 @@
+---
+export const prerender = true;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex,nofollow" />
+    <title>Plain License CMS</title>
+  </head>
+  <body>
+    <script>
+      import { config, title } from "virtual:astro-loader-sveltia-cms/config";
+      import { init } from "@sveltia/cms";
+      import { registerHooks } from "../hooks";
+      import { prefetchSpdxData } from "../spdx-cache";
+
+      if (title !== undefined) {
+        document.title = title;
+      }
+
+      // Register field auto-resolution hooks before CMS init
+      registerHooks();
+      // Start SPDX/GitHub license data prefetch (non-blocking)
+      prefetchSpdxData();
+      init({ config });
+    </script>
+  </body>
+</html>

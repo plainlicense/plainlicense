@@ -1,0 +1,12 @@
+name = "Adam Poulemanos"
+url = "https://plainlicense.org"
+title = "Creator & Maintainer"
+about = "Creator of Plain License, working to make software licenses understandable for everyone."
+email = "adam@plainlicense.org"
+uuid = "a1b2c3d4-5678-9abc-def0-123456789abc"
+
+[social_links]
+github = "bashandbone"
+twitter = "SpyToFounder"
+linkedin = "adampoulemanos"
+bluesky = "adam.knitli.com"

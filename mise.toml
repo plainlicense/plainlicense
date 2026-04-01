@@ -9,6 +9,7 @@ package_manager = "bun"
 bun = "latest"
 "cargo:submod" = ">=0.2.7"
 delta = "latest"
+difftastic = "latest"
 hk = "latest"
 pkl = "latest"
 

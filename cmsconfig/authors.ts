@@ -1,0 +1,95 @@
+import { defineCollection } from "./utils";
+
+export const authorsCollection = defineCollection({
+  name: "authors",
+  label: "Authors",
+  folder: "/content/authors",
+  create: true,
+  icon: "user_attributes",
+  extension: "toml",
+  format: "toml",
+  summary: "{{name}}",
+  identifier_field: "name",
+  label_singular: "Author",
+  slug: "{{name}}",
+  sortable_fields: ["name"],
+  delete: false,
+
+  fields: [
+    {
+      label: "Name",
+      name: "name",
+      widget: "string",
+      default: "{{author-name}}",
+      required: true,
+    },
+    { label: "URL", name: "url", widget: "string", required: false },
+    {
+      label: "Avatar",
+      name: "avatar",
+      widget: "image",
+      required: false,
+    },
+    {
+      label: "Title",
+      name: "title",
+      widget: "string",
+      required: false,
+    },
+    {
+      label: "About/Bio",
+      name: "about",
+      widget: "text",
+      required: false,
+    },
+    {
+      label: "Email",
+      name: "email",
+      widget: "string",
+      required: false,
+      default: "{{author-email}}",
+    },
+    {
+      label: "UUID",
+      name: "uuid",
+      widget: "hidden",
+      readonly: true,
+      required: false,
+      default: "{{uuid}}",
+    },
+    {
+      label: "Social links",
+      name: "social_links",
+      widget: "object",
+      collapsed: "auto",
+      required: false,
+      fields: [
+        {
+          label: "GitHub Username",
+          name: "github",
+          widget: "string",
+          required: false,
+          default: "{{author-login}}",
+        },
+        {
+          label: "X/Twitter Username",
+          name: "twitter",
+          widget: "string",
+          required: false,
+        },
+        {
+          label: "LinkedIn Username",
+          name: "linkedin",
+          widget: "string",
+          required: false,
+        },
+        {
+          label: "Bluesky Username",
+          name: "bluesky",
+          widget: "string",
+          required: false,
+        },
+      ],
+    },
+  ],
+});

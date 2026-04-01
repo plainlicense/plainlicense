@@ -57,6 +57,7 @@ export const spdxDetailsSchema = z.object({
 
 export const originalLicenseSchema = z.object({
   name: z.string(),
+  alternative_names: z.array(z.string()).optional(),
   spdx_id: z
     .string()
     .regex(/^[A-Za-z0-9.-]+$/)
@@ -211,14 +212,14 @@ export const templateBlockSchema = z.object({
     .optional(),
   description: z.string().optional(),
   version: z.string().regex(/^\d+\.\d+\.\d+$/),
-  block_title: z.string().optional(),
+  block_title: z.string(),
 });
 
 export const socialMediaSchema = z.object({
-  github: z.url().optional(),
-  twitter: z.url().optional(),
-  linkedin: z.url().optional(),
-  bluesky: z.url().optional(),
+  github: z.string().optional(),
+  twitter: z.string().optional(),
+  linkedin: z.string().optional(),
+  bluesky: z.string().optional(),
 });
 
 export const authorSchema = z.object({
@@ -274,5 +275,4 @@ export const blogPostSchema = z.object({
   related_licenses: z.array(z.uuid()).optional(),
   status: z.enum(["draft", "published"]).default("draft"),
   uuid: z.uuid(),
-  body: z.string(),
 });

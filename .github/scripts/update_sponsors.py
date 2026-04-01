@@ -1,20 +1,19 @@
-#!/usr/bin/env python3
-# sourcery skip: avoid-global-variables
 """
 Update the sponsors' donation markdown file.
+
+Retrieves the total amount of sponsorships from the GitHub API and updates the front matter of the donation markdown file with this amount. Writes the updated content back to the file.
 """
+
 import os
 import re
 import sys
-
 from pathlib import Path
 from typing import Any, TypedDict, TypeGuard
 
 import ez_yaml as yaml
 import requests
 
-
-DONATE_FILE = Path.cwd() / "docs/helping/donate.md"
+DONATE_FILE = Path("__file__").parent.parent.parent / "src/pages/helping/donate.mdx"
 GOAL = 5000
 ENDPOINT = "https://api.github.com/graphql"
 USERNAME = "bashandbone"
@@ -24,6 +23,7 @@ class DonateFrontMatter(TypedDict):
     """
     TypedDict for the front matter of the donation markdown file.
     """
+
     title: str
     description: str
     template: str
@@ -42,7 +42,14 @@ def frontmatter_guard(content: Any) -> TypeGuard[DonateFrontMatter]:
         TypeGuard[DonateFrontMatter]: True if content is a valid DonateFrontMatter, False otherwise.
     """
     return isinstance(content, dict) and all(
-        key in content for key in ["title", "description", "template", "funding_goal", "funding_progress"]
+        key in content
+        for key in [
+            "title",
+            "description",
+            "template",
+            "funding_goal",
+            "funding_progress",
+        ]
     )
 
 
@@ -87,12 +94,14 @@ def fetch_total_amount(token: str) -> int:
     """
     )
     try:
-        if response := requests.post(url, json={"query": query}, headers=headers, timeout=15):
+        if response := requests.post(
+            url, json={"query": query}, headers=headers, timeout=15
+        ):
             cents = sum(
                 edge["node"]["amountInCents"]
-                for edge in response.json()["data"]["user"]["lifetimeReceivedSponsorshipValues"][
-                    "edges"
-                ]
+                for edge in response.json()["data"]["user"][
+                    "lifetimeReceivedSponsorshipValues"
+                ]["edges"]
             )
             return cents // 100
     except Exception as e:
@@ -105,9 +114,11 @@ def get_frontmatter(content: str) -> tuple[Any, str]:
     """
     Extract the front matter from the donation markdown file content.
     """
-    if not (front_matter_match := re.match(
-        r"^---\s*\n(.*?)\n---\s*\n", content, re.DOTALL | re.MULTILINE
-    )):
+    if not (
+        front_matter_match := re.match(
+            r"^---\s*\n(.*?)\n---\s*\n", content, re.DOTALL | re.MULTILINE
+        )
+    ):
         return {}, content
     front_matter = yaml.to_object(front_matter_match[1])
     return (front_matter, content[front_matter_match.end() :])

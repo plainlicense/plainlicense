@@ -1,6 +1,6 @@
 /** @jsxImportSource preact */
 import { useEffect, useState } from "preact/hooks";
-import { generateClauseHash } from "../utils/hash";
+import { generateClauseHash } from "../../../../src/utils/hash";
 
 interface Clause {
   id: string;
