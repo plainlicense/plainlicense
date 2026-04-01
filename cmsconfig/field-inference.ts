@@ -69,99 +69,112 @@ export type InferFieldOutput<F extends Field> =
 									? string[]
 									: F extends { widget: "file" }
 										? string
-										: // ── Select (extracts literal option values when available) ─
-											F extends {
-													widget: "select";
-													multiple: true;
-													options: readonly (infer O)[];
-												}
-											? (O extends { value: infer V } ? V : O)[]
+										: // ── Select ─────────────────────────────────────────────
+											// Empty options → any (matches runtime selectValuesToZod)
+											F extends { widget: "select"; options: readonly [] }
+											? F extends { multiple: true }
+												? any[]
+												: any
 											: F extends {
 														widget: "select";
+														multiple: true;
 														options: readonly (infer O)[];
 													}
-												? O extends { value: infer V }
-													? V
-													: O
-												: // Select fallback (non-const options)
-													F extends { widget: "select"; multiple: true }
-													? (string | number | null)[]
-													: F extends { widget: "select" }
-														? string | number | null
-														: // ── Relation ────────────────────────────────────────────
-															F extends { widget: "relation"; multiple: true }
-															? string[]
-															: F extends { widget: "relation" }
-																? string
-																: // ── KeyValue ────────────────────────────────────────────
-																	F extends { widget: "keyvalue" }
-																	? Record<string, string>
-																	: // ── Code ────────────────────────────────────────────────
-																		F extends {
-																				widget: "code";
-																				output_code_only: true;
-																			}
-																		? string
-																		: F extends { widget: "code" }
-																			? { code: string; lang: string }
-																			: // ── Hidden (infer from default value type) ──────────────
-																				F extends { widget: "hidden"; default: string }
-																				? string
-																				: F extends { widget: "hidden"; default: number }
-																					? number
-																					: F extends { widget: "hidden"; default: boolean }
-																						? boolean
-																						: F extends { widget: "hidden" }
-																							? unknown
-																							: // ── Object with fields (recursive) ─────────────────────
-																								F extends {
-																										widget: "object";
-																										fields: infer Sub extends readonly Field[];
-																									}
-																								? InferFieldsOutput<Sub>
-																								: // ── Object with types (discriminated union) ─────────────
-																									F extends {
-																											widget: "object";
-																											types: infer Types extends readonly VariableFieldType[];
-																										}
-																									? InferVariants<
-																											Types,
-																											F extends {
-																												typeKey: infer K extends string;
-																											}
-																												? K
-																												: "type"
-																										>
-																									: // ── List with types (array of discriminated union) ──────
+												? (O extends { value: infer V } ? V : O)[]
+												: F extends {
+															widget: "select";
+															options: readonly (infer O)[];
+														}
+													? O extends { value: infer V }
+														? V
+														: O
+													: // Select fallback (non-const options)
+														F extends { widget: "select"; multiple: true }
+														? (string | number | null)[]
+														: F extends { widget: "select" }
+															? string | number | null
+															: // ── Relation ────────────────────────────────────────────
+																F extends { widget: "relation"; multiple: true }
+																? string[]
+																: F extends { widget: "relation" }
+																	? string
+																	: // ── KeyValue ────────────────────────────────────────────
+																		F extends { widget: "keyvalue" }
+																		? Record<string, string>
+																		: // ── Code (respects custom keys when const-narrowed) ─────
+																			F extends {
+																					widget: "code";
+																					output_code_only: true;
+																				}
+																			? string
+																			: F extends {
+																						widget: "code";
+																						keys: {
+																							code: infer CK extends string;
+																							lang: infer LK extends string;
+																						};
+																					}
+																				? { [K in CK | LK]: string }
+																				: F extends { widget: "code" }
+																					? { code: string; lang: string }
+																					: // ── Hidden (infer from default value type) ──────────────
+																						F extends { widget: "hidden"; default: string }
+																						? string
+																						: F extends { widget: "hidden"; default: number }
+																							? number
+																							: F extends { widget: "hidden"; default: boolean }
+																								? boolean
+																								: F extends { widget: "hidden" }
+																									? unknown
+																									: // ── Object with fields (recursive) ─────────────────────
 																										F extends {
-																												widget: "list";
-																												types: infer Types extends readonly VariableFieldType[];
+																												widget: "object";
+																												fields: infer Sub extends readonly Field[];
 																											}
-																										? InferVariants<
-																												Types,
-																												F extends {
-																													typeKey: infer K extends string;
-																												}
-																													? K
-																													: "type"
-																											>[]
-																										: // ── List with fields (array of objects) ─────────────────
+																										? InferFieldsOutput<Sub>
+																										: // ── Object with types (discriminated union) ─────────────
 																											F extends {
-																													widget: "list";
-																													fields: infer Sub extends readonly Field[];
+																													widget: "object";
+																													types: infer Types extends readonly VariableFieldType[];
 																												}
-																											? InferFieldsOutput<Sub>[]
-																											: // ── List with single field ──────────────────────────────
+																											? InferVariants<
+																													Types,
+																													F extends {
+																														typeKey: infer K extends string;
+																													}
+																														? K
+																														: "type"
+																												>
+																											: // ── List with types (array of discriminated union) ──────
 																												F extends {
 																														widget: "list";
-																														field: infer Sub extends Field;
+																														types: infer Types extends readonly VariableFieldType[];
 																													}
-																												? InferFieldOutput<Sub>[]
-																												: // ── Simple list (no subfields -> string[]) ──────────────
-																													F extends { widget: "list" }
-																													? string[]
-																													: // ── Default: string (StringField widget is optional) ─────
-																														string;
+																												? InferVariants<
+																														Types,
+																														F extends {
+																															typeKey: infer K extends string;
+																														}
+																															? K
+																															: "type"
+																													>[]
+																												: // ── List with fields (array of objects) ─────────────────
+																													F extends {
+																															widget: "list";
+																															fields: infer Sub extends readonly Field[];
+																														}
+																													? InferFieldsOutput<Sub>[]
+																													: // ── List with single field ──────────────────────────────
+																														F extends {
+																																widget: "list";
+																																field: infer Sub extends Field;
+																															}
+																														? InferFieldOutput<Sub>[]
+																														: // ── Simple list (no subfields -> string[]) ──────────────
+																															F extends { widget: "list" }
+																															? string[]
+																															: // ── Default: string (StringField widget is optional) ─────
+																																string;
 
 // ─── Compound Type Inference ─────────────────────────────────
 
@@ -172,17 +185,19 @@ export type InferFieldOutput<F extends Field> =
 type InferVariants<
 	Types extends readonly VariableFieldType[],
 	TypeKey extends string,
-> = Types[number] extends infer V
-	? V extends VariableFieldType
-		? Prettify<
-				{ [K in TypeKey]: V["name"] } & (V extends {
-					fields: infer Sub extends readonly Field[];
-				}
-					? InferFieldsOutput<Sub>
-					: Record<string, never>)
-			>
-		: never
-	: never;
+> = Types extends readonly []
+	? Record<string, unknown>
+	: Types[number] extends infer V
+		? V extends VariableFieldType
+			? Prettify<
+					{ [K in TypeKey]: V["name"] } & (V extends {
+						fields: infer Sub extends readonly Field[];
+					}
+						? InferFieldsOutput<Sub>
+						: Record<string, never>)
+				>
+			: never
+		: never;
 
 /**
  * Infer the full output type for a collection's fields array.
