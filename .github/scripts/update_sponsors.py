@@ -13,7 +13,7 @@ from typing import Any, TypedDict, TypeGuard
 import ez_yaml as yaml
 import requests
 
-DONATE_FILE = Path("__file__").parent.parent.parent / "src/pages/helping/donate.mdx"
+DONATE_FILE = Path(__file__).parent.parent.parent / "src/pages/helping/donate.mdx"
 GOAL = 5000
 ENDPOINT = "https://api.github.com/graphql"
 USERNAME = "bashandbone"
@@ -26,7 +26,7 @@ class DonateFrontMatter(TypedDict):
 
     title: str
     description: str
-    template: str
+    layout: str
     funding_goal: int
     funding_progress: int
 
@@ -46,7 +46,7 @@ def frontmatter_guard(content: Any) -> TypeGuard[DonateFrontMatter]:
         for key in [
             "title",
             "description",
-            "template",
+            "layout",
             "funding_goal",
             "funding_progress",
         ]
