@@ -26,11 +26,13 @@ try {
   versions = JSON.parse(content);
 } catch (e) {
   // Fallback to current version if versions.json doesn't exist
-  versions = [{
-    version: license.data.plain_version,
-    date: 'unknown',
-    changelog: 'Initial release'
-  }];
+  versions = [
+    {
+      version: license.data.plain_version,
+      date: "unknown",
+      changelog: "Initial release",
+    },
+  ];
 }
 
 function getDatetime(date: string): string | undefined {
@@ -41,15 +43,18 @@ function getDatetime(date: string): string | undefined {
 <section class="version-history" aria-labelledby="version-history-heading">
   <h3 id="version-history-heading">Version History</h3>
   <div class="timeline">
-    {versions.map((v) => (
-      <div class="version-item">
-        <div class="version-badge">v{v.version}</div>
-        <div class="version-details">
-          <time datetime={getDatetime(v.date)}>{v.date}</time>
-          <p>{v.changelog}</p>
-        </div>
-      </div>
-    ))}
+    {versions.map(
+        (v: { version: string; date: string; changelog: string }) => (
+          // @ts-ignore
+          <div key={v.version} class="version-item">
+            <div class="version-badge">v{v.version}</div>
+            <div class="version-details">
+              <time datetime={getDatetime(v.date)}>{v.date}</time>
+              <p>{v.changelog}</p>
+            </div>
+          </div>
+        ),
+      )}
   </div>
 </section>
 

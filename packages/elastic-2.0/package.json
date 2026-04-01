@@ -1,20 +1,38 @@
 {
-  "name": "plain-license-elastic-2.0",
+  "name": "@plainlicense/plain-elastic",
+  "displayName": "Plain Elastic License",
   "version": "0.1.0",
-  "private": true,
-  "description": "Plain language version of Elastic License 2.0",
+  "description": "Plain language adaptation of Elastic License 2.0",
+  "keywords": [
+    "plainlicense",
+    "plain language",
+    "license",
+    "licensing"
+  ],
+  "homepage": "https://plainlicense.org/elastic-20/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/plainlicense/plainlicense.git",
+    "directory": "packages/elastic-2.0"
+  },
+  "license": "LicenseRef-PlainUnlicense OR Unlicense",
+  "author": {
+    "name": "Adam Poulemanos",
+    "email": "adam@plainlicense.org",
+    "url": "https://plainlicense.org"
+  },
   "main": "../../content/licenses/source-available/elastic-2.0.md",
   "scripts": {
-    "release": "semantic-release"
+    "release": "bunx semantic-release"
   },
   "release": {
     "branches": [
       "+([0-9])?(.{+([0-9]),x}).x",
       "main",
       {
+        "channel": "pre/rc",
         "name": "dev",
-        "prerelease": true,
-        "channel": "pre/rc"
+        "prerelease": true
       }
     ],
     "plugins": [
@@ -23,24 +41,24 @@
         {
           "releaseRules": [
             {
-              "type": "stable",
-              "release": "major"
+              "release": "major",
+              "type": "stable"
             },
             {
-              "type": "new",
-              "release": "minor"
+              "release": "minor",
+              "type": "new"
             },
             {
-              "type": "subs",
-              "release": "minor"
+              "release": "minor",
+              "type": "subs"
             },
             {
-              "type": "admin",
-              "release": "patch"
+              "release": "patch",
+              "type": "admin"
             },
             {
-              "type": "bot",
-              "release": false
+              "release": false,
+              "type": "bot"
             }
           ]
         }
@@ -68,16 +86,20 @@
         {
           "assets": [
             {
-              "path": "../../dist/exports/elastic-2.0/${nextRelease.version}/Plain-Elastic-${nextRelease.version}.gfm.md",
-              "label": "Plain Elastic License 2.0 (Markdown)"
+              "label": "Plain Elastic License (Markdown)",
+              "path": "../../dist/exports/elastic-2.0/${nextRelease.version}/Plain-Elastic-${nextRelease.version}.cm.md"
             },
             {
-              "path": "../../dist/exports/elastic-2.0/${nextRelease.version}/Plain-Elastic-${nextRelease.version}.pdf",
-              "label": "Plain Elastic License 2.0 (PDF)"
+              "label": "Plain Elastic License (GitHub Markdown)",
+              "path": "../../dist/exports/elastic-2.0/${nextRelease.version}/Plain-Elastic-${nextRelease.version}.gfm.md"
             },
             {
-              "path": "../../dist/exports/elastic-2.0/${nextRelease.version}/Plain-Elastic-${nextRelease.version}.txt",
-              "label": "Plain Elastic License 2.0 (Plaintext)"
+              "label": "Plain Elastic License (PDF)",
+              "path": "../../dist/exports/elastic-2.0/${nextRelease.version}/Plain-Elastic-${nextRelease.version}.pdf"
+            },
+            {
+              "label": "Plain Elastic License (Plaintext)",
+              "path": "../../dist/exports/elastic-2.0/${nextRelease.version}/Plain-Elastic-${nextRelease.version}.txt"
             }
           ]
         }
@@ -85,9 +107,21 @@
     ]
   },
   "devDependencies": {
-    "@commitlint/cli": "^19.8.1",
-    "@semantic-release/changelog": "^6.0.3",
-    "@semantic-release/commit-analyzer": "^13.0.1",
-    "@semantic-release/git": "^10.0.1"
+    "@commitlint/cli": "catalog:license-release",
+    "@semantic-release/changelog": "catalog:license-release",
+    "@semantic-release/commit-analyzer": "catalog:license-release",
+    "@semantic-release/git": "catalog:license-release",
+    "@semantic-release/github": "catalog:license-release",
+    "@semantic-release/release-notes-generator": "catalog:license-release",
+    "commitlint-plugin-selective-scope": "catalog:license-release",
+    "semantic-release": "catalog:license-release",
+    "semantic-release-cli": "catalog:license-release"
+  },
+  "devEngines": {
+    "packageManager": {
+      "name": "bun",
+      "version": "",
+      "onFail": "download"
+    }
   }
 }

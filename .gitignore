@@ -150,3 +150,6 @@ tests-results/
 .astro/
 .wrangler/
 package-lock.json
+.size-snapshot.json
+.claude/*.local.*
+worker-configuration.d.ts

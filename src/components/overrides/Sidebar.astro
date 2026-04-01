@@ -7,26 +7,30 @@ const isBlogPage = route.slug.startsWith("blog");
 ---
 
 {isBlogPage ? (
-  <div class="sidebar-wrapper sidebar-wrapper--blog">
-    <Default {...Astro.props}><slot /></Default>
-  </div>
-) : (
-  <div class="sidebar-wrapper">
-    <div class="sidebar-filter">
-      <input
-        type="text"
-        id="sidebar-search"
-        placeholder="Filter licenses..."
-        aria-label="Filter licenses"
-      >
+    <div class="sidebar-wrapper sidebar-wrapper--blog">
+      <Default {...Astro.props}>
+        <slot />
+      </Default>
     </div>
-    <Default {...Astro.props}><slot /></Default>
-  </div>
-)}
+  ) : (
+    <div class="sidebar-wrapper">
+      <div class="sidebar-filter">
+        <input
+          type="text"
+          id="sidebar-search"
+          placeholder="Filter licenses..."
+          aria-label="Filter licenses"
+        />
+      </div>
+      <Default {...Astro.props}>
+        <slot />
+      </Default>
+    </div>
+  )}
 
-{/* Set data-is-blog on <html> synchronously so CSS applies before first paint */}
+<!-- Set data-is-blog on root element synchronously so CSS applies before first paint -->
 {isBlogPage && (
-  <script is:inline>document.documentElement.dataset.isBlog = '';</script>
+<script is:inline>document.documentElement.dataset.isBlog = "";</script>
 )}
 
 <script>

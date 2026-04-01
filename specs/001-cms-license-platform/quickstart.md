@@ -873,7 +873,7 @@ time bun run build
 
 1. Clear Astro cache: `rm -rf .astro/`
 2. Clear node_modules: `rm -rf node_modules && bun install`
-3. Disable source maps for production: `astro.config.mjs → vite.build.sourcemap: false`
+3. Disable source maps for production: `astro.config.mts → vite.build.sourcemap: false`
 
 #### Dev Server Slow
 
@@ -882,7 +882,7 @@ time bun run build
 **Fix**:
 
 1. Reduce content size (temporarily move licenses out of `content/`)
-2. Disable plugins in `astro.config.mjs` during development
+2. Disable plugins in `astro.config.mts` during development
 3. Use `--host` flag only when needed: `bun run dev --host`
 
 ---
@@ -982,7 +982,7 @@ After completing this quickstart:
 
 | File | Purpose |
 |------|---------|
-| `astro.config.mjs` | Astro configuration and plugins |
+| `astro.config.mts` | Astro configuration and plugins |
 | `public/admin/config.yml` | Sveltia CMS configuration |
 | `src/content/config.ts` | Content Collections schemas |
 | `package.json` | Dependencies and scripts |

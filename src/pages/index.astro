@@ -3,7 +3,12 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 import { getLicenseSlug, getPublishedLicenses } from "../utils/collections";
 
 export const prerender = true;
-const CATEGORY_ORDER = ['permissive', 'copyleft', 'source-available', 'public-domain'];
+const CATEGORY_ORDER = [
+  "permissive",
+  "copyleft",
+  "source-available",
+  "public-domain",
+];
 const allLicenses = await getPublishedLicenses();
 const licenses = [...allLicenses].sort((a, b) => {
   const aIdx = CATEGORY_ORDER.indexOf(a.data.license_family);
@@ -21,8 +26,8 @@ const featuredLicenses = licenses.filter((l) => l.data.featured);
     <div class="hero-inner">
       <h1>Licenses you can actually understand</h1>
       <p class="hero-sub">
-        Plain language rewrites of popular software licenses — clear, accurate,
-        and free to use.
+        Plain language rewrites of popular licenses — clear, accurate, and free
+        to use.
       </p>
       <div class="hero-cta">
         <a href="/licenses/" class="btn-primary">Browse Licenses</a>

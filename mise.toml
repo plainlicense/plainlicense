@@ -7,8 +7,9 @@ package_manager = "bun"
 
 [tools]
 bun = "latest"
-"cargo:submod" = "latest"
+"cargo:submod" = ">=0.2.7"
 delta = "latest"
+difftastic = "latest"
 hk = "latest"
 pkl = "latest"
 
@@ -52,11 +53,10 @@ mise doctor --json | jq '.' | jq 'with_entries(select([.key] | inside(["activate
 '''
 hide = true
 
-[tasks._check_doctor]
+[tasks._check-doctor]
 usage = '''
-arg "<action>" {
+arg "<action>" help "The doctor field to check" {
   choices "activated" "shims" "update-available" "shell" "list-tools"
-  help "The doctor field to check"
   }
 '''
 run = '''
@@ -81,29 +81,30 @@ case "$usage_action" in
 esac
 '''
 
-[tasks._is-setup]
+[tasks."_is-setup"]
 usage = '''
-arg "[tool]..." {
-  help "Check if specific tools are set up (e.g. node, bun, hk)"
-  }
+arg "<tool>" 
 '''
+shell = 'bash'
 run = '''
-if [ "$CI" == "true" ]; then
-   shims="$(mise run _check_doctor shims 2>/dev/null)"
-   if [ "$shims" != "true" ]; then
+if [[ "$CI" == "true" ]]; then
+   shims="$(mise run _check-doctor shims 2>/dev/null)"
+   if [[ "$shims" != "true" ]]; then
      mise run setup
-  `   exit 0
+     exit 0
    fi
 else
-    activated="$(mise run _check_doctor activated 2>/dev/null)"
-    if [ "$activated" != "true" ]; then
+    activated="$(mise run _check-doctor activated 2>/dev/null)"
+    if [[ "$activated" != "true" ]]; then
       mise run setup
       exit 0
     fi
+fi
 if [ x"${usage_tool}" != "x" ]; then
-    eval "tools=($usage_tool)"
-    toolset="$(mise run _check_doctor list-tools 2>/dev/null || echo '')"
-    for tool in "${tools[@]}"; do
+    echo "running toolset"
+    toolset="$(mise run _check-doctor list-tools 2>/dev/null || echo '')"
+    echo "running tool check"
+    for tool in "${usage_tool[@]}"; do
       if ! echo "$toolset" | grep -qx "$tool"; then
         mise install "$tool" &>/dev/null || echo " ⚠️  WARNING: mise install $tool failed during setup "
       fi
@@ -141,14 +142,16 @@ run = [
 ]
 
 [tasks.sync-submods]
-tools."cargo:submod" = "latest"
+tools."cargo:submod" = ">=0.2.7"
 run = "submod sync"
 
 [tasks._ensure-node-script]
 tools.node = "24"
 dir = "./node_modules/bun"
 silent = true
+hide = true
 # this may not exist if we've already done it, so we ignore errors here
+# We're catching an edge case
 run = "node install.js &>/dev/null || true"
 
 [tasks.sync-modules]
@@ -156,12 +159,12 @@ tools.bun = "latest"
 run = ["bun i"]
 
 [tasks.sync]
-depends = ["sync-submods", "sync-modules", "_ensure-node-script"]
+depends = ["sync-submods", "_ensure-node-script", "sync-modules"]
 
 [tasks.update-tools]
 run = [
   '''
-    update_available="$(mise run _check_doctor update-available 2>/dev/null)"
+    update_available="$(mise run _check-doctor update-available 2>/dev/null)"
     if [ "$update_available" = "true" ]; then
         mise -yq self-update
     fi
@@ -186,7 +189,7 @@ sources = [
 ]
 shell = "bash"
 run = '''
-biome check --write --unsafe ./{src,bin,tests,packages,.github,.vscode,content}/**/*.{ts,mjs,js,tsx,jsx,json,astro,css} ./*.{ts,mjs,js,json}
+biome check --write ./{src,bin,tests,packages,.github,.vscode,content}/**/*.{ts,mjs,js,tsx,jsx,json,astro,css} ./*.{ts,mjs,js,json}
 '''
 
 [tasks.fmt-sh]
@@ -382,7 +385,7 @@ flag "--unit" {
   }
 '''
 tools.bun = "latest"
-depends = ["sync"]
+depends = ["_is-setup bun", "sync"]
 run = '''
 if [ -n "$usage_coverage" ]; then
   mise run test-cov
@@ -411,10 +414,9 @@ bun run src/build/generate-versions.ts
 
 [tasks.deploy]
 usage = '''
-arg "[env]" {
+arg "[env]" help "The environment to deploy to" default "production"
+{
   choices "production" "staging"
-  help "The environment to deploy to"
-  default "production"
   }
 '''
 tools.bun = "latest"
@@ -424,17 +426,17 @@ bunx wrangler deploy --env "$usage_env"
 '''
 
 [tasks.ci]
-depends = ["_is-setup", "sync", "lint", "test-cov", "build"]
+depends = ["_is-setup bun", "sync", "lint", "test-cov", "build"]
 
 [tasks.ci-release]
 depends = ["ci", "release", "deploy"]
 
 [tasks.dev]
-depends = ["_is-setup", "sync"]
+depends = ["_is-setup bun", "sync"]
 tools.bun = "latest"
 run = "bunx astro dev"
 
 [tasks.preview]
-depends = ["_is-setup", "sync"]
+depends = ["_is-setup bun"]
 tools.bun = "latest"
-run = "bunx astro preview"
+run = ["bunx astro preview"]

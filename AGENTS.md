@@ -54,7 +54,7 @@ Content lives in `content/` and is symlinked into `src/content/`:
 
 License categories: `permissive`, `copyleft`, `source-available`, `public-domain`.
 
-**URL routing is auto-generated** at build time from the `content/licenses/` directory structure (`astro.config.mjs` → `getLicenseRedirects()`). Adding a `content/licenses/{category}/{spdx-id}.md` file automatically creates:
+**URL routing is auto-generated** at build time from the `content/licenses/` directory structure (`astro.config.mts` → `getLicenseRedirects()`). Adding a `content/licenses/{category}/{spdx-id}.md` file automatically creates:
 
 - `/licenses/{spdx-id}` → `/licenses/{category}/{spdx-id}`
 - `/{spdx-id}` → `/licenses/{category}/{spdx-id}`

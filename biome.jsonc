@@ -4,7 +4,7 @@
 // SPDX-License-Identifier: LicenseRef-KnitliProprietary
 
 {
-  "$schema": "https://biomejs.dev/schemas/2.3.8/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.4.6/schema.json",
   "vcs": {
     "enabled": true,
     "clientKind": "git",
@@ -18,7 +18,8 @@
       "!!/**/.astro",
       "!!/**/worker-configuration.d.ts",
       "!!src/hooks/__tests__/*.ts",
-      "!!src/providers/__tests__/*.tsx"
+      "!!src/providers/__tests__/*.tsx",
+      "!**/licenses/*slug*"
     ]
   },
   "formatter": {
@@ -81,7 +82,8 @@
     "actions": {
       "source": {
         "organizeImports": "on"
-      }
+      },
+      "recommended": true
     }
   },
   "overrides": [
@@ -99,9 +101,14 @@
           "correctness": {
             "noUnusedVariables": "off",
 
-            "noUnusedImports": "off"
+            "noUnusedImports": "off",
+
+            "useJsxKeyInIterable": "off"
           }
         }
+      },
+      "formatter": {
+        "enabled": false
       }
     },
     {
@@ -120,9 +127,7 @@
       }
     },
     {
-      "includes": [
-        "/**/worker-configuration.d.ts",
-      ],
+      "includes": ["/**/worker-configuration.d.ts"],
       "linter": {
         "enabled": false
       }

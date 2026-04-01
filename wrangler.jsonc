@@ -9,6 +9,25 @@
   "name": "plainlicense",
   "account_id": "1bb2d128ac96f8ee9dc75e99a54e9260",
   "compatibility_date": "2025-03-01",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "observability": {
+    "enabled": true
+  },
+  "placement": {
+    "mode": "smart"
+  },
+  "images": {
+    "binding": "IMAGES",
+    "remote": true
+  },
+  "preview_urls": true,
+  "workers_dev": true,
+  "routes": [
+    {
+      "pattern": "plainlicense.org",
+      "custom_domain": true
+    }
+  ],
 
   // ── Static assets ──────────────────────────────────────────────────────────
   // The ASSETS binding exposes the site's static files to the Worker so that
@@ -20,8 +39,24 @@
     "directory": "./dist",
     "run_worker_first": false,
     "html_handling": "auto-trailing-slash",
-    "not_found_handling": "single-page-application"
+    "not_found_handling": "404-page"
   },
+  // ── R2 storage for CMS images ───────────────────────────────────────────
+  // The S3_ACCESS_KEY var and PL_S3_SECRET_KEY secret are used by the CMS to authenticate to the
+  // R2 bucket where it uploads images.  The access key is not sensitive and can be declared as a
+  // var, but the secret key must be stored as a secret. Secret-store secrets are accessed at
+  // runtime with `await env.MY_SECRET_KEY.get()`.
+  "vars": {
+    // R2 bucket's access key (not secret key) for CMS images
+    "S3_ACCESS_KEY": "2af46c19f417f0b062f540805412da84"
+  },
+  "secrets_store_secrets": [
+    {
+      "secret_name": "PL_S3_SECRET_KEY",
+      "binding": "S3_SECRET_KEY",
+      "store_id": "98acd7f077774ecfb34a31ac8cce6c98"
+    }
+  ],
 
   // ── Session storage (Cloudflare KV) ────────────────────────────────────────
   // Astro v6 provides a first-class session API.  The @astrojs/cloudflare
@@ -29,6 +64,7 @@
   // defaults to "SESSION".  Declaring the namespace here keeps everything in
   // one place and lets Cloudflare auto-provision the namespace on first deploy
   // (see https://developers.cloudflare.com/workers/wrangler/configuration/#automatic-provisioning).
+  // We can use session for saving basic state like user-defined license template variables
   "kv_namespaces": [
     {
       "binding": "SESSION"

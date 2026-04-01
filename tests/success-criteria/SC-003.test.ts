@@ -1,9 +1,12 @@
-import { describe, it, expect } from 'vitest';
-import fs from 'node:fs/promises';
-import path from 'node:path';
+import fs from "node:fs/promises";
+import path from "node:path";
+import { describe, expect, it } from "vitest";
 
-const exportBaseDir = path.resolve('dist/exports');
-const hasBuildOutput = await fs.access(exportBaseDir).then(() => true).catch(() => false);
+const exportBaseDir = path.resolve("dist/exports");
+const hasBuildOutput = await fs
+  .access(exportBaseDir)
+  .then(() => true)
+  .catch(() => false);
 
 /**
  * SC-003: Download reliability.
@@ -11,38 +14,41 @@ const hasBuildOutput = await fs.access(exportBaseDir).then(() => true).catch(() 
  *
  * Requires `mise run build` to have been run first.
  */
-describe('SC-003: Download Integrity', () => {
-  it.skipIf(!hasBuildOutput)('all export files are readable and have non-zero size', async () => {
-    const licenseDirs = await fs.readdir(exportBaseDir);
-    let totalFilesChecked = 0;
+describe("SC-003: Download Integrity", () => {
+  it.skipIf(!hasBuildOutput)(
+    "all export files are readable and have non-zero size",
+    async () => {
+      const licenseDirs = await fs.readdir(exportBaseDir);
+      let totalFilesChecked = 0;
 
-    for (const licenseSlug of licenseDirs) {
-      const licensePath = path.join(exportBaseDir, licenseSlug);
-      if (!(await fs.stat(licensePath)).isDirectory()) continue;
+      for (const licenseSlug of licenseDirs) {
+        const licensePath = path.join(exportBaseDir, licenseSlug);
+        if (!(await fs.stat(licensePath)).isDirectory()) continue;
 
-      const versions = await fs.readdir(licensePath);
-      for (const version of versions) {
-        const versionPath = path.join(licensePath, version);
-        if (!(await fs.stat(versionPath)).isDirectory()) continue;
+        const versions = await fs.readdir(licensePath);
+        for (const version of versions) {
+          const versionPath = path.join(licensePath, version);
+          if (!(await fs.stat(versionPath)).isDirectory()) continue;
 
-        const files = await fs.readdir(versionPath);
-        for (const file of files) {
-          const filePath = path.join(versionPath, file);
-          const stats = await fs.stat(filePath);
+          const files = await fs.readdir(versionPath);
+          for (const file of files) {
+            const filePath = path.join(versionPath, file);
+            const stats = await fs.stat(filePath);
 
-          expect(stats.size).toBeGreaterThan(0);
+            expect(stats.size).toBeGreaterThan(0);
 
-          const fd = await fs.open(filePath, 'r');
-          const { bytesRead } = await fd.read(Buffer.alloc(1), 0, 1, 0);
-          await fd.close();
+            const fd = await fs.open(filePath, "r");
+            const { bytesRead } = await fd.read(Buffer.alloc(1), 0, 1, 0);
+            await fd.close();
 
-          expect(bytesRead).toBe(1);
-          totalFilesChecked++;
+            expect(bytesRead).toBe(1);
+            totalFilesChecked++;
+          }
         }
       }
-    }
 
-    console.log(`Checked ${totalFilesChecked} export files for integrity.`);
-    expect(totalFilesChecked).toBeGreaterThan(0);
-  });
+      console.log(`Checked ${totalFilesChecked} export files for integrity.`);
+      expect(totalFilesChecked).toBeGreaterThan(0);
+    },
+  );
 });

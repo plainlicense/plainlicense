@@ -5,8 +5,9 @@ block_title: We Offer No Warranty
 category: warranty
 description: Common plain language warranty disclaimer
 version: 1.0.0
+uuid: f21a735a-e48b-41f5-9c65-55316f22bd72
 ---
-We give you the work as it is, and with no promises or guarantees. This means:
+We give you the work as it is, with no promises or guarantees.
 
 - **"As is"**: You get the work exactly how it is. It may have problems or not work at all.
 - **No Guarantees**: We don't promise you can use the work for any specific tasks, or that it won't break any rules.

@@ -14,6 +14,14 @@ tldr:
   - There's no warranty. Use at your own risk.
 attribution_required: false
 fair_code: false
+maker_pitch: "People can use your work freely, but must share changes to your files."
+commercial_restrictions: []
+compare_to:
+  - spdx_id: MIT
+    contrast: "Like MPL, but doesn't require sharing changes"
+  - spdx_id: Elastic-2.0
+    contrast: "Like MPL, but also prevents offering your work as a hosted service"
+uuid: ac0d1786-e005-415d-a0ed-be10bf5cbc65
 plain_gunning_fog: 12.36
 shame_words_count: 0
 original:

@@ -3,19 +3,36 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import type { AstroIntegration, AstroIntegrationLogger } from "astro";
 import matter from "gray-matter";
-import {
-  type ExportContext,
-  ExportOrchestrator,
-} from "../build/exports/index.ts";
-import { getFileAtCommit, getTaggedVersions } from "../utils/git-versions.ts";
-import { derivePlainId } from "../utils/plain-id.ts";
+import { getCollectionSchema } from "~cfg/index";
+import type { BuildCollectionSchemaResult } from "~cfg/utils";
+import { type ExportContext, ExportOrchestrator } from "../build/exports/index";
+import { getFileAtCommit, getTaggedVersions } from "../utils/git-versions";
+import { derivePlainId } from "../utils/plain-id";
+
+const licenseSchema: BuildCollectionSchemaResult = getCollectionSchema;
+
+interface LicenseFrontmatter {
+  plain_name?: string;
+  spdx_id?: string;
+  plain_version?: string;
+  plain_id?: string;
+  license_family?: string;
+  status?: string;
+  slug?: string;
+  is_dedication?: boolean;
+  original?: {
+    name?: string;
+    version_display?: string;
+  };
+  [key: string]: unknown;
+}
 
 /**
  * Resolves {{var:...}} placeholders in content using license frontmatter.
  */
 function resolveTemplateVars(
   content: string,
-  data: Record<string, any>,
+  data: LicenseFrontmatter,
 ): string {
   const vars: Record<string, string> = {
     plain_name: data.plain_name || "",
@@ -65,7 +82,7 @@ async function createLatestAliases(
  */
 async function generateHistoricalExports(
   licensePath: string,
-  data: Record<string, any>,
+  data: LicenseFrontmatter,
   templateBlocks: Record<string, string>,
   orchestrator: ExportOrchestrator,
   outDir: string,
@@ -95,7 +112,7 @@ async function generateHistoricalExports(
     pastBody = injectTemplateBlocks(pastBody, templateBlocks);
     pastBody = resolveTemplateVars(pastBody, pastData);
 
-    const pastPlainId = pastData.plain_id || derivePlainId(data.spdx_id);
+    const pastPlainId = pastData.plain_id || derivePlainId(data.original?.);
     const pastExportDir = path.join(outDir, "exports", spdxLower, tv.version);
 
     const pastCtx: ExportContext = {

@@ -12,21 +12,32 @@ interface Props {
 const { id, items = [] } = Astro.props;
 
 // Mock items if none provided for prototype
-const displayItems = items.length > 0 ? items : [
-  { question: "Is this license OSI approved?", answer: "Yes, the MIT license is OSI approved." },
-  { question: "Can I use this for commercial projects?", answer: "Yes, commercial use is permitted under this license." }
-];
+const displayItems =
+  items.length > 0
+    ? items
+    : [
+        {
+          question: "Is this license OSI approved?",
+          answer: "Yes, the MIT license is OSI approved.",
+        },
+        {
+          question: "Can I use this for commercial projects?",
+          answer: "Yes! You can use this license for commercial projects.",
+        },
+      ];
 ---
 
 <div class="faq-component" id={id}>
-  {displayItems.map(item => (
-    <details class="faq-item">
-      <summary>{item.question}</summary>
-      <div class="faq-answer">
-        <p>{item.answer}</p>
-      </div>
-    </details>
-  ))}
+  {
+    displayItems.map((item) => (
+      <details class="faq-item">
+        <summary>{item.question}</summary>
+        <div class="faq-answer">
+          <p>{item.answer}</p>
+        </div>
+      </details>
+    ))
+  }
 </div>
 
 <style>
@@ -56,12 +67,12 @@ const displayItems = items.length > 0 ? items : [
     display: none;
   }
   summary::after {
-    content: '+';
+    content: "+";
     font-size: 1.2rem;
     color: #883aea;
   }
   details[open] summary::after {
-    content: '−';
+    content: "−";
   }
   .faq-answer {
     padding: 1rem;

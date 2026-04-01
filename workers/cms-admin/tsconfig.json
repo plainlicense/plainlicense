@@ -1,0 +1,8 @@
+{
+  "extends": "../../tsconfig.json",
+  "include": [".astro/types.d.ts", "**/*", "./worker-configuration.d.ts"],
+  "exclude": ["dist"],
+  "compilerOptions": {
+    "types": ["./worker-configuration.d.ts"]
+  }
+}

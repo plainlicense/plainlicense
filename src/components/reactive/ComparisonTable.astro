@@ -39,94 +39,104 @@ function renderCellValue(value: string) {
     <table aria-label={title || "License feature comparison"}>
       <thead>
         <tr>
-          {tableData.headers.map((header: string) => (
-            <th scope="col" key={header}>{header}</th>
-          ))}
+          {
+            tableData.headers.map((header: string) => (
+              // @ts-expect-error - It doesn't like the the key attribute
+              <th scope="col" key={header}>
+                {header}
+              </th>
+            ))
+          }
         </tr>
       </thead>
       <tbody>
-        {tableData.rows.map((row: string[]) => (
-          <tr key={row[0]}>
-            {row.map((cell: string, index: number) => {
-              if (index === 0) {
+        {
+          tableData.rows.map((row: string[]) => (
+            // @ts-expect-error - It doesn't like the the key attribute
+            <tr key={row[0]}>
+              {row.map((cell: string, index: number) => {
+                if (index === 0) {
+                  return (
+                    // @ts-expect-error - It doesn't like the the key attribute
+                    <th scope="row" class="feature-label" key={cell}>
+                      {cell}
+                    </th>
+                  );
+                }
+                const colHeader = tableData.headers[index] ?? `col-${index}`;
+                const { symbol, label } = renderCellValue(cell);
+                const isSymbol = symbol !== cell;
                 return (
-                  <th scope="row" class="feature-label" key={cell}>
-                    {cell}
-                  </th>
+                  // @ts-expect-error - It doesn't like the the key attribute
+                  <td class="feature-value" key={`${row[0]}-${colHeader}`}>
+                    {isSymbol ? (
+                      <>
+                        <span aria-hidden="true">{symbol}</span>
+                        <span class="sr-only">{label}</span>
+                      </>
+                    ) : (
+                      cell
+                    )}
+                  </td>
                 );
-              }
-              const colHeader = tableData.headers[index] ?? `col-${index}`;
-              const { symbol, label } = renderCellValue(cell);
-              const isSymbol = symbol !== cell;
-              return (
-                <td class="feature-value" key={`${row[0]}-${colHeader}`}>
-                  {isSymbol ? (
-                    <>
-                      <span aria-hidden="true">{symbol}</span>
-                      <span class="sr-only">{label}</span>
-                    </>
-                  ) : (
-                    cell
-                  )}
-                </td>
-              );
-            })}
-          </tr>
-        ))}
+              })}
+            </tr>
+          ))
+        }
       </tbody>
     </table>
   </div>
 </div>
 
 <style>
-.table-container {
-  margin: 2rem 0;
-}
-.responsive-table {
-  overflow-x: auto;
-  border: 1px solid #333;
-  border-radius: 8px;
-}
-table {
-  width: 100%;
-  border-collapse: collapse;
-  background: #1a1c23;
-  font-size: 0.9rem;
-}
-th {
-  background: #252833;
-  text-align: left;
-  padding: 1rem;
-  border-bottom: 2px solid #333;
-  color: #883aea;
-}
-td {
-  padding: 1rem;
-  border-bottom: 1px solid #333;
-}
-tr:last-child td {
-  border-bottom: none;
-}
-.feature-label {
-  font-weight: bold;
-  background: #1e2129;
-  width: 30%;
-}
-.feature-value {
-  text-align: center;
-}
-tr:hover {
-  background: #252833;
-}
-.sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
-}
+  .table-container {
+    margin: 2rem 0;
+  }
+  .responsive-table {
+    overflow-x: auto;
+    border: 1px solid #333;
+    border-radius: 8px;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #1a1c23;
+    font-size: 0.9rem;
+  }
+  th {
+    background: #252833;
+    text-align: left;
+    padding: 1rem;
+    border-bottom: 2px solid #333;
+    color: #883aea;
+  }
+  td {
+    padding: 1rem;
+    border-bottom: 1px solid #333;
+  }
+  tr:last-child td {
+    border-bottom: none;
+  }
+  .feature-label {
+    font-weight: bold;
+    background: #1e2129;
+    width: 30%;
+  }
+  .feature-value {
+    text-align: center;
+  }
+  tr:hover {
+    background: #252833;
+  }
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
 </style>

@@ -12,36 +12,36 @@ const { hasMapping = false } = Astro.props;
 ---
 
 {hasMapping ? (
-  <div class="comparison-toggle-container">
-    <button
-      id="comparison-toggle"
-      type="button"
-      class="toggle-btn"
-      aria-pressed="false"
-    >
-      <span class="toggle-icon">🔍</span>
-      <span class="toggle-text">Enable Interactive Comparison</span>
-    </button>
-    <p class="toggle-hint">
-      Hover or focus on sections to see connections to the original
-    </p>
-  </div>
-) : (
-  <div class="comparison-toggle-container comparison-toggle--unavailable">
-    <button
-      type="button"
-      class="toggle-btn toggle-btn--disabled"
-      disabled
-      aria-disabled="true"
-    >
-      <span class="toggle-icon">🔍</span>
-      <span class="toggle-text">Side-by-side comparison coming soon</span>
-    </button>
-    <p class="toggle-hint">
-      Interactive comparison is not yet available for this license
-    </p>
-  </div>
-)}
+    <div class="comparison-toggle-container">
+      <button
+        id="comparison-toggle"
+        type="button"
+        class="toggle-btn"
+        aria-pressed="false"
+      >
+        <span class="toggle-icon">🔍</span>
+        <span class="toggle-text">Enable Interactive Comparison</span>
+      </button>
+      <p class="toggle-hint">
+        Hover or focus on sections to see connections to the original
+      </p>
+    </div>
+  ) : (
+    <div class="comparison-toggle-container comparison-toggle--unavailable">
+      <button
+        type="button"
+        class="toggle-btn toggle-btn--disabled"
+        disabled
+        aria-disabled="true"
+      >
+        <span class="toggle-icon">🔍</span>
+        <span class="toggle-text">Side-by-side comparison coming soon</span>
+      </button>
+      <p class="toggle-hint">
+        Interactive comparison is not yet available for this license
+      </p>
+    </div>
+  )}
 
 <script>
 const toggleBtn = document.getElementById(
@@ -51,19 +51,25 @@ const container = document.querySelector(".license-container") as HTMLElement;
 const STORAGE_KEY = "pl-comparison-mode";
 
 if (toggleBtn) {
+  const toggleText = toggleBtn.querySelector(
+    ".toggle-text",
+  ) as HTMLSpanElement | null;
+
   function updateUI(isActive: boolean) {
     if (isActive) {
       container?.classList.add("comparison-active");
-      toggleBtn!.setAttribute("aria-pressed", "true");
-      toggleBtn!.classList.add("active");
-      toggleBtn!.querySelector(".toggle-text")!.textContent =
-        "Disable Interactive Comparison";
+      toggleBtn?.setAttribute("aria-pressed", "true");
+      toggleBtn?.classList.add("active");
+      if (toggleText) {
+        toggleText.textContent = "Disable Interactive Comparison";
+      }
     } else {
       container?.classList.remove("comparison-active");
-      toggleBtn!.setAttribute("aria-pressed", "false");
-      toggleBtn!.classList.remove("active");
-      toggleBtn!.querySelector(".toggle-text")!.textContent =
-        "Enable Interactive Comparison";
+      toggleBtn?.setAttribute("aria-pressed", "false");
+      toggleBtn?.classList.remove("active");
+      if (toggleText) {
+        toggleText.textContent = "Enable Interactive Comparison";
+      }
     }
   }
 

@@ -13,36 +13,42 @@
  *
  * Exception: source-available licenses surface Zone 5 above the fold.
  */
-import type { CollectionEntry } from 'astro:content';
-import ZoneIdentity from './zones/ZoneIdentity.astro';
-import ZonePermissions from './zones/ZonePermissions.astro';
-import ZoneConditions from './zones/ZoneConditions.astro';
-import ZoneCredit from './zones/ZoneCredit.astro';
-import ZoneRestrictions from './zones/ZoneRestrictions.astro';
-import ZoneProtections from './zones/ZoneProtections.astro';
-import ZoneInterpretation from './zones/ZoneInterpretation.astro';
-import { getFamilyData } from '../../data/license-families/index';
+import type { CollectionEntry } from "astro:content";
+import { getFamilyData } from "../../data/license-families/index";
+import ZoneConditions from "./zones/ZoneConditions.astro";
+import ZoneCredit from "./zones/ZoneCredit.astro";
+import ZoneIdentity from "./zones/ZoneIdentity.astro";
+import ZoneInterpretation from "./zones/ZoneInterpretation.astro";
+import ZonePermissions from "./zones/ZonePermissions.astro";
+import ZoneProtections from "./zones/ZoneProtections.astro";
+import ZoneRestrictions from "./zones/ZoneRestrictions.astro";
 
 interface Props {
-  license: CollectionEntry<'licenses'>;
+  license: CollectionEntry<"licenses">;
 }
 
 const { license } = Astro.props;
 const { data } = license;
 
 const family = getFamilyData(data.license_family);
-const sourceAvailable = data.license_family === 'source-available';
+const sourceAvailable = data.license_family === "source-available";
 
 const permissions = data.original?.permissions ?? [];
 const conditions = data.original?.conditions ?? [];
 // Filter out warranty/liability from limitations — they are licensor protections (Zone 6),
 // not user restrictions (Zone 5). Only trademark-use and patent-use are true restrictions.
-const PROTECTION_TAGS = new Set(['liability', 'warranty']);
-const limitations = (data.original?.limitations ?? []).filter(tag => !PROTECTION_TAGS.has(tag));
+const PROTECTION_TAGS = new Set(["liability", "warranty"]);
+const limitations = (data.original?.limitations ?? []).filter(
+  (tag) => !PROTECTION_TAGS.has(tag),
+);
 ---
 
-<article class="plain-license" data-family={data.license_family} data-spdx={data.spdx_id} aria-label={data.plain_name}>
-
+<article
+  class="plain-license"
+  data-family={data.license_family}
+  data-spdx={data.spdx_id}
+  aria-label={data.plain_name}
+>
   <!-- Zone 1: Identity & orientation -->
   <ZoneIdentity
     plain_name={data.plain_name}
@@ -97,36 +103,35 @@ const limitations = (data.original?.limitations ?? []).filter(tag => !PROTECTION
 
   <!-- Optional slot for exceptional MDX body content -->
   <slot name="outro" />
-
 </article>
 
 <style>
-  .plain-license {
-    container-type: inline-size;
-  }
+.plain-license {
+  container-type: inline-size;
+}
 
-  .fold-divider {
-    position: relative;
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    margin: 2.5rem 0 1.5rem;
-    color: var(--sl-color-gray-3);
-  }
+.fold-divider {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 2.5rem 0 1.5rem;
+  color: var(--sl-color-gray-3);
+}
 
-  .fold-divider::before,
-  .fold-divider::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: var(--sl-color-gray-5);
-  }
+.fold-divider::before,
+.fold-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--sl-color-gray-5);
+}
 
-  .fold-label {
-    font-size: var(--sl-text-xs);
-    white-space: nowrap;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    padding: 0 0.5rem;
-  }
+.fold-label {
+  font-size: var(--sl-text-xs);
+  white-space: nowrap;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 0 0.5rem;
+}
 </style>

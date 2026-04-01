@@ -1,4 +1,6 @@
-import { getCollection, type CollectionEntry } from 'astro:content';
+import { getCollection } from "astro:content";
+import type { BlogPostEntryT } from "src/_types/content";
+import type { LicenseEntryT, LicenseFamilyT } from "../_types/licenses";
 
 /**
  * Derive the canonical URL slug for a license entry.
@@ -7,28 +9,40 @@ import { getCollection, type CollectionEntry } from 'astro:content';
  * becomes mpl-20). Using the frontmatter SPDX ID and license_family instead
  * preserves dotted version numbers in URLs.
  */
-export function getLicenseSlug(license: CollectionEntry<'licenses'>): string {
-  return `${license.data.license_family}/${license.data.spdx_id.toLowerCase()}`;
+export function getLicenseSlug(license: LicenseEntryT): string {
+  const licenseFamily: LicenseFamilyT =
+    license.data?.license_family ?? "permissive";
+  if (license.data?.spdx_id) {
+    return `${licenseFamily.toLowerCase()}/${license.data.spdx_id.trim().toLowerCase()}`;
+  }
+  if (license.data?.original?.spdx_id) {
+    return `${licenseFamily.toLowerCase()}/${license.data.original.spdx_id.trim().toLowerCase()}`;
+  }
+  return `${licenseFamily.toLowerCase()}/${license.slug.toLowerCase()}`;
 }
 
 /**
  * Fetch all published licenses.
  */
-export async function getPublishedLicenses(): Promise<CollectionEntry<'licenses'>[]> {
+export async function getPublishedLicenses(): Promise<LicenseEntryT[]> {
   const isDev = import.meta.env.DEV;
-  return await getCollection('licenses', ({ data }) => {
-    // Show all in development, only published in production
-    return isDev ? true : data.status === 'published';
+  if (isDev) {
+    return await getCollection("licenses");
+  }
+  return await getCollection("licenses", ({ data }) => {
+    if (data && typeof data === "object" && "status" in data) {
+      return data.status === "published";
+    }
+    return false;
   });
 }
 
 /**
  * Fetch all published blog posts.
  */
-export async function getPublishedBlogPosts(): Promise<CollectionEntry<'blog'>[]> {
-  const isDev = import.meta.env.DEV;
-  return await getCollection('blog', ({ data }) => {
-    // Filter by status if we add it, otherwise show all
-    return true; // BlogPost schema in contract doesn't have status yet, but data-model.md does
-  });
+export async function getPublishedBlogPosts(): Promise<BlogPostEntryT[]> {
+  return await getCollection(
+    "blog-posts",
+    ({ data }) => data.status === "published",
+  );
 }

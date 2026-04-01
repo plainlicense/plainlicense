@@ -4,11 +4,12 @@
     "allowSyntheticDefaultImports": true,
     "allowArbitraryExtensions": true,
     "alwaysStrict": true,
-    "baseUrl": "./",
+    "allowJs": true,
+    "rootDir": ".",
     "esModuleInterop": true,
     "isolatedModules": true,
-    "jsx": "react",
-    "jsxFactory": "h",
+    "jsx": "react-jsx",
+    "jsxImportSource": "preact",
     "lib": ["DOM", "DOM.Iterable", "WebWorker", "esnext"],
     "module": "ESNext",
     "moduleResolution": "Bundler",
@@ -19,11 +20,19 @@
     "noImplicitThis": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "outDir": "docs/assets/",
+    "outDir": "./dist",
     "paths": {
+      "~/*": ["./src/*"],
+      "~cfg": ["./cmsconfig/index"],
       "~assets/*": ["./src/assets/*"],
-      "~spdx/*": ["./external/license-list-data/json/*", "./external/license-list-XML/src/*"],
-      "~cal/*": ["./external/choosealicense.com/_data/*", "./external/choosealicense.com/_licenses/*"],
+      "~spdx/*": [
+        "./external/license-list-data/json/*",
+        "./external/license-list-XML/src/*"
+      ],
+      "~cal/*": [
+        "./external/choosealicense.com/_data/*",
+        "./external/choosealicense.com/_licenses/*"
+      ]
     },
     "removeComments": true,
     "skipLibCheck": true,
@@ -35,22 +44,41 @@
     "strictPropertyInitialization": true,
     "stripInternal": true,
     "target": "esnext",
-    "verbatimModuleSyntax": false,
+    "verbatimModuleSyntax": true,
+    "types": [
+      "css-modules",
+      "dom-navigation",
+      "resize-observer-browser",
+      "svgo",
+      "node",
+      "./worker-configuration.d.ts"
+    ],
     "plugins": [
       {
         "name": "@astrojs/ts-plugin"
       }
     ]
   },
+  "ts-node": {
+    "preferTsExts": true,
+    "require": ["tsconfig-paths/register"]
+  },
   "exclude": ["./commitlint.config.ts", "dist"],
   "extends": ["astro/tsconfigs/strict"],
   "include": [
     ".astro/types.d.ts",
     "./worker-configuration.d.ts",
+    "./workers/oauth/worker-configuration.d.ts",
     "src/**/*.ts",
     "src/**/*.d.ts",
     "src/**/*.tsx",
     "src/**/*.astro",
+    "cmsconfig/**/*.ts",
+    "external/license-list-data/json/*.json",
+    "external/license-list-XML/src/*.xml",
+    "external/choosealicense.com/_data/*.yml",
+    "external/choosealicense.com/_licenses/*.txt",
+    "workers/cms-admin/src/licenseXmlSchema.ts"
   ],
   "references": [
     {

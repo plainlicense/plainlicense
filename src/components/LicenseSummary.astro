@@ -10,18 +10,20 @@ const { data } = license;
 
 /** Convert a Gunning Fog score to a human-readable reading level. */
 function readabilityScoreToLevel(score: number): string {
-  if (score <= 6) return '6th grade';
-  if (score <= 8) return '8th grade';
-  if (score <= 10) return '10th grade';
-  if (score <= 12) return 'High school';
-  if (score <= 14) return 'College';
-  return 'Post-graduate';
+  if (score <= 6) return "6th grade";
+  if (score <= 8) return "8th grade";
+  if (score <= 10) return "10th grade";
+  if (score <= 12) return "High school";
+  if (score <= 14) return "College";
+  return "Post-graduate";
 }
 
 const plainFog = data.plain_gunning_fog;
 const originalFog = data.original?.gunning_fog;
-const plainLevel = plainFog !== undefined ? readabilityScoreToLevel(plainFog) : undefined;
-const originalLevel = originalFog !== undefined ? readabilityScoreToLevel(originalFog) : undefined;
+const plainLevel =
+  plainFog !== undefined ? readabilityScoreToLevel(plainFog) : undefined;
+const originalLevel =
+  originalFog !== undefined ? readabilityScoreToLevel(originalFog) : undefined;
 ---
 
 <div class="at-a-glance">

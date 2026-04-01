@@ -1,5 +1,5 @@
 {
-  "$schema": "../../src/schemas/mapping-schema.json",
+  "$schema": "../../workers/cms-admin/src/schemas/mapping-schema.json",
   "license_id": "MIT",
   "version": "0.2.1",
   "mapping_philosophy": "clause-level with interpretive correspondence",

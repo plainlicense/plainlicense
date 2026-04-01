@@ -21,7 +21,7 @@
 
 - [ ] T001 Create directory structure per data-model.md (content/, public/, exports/, workers/)
 - [ ] T002 Initialize Astro project with Starlight theme and Content Collections API
-- [ ] T002a [P] Configure Starlight component overrides in astro.config.mjs (Header, Footer, Sidebar)
+- [ ] T002a [P] Configure Starlight component overrides in astro.config.mts (Header, Footer, Sidebar)
 - [ ] T002b [P] Create custom Header component in src/components/overrides/Header.astro with Plain License branding
 - [ ] T002c [P] Create custom Footer component in src/components/overrides/Footer.astro with attribution
 - [ ] T002d [P] Create custom Sidebar component in src/components/overrides/Sidebar.astro for license navigation
@@ -51,7 +51,7 @@
 - [ ] T015 [P] Setup asset pipeline for images, fonts, and stylesheets in src/assets/
 - [ ] T016 [P] Configure GSAP and RxJS dependencies for reactive components
 - [ ] T017 Create error handling and validation utilities in src/utils/
-- [ ] T018 Setup environment configuration (.env, astro.config.mjs)
+- [ ] T018 Setup environment configuration (.env, astro.config.mts)
 - [ ] T019 Create export generation base infrastructure in src/build/exports/
 - [ ] T020 [P] Setup Cloudflare Workers OAuth proxy structure in workers/oauth-proxy/
 - [ ] T020a [P] Implement build-time versions.json generation from packages/*/package.json (single source of truth, prevent version drift)

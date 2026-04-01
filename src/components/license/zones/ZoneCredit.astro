@@ -24,12 +24,14 @@ const { plain_name, original } = Astro.props as Props;
   </h2>
 
   <p class="zone-intro">
-    When you share this work, you must include the copyright notice and a reference
-    to this license. Here is what that looks like:
+    When you share this work, you must include the copyright notice and a
+    reference to this license. Here is what that looks like:
   </p>
 
   <div class="attribution-template">
-    <p class="template-label">Attribution template — replace the bracketed text with your own details:</p>
+    <p class="template-label">
+      Attribution template — replace the bracketed text with your own details:
+    </p>
     <code class="template-code">
       [Work name] &copy; [Year] [Creator name].{' '}
       {plain_name}.
@@ -41,17 +43,23 @@ const { plain_name, original } = Astro.props as Props;
     <div class="example-list">
       <div class="example-item">
         <div class="example-context">In a source file header</div>
-        <pre class="example-code"><code>{`// Copyright (c) 2025 Your Name. ${plain_name}.
+        <pre
+          class="example-code"
+        ><code>{`// Copyright (c) 2025 Your Name. ${plain_name}.
 // Keep the copyright notice and this license with any copy you share.`}</code></pre>
       </div>
       <div class="example-item">
         <div class="example-context">In a README or document</div>
-        <pre class="example-code"><code>{`This project is licensed under the ${plain_name}.
+        <pre
+          class="example-code"
+        ><code>{`This project is licensed under the ${plain_name}.
 See LICENSE for details.`}</code></pre>
       </div>
       <div class="example-item">
         <div class="example-context">On a website or app</div>
-        <pre class="example-code"><code>&copy; 2025 Your Name &mdash; {plain_name}</code></pre>
+        <pre
+          class="example-code"
+        ><code>&copy; 2025 Your Name &mdash; {plain_name}</code></pre>
       </div>
     </div>
   </div>
@@ -65,136 +73,139 @@ See LICENSE for details.`}</code></pre>
       <li>Use a specific format or location</li>
       <li>Ask for permission before using the work</li>
       <li>Include the full license text everywhere you use the work</li>
-      <li>Use our exact wording — just keep the copyright notice and a reference to the license</li>
+      <li>
+        Use our exact wording — just keep the copyright notice and a reference
+        to the license
+      </li>
     </ul>
   </div>
 </section>
 
 <style>
-  .zone-credit {
-    margin-bottom: 2.5rem;
-  }
+.zone-credit {
+  margin-bottom: 2.5rem;
+}
 
-  .zone-heading {
-    font-size: var(--sl-text-xl);
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
-    color: var(--sl-color-white);
-  }
+.zone-heading {
+  font-size: var(--sl-text-xl);
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  color: var(--sl-color-white);
+}
 
-  .zone-heading-icon {
-    font-size: 1.1rem;
-  }
+.zone-heading-icon {
+  font-size: 1.1rem;
+}
 
-  .zone-intro {
-    color: var(--sl-color-gray-2);
-    font-size: var(--sl-text-sm);
-    margin-bottom: 1.25rem;
-    line-height: 1.6;
-  }
+.zone-intro {
+  color: var(--sl-color-gray-2);
+  font-size: var(--sl-text-sm);
+  margin-bottom: 1.25rem;
+  line-height: 1.6;
+}
 
-  .attribution-template {
-    background: var(--sl-color-gray-6);
-    border: 1px solid var(--sl-color-gray-5);
-    border-radius: 8px;
-    padding: 1rem 1.25rem;
-    margin-bottom: 1.5rem;
-  }
+.attribution-template {
+  background: var(--sl-color-gray-6);
+  border: 1px solid var(--sl-color-gray-5);
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.5rem;
+}
 
-  .template-label {
-    font-size: var(--sl-text-xs);
-    color: var(--sl-color-gray-3);
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    margin: 0 0 0.5rem 0;
-  }
+.template-label {
+  font-size: var(--sl-text-xs);
+  color: var(--sl-color-gray-3);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin: 0 0 0.5rem 0;
+}
 
-  .template-code {
-    font-family: var(--sl-font-mono, monospace);
-    font-size: var(--sl-text-sm);
-    color: var(--sl-color-gray-1);
-    display: block;
-    word-break: break-word;
-  }
+.template-code {
+  font-family: var(--sl-font-mono, monospace);
+  font-size: var(--sl-text-sm);
+  color: var(--sl-color-gray-1);
+  display: block;
+  word-break: break-word;
+}
 
-  .template-code a {
-    color: var(--sl-color-accent);
-  }
+.template-code a {
+  color: var(--sl-color-accent);
+}
 
-  .examples-heading {
-    font-size: var(--sl-text-base);
-    font-weight: 600;
-    margin: 0 0 0.75rem 0;
-    color: var(--sl-color-gray-1);
-  }
+.examples-heading {
+  font-size: var(--sl-text-base);
+  font-weight: 600;
+  margin: 0 0 0.75rem 0;
+  color: var(--sl-color-gray-1);
+}
 
-  .example-list {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-    margin-bottom: 1.5rem;
-  }
+.example-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
 
-  .example-item {
-    background: var(--sl-color-gray-6);
-    border: 1px solid var(--sl-color-gray-5);
-    border-radius: 8px;
-    overflow: hidden;
-  }
+.example-item {
+  background: var(--sl-color-gray-6);
+  border: 1px solid var(--sl-color-gray-5);
+  border-radius: 8px;
+  overflow: hidden;
+}
 
-  .example-context {
-    background: var(--sl-color-gray-5);
-    padding: 0.35rem 0.75rem;
-    font-size: var(--sl-text-xs);
-    color: var(--sl-color-gray-3);
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-  }
+.example-context {
+  background: var(--sl-color-gray-5);
+  padding: 0.35rem 0.75rem;
+  font-size: var(--sl-text-xs);
+  color: var(--sl-color-gray-3);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
 
-  .example-code {
-    margin: 0;
-    padding: 0.75rem 1rem;
-    font-size: var(--sl-text-xs);
-    color: var(--sl-color-gray-2);
-    white-space: pre-wrap;
-    word-break: break-word;
-  }
+.example-code {
+  margin: 0;
+  padding: 0.75rem 1rem;
+  font-size: var(--sl-text-xs);
+  color: var(--sl-color-gray-2);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
 
-  .example-code code {
-    font-family: var(--sl-font-mono, monospace);
-  }
+.example-code code {
+  font-family: var(--sl-font-mono, monospace);
+}
 
-  .not-required-box {
-    background: var(--sl-color-gray-6);
-    border: 1px solid var(--sl-color-gray-5);
-    border-radius: 8px;
-    padding: 1rem 1.25rem;
-  }
+.not-required-box {
+  background: var(--sl-color-gray-6);
+  border: 1px solid var(--sl-color-gray-5);
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+}
 
-  .not-required-heading {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin: 0 0 0.5rem 0;
-    font-size: var(--sl-text-sm);
-    color: var(--sl-color-gray-1);
-  }
+.not-required-heading {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0 0 0.5rem 0;
+  font-size: var(--sl-text-sm);
+  color: var(--sl-color-gray-1);
+}
 
-  .not-required-list {
-    margin: 0;
-    padding-left: 1.25rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-  }
+.not-required-list {
+  margin: 0;
+  padding-left: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
 
-  .not-required-list li {
-    font-size: var(--sl-text-sm);
-    color: var(--sl-color-gray-2);
-    line-height: 1.5;
-  }
+.not-required-list li {
+  font-size: var(--sl-text-sm);
+  color: var(--sl-color-gray-2);
+  line-height: 1.5;
+}
 </style>
