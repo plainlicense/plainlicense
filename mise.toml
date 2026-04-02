@@ -411,6 +411,7 @@ fi
 [tasks.build]
 tools.bun = "latest"
 run = '''
+bun run src/build/update-metrics.ts
 bunx astro build
 bun run src/build/generate-og-images.ts
 bun run src/build/generate-versions.ts

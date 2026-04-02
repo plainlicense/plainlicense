@@ -4,12 +4,14 @@ import matter from "gray-matter";
 import {
   calculateGunningFog,
   countShameWords,
+  extractOriginalSection,
   extractPlainSection,
 } from "../utils/content";
 
 /**
  * Updates readability metrics (Gunning Fog, shame words) in license frontmatter.
- * This can be run as part of the build pipeline to ensure metrics are current.
+ * Calculates metrics for both the plain-language section and the original license text.
+ * This is run as part of the build pipeline to ensure metrics are current.
  */
 async function updateMetrics() {
   const licensesDir = path.resolve("content/licenses");
@@ -30,18 +32,37 @@ async function updateMetrics() {
         const newPlainFog = calculateGunningFog(plainContent);
         const newShameCount = countShameWords(plainContent);
 
-        if (
+        // Calculate Gunning Fog for the original license text (if present)
+        const originalContent = extractOriginalSection(content);
+        const newOriginalFog =
+          originalContent.length > 0
+            ? calculateGunningFog(originalContent)
+            : undefined;
+
+        const currentOriginalFog = data.original?.gunning_fog;
+        const needsUpdate =
           data.plain_gunning_fog !== newPlainFog ||
-          data.shame_words_count !== newShameCount
-        ) {
+          data.shame_words_count !== newShameCount ||
+          currentOriginalFog !== newOriginalFog;
+
+        if (needsUpdate) {
           data.plain_gunning_fog = newPlainFog;
           data.shame_words_count = newShameCount;
 
+          if (newOriginalFog !== undefined) {
+            if (!data.original) {
+              data.original = {};
+            }
+            data.original.gunning_fog = newOriginalFog;
+          }
+
           const newFileContent = matter.stringify(content, data);
           await fs.writeFile(fullPath, newFileContent);
-          console.log(
-            `Updated metrics for ${entry.name}: Fog ${newPlainFog}, Shame ${newShameCount}`,
-          );
+          const fogInfo =
+            newOriginalFog !== undefined
+              ? `Plain Fog ${newPlainFog}, Original Fog ${newOriginalFog}, Shame ${newShameCount}`
+              : `Plain Fog ${newPlainFog}, Shame ${newShameCount}`;
+          console.log(`Updated metrics for ${entry.name}: ${fogInfo}`);
         }
       }
     }
