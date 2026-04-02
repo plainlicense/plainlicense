@@ -173,7 +173,7 @@ def main() -> None:
     Returns:
         None
     """
-    if token := os.getenv("GH_TOKEN"):
+    if token := (os.getenv("GH_TOKEN") or os.getenv("GITHUB_TOKEN")):
         total_amount = fetch_total_amount(token)
 
         content = DONATE_FILE.read_text(encoding="utf-8")
@@ -183,7 +183,7 @@ def main() -> None:
         DONATE_FILE.write_text(updated_content, encoding="utf-8")
     else:
         raise ValueError(
-            "Please set the GH_TOKEN environment variable with your GitHub token."
+            "Please set the GH_TOKEN or GITHUB_TOKEN environment variable with your GitHub token."
         )
 
 

@@ -1,0 +1,7 @@
+[project]
+name = "plainlicense-dev-tools"
+version = "0.1.0"
+description = "A unified environment for various python scripts used in the plainlicense repository."
+requires-python = ">=3.11"
+license-files = ["./UNLICENSE"]
+dependencies = ["rich>=14.3.3"]

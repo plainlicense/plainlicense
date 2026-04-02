@@ -210,7 +210,6 @@
     "@plainlicense/plain-unlicense": "workspace:*",
     "@sveltia/cms": "catalog:workers",
     "astro-loader-sveltia-cms": "^0.1.3",
-    "rxjs": "^7.8.2",
     "starlight-markdown": "^0.1.5"
   },
   "devDependencies": {
@@ -236,9 +235,11 @@
     "@types/bun": "^1.2.16",
     "@types/css-modules": "^1.0.5",
     "@types/dom-navigation": "^1.0.5",
+    "@types/jest": "^30.0.0",
     "@types/node": "^24.12.0",
     "@types/resize-observer-browser": "^0.1.11",
     "@types/rollup-plugin-size-snapshot": "^0.10.5",
+    "@types/semantic-release": "^21.1.0",
     "@types/svgo": "^3.0.0",
     "@vitest/coverage-v8": "^4.0.18",
     "@vitest/ui": "^4.0.18",

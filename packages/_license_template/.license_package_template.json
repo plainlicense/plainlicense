@@ -7,17 +7,21 @@
   "description": "Plain language adaptation of {{LICENSE_NAME}}",
   "devDependencies": {
     "@commitlint/cli": "catalog:license-release",
-    "commitlint-plugin-selective-scope": "catalog:license-release",
-    "semantic-release": "catalog:license-release",
     "@semantic-release/changelog": "catalog:license-release",
-    "semantic-release-cli": "catalog:license-release",
     "@semantic-release/commit-analyzer": "catalog:license-release",
     "@semantic-release/git": "catalog:license-release",
     "@semantic-release/github": "catalog:license-release",
-    "@semantic-release/release-notes-generator": "catalog:license-release"
+    "@semantic-release/release-notes-generator": "catalog:license-release",
+    "commitlint-plugin-selective-scope": "catalog:license-release",
+    "semantic-release": "catalog:license-release",
+    "semantic-release-cli": "catalog:license-release"
   },
   "devEngines": {
-    "packageManager": "bun"
+    "packageManager": {
+      "name": "bun",
+      "onFail": "download",
+      "version": "catalog:"
+    }
   },
   "displayName": "Plain {{LICENSE_NAME}}",
   "homepage": "https://plainlicense.org/{{SPDX_ID}}/",

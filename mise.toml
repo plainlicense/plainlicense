@@ -1,3 +1,7 @@
+experimental_monorepo_root = true
+
+[monorepo]
+
 [settings]
 idiomatic_version_file_enable_tools = []
 experimental = true
@@ -85,7 +89,7 @@ esac
 usage = '''
 arg "<tool>" 
 '''
-shell = 'bash'
+shell = "bash"
 run = '''
 if [[ "$CI" == "true" ]]; then
    shims="$(mise run _check-doctor shims 2>/dev/null)"
@@ -440,3 +444,9 @@ run = "bunx astro dev"
 depends = ["_is-setup bun"]
 tools.bun = "latest"
 run = ["bunx astro preview"]
+
+[tasks.annotate]
+tools."pipx:reuse" = "latest"
+run = '''
+
+'''

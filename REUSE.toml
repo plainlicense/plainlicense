@@ -1,0 +1,45 @@
+version = 1
+
+# !SECTION Submodules
+
+[[annotations]]
+path = "external/choosealicense.com/**"
+precedence = "override"
+SPDX-License-Identifier = "MIT"
+SPDX-FileCopyrightText = "Copyright (c) GitHub, Inc. and contributors"
+
+[[annotations]]
+# NOTE: The files included in external/ license-list-data and license-list-XML are *generated*.
+# Generally, generated files are not coprightable, and thus in the public domain.
+# The software that generates these files is [LicenseListPublisher](https://github.com/spdx/license-list-publisher), which is licensed under Apache-2.0
+# We're considering these Apache-2.0 for the sake of simplicity and to avoid legal pedantry.
+path = ["external/license-list-data/**", "external/license-list-XML/**"]
+precedence = "override"
+SPDX-License-Identifier = "Apache-2.0"
+SPDX-FileCopyrightText = "Copyright (c) SPDX Project"
+
+# !SECTION Tooling
+
+[[annotations]]
+path = [".specify/scripts/**", ".claude/commands/**"]
+precedence = "override"
+SPDX-License-Identifier = "MIT"
+SPDX-FileCopyrightText = "Copyright (c) GitHub, Inc. and contributors"
+
+[[annotations]]
+path = [".claude/skills/accessibility/**", ".github/skills/accessibility/**"]
+precedence = "override"
+SPDX-License-Identifier = "Apache-2.0"
+SPDX-FileCopyrightText = "Copyright (c) Ömer Metin"
+
+[[annotations]]
+path = [".claude/agents/accessibility-specialist.md"]
+precedence = "override"
+SPDX-License-Identifier = "Apache-2.0"
+SPDX-FileCopyrightText = "Copyright (c) Donchitos"
+
+[[annotations]]
+path = [".claude/hookify*"]
+precedence = "override"
+SPDX-License-Identifier = "MIT"
+SPDX-FileCopyrightText = "Copyright (c) 2026 Anthropic PBC"

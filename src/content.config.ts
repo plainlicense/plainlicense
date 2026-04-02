@@ -4,7 +4,6 @@ import { defineCollection } from "astro:content";
 import {
   authorsCollection,
   blogPostsCollection,
-  type CollectionDefinition,
   type CollectionName,
   featuredPostsCollection,
   getAllCollectionSchemas,
@@ -26,7 +25,7 @@ const sveltiaCollections = await getAllCollectionSchemas([
 
 export const definedCollections: {
   [key in CollectionName]: {
-    CollectionConfig: { loader: SveltiaLoader<T>; schema: ZodObject<T> };
+    CollectionConfig: { loader: SveltiaLoader; schema: ZodObject };
   };
 } = Object.fromEntries(
   Object.entries(sveltiaCollections).map(([key, value]) => [
@@ -38,6 +37,4 @@ export const definedCollections: {
   ]),
 );
 
-export const collections = { ...definedCollections } as {
-  [key in CollectionName]: CollectionDefinition;
-};
+export const collections = { ...definedCollections } as const;

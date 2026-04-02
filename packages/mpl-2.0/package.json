@@ -1,30 +1,39 @@
 {
-  "name": "@plainlicense/plain-mpl",
-  "displayName": "Plain MPL",
-  "version": "0.1.0",
+  "author": {
+    "email": "adam@plainlicense.org",
+    "name": "Adam Poulemanos",
+    "url": "https://plainlicense.org"
+  },
   "description": "Plain language adaptation of Mozilla Public License 2.0",
+  "devDependencies": {
+    "@commitlint/cli": "catalog:license-release",
+    "@semantic-release/changelog": "catalog:license-release",
+    "@semantic-release/commit-analyzer": "catalog:license-release",
+    "@semantic-release/git": "catalog:license-release",
+    "@semantic-release/github": "catalog:license-release",
+    "@semantic-release/release-notes-generator": "catalog:license-release",
+    "commitlint-plugin-selective-scope": "catalog:license-release",
+    "semantic-release": "catalog:license-release",
+    "semantic-release-cli": "catalog:license-release"
+  },
+  "devEngines": {
+    "packageManager": {
+      "name": "bun",
+      "onFail": "download",
+      "version": "catalog:"
+    }
+  },
+  "displayName": "Plain MPL",
+  "homepage": "https://plainlicense.org/mpl-2.0/",
   "keywords": [
     "plainlicense",
     "plain language",
     "license",
     "licensing"
   ],
-  "homepage": "https://plainlicense.org/mpl-2.0/",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/plainlicense/plainlicense.git",
-    "directory": "packages/mpl-2.0"
-  },
   "license": "LicenseRef-PlainUnlicense OR Unlicense",
-  "author": {
-    "name": "Adam Poulemanos",
-    "email": "adam@plainlicense.org",
-    "url": "https://plainlicense.org"
-  },
   "main": "../../content/licenses/copyleft/mpl-2.0.md",
-  "scripts": {
-    "release": "bunx semantic-release"
-  },
+  "name": "@plainlicense/plain-mpl",
   "release": {
     "branches": [
       "+([0-9])?(.{+([0-9]),x}).x",
@@ -106,15 +115,13 @@
       ]
     ]
   },
-  "devDependencies": {
-    "@commitlint/cli": "catalog:license-release",
-    "@semantic-release/changelog": "catalog:license-release",
-    "@semantic-release/commit-analyzer": "catalog:license-release",
-    "@semantic-release/git": "catalog:license-release",
-    "@semantic-release/github": "catalog:license-release",
-    "@semantic-release/release-notes-generator": "catalog:license-release",
-    "commitlint-plugin-selective-scope": "catalog:license-release",
-    "semantic-release": "catalog:license-release",
-    "semantic-release-cli": "catalog:license-release"
-  }
+  "repository": {
+    "directory": "packages/mpl-2.0",
+    "type": "git",
+    "url": "git+https://github.com/plainlicense/plainlicense.git"
+  },
+  "scripts": {
+    "release": "bunx semantic-release"
+  },
+  "version": "0.1.0"
 }

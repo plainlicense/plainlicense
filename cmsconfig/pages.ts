@@ -11,6 +11,22 @@ const commonPageFields: Field[] = [
     widget: "text",
     required: true,
   },
+  {
+    label: "Last Updated",
+    name: "last_updated",
+    widget: "hidden",
+    required: false,
+    value_type: "date",
+    default: "{{datetime | date('YYYY-MM-DDTHH:mm:ssZ') }}",
+  },
+  {
+    label: "Status",
+    name: "status",
+    widget: "select",
+    options: ["draft", "published"],
+    default: "draft",
+    required: false,
+  },
   { label: "Body", name: "body", widget: "richtext" },
 ];
 
@@ -57,11 +73,7 @@ export const pagesCollection: FileCollection = {
       "Developer Contributions",
       "src/pages/helping/code.mdx",
     ),
-    page(
-      "helping-commit",
-      "Commit Guidelines",
-      "src/pages/helping/commit.mdx",
-    ),
+    page("helping-commit", "Commit Guidelines", "src/pages/helping/commit.mdx"),
     page("helping-craft", "License Crafting", "src/pages/helping/craft.mdx"),
     page("helping-donate", "Donate", "src/pages/helping/donate.mdx", [
       {
@@ -81,11 +93,7 @@ export const pagesCollection: FileCollection = {
         required: false,
       },
     ]),
-    page(
-      "helping-legal",
-      "Legal Contributions",
-      "src/pages/helping/legal.mdx",
-    ),
+    page("helping-legal", "Legal Contributions", "src/pages/helping/legal.mdx"),
     page(
       "helping-translate",
       "Translation Guide",
@@ -96,10 +104,6 @@ export const pagesCollection: FileCollection = {
       "Brand Voice Guidelines",
       "src/pages/helping/voice.mdx",
     ),
-    page(
-      "helping-write",
-      "Writing Guidelines",
-      "src/pages/helping/write.mdx",
-    ),
+    page("helping-write", "Writing Guidelines", "src/pages/helping/write.mdx"),
   ],
 };

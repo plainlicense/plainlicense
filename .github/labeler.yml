@@ -1,57 +1,84 @@
 # Core site labels
 content:
   - changed-files:
-    - any-glob-to-any-file: ['docs/**/*.md', 'docs/*.md', '!docs/blog/**', '!docs/licenses/**', 'README.md', 'CONTRIBUTING.md', 'UNLICENSE']
+      - any-glob-to-any-file:
+          ["src/content/pages/**", "README.md", "CONTRIBUTING.md", "UNLICENSE"]
 
 blog:
   - changed-files:
-    - any-glob-to-any-file: ['docs/blog/*', 'docs/blog/*/*', 'docs/blog/*/*/*']
+      - any-glob-to-any-file: ["content/blog/**"]
 
 licenses:
   - changed-files:
-    - any-glob-to-any-file: ['docs/licenses/*/*/index.md', 'LICENSE_TEMPLATE.md']
+      - any-glob-to-any-file:
+          ["docs/licenses/*/*/index.md", "LICENSE_TEMPLATE.md"]
 
 # Infrastructure and tooling
 infra:
   - changed-files:
-    - any-glob-to-any-file:
-        - 'src/build/**'
-        - '.editorconfig'
-        - 'mkdocs.yml'
-        - '.browserlistrc'
-        - 'mlc_config.json'
-        - '.github/*'
-        - 'commitlint*'
-        - '*lint*'
-        - 'husky*'
-        - '.releaserc*'
-        - '_typos.toml'
-        - '.pre-commit*'
-        - '.sourcery.yaml'
-        - 'tsconfig*.json'
-        - 'ruff.toml'
-        - 'lerna.json'
-        - '.gitignore'
-        - '.gitmodules'
-        - 'external/**'
+      - any-glob-to-any-file:
+          - "src/build/**"
+          - ".editorconfig"
+          - ".browserlistrc"
+          - "mlc_config.json"
+          - ".github/*"
+          - "commitlint*"
+          - "*lint*"
+          - "husky*"
+          - "hk.pkl"
+          - "misle.toml"
+          - ".releaserc*"
+          - "wrangler.json*"
+          - "_typos.toml"
+          - ".pre-commit*"
+          - ".sourcery.yaml"
+          - "tsconfig*.json"
+          - "ruff.toml"
+          - "lerna.json"
+          - ".gitignore"
+          - ".gitmodules"
+          - "external/**"
 
 deps:
   - changed-files:
-    - any-glob-to-any-file:
-        - package.json
-        - pyproject.toml
-        - '*lock.json'
-        - '*.lock'
-        - 'requirements*'
-        - '**/.uv/**'
-        - 'uv.lock'
-        - '.python-version'
-        - 'bun.lockb'
+      - any-glob-to-any-file:
+          - package.json
+          - pyproject.toml
+          - "*lock.json"
+          - "*.lock"
+          - "requirements*"
+          - "**/.uv/**"
+          - "uv.lock"
+          - ".python-version"
+          - "bun.lockb"
 
 scripts:
   - changed-files:
-    - any-glob-to-any-files: ['*.js', '*.ts', '**/scripts/*', 'bin/**', '*.sh', 'overrides/hooks/**', '*.py', '*.mjs']
+      - any-glob-to-any-files:
+          [
+            "*.js",
+            "*.ts",
+            "*.mts",
+            "**/scripts/*",
+            "bin/**",
+            "*.sh",
+            "*.py",
+            "*.mjs",
+          ]
 
 ui:
   - changed-files:
-    - any-glob-to-any-file: ['overrides/**', 'src/assets/**', 'docs/assets', '!*.js', '!*.ts', '!*.sh', '!*.py', '!*.mjs', '!*.md']
+      - any-glob-to-any-file:
+          [
+            "src/assets/**",
+            "docs/assets",
+            "!*.js",
+            "!*.ts",
+            "!*.sh",
+            "!*.py",
+            "!*.mjs",
+            "!*.md",
+            "src/content/components/**",
+            "cmsconfig/**",
+            "workers/cms-admin/**",
+          ]

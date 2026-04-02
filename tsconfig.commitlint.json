@@ -2,8 +2,22 @@
   "compilerOptions": {
     "composite": true,
     "noEmit": false,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "types": [
+      "@types/node",
+      "@types/jest",
+      "@commitlint/types",
+      "@types/semantic-release",
+      "@types/semantic-release-changelog",
+      "@types/semantic-release-git",
+      "@types/semantic-release-release-notes-generator",
+      "@types/semantic-release-github",
+      "./@types/commitlint-plugin-selective-scope.d.ts"
+    ]
   },
   "extends": "./tsconfig.json",
-  "files": ["commitlint.config.ts"]
+  "files": [
+    "commitlint.config.ts",
+    "./@types/commitlint-plugin-selective-scope.d.ts"
+  ]
 }

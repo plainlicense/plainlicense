@@ -1,30 +1,39 @@
 {
-  "name": "@plainlicense/plain-mit",
-  "displayName": "Plain MIT License",
-  "version": "0.2.1",
+  "author": {
+    "email": "adam@plainlicense.org",
+    "name": "Adam Poulemanos",
+    "url": "https://plainlicense.org"
+  },
   "description": "Plain language adaptation of MIT License",
+  "devDependencies": {
+    "@commitlint/cli": "catalog:license-release",
+    "@semantic-release/changelog": "catalog:license-release",
+    "@semantic-release/commit-analyzer": "catalog:license-release",
+    "@semantic-release/git": "catalog:license-release",
+    "@semantic-release/github": "catalog:license-release",
+    "@semantic-release/release-notes-generator": "catalog:license-release",
+    "commitlint-plugin-selective-scope": "catalog:license-release",
+    "semantic-release": "catalog:license-release",
+    "semantic-release-cli": "catalog:license-release"
+  },
+  "devEngines": {
+    "packageManager": {
+      "name": "bun",
+      "onFail": "download",
+      "version": "catalog:"
+    }
+  },
+  "displayName": "Plain MIT License",
+  "homepage": "https://plainlicense.org/mit/",
   "keywords": [
     "plainlicense",
     "plain language",
     "license",
     "licensing"
   ],
-  "homepage": "https://plainlicense.org/mit/",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/plainlicense/plainlicense.git",
-    "directory": "packages/mit"
-  },
   "license": "LicenseRef-PlainUnlicense OR Unlicense",
-  "author": {
-    "name": "Adam Poulemanos",
-    "email": "adam@plainlicense.org",
-    "url": "https://plainlicense.org"
-  },
   "main": "../../content/licenses/permissive/mit.md",
-  "scripts": {
-    "release": "bunx semantic-release"
-  },
+  "name": "@plainlicense/plain-mit",
   "release": {
     "branches": [
       "+([0-9])?(.{+([0-9]),x}).x",
@@ -106,15 +115,13 @@
       ]
     ]
   },
-  "devDependencies": {
-    "@commitlint/cli": "catalog:license-release",
-    "@semantic-release/changelog": "catalog:license-release",
-    "@semantic-release/commit-analyzer": "catalog:license-release",
-    "@semantic-release/git": "catalog:license-release",
-    "@semantic-release/github": "catalog:license-release",
-    "@semantic-release/release-notes-generator": "catalog:license-release",
-    "commitlint-plugin-selective-scope": "catalog:license-release",
-    "semantic-release": "catalog:license-release",
-    "semantic-release-cli": "catalog:license-release"
-  }
+  "repository": {
+    "directory": "packages/mit",
+    "type": "git",
+    "url": "git+https://github.com/plainlicense/plainlicense.git"
+  },
+  "scripts": {
+    "release": "bunx semantic-release"
+  },
+  "version": "0.2.1"
 }

@@ -1,13 +1,20 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "compatibility_date": "2026-03-29",
-  "compatibility_flags": ["global_fetch_strictly_public", "nodejs_compat"],
-  "account_id": "1bb2d128ac96f8ee9dc75e99a54e9260",
   "name": "plainlicense-cms-admin",
   "main": "@astrojs/cloudflare/entrypoints/server",
   "assets": {
     "directory": "./dist",
     "binding": "ASSETS"
+  },
+  "account_id": "1bb2d128ac96f8ee9dc75e99a54e9260",
+  "compatibility_date": "2026-03-29",
+  "compatibility_flags": [
+    "global_fetch_strictly_public",
+    "nodejs_compat"
+  ],
+  "images": {
+    "binding": "IMAGES",
+    "remote": true
   },
   "observability": {
     "enabled": true
@@ -15,9 +22,13 @@
   "placement": {
     "mode": "smart"
   },
-  "vars": {
-    "S3_ACCESS_KEY": "2af46c19f417f0b062f540805412da84"
-  },
+  "preview_urls": true,
+  "routes": [
+    {
+      "pattern": "admin.plainlicense.org",
+      "custom_domain": true
+    }
+  ],
   "secrets_store_secrets": [
     {
       "secret_name": "PL_S3_SECRET_KEY",
@@ -25,16 +36,8 @@
       "store_id": "98acd7f077774ecfb34a31ac8cce6c98"
     }
   ],
-  "routes": [
-    {
-      "pattern": "admin.plainlicense.org",
-      "custom_domain": true
-    }
-  ],
-  "workers_dev": true,
-  "preview_urls": true,
-  "images": {
-    "binding": "IMAGES",
-    "remote": true
-  }
+  "vars": {
+    "S3_ACCESS_KEY": "2af46c19f417f0b062f540805412da84"
+  },
+  "workers_dev": true
 }

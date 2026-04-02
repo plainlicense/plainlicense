@@ -76,7 +76,7 @@ async function getCollectionSchema<
   const C extends { fields: readonly Field[] },
 >(collection: C): Promise<BuildCollectionSchemaResult<C>> {
   return (await buildCollectionSchema(
-    collection as CollectionEntry,
+    collection as unknown as CollectionEntry,
   )) as BuildCollectionSchemaResult<C>;
 }
 
