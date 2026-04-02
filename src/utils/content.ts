@@ -10,11 +10,19 @@
 export const ORIGINAL_LICENSE_HEADING = "# Original License Text";
 
 /**
- * Shared regex that matches the `---\n# Original License Text` boundary.
+ * Escape special characters in a string so it can be safely used inside a RegExp.
+ */
+function escapeRegExp(str: string): string {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+/**
+ * Shared regex that matches the `---` boundary before the original license heading.
  * Case-sensitive to ensure consistent behaviour between plain/original extraction.
  */
-const ORIGINAL_SECTION_BOUNDARY =
-  /(^|\n)---\s*\n(?=\s*# Original License Text\b)/;
+const ORIGINAL_SECTION_BOUNDARY = new RegExp(
+  `(^|\\n)---\\s*\\n(?=\\s*${escapeRegExp(ORIGINAL_LICENSE_HEADING)}\\b)`
+);
 
 /**
  * Extract only the plain-language portion of a license body.

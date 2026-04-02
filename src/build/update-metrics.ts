@@ -54,6 +54,11 @@ async function updateMetrics() {
               data.original = {};
             }
             data.original.gunning_fog = newOriginalFog;
+          } else if (data.original && "gunning_fog" in data.original) {
+            delete data.original.gunning_fog;
+            if (Object.keys(data.original).length === 0) {
+              delete data.original;
+            }
           }
 
           const newFileContent = matter.stringify(content, data);
