@@ -4,7 +4,7 @@
  * Shows a comparison of readability metrics across all published licenses.
  * Displays plain vs. original Gunning Fog scores and shame word counts.
  */
-import { getPublishedLicenses } from "../utils/collections";
+import { getLicenseSlug, getPublishedLicenses } from "../utils/collections";
 
 const licenses = await getPublishedLicenses();
 
@@ -27,7 +27,8 @@ function fogClass(score: number): string {
 
 interface LicenseRow {
   name: string;
-  spdx_id: string;
+  /** Canonical path segment as returned by getLicenseSlug(), e.g. permissive/mit */
+  slug: string;
   originalFog: number | undefined;
   plainFog: number | undefined;
   shameCount: number | undefined;
@@ -45,7 +46,7 @@ const rows: LicenseRow[] = licenses
         : undefined;
     return {
       name: l.data.plain_name,
-      spdx_id: l.data.spdx_id,
+      slug: getLicenseSlug(l),
       originalFog,
       plainFog,
       shameCount: l.data.shame_words_count,
@@ -74,7 +75,7 @@ const rows: LicenseRow[] = licenses
         {rows.map((row) => (
           <tr>
             <td>
-              <a href={`/licenses/${row.spdx_id.toLowerCase()}`}>{row.name}</a>
+              <a href={`/licenses/${row.slug}/`}>{row.name}</a>
             </td>
             <td class={`num-col ${row.originalFog !== undefined ? fogClass(row.originalFog) : ""}`}>
               {row.originalFog !== undefined

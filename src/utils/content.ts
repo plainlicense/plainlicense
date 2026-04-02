@@ -4,6 +4,19 @@
  */
 
 /**
+ * The heading that separates the plain-language section from the original license text.
+ * Used as the canonical marker in both plain and original section extraction.
+ */
+export const ORIGINAL_LICENSE_HEADING = "# Original License Text";
+
+/**
+ * Shared regex that matches the `---\n# Original License Text` boundary.
+ * Case-sensitive to ensure consistent behaviour between plain/original extraction.
+ */
+const ORIGINAL_SECTION_BOUNDARY =
+  /(^|\n)---\s*\n(?=\s*# Original License Text\b)/;
+
+/**
  * Extract only the plain-language portion of a license body.
  * License markdown files contain the plain rewrite followed by a `---` separator
  * and then the original license text. Metrics should only cover the plain section.
@@ -12,8 +25,7 @@
 export function extractPlainSection(body: string): string {
   // Align boundary detection with rendering/export logic:
   // find the '---' line that directly precedes the '# Original License Text' heading.
-  const boundaryRegex = /(^|\n)---\s*\n(?=\s*# Original License Text\b)/;
-  const match = boundaryRegex.exec(body);
+  const match = ORIGINAL_SECTION_BOUNDARY.exec(body);
 
   if (!match) {
     // If no specific boundary is found, treat the entire body as plain text.
@@ -28,17 +40,23 @@ export function extractPlainSection(body: string): string {
  * Extract only the original license text portion of a license body.
  * Returns the text after the `---\n# Original License Text` separator.
  * Returns an empty string if no separator is found.
+ *
+ * Uses the same boundary regex as `extractPlainSection` for consistency.
  */
 export function extractOriginalSection(body: string): string {
-  const boundaryRegex = /(?:^|\n)---\s*\n\s*# Original License Text\b/i;
-  const match = boundaryRegex.exec(body);
+  const match = ORIGINAL_SECTION_BOUNDARY.exec(body);
 
   if (!match) {
     return "";
   }
 
-  // Return everything after the heading line.
-  const afterHeading = body.slice(match.index + match[0].length);
+  // The match ends just before '# Original License Text'. Skip past the heading
+  // line itself to return only the body text of the original section.
+  const afterBoundary = body.slice(match.index + match[0].length);
+  // Strip the heading line (everything up to and including the first newline)
+  const headingEnd = afterBoundary.indexOf("\n");
+  const afterHeading =
+    headingEnd === -1 ? "" : afterBoundary.slice(headingEnd + 1);
   return afterHeading.trim();
 }
 
@@ -170,20 +188,23 @@ export function countShameWords(text: string): number {
   const normalizedText = text.toLowerCase();
   let count = 0;
 
-  // Count single-word matches (whole-word boundary)
+  // Count single-word matches (whole-word boundary).
+  // Escape metacharacters defensively so future additions with punctuation
+  // (e.g. hyphenated terms) don't accidentally break the regex.
   for (const word of SHAME_WORDS) {
-    const regex = new RegExp(`\\b${word}\\b`, "g");
+    const escaped = word.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const regex = new RegExp(`\\b${escaped}\\b`, "g");
     const matches = normalizedText.match(regex);
     if (matches) {
       count += matches.length;
     }
   }
 
-  // Count multi-word phrase matches (literal substring)
+  // Count multi-word phrase matches (literal substring).
+  // Escape special regex characters defensively — SHAME_PHRASES currently
+  // contains only plain strings, but this guard future-proofs the function
+  // if phrases with punctuation (e.g., "e.g.,") are added later.
   for (const phrase of SHAME_PHRASES) {
-    // Escape special regex characters defensively — SHAME_PHRASES currently
-    // contains only plain strings, but this guard future-proofs the function
-    // if phrases with punctuation (e.g., "e.g.,") are added later.
     const escapedPhrase = phrase.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     const regex = new RegExp(escapedPhrase, "gi");
     const matches = normalizedText.match(regex);

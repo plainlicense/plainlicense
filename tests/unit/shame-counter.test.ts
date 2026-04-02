@@ -66,20 +66,21 @@ describe("Shame Words Utilities", () => {
 
     it("should count multi-word shame phrases", () => {
       const text = "You must do this in order to comply.";
-      expect(countShameWords(text)).toBeGreaterThan(0);
+      // "in order to" appears once
+      expect(countShameWords(text)).toBe(1);
     });
 
     it("should count multi-word phrases case-insensitively", () => {
       const text = "IN ORDER TO proceed, you must agree.";
-      expect(countShameWords(text)).toBeGreaterThan(0);
+      // "in order to" (case-insensitive) → 1
+      expect(countShameWords(text)).toBe(1);
     });
 
     it("should count multiple occurrences of a phrase", () => {
       const text =
         "In order to use this, and in order to share this, you must comply.";
-      const count = countShameWords(text);
       // "in order to" appears twice
-      expect(count).toBeGreaterThanOrEqual(2);
+      expect(countShameWords(text)).toBe(2);
     });
 
     it("should count both words and phrases in the same text", () => {
