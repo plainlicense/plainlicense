@@ -9,10 +9,10 @@ import { describe, expect, it } from "vitest";
  */
 describe("SC-015: CMS Conflict Prevention", () => {
   it("CMS configuration uses a Git-based backend", async () => {
-    const configPath = path.resolve("astro.config.mts");
+    const configPath = path.resolve("cmsconfig/index.ts");
     const content = await fs.readFile(configPath, "utf8");
 
-    // Verify backend is GitHub (Git-based) — sveltia() config is in astro.config.mts
+    // Verify backend is GitHub (Git-based) — backend config is in cmsconfig/index.ts
     expect(content).toContain('name: "github"');
     expect(content).toContain('repo: "plainlicense/plainlicense"');
   });
