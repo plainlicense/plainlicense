@@ -181,6 +181,9 @@ export function countShameWords(text: string): number {
 
   // Count multi-word phrase matches (literal substring)
   for (const phrase of SHAME_PHRASES) {
+    // Escape special regex characters defensively — SHAME_PHRASES currently
+    // contains only plain strings, but this guard future-proofs the function
+    // if phrases with punctuation (e.g., "e.g.,") are added later.
     const escapedPhrase = phrase.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     const regex = new RegExp(escapedPhrase, "gi");
     const matches = normalizedText.match(regex);

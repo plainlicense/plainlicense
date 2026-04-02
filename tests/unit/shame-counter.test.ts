@@ -85,9 +85,11 @@ describe("Shame Words Utilities", () => {
     it("should count both words and phrases in the same text", () => {
       const text =
         "Pursuant to the aforementioned rules, in order to comply, you shall indemnify us.";
-      // aforementioned, shall, indemnify, pursuant (word), "pursuant to" (phrase), "in order to" (phrase)
+      // Word matches: aforementioned(1) + pursuant(1) + shall(1) + indemnify(1) = 4
+      // Phrase matches: "pursuant to"(1) + "in order to"(1) = 2
+      // Total: 6 (note "pursuant" is counted twice: once as a word and once as part of the phrase)
       const count = countShameWords(text);
-      expect(count).toBeGreaterThanOrEqual(4);
+      expect(count).toBe(6);
     });
   });
 });
