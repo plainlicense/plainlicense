@@ -3,27 +3,30 @@ title: Plain Elastic License
 plain_name: Plain Elastic License
 spdx_id: Elastic-2.0
 plain_version: 0.1.0
-description: The Elastic License 2.0 allows use, copying, and changes but prohibits offering the work as a managed service. You must keep notices and may lose patent rights if you sue.
+description: >-
+  The Elastic License 2.0 allows use, copying, and changes but prohibits
+  offering the work as a managed service. You must keep notices and may lose
+  patent rights if you sue.
 license_family: source-available
 is_dedication: false
 status: published
 tldr:
-  - You can use, copy, change, and share this work for most purposes.
+  - 'You can use, copy, change, and share this work for most purposes.'
   - You cannot offer this work or its features as a managed service to others.
-  - Keep all copyright, license, and trademark notices with any copy you share.
+  - 'Keep all copyright, license, and trademark notices with any copy you share.'
   - No warranty is provided. Use at your own risk.
 attribution_required: false
 fair_code: true
-maker_pitch: "Use and change freely, but no one can offer it as a hosted service."
+maker_pitch: 'Use and change freely, but no one can offer it as a hosted service.'
 commercial_restrictions:
   - no-managed-service
 compare_to:
   - spdx_id: MPL-2.0
-    contrast: "Like Elastic, but without commercial restrictions and with OSI approval"
+    contrast: 'Like Elastic, but without commercial restrictions and with OSI approval'
   - spdx_id: MIT
-    contrast: "Like Elastic, but with no restrictions beyond giving credit"
+    contrast: 'Like Elastic, but with no restrictions beyond giving credit'
 uuid: 00208272-a9cb-41b9-ad99-0bbb4078cb9a
-plain_gunning_fog: 11.76
+plain_gunning_fog: 8.71
 shame_words_count: 0
 original:
   name: Elastic License 2.0
@@ -49,6 +52,7 @@ original:
     - liability
     - trademark-use
     - warranty
+  gunning_fog: 16.96
 ---
 # Plain Elastic License
 

@@ -3,22 +3,26 @@ title: Plain Unlicense
 plain_name: Plain Unlicense
 spdx_id: Unlicense
 plain_version: 0.2.0
-description: The Unlicense is a public domain dedication that allows you to do whatever you want with the work without restrictions or required notices.
+description: >-
+  The Unlicense is a public domain dedication that allows you to do whatever you
+  want with the work without restrictions or required notices.
 license_family: public-domain
 is_dedication: true
 status: published
 tldr:
-  - You can do whatever you want with this work — no restrictions, no required notices.
+  - >-
+    You can do whatever you want with this work — no restrictions, no required
+    notices.
   - There's no warranty. Use at your own risk.
 attribution_required: false
 fair_code: false
-maker_pitch: "No restrictions at all. Your work belongs to everyone."
+maker_pitch: No restrictions at all. Your work belongs to everyone.
 commercial_restrictions: []
 compare_to:
   - spdx_id: MIT
-    contrast: "Like Unlicense, but requires giving you credit"
+    contrast: 'Like Unlicense, but requires giving you credit'
 uuid: f7905ee1-c1c1-4e8b-9ffd-27cb7fc77de1
-plain_gunning_fog: 12.2
+plain_gunning_fog: 10.44
 shame_words_count: 0
 original:
   name: The Unlicense
@@ -38,6 +42,7 @@ original:
   limitations:
     - liability
     - warranty
+  gunning_fog: 16.27
 ---
 # Plain Unlicense
 
