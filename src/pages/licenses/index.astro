@@ -49,7 +49,7 @@ const categoryDescriptions: Record<string, string> = {
 
     <div class="categories">
       {categoryOrder.filter(cat => byCategory[cat]?.length).map(cat => (
-        <section class="category-section" id={cat} key={cat}>
+        <section class={`category-section cat-${cat}`} id={cat} key={cat}>
           <div class="category-header">
             <h2>{categoryLabels[cat]}</h2>
             <p>{categoryDescriptions[cat]}</p>
@@ -118,6 +118,19 @@ const categoryDescriptions: Record<string, string> = {
   font-weight: 700;
   margin: 0 0 0.4rem;
   color: var(--text, #e8eaf0);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.category-header h2::before {
+  content: "";
+  display: inline-block;
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 50%;
+  background: var(--cat-color, var(--emerald));
+  flex-shrink: 0;
 }
 
 .category-header p {
@@ -135,8 +148,10 @@ const categoryDescriptions: Record<string, string> = {
 .license-card {
   display: block;
   padding: 1.5rem;
+  padding-left: 1.75rem;
   background: var(--bg-surface, #161923);
   border: 1px solid var(--bg-border, #242836);
+  border-left: 3px solid var(--cat-color, rgb(21, 219, 149));
   border-radius: 10px;
   text-decoration: none;
   color: var(--text, #e8eaf0);
@@ -147,9 +162,10 @@ const categoryDescriptions: Record<string, string> = {
 }
 
 .license-card:hover {
-  border-color: rgb(var(--accent, 21, 219, 149));
+  border-color: var(--bg-border, #242836);
+  border-left-color: var(--cat-color, rgb(21, 219, 149));
   transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(21, 219, 149, 0.1);
+  box-shadow: 0 4px 16px rgba(var(--cat-color-rgb, 21, 219, 149), 0.1);
   color: var(--text, #e8eaf0);
 }
 
@@ -186,7 +202,7 @@ const categoryDescriptions: Record<string, string> = {
   margin: 0 0 0.5rem;
   font-size: 1.1rem;
   font-weight: 700;
-  color: rgb(var(--accent, 21, 219, 149));
+  color: var(--cat-color, rgb(21, 219, 149));
 }
 
 .license-card p {
