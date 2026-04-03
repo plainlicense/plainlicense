@@ -187,6 +187,11 @@
     "vue-html": true,
     "yaml": true
   },
+  "files.associations": {
+    "wrangler.json": "jsonc",
+    "tsconfig.json": "jsonc",
+    "tsconfig.*.json": "jsonc"
+  },
   "npm.fetchOnlinePackageInfo": true,
   "npm.packageManager": "bun",
   "npm.scriptRunner": "bun",
