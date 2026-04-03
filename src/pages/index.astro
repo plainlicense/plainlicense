@@ -92,6 +92,7 @@ const featuredLicenses = licenses.filter((l) => l.data.featured);
 }
 
 .hero h1 {
+  font-family: var(--font-heading, "Plus Jakarta Sans", sans-serif);
   font-size: clamp(2rem, 5vw, 3.5rem);
   font-weight: 800;
   line-height: 1.15;
@@ -166,6 +167,7 @@ const featuredLicenses = licenses.filter((l) => l.data.featured);
 }
 
 .section-title {
+  font-family: var(--font-heading, "Plus Jakarta Sans", sans-serif);
   font-size: 1.5rem;
   font-weight: 700;
   margin: 0 0 1.5rem;
@@ -206,7 +208,7 @@ const featuredLicenses = licenses.filter((l) => l.data.featured);
 }
 
 .spdx-badge {
-  font-family: "Source Code Pro", monospace;
+  font-family: var(--sl-font-mono, "JetBrains Mono", monospace);
   font-size: 0.75rem;
   font-weight: 600;
   background: rgba(21, 219, 149, 0.12);
@@ -227,6 +229,7 @@ const featuredLicenses = licenses.filter((l) => l.data.featured);
 }
 
 .card h3 {
+  font-family: var(--font-heading, "Plus Jakarta Sans", sans-serif);
   margin: 0 0 0.5rem;
   font-size: 1.1rem;
   font-weight: 700;
@@ -296,7 +299,7 @@ const featuredLicenses = licenses.filter((l) => l.data.featured);
 }
 
 .list-spdx {
-  font-family: "Source Code Pro", monospace;
+  font-family: var(--sl-font-mono, "JetBrains Mono", monospace);
   font-size: 0.7rem;
   color: var(--text-muted, #8b90a0);
 }

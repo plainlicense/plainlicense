@@ -9,7 +9,7 @@
 
 /* Header Brand Styling */
 .site-title {
-  font-family: "Raleway", sans-serif;
+  font-family: var(--font-heading);
   font-weight: 700;
   letter-spacing: -0.05em;
 }
@@ -26,7 +26,7 @@
 .sl-markdown-content h4,
 .sl-markdown-content h5,
 .sl-markdown-content h6 {
-  font-family: var(--font-raleway);
+  font-family: var(--font-heading);
   color: var(--zaffre);
 }
 
