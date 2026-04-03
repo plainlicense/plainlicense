@@ -1,5 +1,4 @@
 [![Plain Unlicense](https://img.shields.io/badge/Plain-Unlicense-15db95?style=flat-square&labelColor=0d19a3&cacheSeconds=86400&link=https%3A%2F%2Fplainlicense.org%2Flicenses%2Fpublic-domain%2Funlicense%2F)](https://plainlicense.org/licenses/public-domain/unlicense/)
-[![Commitizen friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli/)
 [![Built with Astro](https://img.shields.io/badge/Built%20with-Astro-FF5D01?style=flat-square&logo=astro&logoColor=white)](https://astro.build)
 [![Deployed on Cloudflare](https://img.shields.io/badge/Deployed%20on-Cloudflare-F48120?style=flat-square&logo=cloudflare&logoColor=white)](https://pages.cloudflare.com)
 
