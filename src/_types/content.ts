@@ -1,17 +1,19 @@
-import type { z } from "astro/zod";
 import type {
-  authorSchema,
-  blogCategorySchema,
-  blogPostSchema,
-  blogSeriesSchema,
-  socialMediaSchema,
-} from "./schemas";
+  InferCollectionOutput,
+  authorsCollection,
+  blogPostsCollection,
+  seriesCollection,
+} from "~cfg";
 
-export type AuthorT = z.infer<typeof authorSchema>;
-export type SocialMediaT = z.infer<typeof socialMediaSchema>;
-export type BlogCategoryT = z.infer<typeof blogCategorySchema>;
-export type BlogSeriesT = z.infer<typeof blogSeriesSchema>;
-export type BlogPostT = z.infer<typeof blogPostSchema>;
+// ─── Inferred from CMS field definitions (single source of truth) ───
+
+export type AuthorT = InferCollectionOutput<typeof authorsCollection>;
+export type BlogPostT = InferCollectionOutput<typeof blogPostsCollection>;
+export type BlogSeriesT = InferCollectionOutput<typeof seriesCollection>;
+export type SocialMediaT = NonNullable<AuthorT["social_links"]>;
+export type BlogCategoryT = BlogPostT["category"];
+
+// ─── Entry wrappers (match Astro's getCollection return shape) ───
 
 export type BlogPostEntryT = {
   id: string;

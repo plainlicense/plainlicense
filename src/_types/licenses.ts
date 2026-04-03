@@ -1,33 +1,25 @@
-import type { z } from "astro/zod";
 import type {
-  chooseALicenseDetailsSchema,
-  conditionTagSchema,
-  licenseSchema,
-  limitationTagSchema,
-  permissionTagSchema,
-  spdxDetailsSchema,
-  templateBlockSchema,
-} from "./schemas";
+  InferCollectionOutput,
+  licensesCollection,
+  templateBlocksCollection,
+} from "~cfg";
 
-export type PermissionTagT = z.infer<typeof permissionTagSchema>;
-export type ConditionTagT = z.infer<typeof conditionTagSchema>;
-export type LimitationTagT = z.infer<typeof limitationTagSchema>;
-export type ChooseALicenseDetailsT = z.infer<
-  typeof chooseALicenseDetailsSchema
+// ─── Inferred from CMS field definitions (single source of truth) ───
+
+export type LicenseT = InferCollectionOutput<typeof licensesCollection>;
+export type TemplateBlockT = InferCollectionOutput<
+  typeof templateBlocksCollection
 >;
-export type SpdxDetailsT = z.infer<typeof spdxDetailsSchema>;
-export type LicenseT = z.infer<typeof licenseSchema>;
-export type TemplateBlockT = z.infer<typeof templateBlockSchema>;
 
-export type LicenseFamilyT =
-  | "public-domain"
-  | "permissive"
-  | "copyleft"
-  | "source-available"
-  | "proprietary";
+export type OriginalLicenseT = NonNullable<LicenseT["original"]>;
+export type PermissionTagT = NonNullable<OriginalLicenseT["permissions"]>[number];
+export type ConditionTagT = NonNullable<OriginalLicenseT["conditions"]>[number];
+export type LimitationTagT = NonNullable<OriginalLicenseT["limitations"]>[number];
 
-// License unless it's public domain, then it's a dedication
+export type LicenseFamilyT = LicenseT["license_family"];
 export type LicenseTypeT = "license" | "dedication";
+
+// ─── Entry wrappers (match Astro's getCollection return shape) ───
 
 export type LicenseEntryT = {
   id: string;

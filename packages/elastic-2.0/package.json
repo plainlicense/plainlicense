@@ -73,6 +73,9 @@
         }
       ],
       [
+        "@semantic-release/release-notes-generator"
+      ],
+      [
         "@semantic-release/changelog",
         {
           "changelogFile": "../changelogs/elastic-2.0.md",
@@ -86,9 +89,6 @@
             "../changelogs/elastic-2.0.md"
           ]
         }
-      ],
-      [
-        "@semantic-release/release-notes-generator"
       ],
       [
         "@semantic-release/github",

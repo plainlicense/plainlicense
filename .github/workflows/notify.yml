@@ -53,13 +53,11 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
+            const result = JSON.parse('${{ steps.check_issue.outputs.result }}');
+            if (!result.issue) return;
             github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              issue_number: context.issue.number,
-              body: `Another workflow run failed on commit ${github.sha} on branch ${github.ref}. Check the [workflow run](https://github.com/${github.repository}/actions/runs/${github.run_id}) for details.
-
-              Run ID: ${github.run_id}
-              Run Time: ${github.run_started_at}
-              Workflow: ${github.workflow}
-              `
+              issue_number: result.issue.number,
+              body: `Another workflow run failed. Check the [workflow run](https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}) for details.`
+            })

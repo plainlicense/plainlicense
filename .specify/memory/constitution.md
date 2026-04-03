@@ -177,7 +177,6 @@ runs: `bunx astro build`, followed by three post-build TypeScript scripts:
 - `src/build/generate-exports.ts` — produces downloadable license files (MD, PDF, TXT)
   into `public/exports/{spdx-id}/v{version}/`
 - `src/build/generate-og-images.ts` — generates Open Graph social share images
-- `src/build/generate-versions.ts` — writes version metadata consumed by the site
 
 URL routing for licenses is auto-generated at build time from `content/licenses/` directory
 structure (via `getLicenseRedirects()` in `astro.config.mts`). No manual routing configuration

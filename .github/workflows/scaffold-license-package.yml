@@ -1,0 +1,153 @@
+name: Scaffold License Package
+
+on:
+  push:
+    branches: [main, dev]
+    paths:
+      - "content/licenses/**/*.md"
+
+permissions:
+  contents: write
+
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  scaffold:
+    name: Scaffold new license packages
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 2
+
+      - name: Detect new license files
+        id: detect
+        run: |
+          # Find .md files added in content/licenses/ (not .versions.json, not deleted)
+          new_files=$(git diff --name-only --diff-filter=A HEAD~1 HEAD -- 'content/licenses/**/*.md' || true)
+
+          if [ -z "$new_files" ]; then
+            echo "No new license files detected."
+            echo "has_new=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "New license files:"
+          echo "$new_files"
+          # Write to a temp file for the next step
+          echo "$new_files" > /tmp/new-license-files.txt
+          echo "has_new=true" >> "$GITHUB_OUTPUT"
+
+      - name: Setup Bun
+        if: steps.detect.outputs.has_new == 'true'
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Scaffold packages
+        if: steps.detect.outputs.has_new == 'true'
+        run: |
+          set -euo pipefail
+
+          TEMPLATE="packages/_license_template/.license_package_template.json"
+          MISE_TEMPLATE="packages/_license_template/template.mise.toml"
+
+          while IFS= read -r file; do
+            [ -z "$file" ] && continue
+
+            echo "::group::Processing $file"
+
+            # Extract frontmatter fields with bun
+            eval "$(bun -e "
+              const fs = require('fs');
+              const content = fs.readFileSync(process.argv[1], 'utf8');
+              const match = content.match(/^---\n([\s\S]*?)\n---/);
+              if (!match) { console.error('No frontmatter in ' + process.argv[1]); process.exit(1); }
+              const fm = match[1];
+              const get = (key) => {
+                const m = fm.match(new RegExp('^' + key + ':\\\\s*(.+)', 'm'));
+                return m ? m[1].trim().replace(/^['\"]|['\"]$/g, '') : '';
+              };
+              console.log('SPDX_ID=' + JSON.stringify(get('spdx_id')));
+              console.log('PLAIN_NAME=' + JSON.stringify(get('plain_name')));
+              console.log('LICENSE_FAMILY=' + JSON.stringify(get('license_family')));
+            " "$file")"
+
+            if [ -z "$SPDX_ID" ]; then
+              echo "::warning::Skipping $file: no spdx_id in frontmatter"
+              echo "::endgroup::"
+              continue
+            fi
+
+            SPDX_LOWER=$(echo "$SPDX_ID" | tr '[:upper:]' '[:lower:]')
+            PKG_DIR="packages/$SPDX_LOWER"
+
+            # Skip if package already exists
+            if [ -d "$PKG_DIR" ]; then
+              echo "Package $PKG_DIR already exists, skipping."
+              echo "::endgroup::"
+              continue
+            fi
+
+            echo "Scaffolding package for $SPDX_ID at $PKG_DIR"
+
+            # Derive LICENSE_NAME from plain_name by stripping "Plain " prefix
+            LICENSE_NAME="${PLAIN_NAME#Plain }"
+
+            # Derive PLAIN_ID: strip version suffixes, keep base name
+            # e.g. "elastic-2.0" -> "Elastic", "MIT" -> "MIT", "mpl-2.0" -> "MPL"
+            PLAIN_ID=$(echo "$SPDX_ID" | sed -E 's/-[0-9]+\.[0-9]+(-only|-or-later)?$//i')
+
+            # Create package directory
+            mkdir -p "$PKG_DIR"
+
+            # Populate package.json from template
+            sed \
+              -e "s|{{SPDX_ID}}|$SPDX_LOWER|g" \
+              -e "s|{{ SPDX_ID }}|$SPDX_LOWER|g" \
+              -e "s|{{LICENSE_NAME}}|$LICENSE_NAME|g" \
+              -e "s|{{PLAIN_ID}}|$PLAIN_ID|g" \
+              -e "s|{{category}}|$LICENSE_FAMILY|g" \
+              "$TEMPLATE" > "$PKG_DIR/package.json"
+
+            # Copy mise.toml
+            cp "$MISE_TEMPLATE" "$PKG_DIR/mise.toml"
+
+            # Add workspace dependency to root package.json
+            PKG_NAME="@plainlicense/plain-$SPDX_LOWER"
+            if ! grep -q "\"$PKG_NAME\"" package.json; then
+              bun -e "
+                const fs = require('fs');
+                const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+                pkg.dependencies[process.argv[1]] = 'workspace:*';
+                const sorted = {};
+                for (const key of Object.keys(pkg.dependencies).sort()) {
+                  sorted[key] = pkg.dependencies[key];
+                }
+                pkg.dependencies = sorted;
+                fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2) + '\n');
+              " "$PKG_NAME"
+              echo "Added $PKG_NAME to root package.json dependencies"
+            fi
+
+            echo "::endgroup::"
+          done < /tmp/new-license-files.txt
+
+      - name: Install dependencies
+        if: steps.detect.outputs.has_new == 'true'
+        run: bun install --no-interactive
+
+      - name: Commit scaffolded packages
+        if: steps.detect.outputs.has_new == 'true'
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add packages/ package.json bun.lock
+          if git diff-index --quiet HEAD; then
+            echo "No changes to commit."
+          else
+            git commit -m "bot(infra): scaffold license workspace packages"
+            git push
+          fi

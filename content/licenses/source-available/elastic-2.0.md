@@ -1,6 +1,7 @@
 ---
 title: Plain Elastic License
 plain_name: Plain Elastic License
+plain_id: Plain-Elastic
 spdx_id: Elastic-2.0
 plain_version: 0.1.0
 description: >-

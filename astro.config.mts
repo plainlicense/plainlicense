@@ -8,7 +8,7 @@ import starlight from "@astrojs/starlight";
 import astroCloudflarePagesHeaders from "astro-cloudflare-pages-headers";
 import favicons from "astro-favicons";
 import { defineConfig, fontProviders, sessionDrivers } from "astro/config";
-import { readFileSync, readdirSync, statSync } from "node:fs";
+import { readdirSync, readFileSync, statSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import rehypeExternalLinks from "rehype-external-links";
@@ -117,7 +117,10 @@ const categoryLabels: Record<LicenseCategory, string> = {
  */
 function buildSidebar() {
   const contentBase = join(__dirname, "content/licenses");
-  const licenseGroups: { label: string; items: { label: string; link: string }[] }[] = [];
+  const licenseGroups: {
+    label: string;
+    items: { label: string; link: string }[];
+  }[] = [];
 
   for (const [category, label] of Object.entries(categoryLabels)) {
     const catDir = join(contentBase, category);
@@ -154,10 +157,7 @@ function buildSidebar() {
   return [
     {
       label: "Licenses",
-      items: [
-        { label: "All Licenses", link: "/licenses/" },
-        ...licenseGroups,
-      ],
+      items: [{ label: "All Licenses", link: "/licenses/" }, ...licenseGroups],
     },
     {
       label: "About",
@@ -191,11 +191,11 @@ function buildSidebar() {
 export default defineConfig({
   adapter: cloudflare({
     imageService: "compile",
-    prerenderEnvironment: "workerd",
+    prerenderEnvironment: "node",
     experimental: {
       headersAndRedirectsDevModeSupport: true,
     },
-    configPath: "./wrangler.jsonc",
+    configPath: "./wrangler.json",
     imagesBindingName: "IMAGES",
     sessionKVBindingName: "SESSION",
   }),
@@ -328,6 +328,7 @@ export default defineConfig({
           bundledLangs: [
             "json",
             "yaml",
+            "git-commit",
             "markdown",
             "diff",
             "typescript",
@@ -424,10 +425,13 @@ export default defineConfig({
       },
     },
     rehypePlugins: [
-      rehypeExternalLinks({
-        content: { type: "text", value: " 🔗" },
-        rel: ["nofollow"],
-      }),
+      [
+        rehypeExternalLinks,
+        {
+          content: { type: "text", value: " 🔗" },
+          rel: ["nofollow"],
+        },
+      ],
     ],
   },
   output: "static",
@@ -453,7 +457,7 @@ export default defineConfig({
     ],
     build: {
       cssCodeSplit: true,
-      cssMinify: "lightningcss",
+      cssMinify: "esbuild",
       minify: "esbuild",
       rollupOptions: {
         external: [],
@@ -461,19 +465,11 @@ export default defineConfig({
           factory: "h",
           fragment: "Fragment",
         },
-        output: {
-          dir: `${rootDir}/dist/_astro`,
-          format: "es",
-          entryFileNames: "[name]-[hash].js",
-          chunkFileNames: "[name]-[hash].js",
-          assetFileNames: "[name]-[hash][extname]",
-          compact: true,
-          interop: "esModule",
-          minifyInternalExports: true,
-          sourcemap: false,
-        },
         treeshake: "smallest",
       },
+    },
+    optimizeDeps: {
+      exclude: ["starlight-blog", "starlight-auto-drafts", "starlight-tags"],
     },
     plugins: [tsConfigPaths()],
     server: {
@@ -481,24 +477,15 @@ export default defineConfig({
         allow: [rootDir],
       },
       headers: {
-        "/*": {
-          // @ts-expect-error
-          "strict-transport-security":
-            "max-age=31536000; includeSubDomains; preload",
-          "x-frame-options": "SAMEORIGIN",
-          "x-content-type-options": "nosniff",
-          "referrer-policy": "strict-origin-when-cross-origin",
-          "permissions-policy":
-            "accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()",
-          "content-security-policy":
-            "default-src 'self'; script-src 'self' 'unsafe-inline'; connect-src 'self'; img-src 'self' data: avatars.githubusercontent.com ui-avatars.com; style-src 'self' 'unsafe-inline' fonts.googleapis.com; font-src 'self' fonts.gstatic.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'",
-        },
-        "/exports/**-embed.html": {
-          // @ts-expect-error
-          "x-frame-options": "ALLOWALL",
-          "content-security-policy":
-            "default-src 'none'; style-src 'unsafe-inline'; frame-ancestors *",
-        },
+        "strict-transport-security":
+          "max-age=31536000; includeSubDomains; preload",
+        "x-frame-options": "SAMEORIGIN",
+        "x-content-type-options": "nosniff",
+        "referrer-policy": "strict-origin-when-cross-origin",
+        "permissions-policy":
+          "accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()",
+        "content-security-policy":
+          "default-src 'self'; script-src 'self' 'unsafe-inline'; connect-src 'self'; img-src 'self' data: avatars.githubusercontent.com ui-avatars.com; style-src 'self' 'unsafe-inline' fonts.googleapis.com; font-src 'self' fonts.gstatic.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'",
       },
     },
   },

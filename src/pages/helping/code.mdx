@@ -58,7 +58,6 @@ That's it! You're ready to start developing. Here are the commands you'll use mo
 - **Build Pipeline**: `mise run build` runs `astro build` followed by three post-build scripts:
   1. `src/build/generate-exports.ts` — creates downloadable license files (MD, PDF, TXT)
   2. `src/build/generate-og-images.ts` — creates social share images
-  3. `src/build/generate-versions.ts` — writes version metadata
 
 - **URL Routing**: License URLs are auto-generated at build time. Adding a file at `content/licenses/{category}/{spdx-id}.md` automatically creates short URLs like `/licenses/{spdx-id}` and `/{spdx-id}` that redirect to the full path.
 
@@ -68,7 +67,7 @@ That's it! You're ready to start developing. Here are the commands you'll use mo
 
 - **CI/CD**: We use GitHub Actions for our CI/CD process. Workflow files are in `.github/workflows/`, and supporting scripts are in `.github/scripts/`.
 
-- **Deployment**: The site deploys to [Cloudflare Pages][cf-pages]. The configuration is in `wrangler.jsonc`.
+- **Deployment**: The site deploys to [Cloudflare Pages][cf-pages]. The configuration is in `wrangler.json`.
 
 ### Key Config Files
 
@@ -78,7 +77,7 @@ That's it! You're ready to start developing. Here are the commands you'll use mo
 | `biome.jsonc` | Linting and formatting rules |
 | `mise.toml` | Tool versions and task definitions |
 | `tsconfig.json` | TypeScript configuration |
-| `wrangler.jsonc` | Cloudflare Pages deployment |
+| `wrangler.json` | Cloudflare Pages deployment |
 | `package.json` | Dependencies and workspace packages |
 
 [adding-license]: /ADDING_A_LICENSE "Adding a License"

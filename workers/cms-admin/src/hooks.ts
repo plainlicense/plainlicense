@@ -2,6 +2,19 @@ import CMS from "@sveltia/cms";
 import { isCacheReady, lookupSpdx } from "./spdx-cache";
 
 /**
+ * Derives a Plain License identifier from an SPDX ID.
+ * Strips trailing version suffixes (-2.0, -3.0-only, -2.0-or-later)
+ * and prepends "Plain-".
+ *
+ * Inlined from src/utils/plain-id.ts to avoid cross-workspace imports.
+ */
+function derivePlainId(spdxId: string): string {
+  if (spdxId.toLowerCase().startsWith("plain-")) return spdxId;
+  const base = spdxId.replace(/-\d+\.\d+(-only|-or-later)?$/i, "");
+  return `Plain-${base}`;
+}
+
+/**
  * Minimal Immutable.js Map interface for the methods we use.
  * Avoids depending on the full `immutable` package in the worker.
  */
@@ -50,6 +63,7 @@ export function registerHooks() {
 
 /**
  * Auto-resolve computed license fields:
+ * - plain_id: derived from original.spdx_id (or spdx_id) via derivePlainId()
  * - is_dedication: true when license_family is "public-domain"
  * - title: falls back to plain_name if empty
  * - original.has_official_source: true when canonical_url is present
@@ -59,6 +73,15 @@ function resolveLicenseFields(
   _author: EventAuthor,
 ) {
   let data = entry.get("data") as ImmutableMap;
+
+  // Derive plain_id from original.spdx_id (or spdx_id for originals)
+  const originalSpdxId = (data.get("original") as ImmutableMap | undefined)?.get(
+    "spdx_id",
+  ) as string | undefined;
+  const spdxId = (data.get("spdx_id") as string | undefined) || originalSpdxId;
+  if (spdxId) {
+    data = data.set("plain_id", derivePlainId(spdxId));
+  }
 
   // Derive is_dedication from license_family
   const licenseFamily = data.get("license_family") as string | undefined;

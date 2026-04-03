@@ -13,10 +13,10 @@ export async function analyzeCommit(diff: string, proposedMessage: string) {
   let recommendedScope = "";
 
   if (isContentChange) {
-    recommendedType = "new"; // Following the spec's releaseRules mapping 'new' to minor/patch
+    recommendedType = "new";
     recommendedScope = "content";
   } else if (isCodeChange) {
-    recommendedType = "feat";
+    recommendedType = "new";
     recommendedScope = "ui";
   }
 

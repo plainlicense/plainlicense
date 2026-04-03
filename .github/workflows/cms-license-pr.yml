@@ -1,0 +1,145 @@
+name: Process CMS License PR
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+    paths:
+      - "content/licenses/**/*.md"
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  process-license-change:
+    name: Auto-bump license version
+    # Only run on CMS-created branches (sveltia uses cms/* branch prefix)
+    if: startsWith(github.head_ref, 'cms/')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Detect changed licenses and bump versions
+        id: bump
+        env:
+          BASE_REF: ${{ github.event.pull_request.base.ref }}
+        run: |
+          bumped=""
+          for license_file in $(git diff --name-only "origin/${BASE_REF}" -- content/licenses/); do
+            [ -f "$license_file" ] || continue
+            [[ "$license_file" == *.md ]] || continue
+
+            # Extract SPDX ID from frontmatter
+            spdx_id=$(grep '^spdx_id:' "$license_file" | head -1 | awk '{print $2}' | tr -d '"' | tr -d "'")
+            [ -z "$spdx_id" ] && continue
+
+            # Find corresponding package.json (lowercase spdx_id)
+            pkg_dir="packages/${spdx_id,,}"
+            pkg_json="${pkg_dir}/package.json"
+            [ -f "$pkg_json" ] || continue
+
+            # Check if version was already bumped in this PR
+            if ! git diff --quiet "origin/${BASE_REF}" -- "$pkg_json" 2>/dev/null; then
+              echo "Version already bumped for ${spdx_id}, skipping"
+              continue
+            fi
+
+            # Read current version and bump patch
+            current=$(bun -e "console.log(require('./${pkg_json}').version)")
+            IFS='.' read -r major minor patch <<< "$current"
+            new_version="${major}.${minor}.$((patch + 1))"
+
+            # Update package.json version
+            bun -e "
+              const fs = require('fs');
+              const pkg = JSON.parse(fs.readFileSync('${pkg_json}', 'utf8'));
+              pkg.version = '${new_version}';
+              fs.writeFileSync('${pkg_json}', JSON.stringify(pkg, null, 2) + '\n');
+            "
+
+            # Also update plain_version in the license frontmatter
+            sed -i "s/^plain_version:.*/plain_version: \"${new_version}\"/" "$license_file"
+
+            echo "Bumped ${spdx_id}: ${current} -> ${new_version}"
+            bumped="${bumped}${spdx_id},"
+          done
+
+          # Output results
+          bumped="${bumped%,}"
+          echo "bumped=${bumped}" >> "$GITHUB_OUTPUT"
+          echo "has_bumps=$( [ -n "$bumped" ] && echo true || echo false )" >> "$GITHUB_OUTPUT"
+
+      - name: Commit version bumps
+        if: steps.bump.outputs.has_bumps == 'true'
+        env:
+          BUMPED: ${{ steps.bump.outputs.bumped }}
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+
+          # Stage only the files we changed
+          IFS=',' read -ra ids <<< "$BUMPED"
+          for id in "${ids[@]}"; do
+            lower_id="${id,,}"
+            git add "packages/${lower_id}/package.json"
+            git add "content/licenses/"*"/${lower_id}.md" 2>/dev/null || true
+          done
+
+          # Create conventional commit
+          if [ "${#ids[@]}" -eq 1 ]; then
+            scope="${ids[0],,}"
+            git commit -m "admin(${scope}): bump version for CMS content update"
+          else
+            git commit -m "admin(content): bump versions for CMS content updates [${BUMPED}]"
+          fi
+
+          git push
+
+      - name: Label PR for review
+        if: steps.bump.outputs.has_bumps == 'true'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const bumped = '${{ steps.bump.outputs.bumped }}'.split(',');
+            const labels = ['cms-update', 'needs-review'];
+            for (const id of bumped) {
+              labels.push(`license:${id.toLowerCase()}`);
+            }
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              labels
+            });
+
+            const body = [
+              '## CMS License Update',
+              '',
+              `Auto-bumped patch version for: **${bumped.join(', ')}**`,
+              '',
+              'The version was bumped as \`admin\` (patch). If this is a **substantive** content change,',
+              'a maintainer should:',
+              '',
+              '1. Change the commit type from \`admin\` to \`subs\` (triggers minor version bump)',
+              '2. Or leave as-is for minor/administrative edits',
+              '',
+              'The release workflow will use the commit type to determine the version increment.',
+            ].join('\n');
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body
+            });

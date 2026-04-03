@@ -69,7 +69,6 @@ Each license has a workspace package at `packages/{spdx-id}/` with its own `pack
 
 1. `src/build/generate-exports.ts` — generates downloadable license files (MD, PDF, TXT) to `public/exports/`
 2. `src/build/generate-og-images.ts` — generates social share images
-3. `src/build/generate-versions.ts` — writes version metadata
 
 ### Frontend Components
 

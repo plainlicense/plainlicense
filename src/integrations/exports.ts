@@ -3,29 +3,12 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import type { AstroIntegration, AstroIntegrationLogger } from "astro";
 import matter from "gray-matter";
-import { getCollectionSchema } from "~cfg/index";
-import type { BuildCollectionSchemaResult } from "~cfg/utils";
+import type { InferCollectionOutput, licensesCollection } from "~cfg";
 import { type ExportContext, ExportOrchestrator } from "../build/exports/index";
 import { getFileAtCommit, getTaggedVersions } from "../utils/git-versions";
 import { derivePlainId } from "../utils/plain-id";
 
-const licenseSchema: BuildCollectionSchemaResult = getCollectionSchema;
-
-interface LicenseFrontmatter {
-  plain_name?: string;
-  spdx_id?: string;
-  plain_version?: string;
-  plain_id?: string;
-  license_family?: string;
-  status?: string;
-  slug?: string;
-  is_dedication?: boolean;
-  original?: {
-    name?: string;
-    version_display?: string;
-  };
-  [key: string]: unknown;
-}
+type LicenseFrontmatter = InferCollectionOutput<typeof licensesCollection>;
 
 /**
  * Resolves {{var:...}} placeholders in content using license frontmatter.
@@ -90,7 +73,9 @@ async function generateHistoricalExports(
   currentVersion: string,
   logger: AstroIntegrationLogger,
 ): Promise<ReturnType<typeof getTaggedVersions>> {
-  const taggedVersions = getTaggedVersions(data.spdx_id);
+  const taggedVersions = getTaggedVersions(
+    data.original?.spdx_id || data.plain_id || data.spdx_id || "",
+  );
 
   for (const tv of taggedVersions) {
     if (tv.version === currentVersion) continue;
@@ -110,19 +95,29 @@ async function generateHistoricalExports(
 
     let { data: pastData, content: pastBody } = matter(pastContent);
     pastBody = injectTemplateBlocks(pastBody, templateBlocks);
-    pastBody = resolveTemplateVars(pastBody, pastData);
+    pastBody = resolveTemplateVars(pastBody, pastData as LicenseFrontmatter);
 
-    const pastPlainId = pastData.plain_id || derivePlainId(data.original?.);
+    const pastPlainId =
+      pastData.plain_id ||
+      derivePlainId(
+        data.original?.spdx_id ||
+          data.plain_id ||
+          data.spdx_id ||
+          (data.plain_name as string).replaceAll(/\s+/g, "-").toLowerCase(),
+      );
     const pastExportDir = path.join(outDir, "exports", spdxLower, tv.version);
 
     const pastCtx: ExportContext = {
-      licenseId: data.spdx_id,
+      licenseId: data.spdx_id || data.plain_id,
       plainId: pastPlainId,
       version: tv.version,
       content: pastBody,
       metadata: {
         ...pastData,
-        slug: pastData.slug || data.spdx_id.toLowerCase(),
+        slug:
+          pastData.slug ||
+          data.spdx_id?.toLowerCase() ||
+          data.plain_id.toLowerCase(),
       },
       outputDir: pastExportDir,
     };
@@ -205,8 +200,9 @@ export default function exportsIntegration(): AstroIntegration {
             } else if (entry.name.endsWith(".md")) {
               const fileContent = await fs.readFile(fullPath, "utf8");
               let { data, content } = matter(fileContent);
+              const licenseData = data as LicenseFrontmatter;
 
-              if (!data.spdx_id || !data.plain_version) {
+              if (!licenseData.spdx_id || !licenseData.plain_version) {
                 logger.warn(
                   `Skipping ${entry.name}: missing spdx_id or plain_version`,
                 );
@@ -214,17 +210,18 @@ export default function exportsIntegration(): AstroIntegration {
               }
 
               // Skip draft/unpublished licenses
-              if (data.status && data.status !== "published") {
+              if (licenseData.status && licenseData.status !== "published") {
                 logger.info(`Skipping draft: ${entry.name}`);
                 continue;
               }
 
               content = injectTemplateBlocks(content, templateBlocks);
-              content = resolveTemplateVars(content, data);
+              content = resolveTemplateVars(content, licenseData);
 
-              const plainId = data.plain_id || derivePlainId(data.spdx_id);
-              const spdxLower = data.spdx_id.toLowerCase();
-              const version = data.plain_version;
+              const plainId =
+                licenseData.plain_id || derivePlainId(licenseData.spdx_id);
+              const spdxLower = licenseData.spdx_id.toLowerCase();
+              const version = licenseData.plain_version;
               const exportDir = path.join(
                 outDir,
                 "exports",
@@ -232,16 +229,16 @@ export default function exportsIntegration(): AstroIntegration {
                 version,
               );
 
-              const slug = data.license_family
-                ? `${data.license_family}/${spdxLower}`
+              const slug = licenseData.license_family
+                ? `${licenseData.license_family}/${spdxLower}`
                 : spdxLower;
 
               const ctx: ExportContext = {
-                licenseId: data.spdx_id,
+                licenseId: licenseData.spdx_id,
                 plainId,
                 version,
                 content,
-                metadata: { ...data, slug },
+                metadata: { ...licenseData, slug },
                 outputDir: exportDir,
               };
 
@@ -257,7 +254,7 @@ export default function exportsIntegration(): AstroIntegration {
 
               const taggedVersions = await generateHistoricalExports(
                 fullPath,
-                data,
+                licenseData,
                 templateBlocks,
                 orchestrator,
                 outDir,

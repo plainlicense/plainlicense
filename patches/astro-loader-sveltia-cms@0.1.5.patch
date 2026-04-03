@@ -1,0 +1,24 @@
+diff --git a/node_modules/astro-loader-sveltia-cms/.bun-tag-5690a6293ab938cc b/.bun-tag-5690a6293ab938cc
+new file mode 100644
+index 0000000000000000000000000000000000000000..e69de29bb2d1d6434b8b29ae775ad8c2e48c5391
+diff --git a/package.json b/package.json
+index 28ca174eb9ce243062b194f87cfcfab2252ff7ef..d0ffa6b5d1095cd6438df02aa23a048bd0475fe7 100644
+--- a/package.json
++++ b/package.json
+@@ -35,7 +35,15 @@
+       "types": "./dist/loader.d.ts",
+       "import": "./dist/loader.js"
+     },
+-    "./admin.astro": "./dist/admin.astro"
++    "./admin.astro": "./dist/admin.astro",
++    "./type-gen": {
++      "types": "./dist/type-gen.d.ts",
++      "import": "./dist/type-gen.js"
++    },
++    "./schema": {
++      "types": "./dist/schema.d.ts",
++      "import": "./dist/schema.js"
++    }
+   },
+   "publishConfig": {
+     "access": "public"

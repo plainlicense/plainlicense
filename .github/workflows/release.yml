@@ -23,55 +23,35 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
+          fetch-depth: 0
           submodules: recursive
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
-      - name: cache
+      - name: Cache dependencies
         uses: actions/cache@v4
         with:
           path: |
             ~/.bun/install/cache
-          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lockb') }}
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}
           restore-keys: |
             ${{ runner.os }}-bun-
-      - name: install dependencies
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: |
-          bun i -d --peer --optional --no-interactive &&
-          bun i --no-interactive -g semantic-release-cli commitlint lerna
-          export NODE_ENV=production
-      - name: cache lerna
-        uses: actions/cache@v4
-        with:
-          path: |
-            **/node_modules
-          key: ${{ runner.os }}-lerna-${{ hashFiles('**/bun.lockb') }}
-      - name: Run Lerna Versioning
-        run: npx lerna version --yes --conventional-commits
-      - name: Release project
+      - name: Install dependencies
+        run: bun i --frozen-lockfile
+      - name: Build exports
+        run: bun run build
+      - name: Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        uses: nick-invision/retry@v3
-        with:
-          timeout_minutes: 10
-          max_attempts: 3
-          command: bunx -b semantic-release
-      - name: Commit updated changelogs
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git add --all
-          git diff-index --quiet HEAD || git commit -m "bot(ci): update changelogs [ci]"
-          git push
+        run: bunx semantic-release
 
   notify:
-      needs: [release]
-      if: failure()
-      uses: ./.github/workflows/notify.yml
-      permissions:
-        contents: read
-        pull-requests: read
-        statuses: write
-        issues: write
+    needs: [release]
+    if: failure()
+    uses: ./.github/workflows/notify.yml
+    permissions:
+      contents: read
+      pull-requests: read
+      statuses: write
+      issues: write

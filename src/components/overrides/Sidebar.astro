@@ -2,8 +2,8 @@
 import Default from "@astrojs/starlight/components/Sidebar.astro";
 import type { StarlightRouteData } from "@astrojs/starlight/route-data";
 
-const route = Astro.locals.starlightRoute as StarlightRouteData;
-const isBlogPage = route.slug.startsWith("blog");
+const route = Astro.locals.starlightRoute as StarlightRouteData | undefined;
+const isBlogPage = route?.slug?.startsWith("blog") ?? false;
 ---
 
 {isBlogPage ? (

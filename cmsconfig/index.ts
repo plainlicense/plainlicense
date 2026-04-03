@@ -1,8 +1,10 @@
 /** biome-ignore-all lint/suspicious/noExplicitAny: <The types are truly 'any'> */
-
 import type { Field } from "@sveltia/cms";
 import type { SveltiaOptions } from "astro-loader-sveltia-cms";
-import { sveltiaLoader } from "astro-loader-sveltia-cms/loader";
+import {
+  sveltiaLoader,
+  type SveltiaEntryCollection,
+} from "astro-loader-sveltia-cms/loader";
 import { z } from "astro/zod";
 import { authorsCollection } from "./authors";
 import {
@@ -25,6 +27,7 @@ export const cmsConfig: SveltiaOptions = {
   title: "Plain License CMS",
   route: "/",
   config: {
+    publish_mode: "editorial_workflow",
     backend: {
       name: "github",
       repo: "plainlicense/plainlicense",
@@ -100,31 +103,26 @@ async function getCollectionDefinitions<const C extends CollectionEntry>(
     schema,
     jsonSchema: JSON.stringify(z.toJSONSchema(schema)),
     collection,
-    // convenience function that returns a sveltiaLoader instance for the collection when called
-    load: () => sveltiaLoader(collection.name as SveltiaCollectionName),
+    // Pass the collection object directly so sveltiaLoader uses it inline
+    // instead of looking it up from config.json (which requires the sveltia
+    // integration to be present in astro.config — not the case for the main site).
+    load: () => sveltiaLoader(collection as unknown as SveltiaEntryCollection),
   };
 }
 
+/** Collection name union — camelCased from each collection's `name` field. */
 type SveltiaCollectionName =
   | "authors"
-  | "licenses"
-  | "series"
-  | "blog-tags"
-  | "featured"
-  | "blog-posts"
-  | "template-blocks";
-
-type CollectionName =
-  | "authors"
-  | "licenses"
-  | "series"
+  | "blogPosts"
   | "blogTags"
   | "featured"
-  | "blogPosts"
+  | "licenses"
+  | "pages"
+  | "series"
   | "templateBlocks";
 
 type CollectionSchemas = {
-  [key in CollectionName]: CollectionDefinition;
+  [key in SveltiaCollectionName]: CollectionDefinition;
 };
 
 function toCamelCase(str: string): string {
@@ -138,7 +136,7 @@ async function getAllCollectionSchemas(
 ): Promise<CollectionSchemas> {
   const schemas: CollectionSchemas = {} as CollectionSchemas;
   for (const collection of collections) {
-    schemas[toCamelCase(collection.name) as CollectionName] =
+    schemas[toCamelCase(collection.name) as SveltiaCollectionName] =
       await getCollectionDefinitions(collection);
   }
   return schemas;
@@ -152,22 +150,22 @@ async function getAllCollectionSchemas(
 export type {
   CollectionDefinition,
   CollectionEntry,
-  CollectionName,
   CollectionSchemas,
   InferCollectionOutput,
   SveltiaCollectionName,
   SveltiaOptions,
+  SveltiaEntryCollection
 };
 
 // Export functions
-export {
-  getAllCollectionSchemas,
-  getCollectionDefinitions,
-  getCollectionSchema,
-};
+  export {
+    getAllCollectionSchemas,
+    getCollectionDefinitions,
+    getCollectionSchema
+  };
 
 // Re-export defineCollection for use in collection definition files
-export { defineCollection } from "./utils";
+  export { defineCollection } from "./utils";
 
 // export collections for use in other parts of the app
 export {
@@ -177,5 +175,6 @@ export {
   licensesCollection,
   seriesCollection,
   tagsCollection,
-  templateBlocksCollection,
+  templateBlocksCollection
 };
+

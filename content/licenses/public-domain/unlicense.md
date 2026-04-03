@@ -1,6 +1,7 @@
 ---
 title: Plain Unlicense
 plain_name: Plain Unlicense
+plain_id: Plain-Unlicense
 spdx_id: Unlicense
 plain_version: 0.2.0
 description: >-

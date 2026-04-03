@@ -73,6 +73,9 @@
         }
       ],
       [
+        "@semantic-release/release-notes-generator"
+      ],
+      [
         "@semantic-release/changelog",
         {
           "changelogFile": "../changelogs/unlicense.md",
@@ -86,9 +89,6 @@
             "../changelogs/unlicense.md"
           ]
         }
-      ],
-      [
-        "@semantic-release/release-notes-generator"
       ],
       [
         "@semantic-release/github",
@@ -122,5 +122,6 @@
   },
   "scripts": {
     "release": "bunx semantic-release"
-  }
+  },
+  "version": "0.2.0"
 }

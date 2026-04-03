@@ -1,6 +1,7 @@
 ---
 title: Plain MIT License
 plain_name: Plain MIT License
+plain_id: Plain-MIT
 spdx_id: MIT
 plain_version: 0.2.1
 description: >-
@@ -28,7 +29,6 @@ compare_to:
     contrast: 'Like MIT, but prevents offering your work as a hosted service'
 uuid: 87a537b5-b43f-4832-9983-33577b0a9828
 meta_description: Plain language MIT license for all creative works
-og_image: /images/licenses/mit-og.png
 has_mapping: true
 mapping_version: 1.0.0
 show_original_comparison: true

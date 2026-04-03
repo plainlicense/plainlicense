@@ -12,6 +12,7 @@ export const prerender = true;
   </head>
   <body>
     <script>
+      // @ts-expect-error - typescript struggles to infer the virtual module's shape, but we know it has these exports
       import { config, title } from "virtual:astro-loader-sveltia-cms/config";
       import { init } from "@sveltia/cms";
       import { registerHooks } from "../hooks";

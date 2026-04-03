@@ -1,6 +1,7 @@
 ---
 title: Plain MPL
 plain_name: Plain MPL
+plain_id: Plain-MPL
 spdx_id: MPL-2.0
 plain_version: 0.1.1
 description: >-

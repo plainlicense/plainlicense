@@ -1,5 +1,10 @@
 [
   {
+    "version": "0.1.1",
+    "date": "2026-04-03",
+    "changelog": "Published version 0.1.1"
+  },
+  {
     "version": "0.1.0",
     "date": "2026-03-05",
     "changelog": "Initial release of Plain MPL 2.0"

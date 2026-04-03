@@ -4,7 +4,7 @@ import { defineCollection } from "astro:content";
 import {
   authorsCollection,
   blogPostsCollection,
-  type CollectionName,
+  type SveltiaCollectionName as CollectionName,
   featuredPostsCollection,
   getAllCollectionSchemas,
   licensesCollection,

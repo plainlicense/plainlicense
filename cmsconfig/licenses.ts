@@ -65,6 +65,15 @@ export const licensesCollection = defineCollection({
       required: true,
     },
     {
+      label: "Plain ID",
+      name: "plain_id",
+      hint: "A unique identifier for this plain license, derived from the original license's SPDX ID. It should be in the format (case depending on usage): 'Plain-[SPDX ID with version suffixes removed]'. For example, 'Plain-MIT' or 'Plain-Apache'. This is used in URLs and as a stable identifier for the license. If the license doesn't have an original SPDX ID, create a unique identifier that follows the same format.",
+      widget: "hidden",
+      readonly: true,
+      required: true,
+      default: "",
+    },
+    {
       label: "SPDX ID",
       name: "spdx_id",
       comment:

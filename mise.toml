@@ -392,7 +392,7 @@ flag "--unit" {
   }
 '''
 tools.bun = "latest"
-depends = ["_is-setup bun", "sync"]
+depends = ["sync"]
 run = '''
 if [ -n "$usage_coverage" ]; then
   mise run test-cov
@@ -414,12 +414,13 @@ fi
 [tasks.build]
 tools.bun = "latest"
 run = '''
+bun run src/build/validate.ts
 bun run src/build/update-metrics.ts
 bunx astro sync
 bunx wrangler types
 bun run src/build/generate-og-images.ts
-bun run src/build/generate-versions.ts
 bunx astro build
+bun run src/build/build-versions.ts
 '''
 
 [tasks.deploy]
@@ -436,18 +437,18 @@ bunx wrangler deploy --env "$usage_env"
 '''
 
 [tasks.ci]
-depends = ["_is-setup bun", "sync", "lint", "test-cov", "build"]
+depends = ["sync", "lint", "test-cov", "build"]
 
 [tasks.ci-release]
 depends = ["ci", "release", "deploy"]
 
 [tasks.dev]
-depends = ["_is-setup bun", "sync"]
+depends = ["sync"]
 tools.bun = "latest"
 run = "bunx astro dev"
 
 [tasks.preview]
-depends = ["_is-setup bun"]
+depends = ["sync"]
 tools.bun = "latest"
 run = ["bunx astro preview"]
 

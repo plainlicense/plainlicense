@@ -67,6 +67,7 @@
           ]
         }
       ],
+      ["@semantic-release/release-notes-generator"],
       [
         "@semantic-release/changelog",
         {
@@ -78,6 +79,29 @@
         "@semantic-release/git",
         {
           "assets": ["../changelogs/{{SPDX_ID}}.md"]
+        }
+      ],
+      [
+        "@semantic-release/github",
+        {
+          "assets": [
+            {
+              "label": "Plain {{LICENSE_NAME}} (Markdown)",
+              "path": "../../dist/exports/{{SPDX_ID}}/${nextRelease.version}/Plain-{{PLAIN_ID}}-${nextRelease.version}.cm.md"
+            },
+            {
+              "label": "Plain {{LICENSE_NAME}} (GitHub Markdown)",
+              "path": "../../dist/exports/{{SPDX_ID}}/${nextRelease.version}/Plain-{{PLAIN_ID}}-${nextRelease.version}.gfm.md"
+            },
+            {
+              "label": "Plain {{LICENSE_NAME}} (PDF)",
+              "path": "../../dist/exports/{{SPDX_ID}}/${nextRelease.version}/Plain-{{PLAIN_ID}}-${nextRelease.version}.pdf"
+            },
+            {
+              "label": "Plain {{LICENSE_NAME}} (Plaintext)",
+              "path": "../../dist/exports/{{SPDX_ID}}/${nextRelease.version}/Plain-{{PLAIN_ID}}-${nextRelease.version}.txt"
+            }
+          ]
         }
       ]
     ]

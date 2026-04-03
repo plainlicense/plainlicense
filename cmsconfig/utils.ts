@@ -1,9 +1,9 @@
 /** biome-ignore-all lint/suspicious/noExplicitAny: <The types here are truly 'any'> */
 import type {
-	CommonCollectionProps,
-	EntryCollection,
-	EntryCollectionProps,
-	Field,
+  CommonCollectionProps,
+  EntryCollection,
+  EntryCollectionProps,
+  Field,
 } from "@sveltia/cms";
 import type { ZodObject } from "astro/zod";
 import { buildCollectionSchema } from "astro-loader-sveltia-cms/type-gen";
@@ -12,10 +12,10 @@ import type { InferCollectionOutput } from "./field-inference";
 export type CollectionEntry = EntryCollectionProps & CommonCollectionProps;
 
 export interface BuildCollectionSchemaResult<
-	C extends { fields: readonly Field[] } = { fields: Field[] },
+  C extends { fields: readonly Field[] } = { fields: Field[] },
 > {
-	schema: ZodObject<any> & { _output: InferCollectionOutput<C> };
-	types: string;
+  schema: ZodObject<any> & { _output: InferCollectionOutput<C> };
+  types: string;
 }
 
 /**
@@ -40,9 +40,9 @@ export interface BuildCollectionSchemaResult<
  * ```
  */
 export function defineCollection<const C extends EntryCollection>(
-	config: C,
+  config: C,
 ): C {
-	return config;
+  return config;
 }
 
 export { buildCollectionSchema };
