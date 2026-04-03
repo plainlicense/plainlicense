@@ -93,4 +93,14 @@
   --turkey-red-rgb: 163, 0, 0;
   --white-rgb: 255, 255, 255;
   --zaffre-rgb: 13, 25, 163;
+
+  /* Category Colors */
+  --cat-permissive: var(--emerald);
+  --cat-permissive-rgb: var(--emerald-rgb);
+  --cat-copyleft: var(--vivid-sky-blue);
+  --cat-copyleft-rgb: 58, 198, 240;
+  --cat-source-available: var(--saffron);
+  --cat-source-available-rgb: var(--saffron-rgb);
+  --cat-public-domain: var(--mauve);
+  --cat-public-domain-rgb: 212, 153, 255;
 }

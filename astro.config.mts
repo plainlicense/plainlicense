@@ -313,6 +313,7 @@ export default defineConfig({
         Header: "./src/components/overrides/Header.astro",
         Footer: "./src/components/overrides/Footer.astro",
         Sidebar: "./src/components/overrides/Sidebar.astro",
+        ThemeSelect: "./src/components/overrides/ThemeSelect.astro",
       },
       customCss: ["./src/assets/stylesheets/custom.css"],
       expressiveCode: {

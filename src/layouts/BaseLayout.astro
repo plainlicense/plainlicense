@@ -24,7 +24,7 @@ const currentPath = Astro.url.pathname;
     <header class="site-header">
       <div class="header-inner">
         <a href="/" class="site-brand" aria-label="Plain License home">
-          <span class="brand-mark" aria-hidden="true">PL</span>
+          <img src="/favicon.svg" alt="" class="brand-logo" width="32" height="32" aria-hidden="true" />
           <span class="brand-name">Plain <strong>License</strong></span>
         </a>
         <nav class="site-nav" aria-label="Main navigation">
@@ -278,18 +278,10 @@ a:hover {
   flex-shrink: 0;
 }
 
-.brand-mark {
+.brand-logo {
   width: 2rem;
   height: 2rem;
-  border-radius: 6px;
-  background: rgb(var(--accent));
-  color: #0d0f15;
-  font-weight: 800;
-  font-size: 0.75rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  letter-spacing: 0.02em;
+  flex-shrink: 0;
 }
 
 .brand-name {
