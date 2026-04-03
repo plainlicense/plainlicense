@@ -4,6 +4,8 @@ description: Plain License Hall of Shame -- the price of complexity in legal lan
 layout: ../layouts/PageLayout.astro
 ---
 
+import ReadabilityTable from "../components/ReadabilityTable.astro";
+
 export const prerender = true
 
 
@@ -15,29 +17,55 @@ Legal documents are full of words that make them harder to understand. We track 
 
 The average person reads at an 8th-grade level. Most legal documents are written at a college or graduate level. That gap isn't just inconvenient — it locks people out of understanding their own rights. Every confusing word is a small barrier. Add them up, and you get licenses that most people can't read, even when those licenses directly affect them.
 
-We think that's worth being a little rebellious about.
+We measure readability with the **Gunning Fog Index** — a score that estimates the school grade level needed to understand a text on the first read. A score of 8 means an 8th-grader can read it. A score of 17 means you need a graduate degree. Most legal documents score between 14 and 20. Our goal is 8 or below.
+
+## Plain vs. Original: The Numbers
+
+Here's how Plain License compares to the original versions of the same licenses. Lower Gunning Fog scores are better.
+
+<ReadabilityTable />
+
+These numbers come directly from the license files and are recalculated automatically during every build.
 
 ## The Shame Words
 
-Here are some of the words we flag and replace in our licenses. We use an automated linter to catch them, and we replace them with plain alternatives every time.
+Here are some of the words and phrases we flag and replace in our licenses. We use an automated linter to catch them, and we replace them with plain alternatives every time.
+
+### Single Words
 
 | Shame word | What we say instead | Why it's shameful |
 |-----------|--------------------|--------------------|
 | attorney | lawyer | "Attorney" sounds formal for no reason. Everyone knows what a lawyer is. |
 | utilize | use | Four syllables to say what "use" says in one. |
 | alter, alteration | change | "Change" is one of the first words children learn. |
-| modify, modification | change | Same problem as "alter" — just say "change." |
 | grant | give | "We grant you permission" sounds like a king on a throne. "We give you permission" sounds like a person. |
 | permit | allow | Simpler, friendlier, clearer. |
 | irrevocable | permanent | "Irrevocable" sends people to a dictionary. "Permanent" doesn't. |
+| perpetual | forever | Perpetual sounds like a legal spell. Forever is a word everyone knows. |
+| statute | law | Everyone knows what a law is. |
+| applicable | related | Simpler and just as precise in most contexts. |
+| imply | suggest | Clearer and more conversational. |
+| shall | must or will | "Shall" is archaic and ambiguous. "Must" or "will" say exactly what you mean. |
+| sublicense | let others use | Says directly what the word means. |
+| indemnify | protect, cover costs | Three syllables to say what "protect" says in two. |
+| notwithstanding | even if, despite | A single five-syllable word that means "even though." |
+| aforementioned | (name the thing) | Just say what you're referring to. |
+| herein, thereof, whereby | (remove or rephrase) | Ghost words that add length but no meaning. |
+
+### Wordy Phrases
+
+| Shame phrase | What we say instead | Why it's shameful |
+|-------------|--------------------|--------------------|
 | in order to | to | Three extra words that add nothing. |
 | in the event that | if | Five words to say "if." |
 | with respect to | about | Just say what you mean. |
 | with regard to | about | Same thing. |
 | in the course of | during | Four words to say "during." |
-| statute | law | Everyone knows what a law is. |
-| applicable | related | Simpler and just as precise in most contexts. |
-| imply | suggest | Clearer and more conversational. |
+| pursuant to | under, following | Two syllables to replace a phrase nobody uses outside legal documents. |
+| subject to | under | Often just "under" works fine. |
+| in connection with | about, for | Vague and wordy. |
+| for the purposes of | to, for | Four words to say "to." |
+| in accordance with | under, following | Formal phrasing where simpler words work just as well. |
 
 We also watch for overuse of the word "that." It's often unnecessary and clutters sentences. Compare: "We believe that this is important" vs. "We believe this is important." Same meaning, fewer words.
 
