@@ -1,0 +1,11 @@
+[tasks]
+[tasks.gentypes]
+run = "bunx wrangler types"
+
+[tasks.build]
+depends = ["gentypes"]
+run = "bunx wrangler build"
+
+[tasks.deploy]
+depends = ["build"]
+run = "bunx wrangler deploy"

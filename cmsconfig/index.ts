@@ -29,6 +29,7 @@ export const cmsConfig: SveltiaOptions = {
       name: "github",
       repo: "plainlicense/plainlicense",
       branch: "main",
+      base_url: "https://auth.plainlicense.org",
     },
     collections: [
       authorsCollection,

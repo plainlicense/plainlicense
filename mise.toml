@@ -1,6 +1,7 @@
 experimental_monorepo_root = true
 
 [monorepo]
+config_roots = ["./", "./packages/*/", "./workers/*/"]
 
 [settings]
 idiomatic_version_file_enable_tools = []
@@ -11,7 +12,7 @@ package_manager = "bun"
 
 [tools]
 bun = "latest"
-"cargo:submod" = ">=0.2.7"
+"cargo:submod" = "latest"
 delta = "latest"
 difftastic = "latest"
 hk = "latest"
@@ -89,6 +90,7 @@ esac
 usage = '''
 arg "<tool>" 
 '''
+interactive = true
 shell = "bash"
 run = '''
 if [[ "$CI" == "true" ]]; then
@@ -118,6 +120,7 @@ fi
 
 [tasks.setup]
 shell = "bash"
+env.MISE_TRUST = 1
 run = [
   "mise set &> /dev/null",
   # trust can error if it's already trusted, so we ignore errors here
@@ -411,6 +414,8 @@ fi
 [tasks.build]
 tools.bun = "latest"
 run = '''
+bunx astro sync
+bunx wrangler types
 bunx astro build
 bun run src/build/generate-og-images.ts
 bun run src/build/generate-versions.ts
@@ -424,8 +429,8 @@ arg "[env]" help "The environment to deploy to" default "production"
   }
 '''
 tools.bun = "latest"
+depends = ["build"]
 run = '''
-bunx wrangler types --env "$usage_env"
 bunx wrangler deploy --env "$usage_env"
 '''
 

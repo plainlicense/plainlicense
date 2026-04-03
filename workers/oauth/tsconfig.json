@@ -1,0 +1,9 @@
+{
+  "extends": "../../tsconfig.json",
+  "include": ["src/**/*", "worker-configuration.d.ts"],
+  "compilerOptions": {
+    "outDir": "dist",
+    "lib": ["es2020", "webworker"],
+    "types": ["./worker-configuration.d.ts"]
+  }
+}

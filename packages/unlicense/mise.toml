@@ -1,0 +1,18 @@
+[env]
+LICENSE_PATH = '''{{ exec(command='command cat package.json | jq -r ".main"') }}'''
+
+[tasks]
+# when we run repo-wide commands, we get warnings if we have tasks that don't work in some packages. So we have no-ops for the tasks that don't apply to this package.
+
+[tasks.check]
+run = "echo ''"
+
+[tasks.build]
+run = "echo ''"
+
+[tasks.deploy]
+run = "echo ''"
+
+[tasks.release]
+tools.bun = "latest"
+run = "bunx semantic-release"

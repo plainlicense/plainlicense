@@ -8,10 +8,12 @@
   },
   "account_id": "1bb2d128ac96f8ee9dc75e99a54e9260",
   "compatibility_date": "2026-03-29",
-  "compatibility_flags": [
-    "global_fetch_strictly_public",
-    "nodejs_compat"
-  ],
+  "compatibility_flags": ["global_fetch_strictly_public", "nodejs_compat"],
+  "build": {
+    "command": "node node_modules/bun/install.js || true; bunx astro sync && bunx wrangler types; bunx astro build; bunx wrangler deploy",
+    "cwd": "./",
+    "watch_dir": "./src"
+  },
   "images": {
     "binding": "IMAGES",
     "remote": true

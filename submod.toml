@@ -1,17 +1,26 @@
-["submodule external/license-list-data"]
+["external/license-list-data"]
 path = "external/license-list-data"
 url = "https://github.com/spdx/license-list-data.git"
+shallow = true
 branch = "main"
 ignore = "all"
 
-["submodule external/choosealicense.com"]
+fetch = "on-demand"
+
+["external/choosealicense.com"]
 path = "external/choosealicense.com"
 url = "https://github.com/github/choosealicense.com.git"
+shallow = true
 branch = "gh-pages"
 ignore = "all"
+fetch = "on-demand"
 
-["submodule external/license-list-XML"]
+
+
+["external/license-list-XML"]
 path = "external/license-list-XML"
 url = "https://www.github.com/spdx/license-list-XML.git"
 branch = "main"
 ignore = "all"
+active = true
+sparse_paths = ["/*", "!/*/", "/equivalentwords.txt/", "/schema/", "/src/"]

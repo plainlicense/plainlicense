@@ -1,0 +1,21 @@
+[tasks]
+[tasks.check]
+run = ["bunx astro check"]
+
+[tasks.astro]
+run = "bunx astro"
+
+[tasks.gentypes]
+run = "bunx astro sync && bunx wrangler types"
+
+[tasks.dev]
+depends = ["gentypes"]
+run = "bunx astro dev"
+
+[tasks.build]
+depends = ["gentypes"]
+run = "bunx astro build"
+
+[tasks.deploy]
+depends = ["build"]
+run = "bunx wrangler deploy"

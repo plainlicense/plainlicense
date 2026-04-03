@@ -1,9 +1,24 @@
+/// <reference path="../worker-configuration.d.ts" />
 /**
  * List of supported OAuth providers.
  *
- * This script is from [sveltia-oauth-]
+ * This script is from [sveltia-cms-auth](https://github.com/sveltia/sveltia-cms-auth), modified for type safety and better error handling and removed gitlab-related code. 
+ * The original script is licensed under MIT License Copyright (c) 2026 Kohei Yoshino.
  */
-const supportedProviders = ["github", "gitlab"];
+const GITHUB_HOSTNAME = "github.com";
+const supportedProviders = ["github"];
+
+interface Env extends Cloudflare {
+  ALLOWED_DOMAINS?: string;
+  GITHUB_CLIENT_ID: { get: () => Promise<string> };
+  GITHUB_CLIENT_SECRET: { get: () => Promise<string> };
+}
+
+export type JsonResponse = {
+  access_token?: string;
+  error?: string;
+};
+
 /**
  * Escape the given string for safe use in a regular expression.
  * @param {string} str - Original string.
@@ -66,15 +81,15 @@ const outputHTML = ({
 /**
  * Handle the `auth` method, which is the first request in the authorization flow.
  * @param {Request} request - HTTP request.
- * @param {{ [key: string]: string }} env - Environment variables.
+ * @param {Env} env - Environment variables.
  * @returns {Promise<Response>} HTTP response.
  */
 const handleAuth = async (
   request: Request,
-  env: { [key: string]: string },
+  env: Env,
 ): Promise<Response> => {
   const { url } = request;
-  const { origin, searchParams } = new URL(url);
+  const { searchParams } = new URL(url);
   const { provider, site_id: domain } = Object.fromEntries(searchParams);
 
   if (!provider || !supportedProviders.includes(provider)) {
@@ -86,10 +101,6 @@ const handleAuth = async (
 
   const {
     ALLOWED_DOMAINS,
-    GITHUB_HOSTNAME = "github.com",
-    GITLAB_CLIENT_ID,
-    GITLAB_CLIENT_SECRET,
-    GITLAB_HOSTNAME = "gitlab.com",
   } = env;
 
   const GITHUB_CLIENT_ID = await env.GITHUB_CLIENT_ID.get();
@@ -135,53 +146,33 @@ const handleAuth = async (
     authURL = `https://${GITHUB_HOSTNAME}/login/oauth/authorize?${params.toString()}`;
   }
 
-  // GitLab
-  if (provider === "gitlab") {
-    if (!GITLAB_CLIENT_ID || !GITLAB_CLIENT_SECRET) {
-      return outputHTML({
-        provider,
-        error: "OAuth app client ID or secret is not configured.",
-        errorCode: "MISCONFIGURED_CLIENT",
-      });
-    }
 
-    const params = new URLSearchParams({
-      client_id: GITLAB_CLIENT_ID,
-      redirect_uri: `${origin}/callback`,
-      response_type: "code",
-      scope: "api",
-      state: csrfToken,
+    // Redirect to the authorization server
+    return new Response("", {
+      status: 302,
+      headers: {
+        Location: authURL,
+        // Cookie expires in 10 minutes; Use `SameSite=Lax` to make sure the cookie is sent by the
+        // browser after redirect
+        "Set-Cookie":
+          `csrf-token=${provider}_${csrfToken}; ` +
+          `HttpOnly; Path=/; Max-Age=600; SameSite=Lax; Secure`,
+      },
     });
-
-    authURL = `https://${GITLAB_HOSTNAME}/oauth/authorize?${params.toString()}`;
-  }
-
-  // Redirect to the authorization server
-  return new Response("", {
-    status: 302,
-    headers: {
-      Location: authURL,
-      // Cookie expires in 10 minutes; Use `SameSite=Lax` to make sure the cookie is sent by the
-      // browser after redirect
-      "Set-Cookie":
-        `csrf-token=${provider}_${csrfToken}; ` +
-        `HttpOnly; Path=/; Max-Age=600; SameSite=Lax; Secure`,
-    },
-  });
-};
+  };
 
 /**
  * Handle the `callback` method, which is the second request in the authorization flow.
  * @param {Request} request - HTTP request.
- * @param {{ [key: string]: string }} env - Environment variables.
+ * @param {Env} env - Environment variables.
  * @returns {Promise<Response>} HTTP response.
  */
 const handleCallback = async (
   request: Request,
-  env: { [key: string]: string },
+  env: Env,
 ): Promise<Response> => {
   const { url, headers } = request;
-  const { origin, searchParams } = new URL(url);
+  const { searchParams } = new URL(url);
   const { code, state } = Object.fromEntries(searchParams);
 
   const [, provider, csrfToken] =
@@ -211,56 +202,30 @@ const handleCallback = async (
     });
   }
 
-  const {
-    GITHUB_CLIENT_ID,
-    GITHUB_CLIENT_SECRET,
-    GITHUB_HOSTNAME = "github.com",
-    GITLAB_CLIENT_ID,
-    GITLAB_CLIENT_SECRET,
-    GITLAB_HOSTNAME = "gitlab.com",
-  } = env;
+  const GITHUB_CLIENT_ID = await env.GITHUB_CLIENT_ID.get();
+  const GITHUB_CLIENT_SECRET = await env.GITHUB_CLIENT_SECRET.get();
 
   let tokenURL = "";
   let requestBody = {};
 
   // GitHub
-  if (provider === "github") {
-    if (!GITHUB_CLIENT_ID || !GITHUB_CLIENT_SECRET) {
-      return outputHTML({
-        provider,
-        error: "OAuth app client ID or secret is not configured.",
-        errorCode: "MISCONFIGURED_CLIENT",
-      });
-    }
-
-    tokenURL = `https://${GITHUB_HOSTNAME}/login/oauth/access_token`;
-    requestBody = {
-      code,
-      client_id: GITHUB_CLIENT_ID,
-      client_secret: GITHUB_CLIENT_SECRET,
-    };
+  if (!GITHUB_CLIENT_ID || !GITHUB_CLIENT_SECRET) {
+    return outputHTML({
+      provider,
+      error: "OAuth app client ID or secret is not configured.",
+      errorCode: "MISCONFIGURED_CLIENT",
+    });
   }
 
-  if (provider === "gitlab") {
-    if (!GITLAB_CLIENT_ID || !GITLAB_CLIENT_SECRET) {
-      return outputHTML({
-        provider,
-        error: "OAuth app client ID or secret is not configured.",
-        errorCode: "MISCONFIGURED_CLIENT",
-      });
-    }
+  tokenURL = `https://${GITHUB_HOSTNAME}/login/oauth/access_token`;
+  requestBody = {
+    code,
+    client_id: GITHUB_CLIENT_ID,
+    client_secret: GITHUB_CLIENT_SECRET,
+  };
 
-    tokenURL = `https://${GITLAB_HOSTNAME}/oauth/token`;
-    requestBody = {
-      code,
-      client_id: GITLAB_CLIENT_ID,
-      client_secret: GITLAB_CLIENT_SECRET,
-      grant_type: "authorization_code",
-      redirect_uri: `${origin}/callback`,
-    };
-  }
 
-  let response;
+  let response: Response | undefined;
   let token = "";
   let error = "";
 
@@ -284,9 +249,11 @@ const handleCallback = async (
       errorCode: "TOKEN_REQUEST_FAILED",
     });
   }
-
+  // response exists
   try {
-    ({ access_token: token, error } = await response.json());
+    const jsonResponse: Awaited<JsonResponse> = await response.json();
+    token = jsonResponse.access_token ?? "";
+    error = jsonResponse.error ?? "";
   } catch {
     return outputHTML({
       provider,
@@ -306,11 +273,10 @@ export default {
    * @returns {Promise<Response>} HTTP response.
    * @see https://developers.cloudflare.com/workers/runtime-apis/fetch/
    * @see https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps
-   * @see https://docs.gitlab.com/ee/api/oauth2.html#authorization-code-flow
    */
   async fetch(
     request: Request,
-    env: { [key: string]: string },
+    env: Env,
   ): Promise<Response> {
     const { method, url } = request;
     const { pathname } = new URL(url);

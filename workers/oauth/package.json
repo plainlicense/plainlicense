@@ -1,0 +1,37 @@
+{
+  "description": "OAuth worker for Plain License",
+  "devDependencies": {
+    "bun": "catalog:",
+    "node": "catalog:workers",
+    "wrangler": "catalog:workers"
+  },
+  "devEngines": {
+    "packageManager": {
+      "name": "bun",
+      "onFail": "download",
+      "version": "catalog:"
+    }
+  },
+  "engines": {
+    "node": "catalog:workers"
+  },
+  "keywords": [
+    "oauth",
+    "worker",
+    "plainlicense"
+  ],
+  "main": "src/index.ts",
+  "name": "plainlicense-oauth-worker",
+  "private": true,
+  "repository": {
+    "directory": "workers/oauth",
+    "type": "git",
+    "url": "git+https://github.com/plainlicense/plainlicense.git"
+  },
+  "scripts": {
+    "build": "bunx wrangler build",
+    "deploy": "bunx wrangler deploy",
+    "prebuild": "bunx wrangler types"
+  },
+  "version": "0.1.0"
+}
