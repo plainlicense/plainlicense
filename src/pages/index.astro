@@ -1,21 +1,25 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { getLicenseSlug, getPublishedLicenses } from "../utils/collections";
+import "../assets/stylesheets/custom.css";
 
 export const prerender = true;
-const CATEGORY_ORDER = [
+const FAMILY_ORDER = [
+  "public-domain",
   "permissive",
   "copyleft",
   "source-available",
-  "public-domain",
+  "proprietary",
 ];
 const allLicenses = await getPublishedLicenses();
 const licenses = [...allLicenses].sort((a, b) => {
-  const aIdx = CATEGORY_ORDER.indexOf(a.data.license_family);
-  const bIdx = CATEGORY_ORDER.indexOf(b.data.license_family);
+  const aIdx = FAMILY_ORDER.indexOf(a.data.license_family);
+  const bIdx = FAMILY_ORDER.indexOf(b.data.license_family);
   return (aIdx === -1 ? 99 : aIdx) - (bIdx === -1 ? 99 : bIdx);
 });
 const featuredLicenses = licenses.filter((l) => l.data.featured);
+const MAX_INLINE_LICENSES = 8;
+const hasMore = licenses.length > MAX_INLINE_LICENSES;
 ---
 
 <BaseLayout
@@ -49,6 +53,7 @@ const featuredLicenses = licenses.filter((l) => l.data.featured);
               </div>
               <h3>{license.data.plain_name}</h3>
               <p>{license.data.description}</p>
+              <span class="card-arrow" aria-hidden="true">&rarr;</span>
             </a>
           ))}
         </div>
@@ -58,7 +63,7 @@ const featuredLicenses = licenses.filter((l) => l.data.featured);
     <section class="section">
       <div class="all-licenses-header">
         <h2 class="section-title">All Licenses</h2>
-        <a href="/licenses/" class="see-all">View all →</a>
+        {hasMore && <a href="/licenses/" class="see-all">Explore all →</a>}
       </div>
       <ul class="license-list">
         {licenses.map(license => (
@@ -78,7 +83,7 @@ const featuredLicenses = licenses.filter((l) => l.data.featured);
         <div class="step">
           <span class="step-number">1</span>
           <h3>Pick a license</h3>
-          <p>Browse our library of popular licenses, organized by type — permissive, copyleft, source-available, or public domain.</p>
+          <p>Browse our library of popular licenses, organized by family — public domain, permissive, copyleft, or source-available.</p>
         </div>
         <div class="step">
           <span class="step-number">2</span>
@@ -122,14 +127,13 @@ const featuredLicenses = licenses.filter((l) => l.data.featured);
 </BaseLayout>
 
 <style>
+/* ── Hero ── */
 .hero {
   padding: 5rem 1.5rem 4rem;
   text-align: center;
-  background: radial-gradient(
-    ellipse 80% 50% at 50% -10%,
-    rgba(21, 219, 149, 0.12),
-    transparent
-  );
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(21, 219, 149, 0.12), transparent),
+    radial-gradient(ellipse 60% 40% at 80% 60%, rgba(var(--zaffre-rgb, 13, 25, 163), 0.08), transparent);
   border-bottom: 1px solid var(--bg-border, #242836);
 }
 
@@ -162,6 +166,7 @@ const featuredLicenses = licenses.filter((l) => l.data.featured);
   flex-wrap: wrap;
 }
 
+/* ── Buttons ── */
 .btn-primary {
   display: inline-flex;
   align-items: center;
@@ -173,14 +178,21 @@ const featuredLicenses = licenses.filter((l) => l.data.featured);
   font-size: 0.95rem;
   text-decoration: none;
   transition:
-    background 0.15s,
-    transform 0.15s;
+    background 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .btn-primary:hover {
   background: rgb(106, 241, 194);
   color: #0d0f15;
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(21, 219, 149, 0.3);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(21, 219, 149, 0.2);
 }
 
 .btn-secondary {
@@ -195,15 +207,24 @@ const featuredLicenses = licenses.filter((l) => l.data.featured);
   font-size: 0.95rem;
   text-decoration: none;
   transition:
-    border-color 0.15s,
-    color 0.15s;
+    border-color 0.2s ease,
+    color 0.2s ease,
+    background 0.2s ease,
+    transform 0.2s ease;
 }
 
 .btn-secondary:hover {
-  border-color: rgb(21, 219, 149);
-  color: rgb(21, 219, 149);
+  border-color: rgba(21, 219, 149, 0.5);
+  color: var(--emerald, rgb(21, 219, 149));
+  background: rgba(21, 219, 149, 0.06);
+  transform: translateY(-2px);
 }
 
+.btn-secondary:active {
+  transform: translateY(0);
+}
+
+/* ── Layout ── */
 .home-content {
   max-width: 72rem;
   margin: 0 auto;
@@ -221,6 +242,7 @@ const featuredLicenses = licenses.filter((l) => l.data.featured);
   color: var(--text, #e8eaf0);
 }
 
+/* ── Featured Cards ── */
 .card-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -228,24 +250,55 @@ const featuredLicenses = licenses.filter((l) => l.data.featured);
 }
 
 .card {
-  display: block;
+  position: relative;
+  display: flex;
+  flex-direction: column;
   padding: 1.5rem;
+  padding-left: 1.75rem;
   background: var(--bg-surface, #161923);
   border: 1px solid var(--bg-border, #242836);
+  border-left: 3px solid var(--cat-color, var(--emerald));
   border-radius: 10px;
   text-decoration: none;
   color: var(--text, #e8eaf0);
   transition:
-    border-color 0.15s,
-    transform 0.15s,
-    box-shadow 0.15s;
+    border-color 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
 }
 
 .card:hover {
-  border-color: var(--cat-color, rgb(21, 219, 149));
-  transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(var(--cat-color-rgb, 21, 219, 149), 0.1);
+  border-color: rgba(var(--cat-color-rgb, 21, 219, 149), 0.3);
+  border-left-width: 4px;
+  padding-left: calc(1.75rem - 1px);
+  transform: translateY(-3px);
+  box-shadow:
+    0 6px 24px rgba(var(--cat-color-rgb, 21, 219, 149), 0.12),
+    0 0 0 1px rgba(var(--cat-color-rgb, 21, 219, 149), 0.08);
+  background:
+    radial-gradient(ellipse at top left, rgba(var(--cat-color-rgb, 21, 219, 149), 0.04), transparent 70%),
+    var(--bg-surface, #161923);
   color: var(--text, #e8eaf0);
+}
+
+.card-arrow {
+  display: block;
+  margin-top: auto;
+  padding-top: 0.75rem;
+  font-size: 1rem;
+  color: var(--cat-color, var(--emerald));
+  opacity: 0;
+  transform: translateX(-4px);
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
+  text-align: right;
+}
+
+.card:hover .card-arrow {
+  opacity: 0.7;
+  transform: translateX(0);
 }
 
 .card-badges {
@@ -290,6 +343,7 @@ const featuredLicenses = licenses.filter((l) => l.data.featured);
   line-height: 1.5;
 }
 
+/* ── All Licenses List ── */
 .all-licenses-header {
   display: flex;
   align-items: baseline;
@@ -303,14 +357,20 @@ const featuredLicenses = licenses.filter((l) => l.data.featured);
 
 .see-all {
   font-size: 0.9rem;
-  color: rgb(21, 219, 149);
+  color: var(--emerald, rgb(21, 219, 149));
   text-decoration: none;
   font-weight: 500;
+  transition:
+    color 0.15s ease,
+    gap 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.15em;
 }
 
 .see-all:hover {
-  text-decoration: underline;
   color: rgb(106, 241, 194);
+  gap: 0.4em;
 }
 
 .license-list {
@@ -333,12 +393,19 @@ const featuredLicenses = licenses.filter((l) => l.data.featured);
   border: 1px solid var(--bg-border, #242836);
   border-left: 3px solid var(--cat-color, rgb(21, 219, 149));
   text-decoration: none;
-  transition: border-color 0.15s;
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .license-list li a:hover {
-  border-color: var(--bg-border, #242836);
+  border-color: rgba(var(--cat-color-rgb, 21, 219, 149), 0.3);
   border-left-color: var(--cat-color, rgb(21, 219, 149));
+  background: rgba(var(--cat-color-rgb, 21, 219, 149), 0.04);
+  transform: translateX(2px);
+  box-shadow: 0 2px 8px rgba(var(--cat-color-rgb, 21, 219, 149), 0.08);
   color: var(--text, #e8eaf0);
 }
 
@@ -354,7 +421,7 @@ const featuredLicenses = licenses.filter((l) => l.data.featured);
   color: var(--text-muted, #8b90a0);
 }
 
-/* How It Works */
+/* ── How It Works ── */
 .steps-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -367,6 +434,16 @@ const featuredLicenses = licenses.filter((l) => l.data.featured);
   background: var(--bg-surface, #161923);
   border: 1px solid var(--bg-border, #242836);
   border-radius: 10px;
+  transition:
+    border-color 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.step:hover {
+  border-color: rgba(21, 219, 149, 0.2);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(21, 219, 149, 0.06);
 }
 
 .step-number {
@@ -398,7 +475,7 @@ const featuredLicenses = licenses.filter((l) => l.data.featured);
   line-height: 1.55;
 }
 
-/* Why Plain Language */
+/* ── Why Plain Language ── */
 .value-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -410,6 +487,16 @@ const featuredLicenses = licenses.filter((l) => l.data.featured);
   border-radius: 10px;
   background: var(--bg-surface, #161923);
   border: 1px solid var(--bg-border, #242836);
+  transition:
+    border-color 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.value-card:hover {
+  border-color: rgba(21, 219, 149, 0.2);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(21, 219, 149, 0.06);
 }
 
 .value-icon {
@@ -418,6 +505,11 @@ const featuredLicenses = licenses.filter((l) => l.data.featured);
   display: block;
   margin-bottom: 0.75rem;
   color: rgb(21, 219, 149);
+  transition: transform 0.2s ease;
+}
+
+.value-card:hover .value-icon {
+  transform: scale(1.1);
 }
 
 .value-card h3 {

@@ -1,37 +1,41 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { getLicenseSlug, getPublishedLicenses } from "../../utils/collections";
+import "../../assets/stylesheets/custom.css";
 
 export const prerender = true;
 const licenses = await getPublishedLicenses();
 
-const byCategory = licenses.reduce<Record<string, typeof licenses>>(
+const byFamily = licenses.reduce<Record<string, typeof licenses>>(
   (acc, l) => {
-    const cat = l.data.license_family;
-    if (!acc[cat]) acc[cat] = [];
-    acc[cat].push(l);
+    const fam = l.data.license_family;
+    if (!acc[fam]) acc[fam] = [];
+    acc[fam].push(l);
     return acc;
   },
   {},
 );
 
-const categoryOrder = [
+const familyOrder = [
+  "public-domain",
   "permissive",
   "copyleft",
   "source-available",
-  "public-domain",
+  "proprietary",
 ];
-const categoryLabels: Record<string, string> = {
+const familyLabels: Record<string, string> = {
+  "public-domain": "Public Domain",
   permissive: "Permissive",
   copyleft: "Copyleft",
   "source-available": "Source Available",
-  "public-domain": "Public Domain",
+  proprietary: "Proprietary",
 };
-const categoryDescriptions: Record<string, string> = {
+const familyDescriptions: Record<string, string> = {
+  "public-domain": "No rights reserved — use any way you want.",
   permissive: "Few restrictions — use freely in almost any project.",
   copyleft: "Share-alike — changes must stay under the same license.",
   "source-available": "Source visible but with usage restrictions.",
-  "public-domain": "No rights reserved — use any way you want.",
+  proprietary: "All rights reserved — usage governed by specific terms.",
 };
 ---
 
@@ -43,19 +47,22 @@ const categoryDescriptions: Record<string, string> = {
     <header class="page-header">
       <h1>All Licenses</h1>
       <p class="lead">
-        Plain-language rewrites of popular software licenses, organized by type.
+        Plain-language rewrites of popular software licenses, organized by family.
+      </p>
+      <p class="page-count">
+        {licenses.length} licenses across {familyOrder.filter(fam => byFamily[fam]?.length).length} families
       </p>
     </header>
 
     <div class="categories">
-      {categoryOrder.filter(cat => byCategory[cat]?.length).map(cat => (
-        <section class={`category-section cat-${cat}`} id={cat} key={cat}>
+      {familyOrder.filter(fam => byFamily[fam]?.length).map(fam => (
+        <section class={`category-section cat-${fam}`} id={fam} key={fam}>
           <div class="category-header">
-            <h2>{categoryLabels[cat]}</h2>
-            <p>{categoryDescriptions[cat]}</p>
+            <span class="category-pill">{familyLabels[fam]}</span>
+            <p>{familyDescriptions[fam]}</p>
           </div>
           <div class="license-grid">
-            {byCategory[cat].map(license => (
+            {byFamily[fam].map(license => (
               <a href={`/licenses/${getLicenseSlug(license)}/`} class="license-card" key={license.data.spdx_id}>
                 <div class="card-top">
                   <span class="spdx-badge">{license.data.spdx_id}</span>
@@ -64,8 +71,9 @@ const categoryDescriptions: Record<string, string> = {
                 <h3>{license.data.plain_name}</h3>
                 <p>{license.data.description}</p>
                 {license.data.summary && (
-                  <p class="summary">{license.data.summary}</p>
+                  <div class="summary">{license.data.summary}</div>
                 )}
+                <span class="card-arrow" aria-hidden="true">&rarr;</span>
               </a>
             ))}
           </div>
@@ -82,18 +90,25 @@ const categoryDescriptions: Record<string, string> = {
   padding: 3rem 1.5rem;
 }
 
+/* ── Page Header ── */
 .page-header {
-  margin-bottom: 3rem;
-  border-bottom: 1px solid var(--bg-border, #242836);
-  padding-bottom: 2rem;
+  margin-bottom: 3.5rem;
+  padding: 2.5rem 2rem 2rem;
+  border-radius: 12px;
+  background:
+    linear-gradient(135deg, rgba(var(--emerald-rgb), 0.06) 0%, transparent 60%),
+    linear-gradient(225deg, rgba(var(--zaffre-rgb), 0.10) 0%, transparent 50%),
+    var(--bg-surface, #161923);
+  border: 1px solid var(--bg-border, #242836);
 }
 
 .page-header h1 {
   font-family: var(--font-heading, "Plus Jakarta Sans", sans-serif);
-  font-size: 2.5rem;
+  font-size: 2.75rem;
   font-weight: 800;
-  margin: 0 0 0.75rem;
+  margin: 0 0 0.5rem;
   color: var(--text, #e8eaf0);
+  letter-spacing: -0.02em;
 }
 
 .lead {
@@ -102,73 +117,91 @@ const categoryDescriptions: Record<string, string> = {
   margin: 0;
 }
 
+.page-count {
+  margin: 0.75rem 0 0;
+  font-size: 0.8rem;
+  font-family: var(--sl-font-mono, "JetBrains Mono", monospace);
+  color: var(--emerald);
+  opacity: 0.7;
+}
+
+/* ── Categories ── */
 .categories {
   display: flex;
   flex-direction: column;
   gap: 3.5rem;
 }
 
+/* ── Category Header ── */
 .category-header {
   margin-bottom: 1.5rem;
+  padding-left: 0.25rem;
 }
 
-.category-header h2 {
-  font-family: var(--font-heading, "Plus Jakarta Sans", sans-serif);
-  font-size: 1.5rem;
-  font-weight: 700;
-  margin: 0 0 0.4rem;
-  color: var(--text, #e8eaf0);
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.category-header h2::before {
-  content: "";
+.category-pill {
   display: inline-block;
-  width: 0.6rem;
-  height: 0.6rem;
-  border-radius: 50%;
-  background: var(--cat-color, var(--emerald));
-  flex-shrink: 0;
+  font-family: var(--font-heading, "Plus Jakarta Sans", sans-serif);
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--cat-color, var(--emerald));
+  background: rgba(var(--cat-color-rgb, 21, 219, 149), 0.1);
+  border: 1px solid rgba(var(--cat-color-rgb, 21, 219, 149), 0.25);
+  border-radius: 6px;
+  padding: 0.3em 0.75em;
+  margin-bottom: 0.5rem;
 }
 
 .category-header p {
   margin: 0;
+  padding-left: 0.15rem;
   color: var(--text-muted, #8b90a0);
   font-size: 0.95rem;
 }
 
+/* ── License Grid ── */
 .license-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 1.25rem;
 }
 
+/* ── License Card ── */
 .license-card {
-  display: block;
+  position: relative;
+  display: flex;
+  flex-direction: column;
   padding: 1.5rem;
   padding-left: 1.75rem;
   background: var(--bg-surface, #161923);
   border: 1px solid var(--bg-border, #242836);
-  border-left: 3px solid var(--cat-color, rgb(21, 219, 149));
+  border-left: 3px solid var(--cat-color, var(--emerald));
   border-radius: 10px;
   text-decoration: none;
   color: var(--text, #e8eaf0);
   transition:
-    border-color 0.15s,
-    transform 0.15s,
-    box-shadow 0.15s;
+    border-color 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
 }
 
 .license-card:hover {
-  border-color: var(--bg-border, #242836);
-  border-left-color: var(--cat-color, rgb(21, 219, 149));
-  transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(var(--cat-color-rgb, 21, 219, 149), 0.1);
+  border-color: rgba(var(--cat-color-rgb, 21, 219, 149), 0.3);
+  border-left-width: 4px;
+  padding-left: calc(1.75rem - 1px); /* compensate for wider border */
+  transform: translateY(-3px);
+  box-shadow:
+    0 6px 24px rgba(var(--cat-color-rgb, 21, 219, 149), 0.12),
+    0 0 0 1px rgba(var(--cat-color-rgb, 21, 219, 149), 0.08);
+  background:
+    radial-gradient(ellipse at top left, rgba(var(--cat-color-rgb, 21, 219, 149), 0.04), transparent 70%),
+    var(--bg-surface, #161923);
   color: var(--text, #e8eaf0);
 }
 
+/* ── Card Inner Elements ── */
 .card-top {
   display: flex;
   align-items: center;
@@ -180,9 +213,9 @@ const categoryDescriptions: Record<string, string> = {
   font-family: var(--sl-font-mono, "JetBrains Mono", monospace);
   font-size: 0.75rem;
   font-weight: 600;
-  background: rgba(21, 219, 149, 0.12);
-  color: rgb(21, 219, 149);
-  border: 1px solid rgba(21, 219, 149, 0.3);
+  background: rgba(var(--cat-color-rgb, 21, 219, 149), 0.12);
+  color: var(--cat-color, var(--emerald));
+  border: 1px solid rgba(var(--cat-color-rgb, 21, 219, 149), 0.3);
   border-radius: 4px;
   padding: 0.15em 0.5em;
 }
@@ -202,7 +235,7 @@ const categoryDescriptions: Record<string, string> = {
   margin: 0 0 0.5rem;
   font-size: 1.1rem;
   font-weight: 700;
-  color: var(--cat-color, rgb(21, 219, 149));
+  color: var(--cat-color, var(--emerald));
 }
 
 .license-card p {
@@ -212,16 +245,49 @@ const categoryDescriptions: Record<string, string> = {
   line-height: 1.5;
 }
 
-.license-card p:last-child {
+.license-card p:last-of-type {
   margin-bottom: 0;
 }
 
-.license-card p.summary {
+/* ── Summary Block ── */
+.summary {
   font-style: italic;
-  font-size: 0.875rem;
-  border-top: 1px solid var(--bg-border, #242836);
-  padding-top: 0.5rem;
-  margin-top: 0.5rem;
-  margin-bottom: 0;
+  font-size: 0.85rem;
+  color: var(--text-muted, #8b90a0);
+  line-height: 1.5;
+  background: rgba(var(--cat-color-rgb, 21, 219, 149), 0.04);
+  border-radius: 6px;
+  padding: 0.6rem 0.75rem;
+  margin-top: 0.75rem;
+}
+
+/* ── Card Arrow ── */
+.card-arrow {
+  display: block;
+  margin-top: auto;
+  padding-top: 0.75rem;
+  font-size: 1rem;
+  color: var(--cat-color, var(--emerald));
+  opacity: 0;
+  transform: translateX(-4px);
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
+  text-align: right;
+}
+
+.license-card:hover .card-arrow {
+  opacity: 0.7;
+  transform: translateX(0);
+}
+
+/* ── Responsive ── */
+@media (max-width: 480px) {
+  .page-header {
+    padding: 1.5rem 1.25rem;
+  }
+  .page-header h1 {
+    font-size: 2rem;
+  }
 }
 </style>

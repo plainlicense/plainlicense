@@ -190,3 +190,7 @@ html[data-is-blog] .sl-markdown-content {
   --cat-color: var(--cat-public-domain);
   --cat-color-rgb: var(--cat-public-domain-rgb);
 }
+.cat-proprietary {
+  --cat-color: var(--cat-proprietary);
+  --cat-color-rgb: var(--cat-proprietary-rgb);
+}

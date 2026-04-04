@@ -103,4 +103,6 @@
   --cat-source-available-rgb: var(--saffron-rgb);
   --cat-public-domain: var(--mauve);
   --cat-public-domain-rgb: 212, 153, 255;
+  --cat-proprietary: var(--atomic-tangerine);
+  --cat-proprietary-rgb: 255, 142, 71;
 }
