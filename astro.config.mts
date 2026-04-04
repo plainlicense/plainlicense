@@ -326,7 +326,10 @@ export default defineConfig({
         Sidebar: "./src/components/overrides/Sidebar.astro",
         ThemeSelect: "./src/components/overrides/ThemeSelect.astro",
       },
-      customCss: ["./src/assets/stylesheets/custom.css"],
+      customCss: [
+        "./src/assets/stylesheets/custom.css",
+        "./src/assets/stylesheets/print.css",
+      ],
       expressiveCode: {
         themes: ["ayu-dark", "github-light-high-contrast"],
         useStarlightDarkModeSwitch: true,
