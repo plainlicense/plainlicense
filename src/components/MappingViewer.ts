@@ -146,43 +146,36 @@ export function initMappingViewer(mappingData: LicenseMappings) {
       plainEls.forEach((plainEl: HTMLElement | null) => {
         if (!plainEl) return;
 
-        // Skip making elements focusable when they are inside visually-hidden / aria-hidden containers
-        const isInHiddenContainer = !!plainEl.closest(
-          '.mapping-anchors, [aria-hidden="true"]',
-        );
-
-        if (!isInHiddenContainer) {
-          // Make element focusable for keyboard users
-          if (!plainEl.getAttribute("tabindex")) {
-            plainEl.setAttribute("tabindex", "0");
-          }
-
-          // Keyboard focus equivalents (desktop)
-          plainEl.addEventListener("focus", () => {
-            if (
-              window.innerWidth < 1024 ||
-              !container.classList.contains("comparison-active")
-            )
-              return;
-            activateFromPlain();
-          });
-
-          plainEl.addEventListener("blur", () => {
-            if (window.innerWidth < 1024) return;
-            handleBlur();
-          });
-
-          plainEl.addEventListener("keydown", (e: KeyboardEvent) => {
-            if (
-              (e.key === "Enter" || e.key === " ") &&
-              window.innerWidth < 1024 &&
-              container.classList.contains("comparison-active")
-            ) {
-              e.preventDefault();
-              showMobileModal(originalEls, plainEl);
-            }
-          });
+        // Make element focusable for keyboard users
+        if (!plainEl.getAttribute("tabindex")) {
+          plainEl.setAttribute("tabindex", "0");
         }
+
+        // Keyboard focus equivalents (desktop)
+        plainEl.addEventListener("focus", () => {
+          if (
+            window.innerWidth < 1024 ||
+            !container.classList.contains("comparison-active")
+          )
+            return;
+          activateFromPlain();
+        });
+
+        plainEl.addEventListener("blur", () => {
+          if (window.innerWidth < 1024) return;
+          handleBlur();
+        });
+
+        plainEl.addEventListener("keydown", (e: KeyboardEvent) => {
+          if (
+            (e.key === "Enter" || e.key === " ") &&
+            window.innerWidth < 1024 &&
+            container.classList.contains("comparison-active")
+          ) {
+            e.preventDefault();
+            showMobileModal(originalEls, plainEl);
+          }
+        });
 
         // Desktop Hover Effects
         plainEl.addEventListener("mouseenter", () => {
