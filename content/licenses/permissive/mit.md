@@ -114,11 +114,11 @@ You can do any of these things with the work, **if you follow these two rules**:
 
 Copyright (c) {{ year }} `<copyright holders>`
 
-<div id=”original-permissions”>
+<div id="original-permissions">
 
 Permission is hereby granted, free of charge, to any person
 obtaining a copy of this software and associated documentation
-files (the “Software”), to deal in the Software without
+files (the "Software"), to deal in the Software without
 restriction, including without limitation the rights to use,
 copy, modify, merge, publish, distribute, sublicense, and/or sell
 copies of the Software, and to permit persons to whom the
@@ -126,16 +126,16 @@ Software is furnished to do so, subject to the following conditions:
 
 </div>
 
-<div id=”original-conditions”>
+<div id="original-conditions">
 
 The above copyright notice and this permission notice shall be
 included in all copies or substantial portions of the Software.
 
 </div>
 
-<div id=”original-protections”>
+<div id="original-protections">
 
-THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND,
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
 OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
 NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
