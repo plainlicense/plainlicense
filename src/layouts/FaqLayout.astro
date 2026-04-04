@@ -1,0 +1,209 @@
+---
+import BaseLayout from "./BaseLayout.astro";
+import "../assets/stylesheets/custom.css";
+
+const { frontmatter } = Astro.props;
+---
+
+<BaseLayout title={frontmatter.title} description={frontmatter.description}>
+  <div class="faq-page">
+    <div class="container">
+      <header class="page-header">
+        <h1>{frontmatter.title}</h1>
+        {frontmatter.description && <p class="description">{frontmatter.description}</p>}
+      </header>
+
+      <article class="faq-content"><slot /></article>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+.faq-page {
+  padding: 3rem 0 4rem;
+}
+
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+/* ── Header ── */
+.page-header {
+  margin-bottom: 3rem;
+  padding: 2rem 2rem 1.75rem;
+  border-radius: 12px;
+  background:
+    linear-gradient(135deg, rgba(var(--emerald-rgb, 21, 219, 149), 0.06) 0%, transparent 60%),
+    linear-gradient(225deg, rgba(var(--zaffre-rgb, 13, 25, 163), 0.10) 0%, transparent 50%),
+    var(--bg-surface, #161923);
+  border: 1px solid var(--bg-border, #242836);
+}
+
+h1 {
+  font-size: 2.25rem;
+  font-weight: 800;
+  margin: 0 0 0.5rem;
+  color: var(--text, #e8eaf0);
+  letter-spacing: -0.02em;
+}
+
+.description {
+  font-size: 1.1rem;
+  color: var(--text-muted, #8b90a0);
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* ── FAQ Content ── */
+.faq-content {
+  line-height: 1.8;
+  color: var(--text, #e8eaf0);
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/*
+ * Each h2 "question" starts a visual card that contains
+ * all sibling content until the next h2.
+ * We use CSS to style h2s as standalone question headers.
+ */
+.faq-content :global(h2) {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin: 0;
+  padding: 1.1rem 1.25rem;
+  color: var(--text, #e8eaf0);
+  background: var(--bg-surface, #161923);
+  border: 1px solid var(--bg-border, #242836);
+  border-left: 3px solid var(--emerald, rgb(21, 219, 149));
+  border-radius: 10px;
+  cursor: default;
+  line-height: 1.4;
+  /* Collapse bottom radius when followed by answer content */
+}
+
+/* Visually connect h2 to its answer block */
+.faq-content :global(h2 + *) {
+  margin-top: -0.75rem;
+}
+
+/* All non-h2 content gets answer styling */
+.faq-content :global(p),
+.faq-content :global(ul),
+.faq-content :global(ol),
+.faq-content :global(table),
+.faq-content :global(blockquote) {
+  margin-left: 1rem;
+  padding-left: 1rem;
+  border-left: 1px solid var(--bg-border, #242836);
+}
+
+.faq-content :global(p) {
+  margin-bottom: 0;
+  margin-top: 0.75rem;
+  font-size: 0.95rem;
+  color: var(--text-muted, #8b90a0);
+  line-height: 1.7;
+}
+
+.faq-content :global(p:last-child) {
+  margin-bottom: 0;
+}
+
+/* ── Lists ── */
+.faq-content :global(ul),
+.faq-content :global(ol) {
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+  padding-left: 2.5rem;
+  font-size: 0.95rem;
+  color: var(--text-muted, #8b90a0);
+}
+
+.faq-content :global(li) {
+  margin-bottom: 0.6rem;
+  line-height: 1.6;
+}
+
+.faq-content :global(li strong) {
+  color: var(--text, #e8eaf0);
+}
+
+/* ── Table ── */
+.faq-content :global(table) {
+  width: calc(100% - 2rem);
+  border-collapse: collapse;
+  margin-top: 0.75rem;
+  margin-bottom: 0.75rem;
+  font-size: 0.88rem;
+}
+
+.faq-content :global(th),
+.faq-content :global(td) {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--bg-border, #242836);
+  text-align: left;
+}
+
+.faq-content :global(th) {
+  background: rgba(var(--emerald-rgb, 21, 219, 149), 0.06);
+  font-weight: 600;
+  color: var(--emerald, rgb(21, 219, 149));
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* ── Inline elements ── */
+.faq-content :global(a) {
+  color: var(--emerald, rgb(21, 219, 149));
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: color 0.15s ease;
+}
+
+.faq-content :global(a:hover) {
+  color: rgb(106, 241, 194);
+}
+
+.faq-content :global(strong) {
+  color: var(--text, #e8eaf0);
+}
+
+.faq-content :global(code) {
+  background: var(--bg-surface, #161923);
+  border: 1px solid var(--bg-border, #242836);
+  border-radius: 4px;
+  padding: 0.1em 0.35em;
+  font-size: 0.85em;
+  font-family: var(--sl-font-mono, "JetBrains Mono", monospace);
+}
+
+.faq-content :global(blockquote) {
+  border-left: 3px solid var(--emerald, rgb(21, 219, 149));
+  margin-left: 1rem;
+  padding-left: 1.25rem;
+  color: var(--text-muted, #8b90a0);
+}
+
+/* ── Responsive ── */
+@media (max-width: 480px) {
+  .page-header {
+    padding: 1.5rem 1.25rem;
+  }
+  h1 {
+    font-size: 1.75rem;
+  }
+  .faq-content :global(p),
+  .faq-content :global(ul),
+  .faq-content :global(ol),
+  .faq-content :global(table),
+  .faq-content :global(blockquote) {
+    margin-left: 0.5rem;
+    padding-left: 0.75rem;
+  }
+}
+</style>

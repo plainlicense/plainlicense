@@ -1,11 +1,12 @@
 ---
 title: Plain License FAQ
 description: Plain License frequently asked questions.
-layout: ../../layouts/PageLayout.astro
+layout: ../../layouts/FaqLayout.astro
 ---
 
 export const prerender = true
 
+import Footnote from '../../components/Footnote.astro'
 
 ## Why do your licenses look different from the originals?
 
@@ -32,13 +33,9 @@ export const prerender = true
 
 ## Can I use one of your licenses for my project?
 
-**Yes!** Our licenses are in the public domain (1), so you can use them for any project. We want to make it easier for people to understand the licenses covering their work, so we're happy to see our licenses used for real projects. You can change them however you like, and you don't have to give us credit. If you appreciate Plain License and our message, then please tell people about us. Our licenses compliment the original license. Every plain license includes an interpretation statement that makes it clear the plain language version is based on the original license. This statement makes the original license a legal "fallback" if you are unclear about the legal meaning of the plain language version.
+**Yes!** Our licenses are in the public domain,<Footnote note="We use the Plain Unlicense for our licenses when we can. Unfortunately, we can't use the Plain Unlicense for all our licenses because some original licenses are licensed under terms that don't allow us to use the Plain Unlicense. In those cases, we use the most permissive license we can and make it clear the license is not in the public domain." /> so you can use them for any project. We want to make it easier for people to understand the licenses covering their work, so we're happy to see our licenses used for real projects. You can change them however you like, and you don't have to give us credit. If you appreciate Plain License and our message, then please tell people about us. Our licenses compliment the original license. Every plain license includes an interpretation statement that makes it clear the plain language version is based on the original license. This statement makes the original license a legal "fallback" if you are unclear about the legal meaning of the plain language version.
 
-1. We use the [Plain Unlicense][plain unlicense] for our licenses when we can. Unfortunately, we can't use the Plain Unlicense for all our licenses because some original licenses are licensed under terms that don't allow us to use the Plain Unlicense. In those cases, we use the most permissive license we can and make it clear the license is not in the public domain.
-
-While we believe plain language helps *everyone* (1) better understand your intent, **we can't guarantee our licenses will work for your project or will hold up in court**. We're not lawyers, and we can't provide legal advice. If you have questions about how to use our licenses, we recommend you talk to a lawyer. If you choose to use one of our licenses, you use it at your own risk.
-
-1. "Everyone" includes lawyers and judges, who *are* real people. We promise.
+While we believe plain language helps *everyone*<Footnote note={`"Everyone" includes lawyers and judges, who are real people. We promise.`} /> better understand your intent, **we can't guarantee our licenses will work for your project or will hold up in court**. We're not lawyers, and we can't provide legal advice. If you have questions about how to use our licenses, we recommend you talk to a lawyer. If you choose to use one of our licenses, you use it at your own risk.
 
 **We use the [Plain Unlicense][plain unlicense]** for most of our content, so we use our licenses. We hope you find our licenses useful for your project. We welcome feedback to help us improve them, and *love* legal feedback to help us improve our interpretations.
 
@@ -54,9 +51,7 @@ Governments and people around the world are embracing plain language, and now we
 
 The [Center for Plain Language][center for plain language] offers resources to help you write plainly. You can get started with their [five-step guide][five-step guide].
 
-Many countries also have laws promoting plain language. In the United States, the Plain Writing Act of 2010 requires federal agencies to write "clear Government communication that the public can understand and use." (1) We think that's a good idea for everyone, not just the government. [Plainlanguage.gov][plainlanguage.gov] is a great resource for plain writing.
-
-1. Take a close look at any recent instructions from the [IRS][irs] and you'll see how much clearer they are than they used to be. We think that's a good thing, and we want to help make licenses clearer too.
+Many countries also have laws promoting plain language. In the United States, the Plain Writing Act of 2010 requires federal agencies to write "clear Government communication that the public can understand and use."<Footnote note="Take a close look at any recent instructions from the IRS and you'll see how much clearer they are than they used to be. We think that's a good thing, and we want to help make licenses clearer too." /> We think that's a good idea for everyone, not just the government. [Plainlanguage.gov][plainlanguage.gov] is a great resource for plain writing.
 
 ## I understand legal writing, why should I care about plain language?
 
@@ -66,9 +61,7 @@ Take it from us, **it's hard to write clearly.** Taking complex ideas and making
 
 ## Aren't there enough licenses already? Isn't this just adding to the confusion?
 
-**There are a lot of licenses out there, and that can be confusing.** We think that's a problem, especially when the licenses are hard to understand. For example, the Free Software Foundation's GPL 3 requires [a very long faq][gpl-faq] just to explain how to use the license. (1)
-
-1. The GPL 3 is a great license, but it's very hard to understand. We applaud the FSF for their work providing clear answers to questions about the license. We think that's a great step in the right direction.
+**There are a lot of licenses out there, and that can be confusing.** We think that's a problem, especially when the licenses are hard to understand. For example, the Free Software Foundation's GPL 3 requires [a very long faq][gpl-faq] just to explain how to use the license.<Footnote note="The GPL 3 is a great license, but it's very hard to understand. We applaud the FSF for their work providing clear answers to questions about the license. We think that's a great step in the right direction." />
 
 We think our licenses stand out because they're clear and easy to read. We hope by making licenses easier to understand, we can help people make better decisions about how to license their work. We can't fix the problem of too many licenses. We can only offer our licenses to compliment and clarify the licenses people use. Maybe one day we'll see a world where all licenses are written in plain language.
 

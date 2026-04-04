@@ -436,7 +436,7 @@ export default defineConfig({
       [
         rehypeExternalLinks,
         {
-          content: { type: "text", value: " 🔗" },
+          content: { type: "text", value: " \u{279A}" },
           rel: ["nofollow"],
         },
       ],
