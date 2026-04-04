@@ -31,7 +31,7 @@ if (!rootDir) {
 
 const headers = {
   "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
-  "x-frame-options": "SAMEORIGIN",
+  "x-frame-options": "DENY",
   "x-content-type-options": "nosniff",
   "referrer-policy": "strict-origin-when-cross-origin",
   "permissions-policy":
