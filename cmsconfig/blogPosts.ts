@@ -318,6 +318,11 @@ export const blogPostsCollection = defineCollection({
       required: false,
       multiple: false,
     },
-    { label: "Body", name: "body", widget: "richtext" },
+    {
+      label: "Body",
+      name: "body",
+      widget: "richtext",
+      editor_components: ["code-block", "image", "footnote"],
+    },
   ],
 });

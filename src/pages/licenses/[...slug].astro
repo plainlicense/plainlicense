@@ -12,6 +12,9 @@ import VersionHistory from "../../components/VersionHistory.astro";
 import NotLegalAdvice from "../../components/NotLegalAdvice.astro";
 import { getLicenseSlug, getPublishedLicenses } from "../../utils/collections";
 import { buildOriginalTextSeparator, stripComponentPlaceholders } from "../../utils/templates";
+import { prepareFootnotes } from "../../utils/footnotes";
+import "../../assets/stylesheets/footnotes.css";
+import FootnoteScript from "../../components/FootnoteScript.astro";
 
 export const prerender = true;
 /**
@@ -106,7 +109,8 @@ const fullProcessedBody = stripComponentPlaceholders(
 // For the full text view: use the fully processed body (blocks resolved, vars replaced, components stripped)
 // Split off any original text that was appended for the clipboard version
 const fullTextBody = stripComponentPlaceholders(resolvedBody);
-const renderedPlainHtml = renderMarkdownWithDivs(fullTextBody);
+const { cleaned: fnCleanedBody, postProcess: fnPostProcess } = prepareFootnotes(fullTextBody);
+const renderedPlainHtml = fnPostProcess(renderMarkdownWithDivs(fnCleanedBody));
 
 // The fullProcessedBody (used for clipboard) has blocks resolved via the export pipeline,
 // but the in-page rendering uses resolvedBody which may have unresolved blocks if
@@ -170,6 +174,7 @@ const renderedPlainHtml = renderMarkdownWithDivs(fullTextBody);
     </div>
     <ComparisonModal />
   </div>
+  <FootnoteScript />
 </BaseLayout>
 
 <script>

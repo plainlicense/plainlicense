@@ -11,8 +11,8 @@
 
   /* Plain License Brand Colors */
   --pl-zaffre: rgb(13, 25, 163);
-  --pl-emerald: rgb(21, 219, 149);
-  --pl-ecru: rgb(228, 197, 129);
+  --pl-emerald: var(--emerald);
+  --pl-ecru: var(--ecru);
   --pl-night: rgb(6, 12, 14);
 }
 

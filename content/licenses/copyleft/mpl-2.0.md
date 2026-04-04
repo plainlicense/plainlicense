@@ -23,9 +23,9 @@ maker_pitch: 'People can use your work freely, but must share changes to your fi
 commercial_restrictions: []
 compare_to:
   - spdx_id: MIT
-    contrast: 'Like MPL, but doesn''t require sharing changes'
+    contrast: 'No sharing requirement — just give credit'
   - spdx_id: Elastic-2.0
-    contrast: 'Like MPL, but also prevents offering your work as a hosted service'
+    contrast: 'Adds commercial restrictions on hosted services'
 uuid: ac0d1786-e005-415d-a0ed-be10bf5cbc65
 plain_gunning_fog: 9.47
 shame_words_count: 0

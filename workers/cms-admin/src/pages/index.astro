@@ -60,6 +60,7 @@ const turnstileSiteKey =
       import { config, title } from "virtual:astro-loader-sveltia-cms/config";
       import { init } from "@sveltia/cms";
       import { registerHooks } from "../hooks";
+      import { registerEditorComponents } from "../editor-components";
       import { prefetchSpdxData } from "../spdx-cache";
 
       function loadCMS() {
@@ -67,6 +68,7 @@ const turnstileSiteKey =
           document.title = title;
         }
         registerHooks();
+        registerEditorComponents();
         prefetchSpdxData();
         init({ config });
       }

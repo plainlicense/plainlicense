@@ -16,95 +16,111 @@ interface Props {
 }
 
 const { entries } = Astro.props;
-const validEntries = entries.filter(e => e.slug);
+const validEntries = entries.filter((e) => e.slug);
 ---
 
-{validEntries.length > 0 && (
-  <section class="compare-section" aria-label="Compare with similar licenses">
-    <h2 class="compare-heading">Also consider</h2>
-    <div class="compare-grid">
-      {validEntries.map(entry => (
-        <a href={`/licenses/${entry.slug}/`} class="compare-card">
-          <span class="compare-name">{entry.name ?? entry.spdx_id}</span>
-          <span class="compare-contrast">{entry.contrast}</span>
-          <svg class="compare-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" set:html={ICONS["arrow-right"]} />
-        </a>
-      ))}
-    </div>
-  </section>
-)}
+{
+  validEntries.length > 0 && (
+    <section class="compare-section" aria-label="Compare with similar licenses">
+      <h2 class="compare-heading">Explore alternatives</h2>
+      <div class="compare-grid">
+        {validEntries.map((entry) => (
+          <a href={`/licenses/${entry.slug}/`} class="compare-card">
+            <span class="compare-name">{entry.name ?? entry.spdx_id}</span>
+            <span class="compare-contrast">{entry.contrast}</span>
+            <svg
+              class="compare-arrow"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+              set:html={ICONS["arrow-right"]}
+            />
+          </a>
+        ))}
+      </div>
+    </section>
+  )
+}
 
 <style>
-.compare-section {
-  margin-bottom: 2rem;
-}
+  .compare-section {
+    margin-bottom: 2rem;
+  }
 
-.compare-heading {
-  font-size: var(--sl-text-sm);
-  font-weight: 600;
-  color: var(--sl-color-gray-3);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  margin: 0 0 0.75rem 0;
-}
+  .compare-arrow {
+    width: 1rem;
+    height: 1rem;
+    color: var(--sl-color-gray-4);
+    flex-shrink: 0;
+    transition:
+      transform 0.2s,
+      color 0.2s;
+  }
 
-.compare-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
+  .compare-heading {
+    font-size: var(--sl-text-sm);
+    font-weight: 600;
+    color: var(--sl-color-gray-3);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin: 0 0 0.75rem 0;
+  }
 
-.compare-card {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.75rem 1rem;
-  background: var(--sl-color-gray-6);
-  border: 1px solid var(--sl-color-gray-5);
-  border-radius: 8px;
-  text-decoration: none;
-  color: var(--sl-color-gray-2);
-  transition: border-color 0.2s, transform 0.15s;
-}
+  .compare-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
 
-.compare-card:hover {
-  border-color: var(--cat-color, var(--sl-color-accent));
-  transform: translateX(2px);
-}
-
-.compare-card:hover .compare-arrow {
-  transform: translateX(3px);
-  color: var(--cat-color, var(--sl-color-accent));
-}
-
-.compare-name {
-  font-weight: 600;
-  font-size: var(--sl-text-sm);
-  color: var(--sl-color-white);
-  white-space: nowrap;
-}
-
-.compare-contrast {
-  font-size: var(--sl-text-xs);
-  color: var(--sl-color-gray-3);
-  line-height: 1.4;
-}
-
-.compare-arrow {
-  width: 1rem;
-  height: 1rem;
-  color: var(--sl-color-gray-4);
-  flex-shrink: 0;
-  transition: transform 0.2s, color 0.2s;
-}
-
-@media (max-width: 640px) {
   .compare-card {
-    grid-template-columns: 1fr auto;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    background: var(--sl-color-gray-6);
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 8px;
+    text-decoration: none;
+    color: var(--sl-color-gray-2);
+    transition:
+      border-color 0.2s,
+      transform 0.15s;
   }
+
+  .compare-card:hover {
+    border-color: var(--cat-color, var(--sl-color-accent));
+    transform: translateX(2px);
+  }
+
+  .compare-card:hover .compare-arrow {
+    transform: translateX(3px);
+    color: var(--cat-color, var(--sl-color-accent));
+  }
+
+  .compare-name {
+    font-weight: 600;
+    font-size: var(--sl-text-sm);
+    color: var(--sl-color-white);
+    white-space: nowrap;
+  }
+
   .compare-contrast {
-    grid-column: 1;
+    font-size: var(--sl-text-xs);
+    color: var(--sl-color-gray-3);
+    line-height: 1.4;
   }
-}
+
+  @media (max-width: 640px) {
+    .compare-card {
+      grid-template-columns: 1fr auto;
+    }
+    .compare-contrast {
+      grid-column: 1;
+    }
+  }
 </style>

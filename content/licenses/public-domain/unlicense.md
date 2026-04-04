@@ -21,7 +21,7 @@ maker_pitch: No restrictions at all. Your work belongs to everyone.
 commercial_restrictions: []
 compare_to:
   - spdx_id: MIT
-    contrast: 'Like Unlicense, but requires giving you credit'
+    contrast: 'Maximum freedom, but requires giving credit'
 uuid: f7905ee1-c1c1-4e8b-9ffd-27cb7fc77de1
 plain_gunning_fog: 10.44
 shame_words_count: 0

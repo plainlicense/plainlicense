@@ -126,7 +126,7 @@ const hasMore = licenses.length > MAX_INLINE_LICENSES;
   padding: 5rem 1.5rem 4rem;
   text-align: center;
   background:
-    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(21, 219, 149, 0.12), transparent),
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(var(--emerald-rgb), 0.12), transparent),
     radial-gradient(ellipse 60% 40% at 80% 60%, rgba(var(--zaffre-rgb, 13, 25, 163), 0.08), transparent);
   border-bottom: 1px solid var(--bg-border, #242836);
 }
@@ -166,7 +166,7 @@ const hasMore = licenses.length > MAX_INLINE_LICENSES;
   align-items: center;
   padding: 0.7rem 1.5rem;
   border-radius: 8px;
-  background: rgb(21, 219, 149);
+  background: var(--emerald);
   color: #0d0f15;
   font-weight: 700;
   font-size: 0.95rem;
@@ -178,15 +178,15 @@ const hasMore = licenses.length > MAX_INLINE_LICENSES;
 }
 
 .btn-primary:hover {
-  background: rgb(106, 241, 194);
+  background: var(--aquamarine);
   color: #0d0f15;
   transform: translateY(-2px);
-  box-shadow: 0 4px 20px rgba(21, 219, 149, 0.3);
+  box-shadow: 0 4px 20px rgba(var(--emerald-rgb), 0.3);
 }
 
 .btn-primary:active {
   transform: translateY(0);
-  box-shadow: 0 2px 8px rgba(21, 219, 149, 0.2);
+  box-shadow: 0 2px 8px rgba(var(--emerald-rgb), 0.2);
 }
 
 .btn-secondary {
@@ -208,9 +208,9 @@ const hasMore = licenses.length > MAX_INLINE_LICENSES;
 }
 
 .btn-secondary:hover {
-  border-color: rgba(21, 219, 149, 0.5);
-  color: var(--emerald, rgb(21, 219, 149));
-  background: rgba(21, 219, 149, 0.06);
+  border-color: rgba(var(--emerald-rgb), 0.5);
+  color: var(--emerald);
+  background: rgba(var(--emerald-rgb), 0.06);
   transform: translateY(-2px);
 }
 
@@ -306,7 +306,7 @@ const hasMore = licenses.length > MAX_INLINE_LICENSES;
   font-size: 0.75rem;
   font-weight: 600;
   background: rgba(var(--cat-color-rgb, 21, 219, 149), 0.12);
-  color: var(--cat-color, rgb(21, 219, 149));
+  color: var(--cat-color, var(--emerald));
   border: 1px solid rgba(var(--cat-color-rgb, 21, 219, 149), 0.3);
   border-radius: 4px;
   padding: 0.15em 0.5em;
@@ -327,7 +327,7 @@ const hasMore = licenses.length > MAX_INLINE_LICENSES;
   margin: 0 0 0.5rem;
   font-size: 1.1rem;
   font-weight: 700;
-  color: var(--cat-color, rgb(21, 219, 149));
+  color: var(--cat-color, var(--emerald));
 }
 
 .card p {
@@ -351,7 +351,7 @@ const hasMore = licenses.length > MAX_INLINE_LICENSES;
 
 .see-all {
   font-size: 0.9rem;
-  color: var(--emerald, rgb(21, 219, 149));
+  color: var(--emerald);
   text-decoration: none;
   font-weight: 500;
   transition:
@@ -363,7 +363,7 @@ const hasMore = licenses.length > MAX_INLINE_LICENSES;
 }
 
 .see-all:hover {
-  color: rgb(106, 241, 194);
+  color: var(--aquamarine);
   gap: 0.4em;
 }
 
@@ -385,7 +385,7 @@ const hasMore = licenses.length > MAX_INLINE_LICENSES;
   border-radius: 6px;
   background: var(--bg-surface, #161923);
   border: 1px solid var(--bg-border, #242836);
-  border-left: 3px solid var(--cat-color, rgb(21, 219, 149));
+  border-left: 3px solid var(--cat-color, var(--emerald));
   text-decoration: none;
   transition:
     border-color 0.2s ease,
@@ -396,7 +396,7 @@ const hasMore = licenses.length > MAX_INLINE_LICENSES;
 
 .license-list li a:hover {
   border-color: rgba(var(--cat-color-rgb, 21, 219, 149), 0.3);
-  border-left-color: var(--cat-color, rgb(21, 219, 149));
+  border-left-color: var(--cat-color, var(--emerald));
   background: rgba(var(--cat-color-rgb, 21, 219, 149), 0.04);
   transform: translateX(2px);
   box-shadow: 0 2px 8px rgba(var(--cat-color-rgb, 21, 219, 149), 0.08);
@@ -435,9 +435,9 @@ const hasMore = licenses.length > MAX_INLINE_LICENSES;
 }
 
 .step:hover {
-  border-color: rgba(21, 219, 149, 0.2);
+  border-color: rgba(var(--emerald-rgb), 0.2);
   transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(21, 219, 149, 0.06);
+  box-shadow: 0 4px 16px rgba(var(--emerald-rgb), 0.06);
 }
 
 .step-number {
@@ -447,7 +447,7 @@ const hasMore = licenses.length > MAX_INLINE_LICENSES;
   width: 2rem;
   height: 2rem;
   border-radius: 50%;
-  background: rgb(21, 219, 149);
+  background: var(--emerald);
   color: #0d0f15;
   font-weight: 800;
   font-size: 0.85rem;
@@ -488,9 +488,9 @@ const hasMore = licenses.length > MAX_INLINE_LICENSES;
 }
 
 .value-card:hover {
-  border-color: rgba(21, 219, 149, 0.2);
+  border-color: rgba(var(--emerald-rgb), 0.2);
   transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(21, 219, 149, 0.06);
+  box-shadow: 0 4px 16px rgba(var(--emerald-rgb), 0.06);
 }
 
 .value-icon {
@@ -498,7 +498,7 @@ const hasMore = licenses.length > MAX_INLINE_LICENSES;
   height: 1.75rem;
   display: block;
   margin-bottom: 0.75rem;
-  color: rgb(21, 219, 149);
+  color: var(--emerald);
   transition: transform 0.2s ease;
 }
 

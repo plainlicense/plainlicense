@@ -3,6 +3,9 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 import { getCollection } from "astro:content";
 import { marked } from "marked";
 import "../../assets/stylesheets/custom.css";
+import "../../assets/stylesheets/footnotes.css";
+import { prepareFootnotes } from "../../utils/footnotes";
+import FootnoteScript from "../../components/FootnoteScript.astro";
 
 export const prerender = true;
 
@@ -98,7 +101,8 @@ const leadingH1 = bodyText.match(/^#\s+(.+)\n*/);
 if (leadingH1 && leadingH1[1].trim() === data.title.trim()) {
   bodyText = bodyText.slice(leadingH1[0].length);
 }
-const renderedBody = marked.parse(bodyText) as string;
+const { cleaned: fnCleaned, postProcess: fnPostProcess } = prepareFootnotes(bodyText);
+const renderedBody = fnPostProcess(marked.parse(fnCleaned) as string);
 
 const CATEGORY_LABELS: Record<string, string> = {
   announcements: "Announcements",
@@ -218,6 +222,7 @@ const CATEGORY_LABELS: Record<string, string> = {
       </nav>
     )}
   </article>
+  <FootnoteScript />
 </BaseLayout>
 
 <style>
@@ -239,7 +244,7 @@ const CATEGORY_LABELS: Record<string, string> = {
 }
 
 .back-link:hover {
-  color: rgb(21, 219, 149);
+  color: var(--emerald);
 }
 
 .post-header {
@@ -262,9 +267,9 @@ const CATEGORY_LABELS: Record<string, string> = {
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: rgb(21, 219, 149);
-  background: rgba(21, 219, 149, 0.1);
-  border: 1px solid rgba(21, 219, 149, 0.25);
+  color: var(--emerald);
+  background: rgba(var(--emerald-rgb), 0.1);
+  border: 1px solid rgba(var(--emerald-rgb), 0.25);
   border-radius: 4px;
   padding: 0.15em 0.5em;
   margin-bottom: 1rem;
@@ -307,7 +312,7 @@ const CATEGORY_LABELS: Record<string, string> = {
 }
 
 .post-author a:hover {
-  color: rgb(21, 219, 149);
+  color: var(--emerald);
 }
 
 .author-avatar {
@@ -349,7 +354,7 @@ const CATEGORY_LABELS: Record<string, string> = {
   padding: 1.25rem;
   background: var(--bg-surface, #161923);
   border: 1px solid var(--bg-border, #242836);
-  border-left: 3px solid rgb(21, 219, 149);
+  border-left: 3px solid var(--emerald);
   border-radius: 8px;
 }
 
@@ -365,7 +370,7 @@ const CATEGORY_LABELS: Record<string, string> = {
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: rgb(21, 219, 149);
+  color: var(--emerald);
 }
 
 .series-name {
@@ -393,7 +398,7 @@ const CATEGORY_LABELS: Record<string, string> = {
 }
 
 .series-list a:hover {
-  color: rgb(21, 219, 149);
+  color: var(--emerald);
 }
 
 .series-current {
@@ -455,16 +460,16 @@ const CATEGORY_LABELS: Record<string, string> = {
 }
 
 .post-body :global(a) {
-  color: rgb(21, 219, 149);
+  color: var(--emerald);
   text-underline-offset: 3px;
 }
 
 .post-body :global(a:hover) {
-  color: rgb(106, 241, 194);
+  color: var(--aquamarine);
 }
 
 .post-body :global(blockquote) {
-  border-left: 3px solid rgb(21, 219, 149);
+  border-left: 3px solid var(--emerald);
   margin: 1.5rem 0;
   padding: 0.5rem 0 0.5rem 1.25rem;
   color: var(--text-muted, #8b90a0);
@@ -532,8 +537,8 @@ const CATEGORY_LABELS: Record<string, string> = {
 
 .nav-prev:hover,
 .nav-next:hover {
-  border-color: rgba(21, 219, 149, 0.3);
-  background: rgba(21, 219, 149, 0.04);
+  border-color: rgba(var(--emerald-rgb), 0.3);
+  background: rgba(var(--emerald-rgb), 0.04);
 }
 
 .nav-next {

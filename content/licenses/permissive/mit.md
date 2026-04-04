@@ -22,11 +22,11 @@ maker_pitch: Do almost anything with this work. Just give credit.
 commercial_restrictions: []
 compare_to:
   - spdx_id: Unlicense
-    contrast: 'Like MIT, but you don''t need to give credit'
+    contrast: 'Share with no restrictions or credit required'
   - spdx_id: MPL-2.0
-    contrast: 'Like MIT, but requires sharing changes to licensed files'
+    contrast: 'Requires sharing changes to licensed files'
   - spdx_id: Elastic-2.0
-    contrast: 'Like MIT, but prevents offering your work as a hosted service'
+    contrast: 'Prevents offering your work as a hosted service'
 uuid: 87a537b5-b43f-4832-9983-33577b0a9828
 meta_description: Plain language MIT license for all creative works
 has_mapping: true

@@ -27,7 +27,12 @@ const commonPageFields: Field[] = [
     default: "draft",
     required: false,
   },
-  { label: "Body", name: "body", widget: "richtext" },
+  {
+    label: "Body",
+    name: "body",
+    widget: "richtext",
+    editor_components: ["code-block", "image", "footnote"],
+  },
 ];
 
 function page(

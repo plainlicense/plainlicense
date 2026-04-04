@@ -163,7 +163,7 @@ const CATEGORY_LABELS: Record<string, string> = {
   padding: 4rem 1.5rem 3rem;
   text-align: center;
   background:
-    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(21, 219, 149, 0.08), transparent),
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(var(--emerald-rgb), 0.08), transparent),
     radial-gradient(ellipse 60% 40% at 80% 60%, rgba(var(--zaffre-rgb, 13, 25, 163), 0.06), transparent);
   border-bottom: 1px solid var(--bg-border, #242836);
 }
@@ -216,7 +216,7 @@ const CATEGORY_LABELS: Record<string, string> = {
   padding: 1.5rem 1.75rem;
   background: var(--bg-surface, #161923);
   border: 1px solid var(--bg-border, #242836);
-  border-left: 3px solid rgb(21, 219, 149);
+  border-left: 3px solid var(--emerald);
   border-radius: 10px;
   text-decoration: none;
   color: var(--text, #e8eaf0);
@@ -249,15 +249,15 @@ const CATEGORY_LABELS: Record<string, string> = {
 }
 
 .post-card:hover {
-  border-color: rgba(21, 219, 149, 0.3);
+  border-color: rgba(var(--emerald-rgb), 0.3);
   border-left-width: 4px;
   padding-left: calc(1.75rem - 1px);
   transform: translateY(-3px);
   box-shadow:
-    0 6px 24px rgba(21, 219, 149, 0.12),
-    0 0 0 1px rgba(21, 219, 149, 0.08);
+    0 6px 24px rgba(var(--emerald-rgb), 0.12),
+    0 0 0 1px rgba(var(--emerald-rgb), 0.08);
   background:
-    radial-gradient(ellipse at top left, rgba(21, 219, 149, 0.04), transparent 70%),
+    radial-gradient(ellipse at top left, rgba(var(--emerald-rgb), 0.04), transparent 70%),
     var(--bg-surface, #161923);
   color: var(--text, #e8eaf0);
 }
@@ -278,9 +278,9 @@ const CATEGORY_LABELS: Record<string, string> = {
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: rgb(21, 219, 149);
-  background: rgba(21, 219, 149, 0.1);
-  border: 1px solid rgba(21, 219, 149, 0.25);
+  color: var(--emerald);
+  background: rgba(var(--emerald-rgb), 0.1);
+  border: 1px solid rgba(var(--emerald-rgb), 0.25);
   border-radius: 4px;
   padding: 0.15em 0.5em;
 }
@@ -290,15 +290,15 @@ const CATEGORY_LABELS: Record<string, string> = {
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: var(--ecru, rgb(228, 197, 129));
-  background: rgba(228, 197, 129, 0.1);
-  border: 1px solid rgba(228, 197, 129, 0.25);
+  color: var(--ecru);
+  background: rgba(var(--ecru-rgb), 0.1);
+  border: 1px solid rgba(var(--ecru-rgb), 0.25);
   border-radius: 4px;
   padding: 0.15em 0.5em;
 }
 
 .post-card--featured {
-  border-left-color: var(--ecru, rgb(228, 197, 129));
+  border-left-color: var(--ecru);
 }
 
 .post-series {
@@ -383,7 +383,7 @@ const CATEGORY_LABELS: Record<string, string> = {
   margin-top: auto;
   padding-top: 0.5rem;
   font-size: 1rem;
-  color: rgb(21, 219, 149);
+  color: var(--emerald);
   opacity: 0;
   transform: translateX(-4px);
   transition:
@@ -418,8 +418,8 @@ const CATEGORY_LABELS: Record<string, string> = {
 }
 
 .rss-link:hover {
-  color: rgb(21, 219, 149);
-  border-color: rgba(21, 219, 149, 0.4);
+  color: var(--emerald);
+  border-color: rgba(var(--emerald-rgb), 0.4);
 }
 
 @media (max-width: 640px) {

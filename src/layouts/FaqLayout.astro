@@ -1,6 +1,8 @@
 ---
 import BaseLayout from "./BaseLayout.astro";
 import "../assets/stylesheets/custom.css";
+import "../assets/stylesheets/footnotes.css";
+import FootnoteScript from "../components/FootnoteScript.astro";
 
 const { frontmatter } = Astro.props;
 ---
@@ -16,6 +18,7 @@ const { frontmatter } = Astro.props;
       <article class="faq-content"><slot /></article>
     </div>
   </div>
+  <FootnoteScript />
 </BaseLayout>
 
 <style>
@@ -78,7 +81,7 @@ h1 {
   color: var(--text, #e8eaf0);
   background: var(--bg-surface, #161923);
   border: 1px solid var(--bg-border, #242836);
-  border-left: 3px solid var(--emerald, rgb(21, 219, 149));
+  border-left: 3px solid var(--emerald);
   border-radius: 10px;
   cursor: default;
   line-height: 1.4;
@@ -151,7 +154,7 @@ h1 {
 .faq-content :global(th) {
   background: rgba(var(--emerald-rgb, 21, 219, 149), 0.06);
   font-weight: 600;
-  color: var(--emerald, rgb(21, 219, 149));
+  color: var(--emerald);
   font-size: 0.82rem;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -159,14 +162,14 @@ h1 {
 
 /* ── Inline elements ── */
 .faq-content :global(a) {
-  color: var(--emerald, rgb(21, 219, 149));
+  color: var(--emerald);
   text-decoration: underline;
   text-underline-offset: 2px;
   transition: color 0.15s ease;
 }
 
 .faq-content :global(a:hover) {
-  color: rgb(106, 241, 194);
+  color: var(--aquamarine);
 }
 
 .faq-content :global(strong) {
@@ -183,7 +186,7 @@ h1 {
 }
 
 .faq-content :global(blockquote) {
-  border-left: 3px solid var(--emerald, rgb(21, 219, 149));
+  border-left: 3px solid var(--emerald);
   margin-left: 1rem;
   padding-left: 1.25rem;
   color: var(--text-muted, #8b90a0);

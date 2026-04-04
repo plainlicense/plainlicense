@@ -422,6 +422,11 @@ export const licensesCollection = defineCollection({
         },
       ],
     },
-    { label: "Body", name: "body", widget: "richtext" },
+    {
+      label: "Body",
+      name: "body",
+      widget: "richtext",
+      editor_components: ["code-block", "image", "footnote"],
+    },
   ],
 });

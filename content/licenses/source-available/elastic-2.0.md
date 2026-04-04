@@ -23,9 +23,9 @@ commercial_restrictions:
   - no-managed-service
 compare_to:
   - spdx_id: MPL-2.0
-    contrast: 'Like Elastic, but without commercial restrictions and with OSI approval'
+    contrast: 'No commercial restrictions, OSI-approved'
   - spdx_id: MIT
-    contrast: 'Like Elastic, but with no restrictions beyond giving credit'
+    contrast: 'No restrictions beyond giving credit'
 uuid: 00208272-a9cb-41b9-ad99-0bbb4078cb9a
 plain_gunning_fog: 8.71
 shame_words_count: 0

@@ -1,0 +1,61 @@
+---
+/**
+ * Client-side script for footnote tooltips.
+ * Include this on any page that renders footnote markup
+ * (either from Footnote.astro or the markdown post-processor).
+ */
+---
+
+<script>
+function initFootnotes() {
+  document.querySelectorAll('.fn-wrap').forEach((wrap) => {
+    const btn = wrap.querySelector('.fn-marker') as HTMLButtonElement;
+    const tip = wrap.querySelector('.fn-tooltip') as HTMLElement;
+    if (!btn || !tip) return;
+
+    // Skip if already initialized
+    if (btn.dataset.fnInit) return;
+    btn.dataset.fnInit = '1';
+
+    function show() {
+      tip.setAttribute('aria-hidden', 'false');
+      btn.setAttribute('aria-expanded', 'true');
+    }
+
+    function hide() {
+      tip.setAttribute('aria-hidden', 'true');
+      btn.setAttribute('aria-expanded', 'false');
+    }
+
+    wrap.addEventListener('mouseenter', show);
+    wrap.addEventListener('mouseleave', hide);
+    btn.addEventListener('focus', show);
+    btn.addEventListener('blur', hide);
+
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const open = tip.getAttribute('aria-hidden') === 'false';
+      if (open) hide(); else show();
+    });
+
+    btn.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        hide();
+        btn.blur();
+      }
+    });
+  });
+
+  // Click outside closes all
+  document.addEventListener('click', () => {
+    document.querySelectorAll('.fn-tooltip[aria-hidden="false"]').forEach((tip) => {
+      tip.setAttribute('aria-hidden', 'true');
+      const btn = tip.previousElementSibling as HTMLElement;
+      if (btn) btn.setAttribute('aria-expanded', 'false');
+    });
+  });
+}
+
+initFootnotes();
+document.addEventListener('astro:page-load', initFootnotes);
+</script>
