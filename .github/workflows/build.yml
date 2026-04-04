@@ -42,6 +42,19 @@ jobs:
             export NODE_ENV=production &&
             bun run build
 
+        - name: Update LICENSE from Plain Unlicense export
+          run: |
+            EXPORT_FILE="dist/exports/unlicense/latest/Plain-Unlicense.gfm.md"
+            if [ -f "$EXPORT_FILE" ]; then
+              if ! diff -q "$EXPORT_FILE" LICENSE 2>/dev/null; then
+                cp "$EXPORT_FILE" LICENSE
+                echo "LICENSE updated from build export"
+              else
+                echo "LICENSE unchanged"
+              fi
+            else
+              echo "::warning::Plain Unlicense GFM export not found at $EXPORT_FILE"
+            fi
         - name: Configure Git Credentials
           run: |
             git config user.name github-actions[bot]
@@ -49,7 +62,7 @@ jobs:
         - name: Commit build
           run: |
             git add --all
-            git commit -m "Build site"
+            git diff-index --quiet HEAD || git commit -m "bot(infra): update build artifacts"
             git push
   notify:
       needs: [build]
