@@ -39,8 +39,6 @@
     --accent-text: 85, 85, 85;
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
   }
 
   html {
