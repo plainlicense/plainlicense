@@ -9,6 +9,7 @@ import {
   PERMISSION_MAP,
   TAG_DESCRIPTIONS,
 } from "../../../data/tagMappings";
+import { ICONS } from "../icons";
 
 interface Props {
   permissions?: string[];
@@ -43,9 +44,7 @@ const cards = permissions
       aria-label="What you can do"
     >
       <h2 class="zone-heading zone-heading--permissions">
-        <span class="zone-heading-icon" aria-hidden="true">
-          ✅
-        </span>
+        <svg class="zone-heading-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" set:html={ICONS["check-circle"]} />
         What you can do
       </h2>
       <div class="permission-grid">
@@ -53,9 +52,7 @@ const cards = permissions
           // @ts-ignore
           <div key={card.tag} class="permission-card" data-tag={card.tag}>
             <div class="card-header">
-              <span class="card-icon" aria-hidden="true">
-                {card.icon}
-              </span>
+              <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" set:html={ICONS[card.icon] ?? ""} />
               <h3 class="card-label">{card.label}</h3>
             </div>
             <p class="card-description">{card.description}</p>
@@ -68,6 +65,9 @@ const cards = permissions
 <style>
 .zone-permissions {
   margin-bottom: 2.5rem;
+  background: rgba(var(--cat-color-rgb, 21, 219, 149), 0.03);
+  border-radius: 12px;
+  padding: 1.5rem;
 }
 
 .zone-heading {
@@ -81,11 +81,13 @@ const cards = permissions
 }
 
 .zone-heading--permissions {
-  color: rgb(21, 219, 149);
+  color: var(--cat-color, rgb(21, 219, 149));
 }
 
 .zone-heading-icon {
-  font-size: 1.1rem;
+  width: 1.25rem;
+  height: 1.25rem;
+  flex-shrink: 0;
 }
 
 .permission-grid {
@@ -97,7 +99,7 @@ const cards = permissions
 .permission-card {
   background: var(--sl-color-gray-6);
   border: 1px solid var(--sl-color-gray-5);
-  border-top: 3px solid rgba(21, 219, 149, 0.5);
+  border-top: 3px solid rgba(var(--cat-color-rgb, 21, 219, 149), 0.5);
   border-radius: 8px;
   padding: 1rem;
   transition:
@@ -106,7 +108,7 @@ const cards = permissions
 }
 
 .permission-card:hover {
-  border-top-color: rgb(21, 219, 149);
+  border-top-color: var(--cat-color, rgb(21, 219, 149));
   transform: translateY(-1px);
 }
 
@@ -118,8 +120,10 @@ const cards = permissions
 }
 
 .card-icon {
-  font-size: 1.25rem;
+  width: 1.25rem;
+  height: 1.25rem;
   flex-shrink: 0;
+  color: var(--cat-color, rgb(21, 219, 149));
 }
 
 .card-label {

@@ -11,6 +11,7 @@ import {
   CONDITION_WHY,
   TAG_DESCRIPTIONS,
 } from "../../../data/tagMappings";
+import { ICONS } from "../icons";
 
 interface Props {
   conditions?: string[];
@@ -46,9 +47,7 @@ const cards = conditions
       aria-label="What you must do"
     >
       <h2 class="zone-heading zone-heading--conditions">
-        <span class="zone-heading-icon" aria-hidden="true">
-          📋
-        </span>
+        <svg class="zone-heading-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" set:html={ICONS.clipboard} />
         What you must do
       </h2>
       <div class="condition-list">
@@ -56,9 +55,7 @@ const cards = conditions
           // @ts-ignore
           <div key={card.tag} class="condition-card" data-tag={card.tag}>
             <div class="card-header">
-              <span class="card-icon" aria-hidden="true">
-                {card.icon}
-              </span>
+              <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" set:html={ICONS[card.icon] ?? ""} />
               <h3 class="card-label">{card.label}</h3>
             </div>
             <p class="card-description">{card.description}</p>
@@ -76,6 +73,9 @@ const cards = conditions
 <style>
 .zone-conditions {
   margin-bottom: 2.5rem;
+  background: rgba(228, 197, 129, 0.04);
+  border-radius: 12px;
+  padding: 1.5rem;
 }
 
 .zone-heading {
@@ -93,7 +93,9 @@ const cards = conditions
 }
 
 .zone-heading-icon {
-  font-size: 1.1rem;
+  width: 1.25rem;
+  height: 1.25rem;
+  flex-shrink: 0;
 }
 
 .condition-list {
@@ -123,8 +125,10 @@ const cards = conditions
 }
 
 .card-icon {
-  font-size: 1.15rem;
+  width: 1.15rem;
+  height: 1.15rem;
   flex-shrink: 0;
+  color: rgb(228, 197, 129);
 }
 
 .card-label {

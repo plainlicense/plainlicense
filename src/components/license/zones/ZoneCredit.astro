@@ -14,12 +14,13 @@ interface Props {
   };
 }
 
+import { ICONS } from "../icons";
 const { plain_name, original } = Astro.props as Props;
 ---
 
 <section class="zone zone-credit" aria-label="How to give credit">
   <h2 class="zone-heading">
-    <span class="zone-heading-icon" aria-hidden="true">©️</span>
+    <svg class="zone-heading-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" set:html={ICONS.copyright} />
     How to give credit
   </h2>
 
@@ -66,7 +67,7 @@ See LICENSE for details.`}</code></pre>
 
   <div class="not-required-box">
     <p class="not-required-heading">
-      <span aria-hidden="true">ℹ️</span>
+      <svg class="not-required-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" set:html={ICONS.info} />
       <strong>You do not need to:</strong>
     </p>
     <ul class="not-required-list">
@@ -97,7 +98,9 @@ See LICENSE for details.`}</code></pre>
 }
 
 .zone-heading-icon {
-  font-size: 1.1rem;
+  width: 1.25rem;
+  height: 1.25rem;
+  flex-shrink: 0;
 }
 
 .zone-intro {
@@ -193,6 +196,13 @@ See LICENSE for details.`}</code></pre>
   margin: 0 0 0.5rem 0;
   font-size: var(--sl-text-sm);
   color: var(--sl-color-gray-1);
+}
+
+.not-required-icon {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+  color: var(--sl-color-gray-3);
 }
 
 .not-required-list {

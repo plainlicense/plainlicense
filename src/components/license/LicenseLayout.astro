@@ -15,6 +15,8 @@
  */
 import type { CollectionEntry } from "astro:content";
 import { getFamilyData } from "../../data/license-families/index";
+import { getLicenseSlug, getPublishedLicenses } from "../../utils/collections";
+import CompareWith from "./CompareWith.astro";
 import ZoneConditions from "./zones/ZoneConditions.astro";
 import ZoneCredit from "./zones/ZoneCredit.astro";
 import ZoneIdentity from "./zones/ZoneIdentity.astro";
@@ -41,6 +43,18 @@ const PROTECTION_TAGS = new Set(["liability", "warranty"]);
 const limitations = (data.original?.limitations ?? []).filter(
   (tag) => !PROTECTION_TAGS.has(tag),
 );
+
+// Resolve compare_to entries to slugs and names
+const allLicenses = await getPublishedLicenses();
+const spdxLookup = new Map(
+  allLicenses.map(l => [l.data.spdx_id, { slug: getLicenseSlug(l), name: l.data.plain_name }])
+);
+const compareEntries = (data.compare_to ?? []).map(c => ({
+  spdx_id: c.spdx_id,
+  contrast: c.contrast,
+  slug: spdxLookup.get(c.spdx_id)?.slug,
+  name: spdxLookup.get(c.spdx_id)?.name ?? c.spdx_id,
+})).filter(c => c.slug);
 ---
 
 <article
@@ -57,10 +71,16 @@ const limitations = (data.original?.limitations ?? []).filter(
     tldr={data.tldr}
     is_dedication={data.is_dedication}
     original={data.original}
+    maker_pitch={data.maker_pitch}
   />
 
   <!-- Zone 2: What you can do -->
   <ZonePermissions permissions={permissions} />
+
+  <!-- Also consider -->
+  {compareEntries.length > 0 && (
+    <CompareWith entries={compareEntries} />
+  )}
 
   <!-- Zone 5 (source-available only): above the fold -->
   {sourceAvailable && limitations.length > 0 && (

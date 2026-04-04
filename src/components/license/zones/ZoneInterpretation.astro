@@ -16,6 +16,7 @@ interface Props {
   };
 }
 
+import { ICONS } from "../icons";
 const {
   plain_name,
   license_family,
@@ -33,7 +34,7 @@ const isOriginal = !original; // PlainLicense original (no original object)
 
 <details class="zone zone-interpretation">
   <summary class="interpretation-summary">
-    <span class="summary-icon" aria-hidden="true">⚖️</span>
+    <svg class="summary-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" set:html={ICONS.scale} />
     <span class="summary-heading">Legal interpretation</span>
     <span class="summary-arrow" aria-hidden="true">▾</span>
   </summary>
@@ -113,7 +114,10 @@ const isOriginal = !original; // PlainLicense original (no original object)
 }
 
 .summary-icon {
-  font-size: 1rem;
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+  color: var(--sl-color-gray-2);
 }
 
 .summary-heading {

@@ -1,11 +1,12 @@
 ---
 import { getCollection } from "astro:content";
+import "../../assets/stylesheets/custom.css";
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import LicenseSummary from "../../components/LicenseSummary.astro";
 import LicenseLayout from "../../components/license/LicenseLayout.astro";
 import { marked } from "marked";
 import ComparisonModal from "../../components/ComparisonModal.astro";
 import ComparisonToggle from "../../components/ComparisonToggle.astro";
+import ReadabilitySidebar from "../../components/license/ReadabilitySidebar.astro";
 import DownloadOptions from "../../components/DownloadOptions.astro";
 import VersionHistory from "../../components/VersionHistory.astro";
 import NotLegalAdvice from "../../components/NotLegalAdvice.astro";
@@ -73,7 +74,7 @@ const bodyParts = license.body.split(/---[\s\n]+# Original License Text/i);
 const originalBody = bodyParts.length > 1 ? bodyParts[1] : "";
 
 // Build processed body for clipboard/export (plain text from body + original text)
-const templateBlocks = await getCollection("template-blocks");
+const templateBlocks = await getCollection("templateBlocks");
 const plainBody = bodyParts[0].replace(
   /{{block:([a-z0-9-]+)}}/g,
   (_match, blockId) => {
@@ -104,47 +105,80 @@ const fullProcessedBody = stripComponentPlaceholders(
 
 // Strip template directives from plainBody for mapping anchors (they serve no purpose in aria-hidden divs)
 const cleanPlainBody = stripTemplatePlaceholders(plainBody);
+
+// For the full text view: use the fully processed body (blocks resolved, vars replaced, components stripped)
+// Split off any original text that was appended for the clipboard version
+const fullTextBody = stripComponentPlaceholders(resolvedBody);
+const renderedPlainHtml = renderMarkdownWithDivs(fullTextBody);
+
+// The fullProcessedBody (used for clipboard) has blocks resolved via the export pipeline,
+// but the in-page rendering uses resolvedBody which may have unresolved blocks if
+// getCollection("template-blocks") returns IDs that don't match. This is a pre-existing
+// content pipeline issue affecting the hidden mapping-anchors div too.
 ---
 
 <BaseLayout title={data.plain_name}>
-  <div class="license-container" data-spdx-id={data.spdx_id}>
-    <LicenseSummary license={license} />
+  <div class={`license-container cat-${data.license_family}`} data-spdx-id={data.spdx_id}>
 
-    <div class="license-layout">
-      <!-- Plain version: rendered via zone components -->
-      <div class="license-column plain-version">
-        <LicenseLayout license={license} />
-        <!--
-          Hidden mapping anchors: the plain markdown body preserves clause-level
-          <div id="..."> elements (e.g. plain-perm-use) that MappingViewer needs
-          to attach hover handlers. Visually hidden; aria-hidden so screen readers
-          skip duplicated content.
-        -->
-        {data.has_mapping && (
-          <div
-            class="mapping-anchors"
-            aria-hidden="true"
-            set:html={renderMarkdownWithDivs(cleanPlainBody)}
-          />
+    <!-- Tab navigation -->
+    <nav class="license-tabs" role="tablist" aria-label="License view">
+      <button role="tab" id="tab-reference" aria-controls="panel-reference" aria-selected="true" class="tab-button active" tabindex="0">
+        Quick Reference
+      </button>
+      <button role="tab" id="tab-fulltext" aria-controls="panel-fulltext" aria-selected="false" class="tab-button" tabindex="-1">
+        Full License Text
+      </button>
+    </nav>
+
+    <!-- Quick Reference panel (zone-based view) -->
+    <div id="panel-reference" role="tabpanel" aria-labelledby="tab-reference" class="tab-panel active">
+      <div class="license-layout">
+        <div class="license-column plain-version">
+          <LicenseLayout license={license} />
+          {data.has_mapping && (
+            <div
+              class="mapping-anchors"
+              aria-hidden="true"
+              set:html={renderMarkdownWithDivs(cleanPlainBody)}
+            />
+          )}
+        </div>
+
+        {data.show_original_comparison !== false && originalBody && (
+          <div class="license-column original-version">
+            <h2 class="original-heading">{data.original?.name ?? "Original License"}</h2>
+            <div
+              class="license-content prose"
+              set:html={renderMarkdownWithDivs(originalBody)}
+            />
+          </div>
         )}
       </div>
+    </div>
 
-      <!-- Original license text: shown only when comparison is active -->
-      {data.show_original_comparison !== false && originalBody && (
-        <div class="license-column original-version">
-          <h2 class="original-heading">{data.original?.name ?? "Original License"}</h2>
-          <div
-            class="license-content prose"
-            set:html={renderMarkdownWithDivs(originalBody)}
-          />
-        </div>
-      )}
+    <!-- Full License Text panel -->
+    <div id="panel-fulltext" role="tabpanel" aria-labelledby="tab-fulltext" class="tab-panel" hidden>
+      <article class="full-license-text prose" set:html={renderedPlainHtml} />
     </div>
 
     <DownloadOptions license={license} processedBody={fullProcessedBody} />
-    <VersionHistory license={license} />
-    <ComparisonToggle hasMapping={!!data.has_mapping} />
-    <NotLegalAdvice />
+
+    <div class="reference-fold" aria-hidden="true">
+      <span class="fold-rule"></span>
+      <span class="fold-note">Reference</span>
+      <span class="fold-rule"></span>
+    </div>
+
+    <div class="reference-section">
+      <ReadabilitySidebar
+        plain_gunning_fog={data.plain_gunning_fog}
+        original_gunning_fog={data.original?.gunning_fog}
+        shame_words_count={data.shame_words_count}
+      />
+      <ComparisonToggle hasMapping={!!data.has_mapping} />
+      <VersionHistory license={license} />
+      <NotLegalAdvice />
+    </div>
     <ComparisonModal />
   </div>
 </BaseLayout>
@@ -165,21 +199,164 @@ if (spdxId) {
       console.log(`No mapping found for ${spdxId}`);
     });
 }
+
+// Tab switching
+const tabs = document.querySelectorAll<HTMLButtonElement>('[role="tab"]');
+const panels = document.querySelectorAll<HTMLElement>('[role="tabpanel"]');
+
+tabs.forEach(tab => {
+  tab.addEventListener('click', () => {
+    tabs.forEach(t => {
+      t.setAttribute('aria-selected', 'false');
+      t.classList.remove('active');
+      t.tabIndex = -1;
+    });
+    panels.forEach(p => {
+      p.hidden = true;
+      p.classList.remove('active');
+    });
+    tab.setAttribute('aria-selected', 'true');
+    tab.classList.add('active');
+    tab.tabIndex = 0;
+    const panelId = tab.getAttribute('aria-controls');
+    if (panelId) {
+      const panel = document.getElementById(panelId);
+      if (panel) {
+        panel.hidden = false;
+        panel.classList.add('active');
+      }
+    }
+  });
+
+  tab.addEventListener('keydown', (e: KeyboardEvent) => {
+    const tabList = Array.from(tabs);
+    const idx = tabList.indexOf(tab);
+    let target: HTMLButtonElement | undefined;
+    if (e.key === 'ArrowRight') target = tabList[(idx + 1) % tabList.length];
+    if (e.key === 'ArrowLeft') target = tabList[(idx - 1 + tabList.length) % tabList.length];
+    if (target) {
+      e.preventDefault();
+      target.focus();
+      target.click();
+    }
+  });
+});
 </script>
 
 <style>
-  .license-container {
+.license-container {
   max-width: 1200px;
   margin: 0 auto;
   padding: 2rem;
   transition: max-width 0.3s ease;
 }
 
+/* ── Tabs ── */
+.license-tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 2px solid var(--sl-color-gray-5);
+  margin-bottom: 2rem;
+}
+
+.tab-button {
+  padding: 0.75rem 1.5rem;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  color: var(--sl-color-gray-3);
+  font-weight: 600;
+  font-size: var(--sl-text-sm);
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s;
+}
+
+.tab-button:hover {
+  color: var(--sl-color-gray-1);
+}
+
+.tab-button.active {
+  color: var(--cat-color, var(--sl-color-accent));
+  border-bottom-color: var(--cat-color, var(--sl-color-accent));
+}
+
+.tab-panel {
+  display: none;
+}
+
+.tab-panel.active {
+  display: block;
+}
+
+/* ── Full License Text ── */
+.full-license-text {
+  max-width: 65ch;
+  font-size: var(--sl-text-base);
+  line-height: 1.8;
+  color: var(--sl-color-gray-1);
+}
+
+.full-license-text :global(h1) {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--sl-color-white);
+  margin: 0 0 1.5rem 0;
+  line-height: 1.3;
+}
+
+.full-license-text :global(h2) {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--sl-color-white);
+  margin: 2rem 0 1rem 0;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--sl-color-gray-5);
+}
+
+.full-license-text :global(h3) {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--sl-color-gray-1);
+  margin: 1.5rem 0 0.75rem 0;
+}
+
+.full-license-text :global(p) {
+  margin: 0 0 1rem 0;
+}
+
+.full-license-text :global(ul),
+.full-license-text :global(ol) {
+  margin: 0 0 1rem 0;
+  padding-left: 1.5rem;
+}
+
+.full-license-text :global(li) {
+  margin-bottom: 0.5rem;
+}
+
+.full-license-text :global(code) {
+  background: var(--sl-color-gray-6);
+  border: 1px solid var(--sl-color-gray-5);
+  border-radius: 4px;
+  padding: 0.1em 0.35em;
+  font-size: 0.85em;
+}
+
+.full-license-text :global(strong) {
+  color: var(--sl-color-white);
+}
+
+.full-license-text :global(a) {
+  color: var(--cat-color, var(--sl-color-accent));
+  text-underline-offset: 2px;
+}
+
+/* ── Zone layout ── */
 .license-layout {
   display: grid;
   grid-template-columns: 1fr;
   gap: 2rem;
-  margin-top: 2rem;
 }
 
 .original-version {
@@ -214,7 +391,36 @@ if (spdxId) {
   line-height: 1.6;
 }
 
-/* Mapping anchors: hidden from view, present in DOM for MappingViewer */
+/* ── Reference fold ── */
+.reference-fold {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin: 3rem 0 2rem;
+}
+
+.fold-rule {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--sl-color-gray-4), transparent);
+}
+
+.fold-note {
+  font-size: var(--sl-text-xs);
+  color: var(--sl-color-gray-4);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  white-space: nowrap;
+}
+
+.reference-section {
+  padding: 1.5rem;
+  background: rgba(var(--sl-color-gray-6-rgb, 0, 0, 0), 0.3);
+  border: 1px solid var(--sl-color-gray-5);
+  border-radius: 12px;
+}
+
+/* ── Mapping anchors ── */
 .mapping-anchors {
   position: absolute;
   width: 1px;
@@ -226,14 +432,11 @@ if (spdxId) {
   pointer-events: none;
 }
 
-/* When comparison is active, mapping anchors get hover events from MappingViewer
-   but should not visually show; the zone components receive the highlight classes */
 .comparison-active .mapping-anchors [id].highlight-active,
 .comparison-active .mapping-anchors [id].highlight-match {
   /* no visual change; zone elements get highlight instead */
 }
 
-/* Interactive Mapped Sections */
 .comparison-active .license-content [id] {
   cursor: pointer;
   position: relative;
@@ -263,5 +466,19 @@ if (spdxId) {
   border-radius: 4px;
   box-shadow: 0 0 0 4px rgba(var(--sl-color-accent-rgb), 0.1);
   transition: all 0.2s ease;
+}
+
+/* ── Mobile ── */
+@media (max-width: 640px) {
+  .license-container {
+    padding: 1rem;
+  }
+  .tab-button {
+    padding: 0.6rem 1rem;
+    font-size: var(--sl-text-xs);
+  }
+  .reference-section {
+    padding: 1rem;
+  }
 }
 </style>

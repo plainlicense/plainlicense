@@ -120,28 +120,28 @@ export const LIMITATION_WHY: Record<string, string> = {
 };
 
 export const PERMISSION_ICONS: Record<string, string> = {
-  "commercial-use": "💰",
-  distribution: "📤",
-  modifications: "✏️",
-  "private-use": "🔒",
-  "patent-use": "⚗️",
-  revokable: "↩️",
+  "commercial-use": "dollar",
+  distribution: "share",
+  modifications: "pencil",
+  "private-use": "lock",
+  "patent-use": "certificate",
+  revokable: "undo",
 };
 
 export const CONDITION_ICONS: Record<string, string> = {
-  "disclose-source": "📂",
-  "document-changes": "📝",
-  "include-copyright": "©️",
-  "include-copyright--source": "©️",
-  "network-use-disclose": "🌐",
-  "same-license": "♻️",
-  "same-license--file": "♻️",
-  "same-license--library": "♻️",
+  "disclose-source": "folder-open",
+  "document-changes": "document",
+  "include-copyright": "copyright",
+  "include-copyright--source": "copyright",
+  "network-use-disclose": "globe",
+  "same-license": "refresh",
+  "same-license--file": "refresh",
+  "same-license--library": "refresh",
 };
 
 export const LIMITATION_ICONS: Record<string, string> = {
-  liability: "⚖️",
-  warranty: "🛡️",
-  "trademark-use": "™️",
-  "patent-use": "⚗️",
+  liability: "scale",
+  warranty: "shield-off",
+  "trademark-use": "trademark",
+  "patent-use": "certificate",
 };

@@ -9,13 +9,14 @@ interface Props {
   protections: string;
 }
 
+import { ICONS } from "../icons";
 const { protections } = Astro.props as Props;
 const protectionsHtml = await marked.parse(protections);
 ---
 
 <details class="zone zone-protections">
   <summary class="protections-summary">
-    <span class="summary-icon" aria-hidden="true">🛡️</span>
+    <svg class="summary-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" set:html={ICONS.shield} />
     <span class="summary-heading">Standard protections</span>
     <span class="summary-note">— the same across all licenses</span>
     <span class="summary-arrow" aria-hidden="true">▾</span>
@@ -56,7 +57,10 @@ const protectionsHtml = await marked.parse(protections);
 }
 
 .summary-icon {
-  font-size: 1rem;
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+  color: var(--sl-color-gray-2);
 }
 
 .summary-heading {
