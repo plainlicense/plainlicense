@@ -7,9 +7,29 @@
   --sl-color-accent-high: var(--aquamarine);
 }
 
+/* Starlight Dark Theme — match BaseLayout palette */
+:root[data-theme="dark"] {
+  --sl-color-bg: #0d0f15;
+  --sl-color-bg-nav: rgba(13, 15, 21, 0.92);
+  --sl-color-bg-sidebar: #0d0f15;
+  --sl-color-hairline-light: #242836;
+  --sl-color-hairline: #242836;
+  --sl-color-text: #e8eaf0;
+  --sl-color-text-accent: var(--emerald);
+  --sl-color-white: #e8eaf0;
+  --sl-color-gray-1: #e8eaf0;
+  --sl-color-gray-2: #c0c4d0;
+  --sl-color-gray-3: #8b90a0;
+  --sl-color-gray-4: #5a5f70;
+  --sl-color-gray-5: #242836;
+  --sl-color-gray-6: #161923;
+  --sl-color-gray-7: #0d0f15;
+  --sl-color-black: #0d0f15;
+}
+
 /* Header Brand Styling */
 .site-title {
-  font-family: "Raleway", sans-serif;
+  font-family: var(--font-heading);
   font-weight: 700;
   letter-spacing: -0.05em;
 }
@@ -26,7 +46,7 @@
 .sl-markdown-content h4,
 .sl-markdown-content h5,
 .sl-markdown-content h6 {
-  font-family: var(--font-raleway);
+  font-family: var(--font-heading);
   color: var(--zaffre);
 }
 
@@ -152,3 +172,9 @@ html[data-is-blog] .main-pane {
 html[data-is-blog] .sl-markdown-content {
   max-width: 50rem;
 }
+
+/* Category Color System */
+.cat-permissive { --cat-color: var(--cat-permissive); --cat-color-rgb: var(--cat-permissive-rgb); }
+.cat-copyleft { --cat-color: var(--cat-copyleft); --cat-color-rgb: var(--cat-copyleft-rgb); }
+.cat-source-available { --cat-color: var(--cat-source-available); --cat-color-rgb: var(--cat-source-available-rgb); }
+.cat-public-domain { --cat-color: var(--cat-public-domain); --cat-color-rgb: var(--cat-public-domain-rgb); }

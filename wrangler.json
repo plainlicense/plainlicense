@@ -1,75 +1,79 @@
 {
-  // Cloudflare Workers / Pages deployment configuration for Plain License.
-  // The @astrojs/cloudflare adapter reads this file at build time and merges
-  // its own generated settings (e.g. the Worker entry-point) with what is
-  // defined here.  Any binding you declare here takes precedence over the
-  // adapter's auto-generated defaults, so you can customize names or add
-  // extra namespaces/bindings as needed.
-  "$schema": "./node_modules/wrangler/config-schema.json",
-  "account_id": "1bb2d128ac96f8ee9dc75e99a54e9260",
-  // ── Static assets ──────────────────────────────────────────────────────────
-  // The ASSETS binding exposes the site's static files to the Worker so that
-  // it can serve them via `env.ASSETS.fetch(request)`.  The adapter defaults
-  // to the binding name "ASSETS"; declaring it here makes the configuration
-  // explicit and avoids any auto-provisioning surprises.
-  "assets": {
-    "binding": "ASSETS",
-    "directory": "./dist",
-    "html_handling": "auto-trailing-slash",
-    "not_found_handling": "404-page",
-    "run_worker_first": false
-  },
-  "compatibility_date": "2025-03-01",
-  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
-  "images": {
-    "binding": "IMAGES",
-    "remote": true
-  },
-  // ── Session storage (Cloudflare KV) ────────────────────────────────────────
-  // Astro v6 provides a first-class session API.  The @astrojs/cloudflare
-  // adapter automatically wires sessions to a KV namespace whose binding name
-  // defaults to "SESSION".  Declaring the namespace here keeps everything in
-  // one place and lets Cloudflare auto-provision the namespace on first deploy
-  // (see https://developers.cloudflare.com/workers/wrangler/configuration/#automatic-provisioning).
-  // We can use session for saving basic state like user-defined license template variables
-  "kv_namespaces": [
-    {
-      "binding": "SESSION"
-      // "id" and "preview_id" are populated by `wrangler kv namespace create`
-      // or by Cloudflare's automatic provisioning on deploy.
-      // Add them here once the namespaces exist in your Cloudflare account.
-    }
-  ],
-  "main": "@astrojs/cloudflare/entrypoints/server",
-  "name": "plainlicense",
-  "observability": {
-    "enabled": true
-  },
-  "placement": {
-    "mode": "smart"
-  },
-  "preview_urls": true,
-  "routes": [
-    {
-      "custom_domain": true,
-      "pattern": "plainlicense.org"
-    }
-  ],
-  "secrets_store_secrets": [
-    {
-      "binding": "S3_SECRET_KEY",
-      "secret_name": "PL_S3_SECRET_KEY",
-      "store_id": "98acd7f077774ecfb34a31ac8cce6c98"
-    }
-  ],
-  // ── R2 storage for CMS images ───────────────────────────────────────────
-  // The S3_ACCESS_KEY var and PL_S3_SECRET_KEY secret are used by the CMS to authenticate to the
-  // R2 bucket where it uploads images.  The access key is not sensitive and can be declared as a
-  // var, but the secret key must be stored as a secret. Secret-store secrets are accessed at
-  // runtime with `await env.MY_SECRET_KEY.get()`.
-  "vars": {
-    // R2 bucket's access key (not secret key) for CMS images
-    "S3_ACCESS_KEY": "2af46c19f417f0b062f540805412da84"
-  },
-  "workers_dev": true
+	// Cloudflare Workers / Pages deployment configuration for Plain License.
+	// The @astrojs/cloudflare adapter reads this file at build time and merges
+	// its own generated settings (e.g. the Worker entry-point) with what is
+	// defined here.  Any binding you declare here takes precedence over the
+	// adapter's auto-generated defaults, so you can customize names or add
+	// extra namespaces/bindings as needed.
+	"$schema": "./node_modules/wrangler/config-schema.json",
+	"account_id": "1bb2d128ac96f8ee9dc75e99a54e9260",
+	// ── Static assets ──────────────────────────────────────────────────────────
+	// The ASSETS binding exposes the site's static files to the Worker so that
+	// it can serve them via `env.ASSETS.fetch(request)`.  The adapter defaults
+	// to the binding name "ASSETS"; declaring it here makes the configuration
+	// explicit and avoids any auto-provisioning surprises.
+	"assets": {
+		"binding": "ASSETS",
+		"directory": "./dist",
+		"html_handling": "auto-trailing-slash",
+		"not_found_handling": "404-page",
+		"run_worker_first": false
+	},
+	"compatibility_date": "2025-03-01",
+	"compatibility_flags": [
+		"nodejs_compat",
+		"global_fetch_strictly_public"
+	],
+	"images": {
+		"binding": "IMAGES",
+		"remote": true
+	},
+	// ── Session storage (Cloudflare KV) ────────────────────────────────────────
+	// Astro v6 provides a first-class session API.  The @astrojs/cloudflare
+	// adapter automatically wires sessions to a KV namespace whose binding name
+	// defaults to "SESSION".  Declaring the namespace here keeps everything in
+	// one place and lets Cloudflare auto-provision the namespace on first deploy
+	// (see https://developers.cloudflare.com/workers/wrangler/configuration/#automatic-provisioning).
+	// We can use session for saving basic state like user-defined license template variables
+	"kv_namespaces": [
+		{
+			"binding": "SESSION",
+			"id": "45e478849b9745f9a23efee1b5844469"
+			// "id" and "preview_id" are populated by `wrangler kv namespace create`
+			// or by Cloudflare's automatic provisioning on deploy.
+			// Add them here once the namespaces exist in your Cloudflare account.
+		}
+	],
+	"main": "@astrojs/cloudflare/entrypoints/server",
+	"name": "plainlicense",
+	"observability": {
+		"enabled": true
+	},
+	"placement": {
+		"mode": "smart"
+	},
+	"preview_urls": true,
+	"routes": [
+		{
+			"custom_domain": true,
+			"pattern": "plainlicense.org"
+		}
+	],
+	"secrets_store_secrets": [
+		{
+			"binding": "S3_SECRET_KEY",
+			"secret_name": "PL_S3_SECRET_KEY",
+			"store_id": "98acd7f077774ecfb34a31ac8cce6c98"
+		}
+	],
+	// ── R2 storage for CMS images ───────────────────────────────────────────
+	// The S3_ACCESS_KEY var and PL_S3_SECRET_KEY secret are used by the CMS to authenticate to the
+	// R2 bucket where it uploads images.  The access key is not sensitive and can be declared as a
+	// var, but the secret key must be stored as a secret. Secret-store secrets are accessed at
+	// runtime with `await env.MY_SECRET_KEY.get()`.
+	"vars": {
+		// R2 bucket's access key (not secret key) for CMS images
+		"S3_ACCESS_KEY": "2af46c19f417f0b062f540805412da84"
+	},
+	"workers_dev": true
 }

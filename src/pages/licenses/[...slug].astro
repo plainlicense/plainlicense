@@ -108,7 +108,6 @@ const cleanPlainBody = stripTemplatePlaceholders(plainBody);
 
 <BaseLayout title={data.plain_name}>
   <div class="license-container" data-spdx-id={data.spdx_id}>
-    <ComparisonToggle hasMapping={!!data.has_mapping} />
     <LicenseSummary license={license} />
 
     <div class="license-layout">
@@ -144,6 +143,7 @@ const cleanPlainBody = stripTemplatePlaceholders(plainBody);
 
     <DownloadOptions license={license} processedBody={fullProcessedBody} />
     <VersionHistory license={license} />
+    <ComparisonToggle hasMapping={!!data.has_mapping} />
     <NotLegalAdvice />
     <ComparisonModal />
   </div>

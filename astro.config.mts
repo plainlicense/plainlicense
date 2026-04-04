@@ -28,6 +28,18 @@ if (!rootDir) {
     "Could not find workspace root. Ensure that this project is within a valid workspace with a package.json file.",
   );
 }
+
+const headers = {
+  "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+  "x-frame-options": "DENY",
+  "x-content-type-options": "nosniff",
+  "referrer-policy": "strict-origin-when-cross-origin",
+  "permissions-policy":
+    "accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()",
+  "content-security-policy":
+    "default-src 'self'; script-src 'self' 'unsafe-inline' https://ajax.cloudflare.com https://static.cloudflareinsights.com https://challenges.cloudflare.com; connect-src 'self' https://cloudflareinsights.com; img-src 'self' data: https://avatars.githubusercontent.com https://ui-avatars.com; style-src 'self' 'unsafe-inline'; frame-src 'self' https://challenges.cloudflare.com; font-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'",
+};
+
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 type LicenseCategory =
@@ -224,24 +236,22 @@ export default defineConfig({
       cssVariable: "--sl-font",
       fallbacks: [
         "Noto Sans",
-        "Open Sans",
-        "Lato",
         "Helvetica Neue",
         "Helvetica",
         "system-ui",
         "sans-serif",
       ],
       formats: ["woff2", "woff"],
-      name: "Inter",
+      name: "Lexend",
       provider: fontProviders.google(),
-      styles: ["normal", "italic"],
+      styles: ["normal"],
       subsets: ["latin", "latin-ext"],
-      weights: [500, 700],
+      weights: [300, 400, 500, 600, 700],
     },
     {
       cssVariable: "--sl-font-mono",
       fallbacks: [
-        "Fira Code Mono",
+        "Fira Code",
         "Inconsolata",
         "Monaco",
         "Consolas",
@@ -249,30 +259,27 @@ export default defineConfig({
         "monospace",
       ],
       formats: ["woff2", "woff"],
-      name: "Source Code Pro",
+      name: "JetBrains Mono",
       provider: fontProviders.google(),
       styles: ["normal", "italic"],
       subsets: ["latin", "latin-ext"],
-      weights: [500, 700],
+      weights: [400, 500, 700],
     },
     {
-      cssVariable: "--font-raleway",
+      cssVariable: "--font-heading",
       fallbacks: [
-        "Montserrat",
         "Noto Sans",
-        "Open Sans",
-        "Lato",
         "Helvetica Neue",
         "Helvetica",
         "system-ui",
         "sans-serif",
       ],
       formats: ["woff2", "woff"],
-      name: "Raleway",
+      name: "Plus Jakarta Sans",
       provider: fontProviders.google(),
-      styles: ["normal"],
-      subsets: ["latin"],
-      weights: [500, 700],
+      styles: ["normal", "italic"],
+      subsets: ["latin", "latin-ext"],
+      weights: [500, 600, 700, 800],
     },
   ],
   // Image optimization
@@ -318,6 +325,7 @@ export default defineConfig({
         Header: "./src/components/overrides/Header.astro",
         Footer: "./src/components/overrides/Footer.astro",
         Sidebar: "./src/components/overrides/Sidebar.astro",
+        ThemeSelect: "./src/components/overrides/ThemeSelect.astro",
       },
       customCss: ["./src/assets/stylesheets/custom.css"],
       expressiveCode: {
@@ -446,6 +454,9 @@ export default defineConfig({
     }),
   },
   site: "https://plainlicense.org",
+  server: {
+    headers: headers,
+  },
   vite: {
     assetsInclude: [
       "src/*.webp",
@@ -476,17 +487,7 @@ export default defineConfig({
       fs: {
         allow: [rootDir],
       },
-      headers: {
-        "strict-transport-security":
-          "max-age=31536000; includeSubDomains; preload",
-        "x-frame-options": "SAMEORIGIN",
-        "x-content-type-options": "nosniff",
-        "referrer-policy": "strict-origin-when-cross-origin",
-        "permissions-policy":
-          "accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()",
-        "content-security-policy":
-          "default-src 'self'; script-src 'self' 'unsafe-inline'; connect-src 'self'; img-src 'self' data: avatars.githubusercontent.com ui-avatars.com; style-src 'self' 'unsafe-inline' fonts.googleapis.com; font-src 'self' fonts.gstatic.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'",
-      },
+      headers: headers,
     },
   },
 });

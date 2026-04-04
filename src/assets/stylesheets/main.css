@@ -1,12 +1,12 @@
 :root {
-  --accent: 136, 58, 234;
-  --accent-light: 224, 204, 250;
-  --accent-dark: 49, 10, 101;
+  --accent: var(--emerald-rgb);
+  --accent-light: var(--aquamarine-rgb);
+  --accent-dark: var(--castleton-grn-rgb);
   --accent-gradient: linear-gradient(
     45deg,
-    rgb(var(--accent)),
-    rgb(var(--accent-light)) 30%,
-    white 60%
+    rgb(var(--emerald-rgb)),
+    rgb(var(--aquamarine-rgb)) 30%,
+    rgb(var(--dutch-white-rgb)) 60%
   );
 
   /* Plain License Brand Colors */
@@ -14,18 +14,6 @@
   --pl-emerald: rgb(21, 219, 149);
   --pl-ecru: rgb(228, 197, 129);
   --pl-night: rgb(6, 12, 14);
-}
-
-.highlight-match {
-  background-color: rgba(136, 58, 234, 0.2);
-  transition: background-color 0.2s;
-  border-radius: 4px;
-}
-
-.highlight-active {
-  background-color: rgba(136, 58, 234, 0.4);
-  transition: background-color 0.2s;
-  border-radius: 4px;
 }
 
 [id^="plain-"],

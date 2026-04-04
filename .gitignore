@@ -153,3 +153,4 @@ package-lock.json
 .size-snapshot.json
 .claude/*.local.*
 worker-configuration.d.ts
+.playwright-mcp/

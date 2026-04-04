@@ -42,7 +42,7 @@ const featuredLicenses = licenses.filter((l) => l.data.featured);
         <h2 class="section-title">Featured Licenses</h2>
         <div class="card-grid">
           {featuredLicenses.map(license => (
-            <a href={`/licenses/${getLicenseSlug(license)}/`} class="card">
+            <a href={`/licenses/${getLicenseSlug(license)}/`} class={`card cat-${license.data.license_family}`}>
               <div class="card-badges">
                 <span class="spdx-badge">{license.data.spdx_id}</span>
                 {license.data.is_osi_approved && <span class="osi-badge">OSI ✓</span>}
@@ -62,7 +62,7 @@ const featuredLicenses = licenses.filter((l) => l.data.featured);
       </div>
       <ul class="license-list">
         {licenses.map(license => (
-          <li>
+          <li class={`cat-${license.data.license_family}`}>
             <a href={`/licenses/${getLicenseSlug(license)}/`}>
               <span class="list-name">{license.data.plain_name}</span>
               <span class="list-spdx">{license.data.spdx_id}</span>
@@ -70,6 +70,53 @@ const featuredLicenses = licenses.filter((l) => l.data.featured);
           </li>
         ))}
       </ul>
+    </section>
+
+    <section class="section how-it-works">
+      <h2 class="section-title">How it works</h2>
+      <div class="steps-grid">
+        <div class="step">
+          <span class="step-number">1</span>
+          <h3>Pick a license</h3>
+          <p>Browse our library of popular licenses, organized by type — permissive, copyleft, source-available, or public domain.</p>
+        </div>
+        <div class="step">
+          <span class="step-number">2</span>
+          <h3>Read the plain version</h3>
+          <p>Each license is rewritten at an 8th-grade reading level. No legal jargon, no confusion — just clear rights and responsibilities.</p>
+        </div>
+        <div class="step">
+          <span class="step-number">3</span>
+          <h3>Use it in your project</h3>
+          <p>Download in any format, copy the attribution template, and you're done. The original license still applies — we just make it understandable.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section why-plain">
+      <h2 class="section-title">Why plain language?</h2>
+      <div class="value-grid">
+        <div class="value-card">
+          <svg class="value-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+          <h3>8th-grade reading level</h3>
+          <p>The average American reads at an 8th-grade level. Most licenses require a college education. We bridge that gap.</p>
+        </div>
+        <div class="value-card">
+          <svg class="value-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v15"/><path d="m5 12 7 8 7-8"/><circle cx="5" cy="6" r="3"/><circle cx="19" cy="6" r="3"/></svg>
+          <h3>Legally grounded</h3>
+          <p>Every plain license falls back to its original. You get clarity without sacrificing legal standing.</p>
+        </div>
+        <div class="value-card">
+          <svg class="value-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          <h3>Free and open</h3>
+          <p>All our work is public domain. Use it, share it, build on it — no strings attached.</p>
+        </div>
+        <div class="value-card">
+          <svg class="value-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <h3>Community driven</h3>
+          <p>Writers, lawyers, and developers collaborate to make every license clear, accurate, and accessible.</p>
+        </div>
+      </div>
     </section>
   </div>
 </BaseLayout>
@@ -92,6 +139,7 @@ const featuredLicenses = licenses.filter((l) => l.data.featured);
 }
 
 .hero h1 {
+  font-family: var(--font-heading, "Plus Jakarta Sans", sans-serif);
   font-size: clamp(2rem, 5vw, 3.5rem);
   font-weight: 800;
   line-height: 1.15;
@@ -166,6 +214,7 @@ const featuredLicenses = licenses.filter((l) => l.data.featured);
 }
 
 .section-title {
+  font-family: var(--font-heading, "Plus Jakarta Sans", sans-serif);
   font-size: 1.5rem;
   font-weight: 700;
   margin: 0 0 1.5rem;
@@ -193,9 +242,9 @@ const featuredLicenses = licenses.filter((l) => l.data.featured);
 }
 
 .card:hover {
-  border-color: rgb(21, 219, 149);
+  border-color: var(--cat-color, rgb(21, 219, 149));
   transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(21, 219, 149, 0.1);
+  box-shadow: 0 4px 16px rgba(var(--cat-color-rgb, 21, 219, 149), 0.1);
   color: var(--text, #e8eaf0);
 }
 
@@ -206,12 +255,12 @@ const featuredLicenses = licenses.filter((l) => l.data.featured);
 }
 
 .spdx-badge {
-  font-family: "Source Code Pro", monospace;
+  font-family: var(--sl-font-mono, "JetBrains Mono", monospace);
   font-size: 0.75rem;
   font-weight: 600;
-  background: rgba(21, 219, 149, 0.12);
-  color: rgb(21, 219, 149);
-  border: 1px solid rgba(21, 219, 149, 0.3);
+  background: rgba(var(--cat-color-rgb, 21, 219, 149), 0.12);
+  color: var(--cat-color, rgb(21, 219, 149));
+  border: 1px solid rgba(var(--cat-color-rgb, 21, 219, 149), 0.3);
   border-radius: 4px;
   padding: 0.15em 0.5em;
 }
@@ -227,10 +276,11 @@ const featuredLicenses = licenses.filter((l) => l.data.featured);
 }
 
 .card h3 {
+  font-family: var(--font-heading, "Plus Jakarta Sans", sans-serif);
   margin: 0 0 0.5rem;
   font-size: 1.1rem;
   font-weight: 700;
-  color: rgb(21, 219, 149);
+  color: var(--cat-color, rgb(21, 219, 149));
 }
 
 .card p {
@@ -277,15 +327,18 @@ const featuredLicenses = licenses.filter((l) => l.data.featured);
   align-items: center;
   justify-content: space-between;
   padding: 0.6rem 0.75rem;
+  padding-left: 1rem;
   border-radius: 6px;
   background: var(--bg-surface, #161923);
   border: 1px solid var(--bg-border, #242836);
+  border-left: 3px solid var(--cat-color, rgb(21, 219, 149));
   text-decoration: none;
   transition: border-color 0.15s;
 }
 
 .license-list li a:hover {
-  border-color: rgb(21, 219, 149);
+  border-color: var(--bg-border, #242836);
+  border-left-color: var(--cat-color, rgb(21, 219, 149));
   color: var(--text, #e8eaf0);
 }
 
@@ -296,8 +349,89 @@ const featuredLicenses = licenses.filter((l) => l.data.featured);
 }
 
 .list-spdx {
-  font-family: "Source Code Pro", monospace;
+  font-family: var(--sl-font-mono, "JetBrains Mono", monospace);
   font-size: 0.7rem;
   color: var(--text-muted, #8b90a0);
+}
+
+/* How It Works */
+.steps-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 2rem;
+}
+
+.step {
+  position: relative;
+  padding: 1.5rem;
+  background: var(--bg-surface, #161923);
+  border: 1px solid var(--bg-border, #242836);
+  border-radius: 10px;
+}
+
+.step-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background: rgb(21, 219, 149);
+  color: #0d0f15;
+  font-weight: 800;
+  font-size: 0.85rem;
+  margin-bottom: 0.75rem;
+}
+
+.step h3 {
+  font-family: var(--font-heading, "Plus Jakarta Sans", sans-serif);
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem;
+  color: var(--text, #e8eaf0);
+}
+
+.step p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-muted, #8b90a0);
+  line-height: 1.55;
+}
+
+/* Why Plain Language */
+.value-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.5rem;
+}
+
+.value-card {
+  padding: 1.25rem;
+  border-radius: 10px;
+  background: var(--bg-surface, #161923);
+  border: 1px solid var(--bg-border, #242836);
+}
+
+.value-icon {
+  width: 1.75rem;
+  height: 1.75rem;
+  display: block;
+  margin-bottom: 0.75rem;
+  color: rgb(21, 219, 149);
+}
+
+.value-card h3 {
+  font-family: var(--font-heading, "Plus Jakarta Sans", sans-serif);
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin: 0 0 0.4rem;
+  color: var(--text, #e8eaf0);
+}
+
+.value-card p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--text-muted, #8b90a0);
+  line-height: 1.5;
 }
 </style>

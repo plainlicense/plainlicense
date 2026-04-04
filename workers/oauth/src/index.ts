@@ -90,7 +90,8 @@ const handleAuth = async (
 ): Promise<Response> => {
   const { url } = request;
   const { searchParams } = new URL(url);
-  const { provider, site_id: domain } = Object.fromEntries(searchParams);
+  const provider = searchParams.get("provider");
+  const domain = searchParams.get("site_id");
 
   if (!provider || !supportedProviders.includes(provider)) {
     return outputHTML({
@@ -173,7 +174,8 @@ const handleCallback = async (
 ): Promise<Response> => {
   const { url, headers } = request;
   const { searchParams } = new URL(url);
-  const { code, state } = Object.fromEntries(searchParams);
+  const state = searchParams.get("state");
+  const code = searchParams.get("code");
 
   const [, provider, csrfToken] =
     headers.get("Cookie")?.match(/\bcsrf-token=([a-z-]+?)_([0-9a-f]{32})\b/) ??

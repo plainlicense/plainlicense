@@ -24,7 +24,7 @@ const currentPath = Astro.url.pathname;
     <header class="site-header">
       <div class="header-inner">
         <a href="/" class="site-brand" aria-label="Plain License home">
-          <span class="brand-mark" aria-hidden="true">PL</span>
+          <img src="/favicon.svg" alt="" class="brand-logo" width="32" height="32" aria-hidden="true" />
           <span class="brand-name">Plain <strong>License</strong></span>
         </a>
         <nav class="site-nav" aria-label="Main navigation">
@@ -124,6 +124,10 @@ const currentPath = Astro.url.pathname;
     <main class="page-main" id="main-content"><slot /></main>
     <footer class="site-footer">
       <div class="footer-inner">
+        <div class="footer-brand">
+          <img src="/favicon.svg" alt="" class="footer-logo" width="24" height="24" aria-hidden="true" />
+          <span class="footer-tagline">Licenses you can actually understand.</span>
+        </div>
         <p class="footer-copy">
           Plain License's authors dedicate all original content to the public
           domain.
@@ -133,6 +137,7 @@ const currentPath = Astro.url.pathname;
           <a href="/licenses/">Licenses</a>
           <a href="/faq/">FAQ</a>
           <a href="/about/">About</a>
+          <a href="/helping/">Contributing</a>
           <a href="/blog/">Blog</a>
           <a
             href="https://github.com/plainlicense/plainlicense"
@@ -185,7 +190,7 @@ if (toggle && mobileNav) {
 }
 
 html {
-  font-family: "Inter", "Noto Sans", system-ui, sans-serif;
+  font-family: var(--sl-font, "Lexend", "Noto Sans", system-ui, sans-serif);
   background: var(--bg);
   color: var(--text);
 }
@@ -239,7 +244,7 @@ body {
 }
 
 code {
-  font-family: "Source Code Pro", "Fira Code", "Inconsolata", monospace;
+  font-family: var(--sl-font-mono, "JetBrains Mono", "Fira Code", monospace);
 }
 
 a {
@@ -278,18 +283,10 @@ a:hover {
   flex-shrink: 0;
 }
 
-.brand-mark {
+.brand-logo {
   width: 2rem;
   height: 2rem;
-  border-radius: 6px;
-  background: rgb(var(--accent));
-  color: #0d0f15;
-  font-weight: 800;
-  font-size: 0.75rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  letter-spacing: 0.02em;
+  flex-shrink: 0;
 }
 
 .brand-name {
@@ -401,6 +398,25 @@ a:hover {
   gap: 1rem;
   font-size: 0.875rem;
   color: var(--text-muted);
+}
+
+.footer-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  margin-bottom: 0.75rem;
+}
+
+.footer-logo {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.footer-tagline {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  font-style: italic;
 }
 
 .footer-copy {
