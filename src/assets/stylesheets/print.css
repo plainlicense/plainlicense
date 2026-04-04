@@ -34,7 +34,11 @@
     --bg-border: #ddd;
     --text: #1a1a1a;
     --text-muted: #555;
-    color-adjust: exact;
+    --accent: 26, 26, 26;
+    --accent-dark: 26, 26, 26;
+    --accent-text: 85, 85, 85;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
@@ -85,7 +89,8 @@
 
   /* ── Show all tab panels ──────────────────────────────────── */
   .tab-panel,
-  .tab-panel[hidden] {
+  .tab-panel[hidden],
+  [role="tabpanel"][hidden] {
     display: block !important;
     visibility: visible !important;
   }
@@ -214,30 +219,30 @@
 
   /* ── Badges ───────────────────────────────────────────────── */
   .family-badge {
-    border: 1.5pt solid #333;
-    color: #333;
-    background: #f0f0f0;
+    border: 1.5pt solid #333 !important;
+    color: #333 !important;
+    background: #f0f0f0 !important;
     font-size: 8pt;
     padding: 2pt 8pt;
   }
 
   .dedication-badge {
-    border: 1.5pt solid #555;
-    color: #555;
-    background: #f5f5f5;
+    border: 1.5pt solid #555 !important;
+    color: #555 !important;
+    background: #f5f5f5 !important;
   }
 
   .column-badge {
-    border: 1pt solid #999;
-    background: #f5f5f5;
-    color: #333;
+    border: 1pt solid #999 !important;
+    background: #f5f5f5 !important;
+    color: #333 !important;
   }
 
   /* ── TL;DR block ──────────────────────────────────────────── */
   .tldr-block {
-    background: #f8f8f8;
-    border: 1pt solid #ccc;
-    border-left: 4pt solid #333;
+    background: #f8f8f8 !important;
+    border: 1pt solid #ccc !important;
+    border-left: 4pt solid #333 !important;
   }
 
   .tldr-header strong {
@@ -250,9 +255,9 @@
 
   /* ── Permission/restriction cards ─────────────────────────── */
   .permission-card {
-    border: 1pt solid #ccc;
-    border-top: 2.5pt solid #555;
-    background: #fafafa;
+    border: 1pt solid #ccc !important;
+    border-top: 2.5pt solid #555 !important;
+    background: #fafafa !important;
   }
 
   .permission-card:hover {
@@ -269,26 +274,26 @@
 
   /* ── Zone backgrounds ─────────────────────────────────────── */
   .zone-permissions {
-    background: #fafafa;
-    border: 1pt solid #ddd;
+    background: #fafafa !important;
+    border: 1pt solid #ddd !important;
     border-radius: 6pt;
   }
 
   .zone-credit {
-    border-left: 3pt solid #555;
-    background: #fafafa;
+    border-left: 3pt solid #555 !important;
+    background: #fafafa !important;
   }
 
   .zone-protections {
-    border: 1pt solid #ccc;
-    border-left: 3pt solid #777;
-    background: #fafafa;
+    border: 1pt solid #ccc !important;
+    border-left: 3pt solid #777 !important;
+    background: #fafafa !important;
   }
 
   .zone-interpretation {
-    border: 1pt solid #ccc;
-    border-left: 3pt solid #999;
-    background: #fafafa;
+    border: 1pt solid #ccc !important;
+    border-left: 3pt solid #999 !important;
+    background: #fafafa !important;
   }
 
   .protections-summary,
@@ -296,12 +301,13 @@
     cursor: default;
     padding: 8pt 12pt;
     font-weight: 700;
-    border-bottom: 1pt solid #ddd;
+    border-bottom: 1pt solid #ddd !important;
+    background: transparent !important;
   }
 
   .protections-summary:hover,
   .interpretation-summary:hover {
-    background: transparent;
+    background: transparent !important;
   }
 
   .summary-icon {
@@ -310,8 +316,8 @@
 
   /* ── Callout (source-available warning) ───────────────────── */
   .callout--important {
-    border: 1.5pt solid #555;
-    background: #f8f8f8;
+    border: 1.5pt solid #555 !important;
+    background: #f8f8f8 !important;
   }
 
   .callout-icon {
@@ -320,8 +326,8 @@
 
   /* ── Copyright block ──────────────────────────────────────── */
   .copyright-block {
-    background: #f5f5f5;
-    border: 1pt solid #ccc;
+    background: #f5f5f5 !important;
+    border: 1pt solid #ccc !important;
   }
 
   .placeholder {
@@ -331,29 +337,29 @@
 
   /* ── Attribution template ─────────────────────────────────── */
   .attribution-template {
-    background: #f5f5f5;
-    border: 1pt solid #ccc;
+    background: #f5f5f5 !important;
+    border: 1pt solid #ccc !important;
   }
 
   .example-item {
-    background: #fafafa;
-    border: 1pt solid #ccc;
+    background: #fafafa !important;
+    border: 1pt solid #ccc !important;
   }
 
   .example-context {
-    background: #eee;
-    color: #333;
+    background: #eee !important;
+    color: #333 !important;
   }
 
   .not-required-box {
-    background: #f5f5f5;
-    border: 1pt solid #ccc;
+    background: #f5f5f5 !important;
+    border: 1pt solid #ccc !important;
   }
 
   /* ── Readability bar (fulltext tab) ───────────────────────── */
   .readability-bar {
-    background: #f5f5f5;
-    border: 1pt solid #ccc;
+    background: #f5f5f5 !important;
+    border: 1pt solid #ccc !important;
   }
 
   .bar-stat-score {
@@ -372,8 +378,8 @@
 
   /* ── Reference section ────────────────────────────────────── */
   .reference-section {
-    background: #fafafa;
-    border: 1pt solid #ccc;
+    background: #fafafa !important;
+    border: 1pt solid #ccc !important;
   }
 
   /* ── Fold dividers ────────────────────────────────────────── */
@@ -402,19 +408,19 @@
 
   /* ── Definition lists ─────────────────────────────────────── */
   .full-license-text dl.license-definitions {
-    border: 1pt solid #ccc;
-    background: #fafafa;
+    border: 1pt solid #ccc !important;
+    background: #fafafa !important;
   }
 
   .full-license-text dl.license-definitions dt {
-    border-top-color: #ddd;
-    background: #f5f5f5;
-    color: #1a1a1a;
+    border-top-color: #ddd !important;
+    background: #f5f5f5 !important;
+    color: #1a1a1a !important;
     font-weight: 700;
   }
 
   .full-license-text dl.license-definitions dd {
-    background: #fafafa;
+    background: #fafafa !important;
     color: #333;
   }
 

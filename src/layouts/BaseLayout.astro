@@ -170,6 +170,29 @@ if (toggle && mobileNav) {
     }
   });
 }
+
+// Print: force all <details> open and all tab panels visible
+window.addEventListener("beforeprint", () => {
+  document.querySelectorAll("details:not([open])").forEach((d) => {
+    d.setAttribute("open", "");
+    d.setAttribute("data-print-opened", "");
+  });
+  document.querySelectorAll<HTMLElement>(".tab-panel[hidden]").forEach((p) => {
+    p.removeAttribute("hidden");
+    p.setAttribute("data-print-shown", "");
+  });
+});
+
+window.addEventListener("afterprint", () => {
+  document.querySelectorAll("[data-print-opened]").forEach((d) => {
+    d.removeAttribute("open");
+    d.removeAttribute("data-print-opened");
+  });
+  document.querySelectorAll<HTMLElement>("[data-print-shown]").forEach((p) => {
+    p.setAttribute("hidden", "");
+    p.removeAttribute("data-print-shown");
+  });
+});
 </script>
 
 <style is:global>
