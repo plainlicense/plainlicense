@@ -415,6 +415,7 @@ fi
 tools.bun = "latest"
 run = '''
 bun run src/build/validate.ts
+bun run src/build/validate-mappings.ts
 bun run src/build/update-metrics.ts
 bunx astro sync
 bunx wrangler -c ./wrangler.json types

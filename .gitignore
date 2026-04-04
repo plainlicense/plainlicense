@@ -14,6 +14,7 @@ report.[0-9]_[0-9]_[0-9]_[0-9]_.json
 out/
 dist/
 public/exports/
+public/mappings/
 *.tgz
 coverage
 *.lcov
