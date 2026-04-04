@@ -102,7 +102,7 @@ if (toggleBtn) {
   align-items: center;
   gap: 0.4rem;
   background: transparent;
-  color: var(--sl-color-white, var(--text, #e8eaf0));
+  color: var(--sl-color-white);
   border: 1px solid var(--bg-border, var(--sl-color-gray-5));
   padding: 0.4rem 1rem;
   border-radius: 6px;
@@ -112,29 +112,29 @@ if (toggleBtn) {
   transition: all 0.15s;
 }
 .toggle-btn:hover {
-  border-color: var(--sl-color-accent, rgb(21, 219, 149));
-  color: var(--sl-color-accent, rgb(21, 219, 149));
+  border-color: var(--sl-color-accent);
+  color: var(--sl-color-accent);
   background: transparent;
 }
 .toggle-btn.active {
-  background: rgba(21, 219, 149, 0.1);
-  border-color: var(--sl-color-accent, rgb(21, 219, 149));
-  color: var(--sl-color-accent, rgb(21, 219, 149));
+  background: rgba(var(--emerald-rgb), 0.1);
+  border-color: var(--sl-color-accent);
+  color: var(--sl-color-accent);
 }
 .toggle-btn--disabled {
-  border-color: var(--sl-color-gray-4, #5a5f70);
-  color: var(--sl-color-gray-3, #8b90a0);
+  border-color: var(--sl-color-gray-4);
+  color: var(--sl-color-gray-3);
   cursor: not-allowed;
   opacity: 0.5;
 }
 .toggle-btn--disabled:hover {
   background: transparent;
-  color: var(--sl-color-gray-3, #8b90a0);
-  border-color: var(--sl-color-gray-4, #5a5f70);
+  color: var(--sl-color-gray-3);
+  border-color: var(--sl-color-gray-4);
 }
 .toggle-hint {
   font-size: 0.8rem;
-  color: var(--sl-color-gray-3, #8b90a0);
+  color: var(--sl-color-gray-3);
   margin: 0;
 }
 .toggle-icon {

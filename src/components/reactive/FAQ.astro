@@ -43,19 +43,19 @@ const displayItems =
 <style>
   .faq-component {
     margin: 2rem 0;
-    border: 1px solid #333;
+    border: 1px solid var(--sl-color-gray-5);
     border-radius: 8px;
     overflow: hidden;
   }
   .faq-item {
-    border-bottom: 1px solid #333;
+    border-bottom: 1px solid var(--sl-color-gray-5);
   }
   .faq-item:last-child {
     border-bottom: none;
   }
   summary {
     padding: 1rem;
-    background: #1a1c23;
+    background: var(--sl-color-gray-6);
     cursor: pointer;
     font-weight: bold;
     list-style: none;
@@ -69,16 +69,16 @@ const displayItems =
   summary::after {
     content: "+";
     font-size: 1.2rem;
-    color: #883aea;
+    color: var(--accent-purple);
   }
   details[open] summary::after {
     content: "−";
   }
   .faq-answer {
     padding: 1rem;
-    background: #0d0f14;
+    background: var(--sl-color-black);
     line-height: 1.6;
-    color: #ccc;
+    color: var(--sl-color-gray-2);
   }
   .faq-answer p {
     margin: 0;

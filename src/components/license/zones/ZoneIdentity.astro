@@ -127,9 +127,9 @@ const isSourceAvailable = license_family === "source-available";
   border-radius: 99px;
   font-size: var(--sl-text-xs);
   font-weight: 600;
-  background: rgba(228, 197, 129, 0.1);
-  color: rgb(228, 197, 129);
-  border: 1px solid rgba(228, 197, 129, 0.2);
+  background: rgba(var(--ecru-rgb), 0.1);
+  color: var(--ecru);
+  border: 1px solid rgba(var(--ecru-rgb), 0.2);
 }
 
 .maker-pitch {
@@ -160,8 +160,8 @@ const isSourceAvailable = license_family === "source-available";
 }
 
 .callout--important {
-  background: rgba(234, 140, 58, 0.1);
-  border: 1px solid rgba(234, 140, 58, 0.3);
+  background: rgba(var(--callout-orange-rgb), 0.1);
+  border: 1px solid rgba(var(--callout-orange-rgb), 0.3);
   color: var(--sl-color-gray-1);
 }
 
@@ -170,7 +170,7 @@ const isSourceAvailable = license_family === "source-available";
   height: 1.1rem;
   flex-shrink: 0;
   margin-top: 0.15rem;
-  color: rgb(234, 140, 58);
+  color: var(--callout-orange);
 }
 
 .tldr-block {

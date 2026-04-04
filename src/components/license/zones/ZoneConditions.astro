@@ -73,7 +73,7 @@ const cards = conditions
 <style>
 .zone-conditions {
   margin-bottom: 2.5rem;
-  background: rgba(228, 197, 129, 0.04);
+  background: rgba(var(--ecru-rgb), 0.04);
   border-radius: 12px;
   padding: 1.5rem;
 }
@@ -89,7 +89,7 @@ const cards = conditions
 }
 
 .zone-heading--conditions {
-  color: rgb(228, 197, 129);
+  color: var(--ecru);
 }
 
 .zone-heading-icon {
@@ -107,14 +107,14 @@ const cards = conditions
 .condition-card {
   background: var(--sl-color-gray-6);
   border: 1px solid var(--sl-color-gray-5);
-  border-left: 4px solid rgba(228, 197, 129, 0.5);
+  border-left: 4px solid rgba(var(--ecru-rgb), 0.5);
   border-radius: 0 8px 8px 0;
   padding: 1rem 1.25rem;
   transition: border-color 0.2s;
 }
 
 .condition-card:hover {
-  border-left-color: rgb(228, 197, 129);
+  border-left-color: var(--ecru);
 }
 
 .card-header {
@@ -128,7 +128,7 @@ const cards = conditions
   width: 1.15rem;
   height: 1.15rem;
   flex-shrink: 0;
-  color: rgb(228, 197, 129);
+  color: var(--ecru);
 }
 
 .card-label {
@@ -157,6 +157,6 @@ const cards = conditions
 }
 
 .card-why strong {
-  color: rgb(228, 197, 129);
+  color: var(--ecru);
 }
 </style>

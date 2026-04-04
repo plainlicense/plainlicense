@@ -102,7 +102,7 @@ const cards = limitations
 }
 
 .zone-restrictions--above-fold {
-  background: rgba(234, 100, 80, 0.04);
+  background: rgba(var(--restriction-red-rgb), 0.04);
   border-radius: 12px;
   padding: 1.5rem;
 }
@@ -118,7 +118,7 @@ const cards = limitations
 }
 
 .zone-heading--restrictions {
-  color: rgb(234, 100, 80);
+  color: var(--restriction-red);
 }
 
 .zone-heading-icon {
@@ -160,7 +160,7 @@ const cards = limitations
   width: 1rem;
   height: 1rem;
   flex-shrink: 0;
-  color: rgb(234, 100, 80);
+  color: var(--restriction-red);
 }
 
 .summary-heading {
@@ -198,7 +198,7 @@ details[open] .summary-arrow {
 .restriction-card {
   background: var(--sl-color-gray-6, rgba(0, 0, 0, 0.2));
   border: 1px solid var(--sl-color-gray-5);
-  border-left: 4px solid rgba(234, 100, 80, 0.5);
+  border-left: 4px solid rgba(var(--restriction-red-rgb), 0.5);
   border-radius: 0 8px 8px 0;
   padding: 0.9rem 1.1rem;
   transition: border-color 0.2s;
@@ -209,7 +209,7 @@ details[open] .summary-arrow {
 }
 
 .restriction-card:hover {
-  border-left-color: rgb(234, 100, 80);
+  border-left-color: var(--restriction-red);
 }
 
 .card-header {
@@ -223,7 +223,7 @@ details[open] .summary-arrow {
   width: 1.1rem;
   height: 1.1rem;
   flex-shrink: 0;
-  color: rgb(234, 100, 80);
+  color: var(--restriction-red);
 }
 
 .card-label {
@@ -246,12 +246,12 @@ details[open] .summary-arrow {
   color: var(--sl-color-gray-2);
   margin: 0;
   padding: 0.4rem 0.6rem;
-  background: rgba(234, 100, 80, 0.08);
+  background: rgba(var(--restriction-red-rgb), 0.08);
   border-radius: 4px;
   line-height: 1.4;
 }
 
 .card-why strong {
-  color: rgb(234, 140, 100);
+  color: var(--restriction-red-light);
 }
 </style>
