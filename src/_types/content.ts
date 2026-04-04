@@ -1,7 +1,7 @@
 import type {
-  InferCollectionOutput,
   authorsCollection,
   blogPostsCollection,
+  InferCollectionOutput,
   seriesCollection,
 } from "~cfg";
 

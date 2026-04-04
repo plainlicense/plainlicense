@@ -1,6 +1,6 @@
-import type { SveltiaLoader } from "astro-loader-sveltia-cms/schema";
-import type { ZodObject } from "astro/zod";
 import { defineCollection } from "astro:content";
+import type { ZodObject } from "astro/zod";
+import type { SveltiaLoader } from "astro-loader-sveltia-cms/schema";
 import {
   authorsCollection,
   blogPostsCollection,

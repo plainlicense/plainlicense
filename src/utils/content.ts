@@ -21,7 +21,7 @@ function escapeRegExp(str: string): string {
  * Case-sensitive to ensure consistent behaviour between plain/original extraction.
  */
 const ORIGINAL_SECTION_BOUNDARY = new RegExp(
-  `(^|\\n)---\\s*\\n(?=\\s*${escapeRegExp(ORIGINAL_LICENSE_HEADING)}\\b)`
+  `(^|\\n)---\\s*\\n(?=\\s*${escapeRegExp(ORIGINAL_LICENSE_HEADING)}\\b)`,
 );
 
 /**

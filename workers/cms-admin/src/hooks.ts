@@ -68,16 +68,13 @@ export function registerHooks() {
  * - title: falls back to plain_name if empty
  * - original.has_official_source: true when canonical_url is present
  */
-function resolveLicenseFields(
-  entry: ImmutableMap,
-  _author: EventAuthor,
-) {
+function resolveLicenseFields(entry: ImmutableMap, _author: EventAuthor) {
   let data = entry.get("data") as ImmutableMap;
 
   // Derive plain_id from original.spdx_id (or spdx_id for originals)
-  const originalSpdxId = (data.get("original") as ImmutableMap | undefined)?.get(
-    "spdx_id",
-  ) as string | undefined;
+  const originalSpdxId = (
+    data.get("original") as ImmutableMap | undefined
+  )?.get("spdx_id") as string | undefined;
   const spdxId = (data.get("spdx_id") as string | undefined) || originalSpdxId;
   if (spdxId) {
     data = data.set("plain_id", derivePlainId(spdxId));
@@ -95,9 +92,7 @@ function resolveLicenseFields(
   }
 
   // Derive original.has_official_source from canonical_url presence
-  const original = data.get("original") as
-    | ImmutableMap
-    | undefined;
+  const original = data.get("original") as ImmutableMap | undefined;
   if (original) {
     const canonicalUrl = original.get("canonical_url") as string | undefined;
     data = data.setIn(
@@ -110,7 +105,10 @@ function resolveLicenseFields(
     if (spdxId && isCacheReady()) {
       const cached = lookupSpdx(spdxId);
       if (cached) {
-        data = data.setIn(["original", "is_osi_approved"], cached.isOsiApproved);
+        data = data.setIn(
+          ["original", "is_osi_approved"],
+          cached.isOsiApproved,
+        );
         data = data.setIn(["original", "is_deprecated"], cached.isDeprecated);
 
         if (cached.permissions) {
@@ -134,10 +132,7 @@ function resolveLicenseFields(
  * - creation_date: set on first save if missing
  * - last_updated: always update to current timestamp
  */
-function resolveBlogPostFields(
-  entry: ImmutableMap,
-  _author: EventAuthor,
-) {
+function resolveBlogPostFields(entry: ImmutableMap, _author: EventAuthor) {
   let data = entry.get("data") as ImmutableMap;
   const now = new Date().toISOString();
 
@@ -157,10 +152,7 @@ function resolveBlogPostFields(
  * - email: placeholder (not available from GitHub OAuth)
  * - social_links.github: from author login
  */
-function resolveAuthorFields(
-  entry: ImmutableMap,
-  author: EventAuthor,
-) {
+function resolveAuthorFields(entry: ImmutableMap, author: EventAuthor) {
   let data = entry.get("data") as ImmutableMap;
   const isNew = entry.get("newRecord") as boolean | undefined;
 
@@ -172,9 +164,7 @@ function resolveAuthorFields(
     }
 
     // Pre-fill GitHub username from login
-    const github = data.getIn(["social_links", "github"]) as
-      | string
-      | undefined;
+    const github = data.getIn(["social_links", "github"]) as string | undefined;
     if (!github && author.login) {
       data = data.setIn(["social_links", "github"], author.login);
     }

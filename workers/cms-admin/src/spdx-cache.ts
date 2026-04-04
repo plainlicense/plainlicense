@@ -70,7 +70,10 @@ export function isCacheReady(): boolean {
 export function prefetchSpdxData(): void {
   // Fire and forget — don't await, don't block CMS init
   doPrefetch().catch((err) => {
-    console.warn("[spdx-cache] Prefetch failed, enrichment will be skipped:", err);
+    console.warn(
+      "[spdx-cache] Prefetch failed, enrichment will be skipped:",
+      err,
+    );
     initialized = true;
   });
 }
@@ -105,7 +108,10 @@ async function doPrefetch(): Promise<void> {
 
   // ── Phase 2: Enrich with GitHub Licenses API (choosealicense data) ──
 
-  if (ghListResult.status === "fulfilled" && Array.isArray(ghListResult.value)) {
+  if (
+    ghListResult.status === "fulfilled" &&
+    Array.isArray(ghListResult.value)
+  ) {
     const ghList = ghListResult.value;
 
     // Build spdx_id → GitHub API key mapping

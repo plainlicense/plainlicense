@@ -2,7 +2,7 @@
 /**
  * List of supported OAuth providers.
  *
- * This script is from [sveltia-cms-auth](https://github.com/sveltia/sveltia-cms-auth), modified for type safety and better error handling and removed gitlab-related code. 
+ * This script is from [sveltia-cms-auth](https://github.com/sveltia/sveltia-cms-auth), modified for type safety and better error handling and removed gitlab-related code.
  * The original script is licensed under MIT License Copyright (c) 2026 Kohei Yoshino.
  */
 const GITHUB_HOSTNAME = "github.com";
@@ -84,10 +84,7 @@ const outputHTML = ({
  * @param {Env} env - Environment variables.
  * @returns {Promise<Response>} HTTP response.
  */
-const handleAuth = async (
-  request: Request,
-  env: Env,
-): Promise<Response> => {
+const handleAuth = async (request: Request, env: Env): Promise<Response> => {
   const { url } = request;
   const { searchParams } = new URL(url);
   const provider = searchParams.get("provider");
@@ -100,9 +97,7 @@ const handleAuth = async (
     });
   }
 
-  const {
-    ALLOWED_DOMAINS,
-  } = env;
+  const { ALLOWED_DOMAINS } = env;
 
   const GITHUB_CLIENT_ID = await env.GITHUB_CLIENT_ID.get();
   const GITHUB_CLIENT_SECRET = await env.GITHUB_CLIENT_SECRET.get();
@@ -147,20 +142,19 @@ const handleAuth = async (
     authURL = `https://${GITHUB_HOSTNAME}/login/oauth/authorize?${params.toString()}`;
   }
 
-
-    // Redirect to the authorization server
-    return new Response("", {
-      status: 302,
-      headers: {
-        Location: authURL,
-        // Cookie expires in 10 minutes; Use `SameSite=Lax` to make sure the cookie is sent by the
-        // browser after redirect
-        "Set-Cookie":
-          `csrf-token=${provider}_${csrfToken}; ` +
-          `HttpOnly; Path=/; Max-Age=600; SameSite=Lax; Secure`,
-      },
-    });
-  };
+  // Redirect to the authorization server
+  return new Response("", {
+    status: 302,
+    headers: {
+      Location: authURL,
+      // Cookie expires in 10 minutes; Use `SameSite=Lax` to make sure the cookie is sent by the
+      // browser after redirect
+      "Set-Cookie":
+        `csrf-token=${provider}_${csrfToken}; ` +
+        `HttpOnly; Path=/; Max-Age=600; SameSite=Lax; Secure`,
+    },
+  });
+};
 
 /**
  * Handle the `callback` method, which is the second request in the authorization flow.
@@ -226,7 +220,6 @@ const handleCallback = async (
     client_secret: GITHUB_CLIENT_SECRET,
   };
 
-
   let response: Response | undefined;
   let token = "";
   let error = "";
@@ -276,10 +269,7 @@ export default {
    * @see https://developers.cloudflare.com/workers/runtime-apis/fetch/
    * @see https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps
    */
-  async fetch(
-    request: Request,
-    env: Env,
-  ): Promise<Response> {
+  async fetch(request: Request, env: Env): Promise<Response> {
     const { method, url } = request;
     const { pathname } = new URL(url);
 

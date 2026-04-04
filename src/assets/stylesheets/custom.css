@@ -174,7 +174,19 @@ html[data-is-blog] .sl-markdown-content {
 }
 
 /* Category Color System */
-.cat-permissive { --cat-color: var(--cat-permissive); --cat-color-rgb: var(--cat-permissive-rgb); }
-.cat-copyleft { --cat-color: var(--cat-copyleft); --cat-color-rgb: var(--cat-copyleft-rgb); }
-.cat-source-available { --cat-color: var(--cat-source-available); --cat-color-rgb: var(--cat-source-available-rgb); }
-.cat-public-domain { --cat-color: var(--cat-public-domain); --cat-color-rgb: var(--cat-public-domain-rgb); }
+.cat-permissive {
+  --cat-color: var(--cat-permissive);
+  --cat-color-rgb: var(--cat-permissive-rgb);
+}
+.cat-copyleft {
+  --cat-color: var(--cat-copyleft);
+  --cat-color-rgb: var(--cat-copyleft-rgb);
+}
+.cat-source-available {
+  --cat-color: var(--cat-source-available);
+  --cat-color-rgb: var(--cat-source-available-rgb);
+}
+.cat-public-domain {
+  --cat-color: var(--cat-public-domain);
+  --cat-color-rgb: var(--cat-public-domain-rgb);
+}

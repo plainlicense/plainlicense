@@ -1,8 +1,8 @@
 ---
+import type { Props } from "@astrojs/starlight/props";
 // Wrap starlight-blog's ThemeSelect override (which includes blog navigation)
 // but force dark mode and hide the theme toggle selector.
 import BlogThemeSelect from "starlight-blog/overrides/ThemeSelect.astro";
-import type { Props } from "@astrojs/starlight/props";
 ---
 
 <BlogThemeSelect {...Astro.props}><slot /></BlogThemeSelect>
