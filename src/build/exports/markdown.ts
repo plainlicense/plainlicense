@@ -1,17 +1,65 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import type { ExportContext } from "./index.ts";
+import {
+  convertDefinitionLists,
+  extractSemanticBlocks,
+  footnotesToInline,
+  semanticBlockToCmBlockquote,
+  semanticBlockToGfmAlert,
+  stripHtmlDivs,
+} from "./transforms.ts";
 import { licenseUrl } from "../../utils/constants";
 
 /**
+ * Applies GFM-specific transforms to license content.
+ * Pipeline: stripHtmlDivs → extractSemanticBlocks → GFM alerts.
+ * Footnotes and definition lists are kept as-is (GitHub renders them natively).
+ */
+function transformGfm(content: string): string {
+  let result = stripHtmlDivs(content);
+  const { content: withPlaceholders, blocks } = extractSemanticBlocks(result);
+  result = withPlaceholders;
+  for (const block of blocks) {
+    result = result.replace(
+      `{{rendered:${block.id}}}`,
+      semanticBlockToGfmAlert(block),
+    );
+  }
+  return result;
+}
+
+/**
+ * Applies CommonMark-specific transforms to license content.
+ * Pipeline: stripHtmlDivs → extractSemanticBlocks → CM blockquotes →
+ *           footnotesToInline → convertDefinitionLists.
+ */
+function transformCm(content: string): string {
+  let result = stripHtmlDivs(content);
+  const { content: withPlaceholders, blocks } = extractSemanticBlocks(result);
+  result = withPlaceholders;
+  for (const block of blocks) {
+    result = result.replace(
+      `{{rendered:${block.id}}}`,
+      semanticBlockToCmBlockquote(block),
+    );
+  }
+  result = footnotesToInline(result);
+  result = convertDefinitionLists(result, "markdown");
+  return result;
+}
+
+/**
  * Generates GitHub-flavored and CommonMark markdown exports.
+ * GFM uses alert syntax for semantic blocks; CM uses labelled blockquotes,
+ * inline footnotes, and converted definition lists.
  */
 export async function generateMarkdown(ctx: ExportContext) {
   const { plainId, version, content, metadata, outputDir } = ctx;
 
   const baseName = `${plainId}-${version}`;
 
-  // GFM Version (includes metadata header)
+  // GFM Version (includes metadata header + GFM-specific transforms)
   const gfmFileName = `${baseName}.gfm.md`;
   const gfmFilePath = path.join(outputDir, gfmFileName);
   const slug = metadata.license_family
@@ -20,12 +68,12 @@ export async function generateMarkdown(ctx: ExportContext) {
   const gfmHeader =
     `<!-- Plain License: ${plainId} ${version} -->\n` +
     `<!-- Attribution: ${licenseUrl(slug)} -->\n\n`;
-  const gfmContent = gfmHeader + content;
+  const gfmContent = gfmHeader + transformGfm(content);
 
-  // CommonMark Version (No comments, cleaner)
+  // CommonMark Version (no header, CM-specific transforms)
   const cmFileName = `${baseName}.cm.md`;
   const cmFilePath = path.join(outputDir, cmFileName);
-  const cmContent = content;
+  const cmContent = transformCm(content);
 
   await fs.mkdir(outputDir, { recursive: true });
   await Promise.all([
