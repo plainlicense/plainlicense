@@ -1,10 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { generateClauseHash } from "../../src/utils/hash.ts";
 import {
-  type MappingValidationResult,
   extractDivContent,
   validateMappingHashes,
 } from "../../src/build/validate-mappings.ts";
+import { generateClauseHash } from "../../src/utils/hash.ts";
 
 describe("extractDivContent", () => {
   it("should extract content from a single div", () => {
@@ -94,7 +93,11 @@ describe("validateMappingHashes", () => {
       "original-permissions": originalContent,
     };
 
-    const result = await validateMappingHashes(mapping, plainDivs, originalDivs);
+    const result = await validateMappingHashes(
+      mapping,
+      plainDivs,
+      originalDivs,
+    );
     expect(result.licenseId).toBe("MIT");
     expect(result.valid).toBe(true);
     expect(result.staleClauseIds).toHaveLength(0);
@@ -132,7 +135,11 @@ describe("validateMappingHashes", () => {
       "original-permissions": "Updated original content.",
     };
 
-    const result = await validateMappingHashes(mapping, plainDivs, originalDivs);
+    const result = await validateMappingHashes(
+      mapping,
+      plainDivs,
+      originalDivs,
+    );
     expect(result.valid).toBe(false);
     expect(result.staleClauseIds).toContain("plain-permissions");
     expect(result.staleClauseIds).toContain("original-permissions");
@@ -164,13 +171,22 @@ describe("validateMappingHashes", () => {
     const plainDivs: Record<string, string> = {};
     const originalDivs: Record<string, string> = {};
 
-    const result = await validateMappingHashes(mapping, plainDivs, originalDivs);
+    const result = await validateMappingHashes(
+      mapping,
+      plainDivs,
+      originalDivs,
+    );
     expect(result.valid).toBe(false);
     expect(result.missingIds).toContain("plain-nonexistent");
     expect(result.missingIds).toContain("original-nonexistent");
   });
 
-  it("should skip unmapped entries", async () => {
+  it("should validate the present side for unmapped entries", async () => {
+    const plainContent = "Unmapped plain clause.";
+    const originalContent = "Unmapped original clause.";
+    const plainHash = `sha256:${await generateClauseHash(plainContent)}`;
+    const originalHash = `sha256:${await generateClauseHash(originalContent)}`;
+
     const mapping = {
       license_id: "MIT",
       version: "1.0.0",
@@ -181,8 +197,8 @@ describe("validateMappingHashes", () => {
           type: "unmapped-plain",
           plain_clause: {
             id: "plain-extra",
-            hash: "sha256:0000000000000000000000000000000000000000000000000000000000000000",
-            content: "Unmapped plain clause.",
+            hash: plainHash,
+            content: plainContent,
           },
         },
         {
@@ -190,23 +206,63 @@ describe("validateMappingHashes", () => {
           type: "unmapped-original",
           original_clause: {
             id: "original-extra",
-            hash: "sha256:1111111111111111111111111111111111111111111111111111111111111111",
-            content: "Unmapped original clause.",
+            hash: originalHash,
+            content: originalContent,
           },
         },
       ],
     };
 
-    const plainDivs: Record<string, string> = {};
-    const originalDivs: Record<string, string> = {};
+    const plainDivs: Record<string, string> = {
+      "plain-extra": plainContent,
+    };
+    const originalDivs: Record<string, string> = {
+      "original-extra": originalContent,
+    };
 
-    const result = await validateMappingHashes(mapping, plainDivs, originalDivs);
+    const result = await validateMappingHashes(
+      mapping,
+      plainDivs,
+      originalDivs,
+    );
     expect(result.valid).toBe(true);
     expect(result.staleClauseIds).toHaveLength(0);
     expect(result.missingIds).toHaveLength(0);
   });
 
-  it("should handle plural clause keys (plain_clauses / original_clauses)", async () => {
+  it("should detect stale hash in unmapped-plain entry", async () => {
+    const mapping = {
+      license_id: "MIT",
+      version: "1.0.0",
+      mapping_philosophy: "clause-level",
+      mappings: [
+        {
+          id: "map-unmapped-stale",
+          type: "unmapped-plain",
+          plain_clause: {
+            id: "plain-extra",
+            hash: "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+            content: "Old unmapped content.",
+          },
+        },
+      ],
+    };
+
+    const plainDivs: Record<string, string> = {
+      "plain-extra": "Updated unmapped content.",
+    };
+    const originalDivs: Record<string, string> = {};
+
+    const result = await validateMappingHashes(
+      mapping,
+      plainDivs,
+      originalDivs,
+    );
+    expect(result.valid).toBe(false);
+    expect(result.staleClauseIds).toContain("plain-extra");
+  });
+
+  it("should handle plain_clause/original_clause as arrays (schema-valid many-to-* form)", async () => {
     const plainContent1 = "First plain clause.";
     const plainContent2 = "Second plain clause.";
     const originalContent = "Original clause.";
@@ -221,8 +277,8 @@ describe("validateMappingHashes", () => {
       mappings: [
         {
           id: "map-multi",
-          type: "one-to-many",
-          plain_clauses: [
+          type: "many-to-one",
+          plain_clause: [
             {
               id: "plain-a",
               hash: plainHash1,
@@ -251,7 +307,11 @@ describe("validateMappingHashes", () => {
       "original-a": originalContent,
     };
 
-    const result = await validateMappingHashes(mapping, plainDivs, originalDivs);
+    const result = await validateMappingHashes(
+      mapping,
+      plainDivs,
+      originalDivs,
+    );
     expect(result.valid).toBe(true);
     expect(result.staleClauseIds).toHaveLength(0);
     expect(result.missingIds).toHaveLength(0);

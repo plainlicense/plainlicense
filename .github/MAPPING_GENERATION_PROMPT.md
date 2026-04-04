@@ -85,16 +85,20 @@ Assign a confidence score and mapping type based on how the plain clause relates
 {
   "id": "map-{descriptive-kebab-case}",   // e.g. "map-permissions", "map-warranty"
   "type": "<type from schema enum>",
-  "plain_clause": {                        // or "plain_clauses" array for many-to-*
+  "plain_clause": {                        // single clause for one-to-one/one-to-many
     "id": "plain-{id}",                    // matches the div id in markdown
     "hash": "sha256:{64-char-hex}",
     "content": "<raw text from inside the div>"
   },
-  "original_clause": {                     // or "original_clauses" array for *-to-many
+  // For many-to-one or many-to-many, plain_clause is an array:
+  // "plain_clause": [{ "id": "plain-a", "hash": "sha256:...", "content": "..." }, ...],
+  "original_clause": {                     // single clause for one-to-one/many-to-one
     "id": "original-{id}",                 // matches the div id in markdown
     "hash": "sha256:{64-char-hex}",
     "content": "<raw text from inside the div>"
   },
+  // For one-to-many or many-to-many, original_clause is an array:
+  // "original_clause": [{ "id": "original-a", "hash": "sha256:...", "content": "..." }, ...],
   "confidence": 0.92,                      // float 0.0-1.0, or null for unmapped
   "semantic_tag": "permissions"             // see list below
 }

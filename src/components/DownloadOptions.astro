@@ -1,39 +1,22 @@
 ---
-import type { CollectionEntry, DataEntryMap } from "astro:content";
+import type { LicenseEntryT } from "../_types/licenses";
 import { derivePlainId } from "../utils/plain-id";
 import { ICONS } from "./license/icons";
 
 interface Props {
-  license: CollectionEntry<"licenses">;
+  license: LicenseEntryT;
   processedBody?: string;
 }
 
 const { license, processedBody } = Astro.props;
-const data = (license as unknown as DataEntryMap["licenses"]).data;
-if (!data) {
-  throw new Error("License data is missing or malformed.");
-}
-const loadedData = data as typeof data & {
-  spdx_id?: string;
-  plain_id?: string;
-  name?: string;
-  original?: { spdx_id: string };
-  plain_version: string;
-  plain_name: string;
-};
+const { data } = license;
 const clipboardContent = processedBody || license.body;
 
-const plainId =
-  loadedData.plain_id ||
-  derivePlainId(
-    loadedData.spdx_id ||
-      loadedData.original?.spdx_id ||
-      loadedData?.name ||
-      "unknown-license - this shouldn't happen",
-  );
-const version = loadedData.plain_version;
+const plainId = data.plain_id || derivePlainId(data.spdx_id || data.original?.spdx_id || "");
+const spdxDir = (data.spdx_id || data.original?.spdx_id || "").toLowerCase();
+const version = data.plain_version;
 const baseName = `${plainId}-${version}`;
-const exportBase = `/exports/${plainId.toLowerCase()}/${version}/`;
+const exportBase = `/exports/${spdxDir}/${version}/`;
 
 const formats = [
   {
@@ -68,13 +51,12 @@ const formats = [
   },
 ];
 
-const slug = plainId.toLowerCase();
-const embedUrl = `https://plainlicense.org/licenses/${slug}`;
+const embedUrl = `https://plainlicense.org/licenses/${data.license_family}/${spdxDir}`;
 const embedCode = `<iframe
   id="license-embed"
   src="${embedUrl}"
   style="width: 100%; height: 600px; border: none;"
-  title="${loadedData.plain_name}"
+  title="${data.plain_name}"
   loading="lazy"
   sandbox="allow-scripts allow-same-origin"
 ></iframe>`;
@@ -90,7 +72,7 @@ const embedCode = `<iframe
             href={format.path}
             class="download-card"
             download
-            aria-label={`Download ${loadedData.plain_name} as ${format.name} (${format.ext})`}
+            aria-label={`Download ${data.plain_name} as ${format.name} (${format.ext})`}
           >
             <svg
               class="format-icon"

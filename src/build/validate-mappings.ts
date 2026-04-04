@@ -14,10 +14,8 @@ export interface ClauseRef {
 interface MappingEntry {
   id: string;
   type: string;
-  plain_clause?: ClauseRef;
-  original_clause?: ClauseRef;
-  plain_clauses?: ClauseRef[];
-  original_clauses?: ClauseRef[];
+  plain_clause?: ClauseRef | ClauseRef[] | null;
+  original_clause?: ClauseRef | ClauseRef[] | null;
   [key: string]: unknown;
 }
 
@@ -41,13 +39,13 @@ export interface MappingValidationResult {
 /**
  * Extracts text inside `<div id="...">...</div>` blocks.
  * Returns a map of id → trimmed inner content.
+ * Handles optional whitespace/newlines around the div tags.
  */
 export function extractDivContent(md: string): Record<string, string> {
   const result: Record<string, string> = {};
-  const regex = /<div\s+id="([^"]+)">\s*\n([\s\S]*?)\n<\/div>/g;
-  let match: RegExpExecArray | null;
+  const regex = /<div\s+id="([^"]+)"[^>]*>\s*([\s\S]*?)\s*<\/div>/g;
 
-  while ((match = regex.exec(md)) !== null) {
+  for (const match of md.matchAll(regex)) {
     const id = match[1];
     const content = match[2].trim();
     result[id] = content;
@@ -57,32 +55,31 @@ export function extractDivContent(md: string): Record<string, string> {
 }
 
 /**
- * Collects all clause refs from a mapping entry, normalizing
- * singular (plain_clause/original_clause) and plural
- * (plain_clauses/original_clauses) keys into a flat array
- * with a side indicator.
+ * Collects all clause refs from a mapping entry.
+ * Handles `plain_clause`/`original_clause` as either a single object or
+ * an array (per the mapping schema's oneOf definition).
  */
 function collectClauseRefs(
   entry: MappingEntry,
 ): Array<{ ref: ClauseRef; side: "plain" | "original" }> {
   const refs: Array<{ ref: ClauseRef; side: "plain" | "original" }> = [];
 
-  if (entry.plain_clause) {
-    refs.push({ ref: entry.plain_clause, side: "plain" });
-  }
-  if (entry.plain_clauses) {
-    for (const clause of entry.plain_clauses) {
-      refs.push({ ref: clause, side: "plain" });
+  const addRefs = (
+    value: ClauseRef | ClauseRef[] | null | undefined,
+    side: "plain" | "original",
+  ) => {
+    if (!value) return;
+    if (Array.isArray(value)) {
+      for (const clause of value) {
+        refs.push({ ref: clause, side });
+      }
+    } else {
+      refs.push({ ref: value, side });
     }
-  }
-  if (entry.original_clause) {
-    refs.push({ ref: entry.original_clause, side: "original" });
-  }
-  if (entry.original_clauses) {
-    for (const clause of entry.original_clauses) {
-      refs.push({ ref: clause, side: "original" });
-    }
-  }
+  };
+
+  addRefs(entry.plain_clause, "plain");
+  addRefs(entry.original_clause, "original");
 
   return refs;
 }
@@ -104,14 +101,6 @@ export async function validateMappingHashes(
   };
 
   for (const entry of mapping.mappings) {
-    // Skip unmapped entries
-    if (
-      entry.type === "unmapped-plain" ||
-      entry.type === "unmapped-original"
-    ) {
-      continue;
-    }
-
     const clauseRefs = collectClauseRefs(entry);
 
     for (const { ref, side } of clauseRefs) {
@@ -181,9 +170,7 @@ async function findLicenseFile(spdxId: string): Promise<string | null> {
     const files = await fs.readdir(catDir);
 
     for (const file of files) {
-      if (
-        file.toLowerCase() === `${spdxId.toLowerCase()}.md`
-      ) {
+      if (file.toLowerCase() === `${spdxId.toLowerCase()}.md`) {
         return path.join(catDir, file);
       }
     }
@@ -240,9 +227,7 @@ export async function validateAllMappings(): Promise<
         valid: false,
         staleClauseIds: [],
         missingIds: [],
-        errors: [
-          `License file not found for ${mapping.license_id}`,
-        ],
+        errors: [`License file not found for ${mapping.license_id}`],
       });
       continue;
     }
@@ -260,7 +245,11 @@ export async function validateAllMappings(): Promise<
     const plainDivs = extractDivContent(plain);
     const originalDivs = extractDivContent(original);
 
-    const result = await validateMappingHashes(mapping, plainDivs, originalDivs);
+    const result = await validateMappingHashes(
+      mapping,
+      plainDivs,
+      originalDivs,
+    );
     results.push(result);
   }
 
@@ -301,14 +290,10 @@ async function main() {
         }
       }
       if (result.staleClauseIds.length > 0) {
-        console.error(
-          `   Stale: ${result.staleClauseIds.join(", ")}`,
-        );
+        console.error(`   Stale: ${result.staleClauseIds.join(", ")}`);
       }
       if (result.missingIds.length > 0) {
-        console.error(
-          `   Missing: ${result.missingIds.join(", ")}`,
-        );
+        console.error(`   Missing: ${result.missingIds.join(", ")}`);
       }
       // Remove stale mapping from public/mappings/ if it exists
       const destFile = path.join(

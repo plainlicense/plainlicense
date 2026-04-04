@@ -133,7 +133,11 @@ const renderedPlainHtml = renderMarkdownWithDivs(fullTextBody);
 
     <!-- Full License Text panel -->
     <div id="panel-fulltext" role="tabpanel" aria-labelledby="tab-fulltext" class="tab-panel" hidden>
-      {data.has_mapping && <ComparisonToggle hasMapping={true} />}
+      {data.has_mapping && (
+        <div id="comparison-toggle-wrapper" hidden>
+          <ComparisonToggle hasMapping={true} />
+        </div>
+      )}
       <div class="license-layout">
         <div class="license-column plain-version">
           <article class="full-license-text prose" set:html={renderedPlainHtml} />
@@ -176,8 +180,13 @@ const spdxId = container?.dataset.spdxId;
 
 if (spdxId) {
   fetch(`/mappings/${spdxId}-mapping.json`)
-    .then((res) => res.json())
+    .then((res) => {
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return res.json();
+    })
     .then((mappingData) => {
+      const wrapper = document.getElementById("comparison-toggle-wrapper");
+      if (wrapper) wrapper.hidden = false;
       initMappingViewer(mappingData);
     })
     .catch(() => {

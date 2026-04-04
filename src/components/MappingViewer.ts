@@ -3,13 +3,13 @@
  * Implements hover highlighting and SVG connectors between plain and original sections.
  */
 
+type ClauseRef = { id: string; content: string };
+
 type LicenseMapping = {
   id: string;
   type: string;
-  plain_clause?: { id: string; content: string };
-  plain_clauses: { id: string; content: string }[];
-  original_clause?: { id: string; content: string };
-  original_clauses: { id: string; content: string }[];
+  plain_clause?: ClauseRef | ClauseRef[] | null;
+  original_clause?: ClauseRef | ClauseRef[] | null;
 };
 
 type LicenseMappings = {
@@ -40,13 +40,16 @@ export function initMappingViewer(mappingData: LicenseMappings) {
   } | null = null;
 
   mappings.forEach((mapping: LicenseMapping) => {
-    // ... support both old and new mapping structure ...
-    const plainClauses =
-      mapping.plain_clauses ||
-      (mapping.plain_clause ? [mapping.plain_clause] : []);
-    const originalClauses =
-      mapping.original_clauses ||
-      (mapping.original_clause ? [mapping.original_clause] : []);
+    const plainClauses = Array.isArray(mapping.plain_clause)
+      ? mapping.plain_clause
+      : mapping.plain_clause
+        ? [mapping.plain_clause]
+        : [];
+    const originalClauses = Array.isArray(mapping.original_clause)
+      ? mapping.original_clause
+      : mapping.original_clause
+        ? [mapping.original_clause]
+        : [];
 
     const plainEls = plainClauses
       .map((c: { id: string; content: string }) =>
