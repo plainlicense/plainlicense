@@ -1,6 +1,6 @@
 # Design Overhaul Implementation Plan
 
-> **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
+> **Implementation note:** Execute this plan task-by-task.
 
 **Goal:** Unify the site's visual identity, fix broken elements (logo, theme consistency), improve typography, add visual hierarchy with category color-coding, and fill content gaps on the homepage.
 
