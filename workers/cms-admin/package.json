@@ -36,6 +36,11 @@
     "predev": "bunx astro sync && bunx wrangler types",
     "preview": "bunx astro build && bunx astro preview"
   },
+  "trustedDependencies": [
+    "bun",
+    "@parcel/watcher",
+    "@swc/core"
+  ],
   "type": "module",
   "version": "0.0.1"
 }

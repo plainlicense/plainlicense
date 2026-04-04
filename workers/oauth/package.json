@@ -33,5 +33,10 @@
     "deploy": "bunx wrangler deploy",
     "prebuild": "bunx wrangler types"
   },
+  "trustedDependencies": [
+    "bun",
+    "@parcel/watcher",
+    "@swc/core"
+  ],
   "version": "0.1.0"
 }

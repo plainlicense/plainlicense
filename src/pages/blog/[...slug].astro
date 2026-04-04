@@ -1,0 +1,569 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getCollection } from "astro:content";
+import { marked } from "marked";
+import "../../assets/stylesheets/custom.css";
+
+export const prerender = true;
+
+export async function getStaticPaths() {
+  const allPosts = await getCollection("blogPosts");
+  const posts = allPosts.filter(
+    (p) => import.meta.env.DEV || p.data.status === "published",
+  );
+
+  return posts.map((post) => {
+    const slug = post.id.replace(/^posts\//, "").replace(/\.mdx?$/, "");
+    return {
+      params: { slug },
+      props: { post },
+    };
+  });
+}
+
+const { post } = Astro.props;
+const { data } = post;
+
+const authors = await getCollection("authors");
+const tags = await getCollection("blogTags");
+const seriesEntries = await getCollection("series");
+const allPosts = await getCollection("blogPosts");
+const published = allPosts
+  .filter((p) => import.meta.env.DEV || p.data.status === "published")
+  .sort((a, b) => {
+    const da = a.data.publication_date || a.data.creation_date || "";
+    const db = b.data.publication_date || b.data.creation_date || "";
+    return new Date(db).getTime() - new Date(da).getTime();
+  });
+
+// Find prev/next posts
+const currentSlug = post.id.replace(/^posts\//, "").replace(/\.mdx?$/, "");
+const currentIdx = published.findIndex(
+  (p) => p.id.replace(/^posts\//, "").replace(/\.mdx?$/, "") === currentSlug,
+);
+const prevPost = currentIdx < published.length - 1 ? published[currentIdx + 1] : null;
+const nextPost = currentIdx > 0 ? published[currentIdx - 1] : null;
+
+function getPostSlug(p: typeof post) {
+  return p.id.replace(/^posts\//, "").replace(/\.mdx?$/, "");
+}
+
+function resolveAuthor(uuid: string) {
+  return authors.find((a) => a.data.uuid === uuid);
+}
+
+function readingTime(body: string): string {
+  const words = body.trim().split(/\s+/).length;
+  const minutes = Math.max(1, Math.round(words / 230));
+  return `${minutes} min read`;
+}
+
+function formatDate(date: string | undefined): string {
+  if (!date) return "";
+  return new Date(date).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+}
+
+const postAuthors = (data.authors ?? [])
+  .map((uuid: string) => resolveAuthor(uuid))
+  .filter(Boolean);
+
+const postTags = (Array.isArray(data.tags) ? data.tags : data.tags ? [data.tags] : [])
+  .map((uuid: string) => tags.find((t) => t.data.uuid === uuid))
+  .filter(Boolean);
+
+const postSeries = data.series
+  ? seriesEntries.find((s) => s.data.uuid === data.series)
+  : null;
+
+// Resolve other posts in the same series for navigation
+const seriesPosts = postSeries
+  ? published
+      .filter((p) => p.data.series === data.series)
+      .sort((a, b) => {
+        const da = a.data.publication_date || a.data.creation_date || "";
+        const db = b.data.publication_date || b.data.creation_date || "";
+        return new Date(da).getTime() - new Date(db).getTime();
+      })
+  : [];
+
+const date = formatDate(data.publication_date || data.creation_date);
+
+// Strip leading h1 if it duplicates the frontmatter title
+let bodyText = (post.body ?? "").trim();
+const leadingH1 = bodyText.match(/^#\s+(.+)\n*/);
+if (leadingH1 && leadingH1[1].trim() === data.title.trim()) {
+  bodyText = bodyText.slice(leadingH1[0].length);
+}
+const renderedBody = marked.parse(bodyText) as string;
+
+const CATEGORY_LABELS: Record<string, string> = {
+  announcements: "Announcements",
+  guides: "Guides",
+  updates: "Updates",
+  community: "Community",
+  "license-talk": "License Talk",
+};
+---
+
+<BaseLayout title={data.title} description={data.description}>
+  <article class="blog-post">
+    <header class="post-header">
+      <a href="/blog/" class="back-link">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
+        All posts
+      </a>
+
+      {data.title_image && (
+        <img
+          src={data.title_image}
+          alt=""
+          class="post-cover"
+          loading="eager"
+        />
+      )}
+
+      {data.category && (
+        <span class="post-category">{CATEGORY_LABELS[data.category] ?? data.category}</span>
+      )}
+
+      <h1>{data.title}</h1>
+
+      <div class="post-meta">
+        {postAuthors.length > 0 && (
+          <div class="post-authors">
+            {postAuthors.map((author: any) => (
+              <span class="post-author">
+                {author.data.avatar && (
+                  <img
+                    src={author.data.avatar}
+                    alt=""
+                    class="author-avatar"
+                    width="24"
+                    height="24"
+                    loading="lazy"
+                  />
+                )}
+                {author.data.url ? (
+                  <a href={author.data.url} target="_blank" rel="noopener noreferrer">{author.data.name}</a>
+                ) : (
+                  author.data.name
+                )}
+              </span>
+            ))}
+          </div>
+        )}
+        <div class="post-details">
+          {date && <time>{date}</time>}
+          <span class="meta-dot" aria-hidden="true">&middot;</span>
+          <span>{readingTime(post.body ?? "")}</span>
+        </div>
+      </div>
+
+      {postTags.length > 0 && (
+        <div class="post-tags">
+          {postTags.map((tag: any) => (
+            <span class="post-tag">{tag.data.name}</span>
+          ))}
+        </div>
+      )}
+    </header>
+
+    {postSeries && seriesPosts.length > 1 && (
+      <nav class="series-nav" aria-label={`Series: ${postSeries.data.name}`}>
+        <div class="series-header">
+          <span class="series-label">Series</span>
+          <strong class="series-name">{postSeries.data.name}</strong>
+          {postSeries.data.tagline && (
+            <span class="series-tagline">{postSeries.data.tagline}</span>
+          )}
+        </div>
+        <ol class="series-list">
+          {seriesPosts.map((sp) => {
+            const spSlug = getPostSlug(sp);
+            const isCurrent = spSlug === currentSlug;
+            return (
+              <li class:list={{ "series-current": isCurrent }}>
+                {isCurrent ? (
+                  <span>{sp.data.title}</span>
+                ) : (
+                  <a href={`/blog/${spSlug}/`}>{sp.data.title}</a>
+                )}
+              </li>
+            );
+          })}
+        </ol>
+      </nav>
+    )}
+
+    <div class="post-body prose" set:html={renderedBody} />
+
+    {(prevPost || nextPost) && (
+      <nav class="post-nav" aria-label="Post navigation">
+        {prevPost ? (
+          <a href={`/blog/${getPostSlug(prevPost)}/`} class="nav-prev">
+            <span class="nav-label">Older</span>
+            <span class="nav-title">{prevPost.data.title}</span>
+          </a>
+        ) : <div />}
+        {nextPost ? (
+          <a href={`/blog/${getPostSlug(nextPost)}/`} class="nav-next">
+            <span class="nav-label">Newer</span>
+            <span class="nav-title">{nextPost.data.title}</span>
+          </a>
+        ) : <div />}
+      </nav>
+    )}
+  </article>
+</BaseLayout>
+
+<style>
+.blog-post {
+  max-width: 50rem;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 4rem;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.85rem;
+  color: var(--text-muted, #8b90a0);
+  text-decoration: none;
+  margin-bottom: 2rem;
+  transition: color 0.15s;
+}
+
+.back-link:hover {
+  color: rgb(21, 219, 149);
+}
+
+.post-header {
+  margin-bottom: 2.5rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid var(--bg-border, #242836);
+}
+
+.post-cover {
+  width: 100%;
+  max-height: 320px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 1.25rem;
+}
+
+.post-category {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: rgb(21, 219, 149);
+  background: rgba(21, 219, 149, 0.1);
+  border: 1px solid rgba(21, 219, 149, 0.25);
+  border-radius: 4px;
+  padding: 0.15em 0.5em;
+  margin-bottom: 1rem;
+}
+
+.post-header h1 {
+  font-family: var(--font-heading, "Plus Jakarta Sans", sans-serif);
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  line-height: 1.2;
+  margin: 0 0 1.25rem;
+  color: var(--text, #e8eaf0);
+}
+
+.post-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.85rem;
+  color: var(--text-muted, #8b90a0);
+}
+
+.post-authors {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.post-author {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.post-author a {
+  color: var(--text-muted, #8b90a0);
+  text-decoration: none;
+}
+
+.post-author a:hover {
+  color: rgb(21, 219, 149);
+}
+
+.author-avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+}
+
+.post-details {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.meta-dot {
+  opacity: 0.4;
+}
+
+.post-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.75rem;
+}
+
+.post-tag {
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: var(--text-muted, #8b90a0);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--bg-border, #242836);
+  border-radius: 3px;
+  padding: 0.15em 0.5em;
+}
+
+/* ── Series nav ── */
+.series-nav {
+  margin-bottom: 2.5rem;
+  padding: 1.25rem;
+  background: var(--bg-surface, #161923);
+  border: 1px solid var(--bg-border, #242836);
+  border-left: 3px solid rgb(21, 219, 149);
+  border-radius: 8px;
+}
+
+.series-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  margin-bottom: 0.75rem;
+}
+
+.series-label {
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: rgb(21, 219, 149);
+}
+
+.series-name {
+  font-family: var(--font-heading, "Plus Jakarta Sans", sans-serif);
+  font-size: 0.95rem;
+  color: var(--text, #e8eaf0);
+}
+
+.series-tagline {
+  font-size: 0.8rem;
+  font-style: italic;
+  color: var(--text-muted, #8b90a0);
+}
+
+.series-list {
+  margin: 0;
+  padding-left: 1.25rem;
+  font-size: 0.85rem;
+  line-height: 1.8;
+}
+
+.series-list a {
+  color: var(--text-muted, #8b90a0);
+  text-decoration: none;
+}
+
+.series-list a:hover {
+  color: rgb(21, 219, 149);
+}
+
+.series-current {
+  font-weight: 600;
+  color: var(--text, #e8eaf0);
+}
+
+/* ── Post body ── */
+.post-body {
+  font-size: 1rem;
+  line-height: 1.8;
+  color: var(--text, #e8eaf0);
+}
+
+.post-body :global(h1) {
+  font-family: var(--font-heading, "Plus Jakarta Sans", sans-serif);
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--text, #e8eaf0);
+  margin: 2.5rem 0 1rem;
+  letter-spacing: -0.02em;
+}
+
+.post-body :global(h2) {
+  font-family: var(--font-heading, "Plus Jakarta Sans", sans-serif);
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--text, #e8eaf0);
+  margin: 2rem 0 0.75rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid var(--bg-border, #242836);
+}
+
+.post-body :global(h3) {
+  font-family: var(--font-heading, "Plus Jakarta Sans", sans-serif);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text, #e8eaf0);
+  margin: 1.5rem 0 0.5rem;
+}
+
+.post-body :global(p) {
+  margin: 0 0 1.25rem;
+}
+
+.post-body :global(ul),
+.post-body :global(ol) {
+  margin: 0 0 1.25rem;
+  padding-left: 1.5rem;
+}
+
+.post-body :global(li) {
+  margin-bottom: 0.4rem;
+}
+
+.post-body :global(strong) {
+  color: var(--text, #e8eaf0);
+  font-weight: 600;
+}
+
+.post-body :global(a) {
+  color: rgb(21, 219, 149);
+  text-underline-offset: 3px;
+}
+
+.post-body :global(a:hover) {
+  color: rgb(106, 241, 194);
+}
+
+.post-body :global(blockquote) {
+  border-left: 3px solid rgb(21, 219, 149);
+  margin: 1.5rem 0;
+  padding: 0.5rem 0 0.5rem 1.25rem;
+  color: var(--text-muted, #8b90a0);
+}
+
+.post-body :global(code) {
+  font-family: var(--sl-font-mono, "JetBrains Mono", monospace);
+  background: var(--bg-surface, #161923);
+  border: 1px solid var(--bg-border, #242836);
+  border-radius: 4px;
+  padding: 0.1em 0.35em;
+  font-size: 0.875em;
+}
+
+.post-body :global(pre) {
+  background: var(--bg-surface, #161923);
+  border: 1px solid var(--bg-border, #242836);
+  border-radius: 8px;
+  padding: 1rem;
+  overflow-x: auto;
+  margin: 1.5rem 0;
+}
+
+.post-body :global(pre code) {
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+.post-body :global(img) {
+  max-width: 100%;
+  border-radius: 8px;
+  margin: 1.5rem 0;
+}
+
+.post-body :global(hr) {
+  border: none;
+  border-top: 1px solid var(--bg-border, #242836);
+  margin: 2rem 0;
+}
+
+/* ── Prev/Next nav ── */
+.post-nav {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--bg-border, #242836);
+}
+
+.nav-prev,
+.nav-next {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 1rem;
+  border: 1px solid var(--bg-border, #242836);
+  border-radius: 8px;
+  text-decoration: none;
+  transition:
+    border-color 0.2s,
+    background 0.2s;
+}
+
+.nav-prev:hover,
+.nav-next:hover {
+  border-color: rgba(21, 219, 149, 0.3);
+  background: rgba(21, 219, 149, 0.04);
+}
+
+.nav-next {
+  text-align: right;
+}
+
+.nav-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted, #8b90a0);
+}
+
+.nav-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text, #e8eaf0);
+  line-height: 1.3;
+}
+
+@media (max-width: 640px) {
+  .blog-post {
+    padding: 1.5rem 1rem 3rem;
+  }
+  .post-header h1 {
+    font-size: 1.5rem;
+  }
+  .post-nav {
+    grid-template-columns: 1fr;
+  }
+}
+</style>

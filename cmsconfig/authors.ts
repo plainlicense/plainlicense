@@ -3,7 +3,7 @@ import { defineCollection } from "./utils";
 export const authorsCollection = defineCollection({
   name: "authors",
   label: "Authors",
-  folder: "/content/authors",
+  folder: "content/authors",
   create: true,
   icon: "user_attributes",
   extension: "toml",

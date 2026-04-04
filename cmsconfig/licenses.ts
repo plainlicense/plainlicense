@@ -345,6 +345,15 @@ export const licensesCollection = defineCollection({
           hint: "The URL of the official source for the license text, if it has one. This is used in the 'original text' comparison view to link to the original license.",
         },
         {
+          label: "Gunning Fog of original license text",
+          name: "original_gunning_fog",
+          widget: "hidden",
+          readonly: true,
+          default: 0,
+          value_type: "float",
+          required: false,
+        },
+        {
           label:
             "Does the original text include a link to its own canonical URL?",
           name: "link_in_original",

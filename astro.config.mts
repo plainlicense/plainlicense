@@ -13,7 +13,6 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import rehypeExternalLinks from "rehype-external-links";
 import starlightAutoDrafts from "starlight-auto-drafts";
-import starlightBlog from "starlight-blog";
 import starlightHeadingBadges from "starlight-heading-badges";
 import starlightLLMsTxt from "starlight-llms-txt";
 import starlightPageActions from "starlight-page-actions";
@@ -346,20 +345,6 @@ export default defineConfig({
       },
       sidebar: buildSidebar(),
       plugins: [
-        starlightBlog({
-          authors: {
-            adam: {
-              name: "Adam Poulemanos",
-              url: "https://github.com/bashandbone",
-              picture: "https://avatars.githubusercontent.com/u/89049923?v=4",
-              title: "Founder",
-            },
-          },
-          metrics: {
-            readingTime: true,
-          },
-          rss: true,
-        }),
         starlightAutoDrafts(),
         starlightHeadingBadges(),
         starlightPageActions({
@@ -480,7 +465,7 @@ export default defineConfig({
       },
     },
     optimizeDeps: {
-      exclude: ["starlight-blog", "starlight-auto-drafts", "starlight-tags"],
+      exclude: ["starlight-auto-drafts", "starlight-tags"],
     },
     plugins: [tsConfigPaths()],
     server: {

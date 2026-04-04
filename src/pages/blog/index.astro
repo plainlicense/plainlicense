@@ -1,0 +1,439 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getCollection } from "astro:content";
+import "../../assets/stylesheets/custom.css";
+
+export const prerender = true;
+
+const allPosts = await getCollection("blogPosts");
+const authors = await getCollection("authors");
+const tags = await getCollection("blogTags");
+const seriesEntries = await getCollection("series");
+
+const posts = allPosts
+  .filter((p) => import.meta.env.DEV || p.data.status === "published")
+  .sort((a, b) => {
+    // Featured posts first, then by date
+    if (a.data.featured && !b.data.featured) return -1;
+    if (!a.data.featured && b.data.featured) return 1;
+    const da = a.data.publication_date || a.data.creation_date || "";
+    const db = b.data.publication_date || b.data.creation_date || "";
+    return new Date(db).getTime() - new Date(da).getTime();
+  });
+
+function resolveAuthor(uuid: string) {
+  return authors.find((a) => a.data.uuid === uuid);
+}
+
+function resolveTag(uuid: string) {
+  return tags.find((t) => t.data.uuid === uuid);
+}
+
+function resolveSeries(uuid: string) {
+  return seriesEntries.find((s) => s.data.uuid === uuid);
+}
+
+function readingTime(body: string): string {
+  const words = body.trim().split(/\s+/).length;
+  const minutes = Math.max(1, Math.round(words / 230));
+  return `${minutes} min read`;
+}
+
+function formatDate(date: string | undefined): string {
+  if (!date) return "";
+  return new Date(date).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+}
+
+const CATEGORY_LABELS: Record<string, string> = {
+  announcements: "Announcements",
+  guides: "Guides",
+  updates: "Updates",
+  community: "Community",
+  "license-talk": "License Talk",
+};
+---
+
+<BaseLayout
+  title="Blog"
+  description="News, guides, and updates from the Plain License project."
+>
+  <div class="blog-hero">
+    <div class="blog-hero-inner">
+      <h1>Blog</h1>
+      <p class="blog-hero-sub">
+        News, guides, and updates from the Plain License project.
+      </p>
+    </div>
+  </div>
+
+  <div class="blog-content">
+    {posts.length === 0 ? (
+      <p class="no-posts">No posts yet. Check back soon.</p>
+    ) : (
+      <div class="post-grid">
+        {posts.map((post) => {
+          const postAuthors = (post.data.authors ?? [])
+            .map((uuid: string) => resolveAuthor(uuid))
+            .filter(Boolean);
+          const postTags = (Array.isArray(post.data.tags) ? post.data.tags : post.data.tags ? [post.data.tags] : [])
+            .map((uuid: string) => resolveTag(uuid))
+            .filter(Boolean);
+          const postSeries = post.data.series ? resolveSeries(post.data.series) : null;
+          const date = formatDate(post.data.publication_date || post.data.creation_date);
+          const category = post.data.category;
+          const slug = post.id.replace(/^posts\//, "").replace(/\.mdx?$/, "");
+          return (
+            <a href={`/blog/${slug}/`} class:list={["post-card", { "post-card--featured": post.data.featured, "post-card--has-image": !!post.data.title_image }]}>
+              {post.data.title_image && (
+                <img
+                  src={post.data.title_image}
+                  alt=""
+                  class="post-cover"
+                  loading="lazy"
+                />
+              )}
+              <div class="post-card-body">
+              <div class="post-badges">
+                {post.data.featured && <span class="featured-badge">Featured</span>}
+                {category && (
+                  <span class="post-category">{CATEGORY_LABELS[category] ?? category}</span>
+                )}
+              </div>
+              <h2>{post.data.title}</h2>
+              {postSeries && (
+                <span class="post-series">Part of: {postSeries.data.name}</span>
+              )}
+              {post.data.description && <p class="post-excerpt">{post.data.description}</p>}
+              <div class="post-meta">
+                {postAuthors.length > 0 && (
+                  <div class="post-authors">
+                    {postAuthors.map((author: any) => (
+                      <span class="post-author">
+                        {author.data.avatar && (
+                          <img
+                            src={author.data.avatar}
+                            alt=""
+                            class="author-avatar"
+                            width="20"
+                            height="20"
+                            loading="lazy"
+                          />
+                        )}
+                        {author.data.name}
+                      </span>
+                    ))}
+                  </div>
+                )}
+                <div class="post-details">
+                  {date && <span>{date}</span>}
+                  <span class="meta-dot" aria-hidden="true">&middot;</span>
+                  <span>{readingTime(post.body ?? "")}</span>
+                </div>
+              </div>
+              {postTags.length > 0 && (
+                <div class="post-tags">
+                  {postTags.map((tag: any) => (
+                    <span class="post-tag">{tag.data.name}</span>
+                  ))}
+                </div>
+              )}
+              <span class="post-arrow" aria-hidden="true">&rarr;</span>
+              </div>
+            </a>
+          );
+        })}
+      </div>
+    )}
+
+    <div class="blog-rss">
+      <a href="/blog/rss.xml" class="rss-link">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 11a9 9 0 0 1 9 9"/><path d="M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1"/></svg>
+        RSS Feed
+      </a>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+.blog-hero {
+  padding: 4rem 1.5rem 3rem;
+  text-align: center;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(21, 219, 149, 0.08), transparent),
+    radial-gradient(ellipse 60% 40% at 80% 60%, rgba(var(--zaffre-rgb, 13, 25, 163), 0.06), transparent);
+  border-bottom: 1px solid var(--bg-border, #242836);
+}
+
+.blog-hero-inner {
+  max-width: 48rem;
+  margin: 0 auto;
+}
+
+.blog-hero h1 {
+  font-family: var(--font-heading, "Plus Jakarta Sans", sans-serif);
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  margin: 0 0 0.75rem;
+  color: var(--text, #e8eaf0);
+}
+
+.blog-hero-sub {
+  font-size: 1.1rem;
+  color: var(--text-muted, #8b90a0);
+  margin: 0;
+  line-height: 1.6;
+}
+
+.blog-content {
+  max-width: 52rem;
+  margin: 0 auto;
+  padding: 3rem 1.5rem;
+}
+
+.no-posts {
+  text-align: center;
+  color: var(--text-muted, #8b90a0);
+  font-size: 1.1rem;
+  padding: 4rem 0;
+}
+
+.post-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.post-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1.5rem 1.75rem;
+  background: var(--bg-surface, #161923);
+  border: 1px solid var(--bg-border, #242836);
+  border-left: 3px solid rgb(21, 219, 149);
+  border-radius: 10px;
+  text-decoration: none;
+  color: var(--text, #e8eaf0);
+  transition:
+    border-color 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+
+.post-card--has-image {
+  padding: 0;
+  border-left: none;
+  overflow: hidden;
+}
+
+.post-card--has-image .post-card-body {
+  padding: 1.5rem 1.75rem;
+}
+
+.post-cover {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  display: block;
+}
+
+.post-card:not(.post-card--has-image) .post-card-body {
+  display: contents;
+}
+
+.post-card:hover {
+  border-color: rgba(21, 219, 149, 0.3);
+  border-left-width: 4px;
+  padding-left: calc(1.75rem - 1px);
+  transform: translateY(-3px);
+  box-shadow:
+    0 6px 24px rgba(21, 219, 149, 0.12),
+    0 0 0 1px rgba(21, 219, 149, 0.08);
+  background:
+    radial-gradient(ellipse at top left, rgba(21, 219, 149, 0.04), transparent 70%),
+    var(--bg-surface, #161923);
+  color: var(--text, #e8eaf0);
+}
+
+.post-card--has-image:hover {
+  border-left-width: 0;
+  padding-left: 0;
+}
+
+.post-badges {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.post-category {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: rgb(21, 219, 149);
+  background: rgba(21, 219, 149, 0.1);
+  border: 1px solid rgba(21, 219, 149, 0.25);
+  border-radius: 4px;
+  padding: 0.15em 0.5em;
+}
+
+.featured-badge {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ecru, rgb(228, 197, 129));
+  background: rgba(228, 197, 129, 0.1);
+  border: 1px solid rgba(228, 197, 129, 0.25);
+  border-radius: 4px;
+  padding: 0.15em 0.5em;
+}
+
+.post-card--featured {
+  border-left-color: var(--ecru, rgb(228, 197, 129));
+}
+
+.post-series {
+  font-size: 0.8rem;
+  font-style: italic;
+  color: var(--text-muted, #8b90a0);
+}
+
+.post-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.25rem;
+}
+
+.post-tag {
+  font-size: 0.65rem;
+  font-weight: 500;
+  color: var(--text-muted, #8b90a0);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--bg-border, #242836);
+  border-radius: 3px;
+  padding: 0.1em 0.4em;
+}
+
+.post-card h2 {
+  font-family: var(--font-heading, "Plus Jakarta Sans", sans-serif);
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--text, #e8eaf0);
+  line-height: 1.3;
+}
+
+.post-excerpt {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-muted, #8b90a0);
+  line-height: 1.55;
+}
+
+.post-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.25rem;
+  font-size: 0.8rem;
+  color: var(--text-muted, #8b90a0);
+}
+
+.post-authors {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.post-author {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.author-avatar {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+}
+
+.post-details {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.meta-dot {
+  opacity: 0.4;
+}
+
+.post-arrow {
+  display: block;
+  margin-top: auto;
+  padding-top: 0.5rem;
+  font-size: 1rem;
+  color: rgb(21, 219, 149);
+  opacity: 0;
+  transform: translateX(-4px);
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
+  text-align: right;
+}
+
+.post-card:hover .post-arrow {
+  opacity: 0.7;
+  transform: translateX(0);
+}
+
+.blog-rss {
+  margin-top: 3rem;
+  text-align: center;
+}
+
+.rss-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  color: var(--text-muted, #8b90a0);
+  text-decoration: none;
+  padding: 0.4rem 0.8rem;
+  border: 1px solid var(--bg-border, #242836);
+  border-radius: 6px;
+  transition:
+    color 0.15s,
+    border-color 0.15s;
+}
+
+.rss-link:hover {
+  color: rgb(21, 219, 149);
+  border-color: rgba(21, 219, 149, 0.4);
+}
+
+@media (max-width: 640px) {
+  .blog-hero {
+    padding: 3rem 1rem 2rem;
+  }
+  .blog-content {
+    padding: 2rem 1rem;
+  }
+  .post-card {
+    padding: 1.25rem;
+  }
+  .post-card h2 {
+    font-size: 1.1rem;
+  }
+}
+</style>

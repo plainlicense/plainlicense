@@ -1,37 +1,20 @@
 ---
 import Default from "@astrojs/starlight/components/Sidebar.astro";
-import type { StarlightRouteData } from "@astrojs/starlight/route-data";
-
-const route = Astro.locals.starlightRoute as StarlightRouteData | undefined;
-const isBlogPage = route?.slug?.startsWith("blog") ?? false;
 ---
 
-{isBlogPage ? (
-    <div class="sidebar-wrapper sidebar-wrapper--blog">
-      <Default {...Astro.props}>
-        <slot />
-      </Default>
-    </div>
-  ) : (
-    <div class="sidebar-wrapper">
-      <div class="sidebar-filter">
-        <input
-          type="text"
-          id="sidebar-search"
-          placeholder="Filter licenses..."
-          aria-label="Filter licenses"
-        />
-      </div>
-      <Default {...Astro.props}>
-        <slot />
-      </Default>
-    </div>
-  )}
-
-<!-- Set data-is-blog on root element synchronously so CSS applies before first paint -->
-{isBlogPage && (
-<script is:inline>document.documentElement.dataset.isBlog = "";</script>
-)}
+<div class="sidebar-wrapper">
+  <div class="sidebar-filter">
+    <input
+      type="text"
+      id="sidebar-search"
+      placeholder="Filter licenses..."
+      aria-label="Filter licenses"
+    />
+  </div>
+  <Default {...Astro.props}>
+    <slot />
+  </Default>
+</div>
 
 <script>
 const searchInput = document.getElementById(
@@ -59,9 +42,6 @@ if (searchInput) {
   display: flex;
   flex-direction: column;
   height: 100%;
-}
-.sidebar-wrapper--blog {
-  /* Blog sidebar is simpler — no filter input needed */
 }
 .sidebar-filter {
   padding: 1rem;

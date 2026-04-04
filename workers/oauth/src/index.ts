@@ -12,6 +12,8 @@ interface Env extends Cloudflare {
   ALLOWED_DOMAINS?: string;
   GITHUB_CLIENT_ID: { get: () => Promise<string> };
   GITHUB_CLIENT_SECRET: { get: () => Promise<string> };
+  TURNSTILE_SECRET_KEY: { get: () => Promise<string> };
+  TURNSTILE_SITE_KEY: string;
 }
 
 export type JsonResponse = {
@@ -78,22 +80,132 @@ const outputHTML = ({
   );
 };
 
+const TURNSTILE_VERIFY_URL =
+  "https://challenges.cloudflare.com/turnstile/v0/siteverify";
+
 /**
- * Handle the `auth` method, which is the first request in the authorization flow.
- * @param {Request} request - HTTP request.
- * @param {Env} env - Environment variables.
- * @returns {Promise<Response>} HTTP response.
+ * Verify a Turnstile token server-side.
+ * @param {string} token - The Turnstile response token from the client.
+ * @param {string} secretKey - The Turnstile secret key.
+ * @param {string} remoteIp - The client's IP address.
+ * @returns {Promise<boolean>} Whether the token is valid.
  */
-const handleAuth = async (request: Request, env: Env): Promise<Response> => {
-  const { url } = request;
-  const { searchParams } = new URL(url);
-  const provider = searchParams.get("provider");
-  const domain = searchParams.get("site_id");
+const verifyTurnstile = async (
+  token: string,
+  secretKey: string,
+  remoteIp: string,
+): Promise<boolean> => {
+  const response = await fetch(TURNSTILE_VERIFY_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({
+      secret: secretKey,
+      response: token,
+      remoteip: remoteIp,
+    }),
+  });
+
+  const result: { success: boolean } = await response.json();
+  return result.success;
+};
+
+/**
+ * Render the Turnstile challenge page that gates the OAuth flow.
+ * On successful verification, the form auto-submits to POST /auth.
+ */
+const renderChallengePage = (
+  siteKey: string,
+  provider: string,
+  siteId: string,
+): Response =>
+  new Response(
+    `<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Verifying — Plain License</title>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <style>
+    body { display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; font-family: system-ui, sans-serif; background: #f8f9fa; color: #1a1a2e; }
+    .container { text-align: center; }
+    .container p { margin: 1rem 0 1.5rem; color: #555; }
+    noscript p { color: #c00; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <p>Verifying you are human before signing in&hellip;</p>
+    <form id="auth-form" method="POST" action="/auth">
+      <input type="hidden" name="provider" value="${provider}">
+      <input type="hidden" name="site_id" value="${siteId}">
+      <div class="cf-turnstile" data-sitekey="${siteKey}" data-callback="onVerified" data-theme="auto" data-size="normal"></div>
+      <noscript><p>JavaScript is required to continue.</p></noscript>
+    </form>
+  </div>
+  <script>
+    function onVerified() { document.getElementById('auth-form').submit(); }
+  </script>
+</body>
+</html>`,
+    { headers: { "Content-Type": "text/html;charset=UTF-8" } },
+  );
+
+/**
+ * Handle GET /auth — show the Turnstile challenge page.
+ */
+const handleAuthChallenge = (
+  request: Request,
+  env: Env,
+): Response => {
+  const { searchParams } = new URL(request.url);
+  const provider = searchParams.get("provider") ?? "";
+  const siteId = searchParams.get("site_id") ?? "";
 
   if (!provider || !supportedProviders.includes(provider)) {
     return outputHTML({
       error: "Your Git backend is not supported by the authenticator.",
       errorCode: "UNSUPPORTED_BACKEND",
+    });
+  }
+
+  return renderChallengePage(env.TURNSTILE_SITE_KEY, provider, siteId);
+};
+
+/**
+ * Handle POST /auth — verify Turnstile token, then redirect to the OAuth provider.
+ */
+const handleAuth = async (request: Request, env: Env): Promise<Response> => {
+  const formData = await request.formData();
+  const provider = formData.get("provider") as string | null;
+  const domain = formData.get("site_id") as string | null;
+  const turnstileToken = formData.get("cf-turnstile-response") as string | null;
+
+  if (!provider || !supportedProviders.includes(provider)) {
+    return outputHTML({
+      error: "Your Git backend is not supported by the authenticator.",
+      errorCode: "UNSUPPORTED_BACKEND",
+    });
+  }
+
+  // Verify Turnstile token
+  if (!turnstileToken) {
+    return outputHTML({
+      provider,
+      error: "Verification challenge was not completed. Please try again.",
+      errorCode: "TURNSTILE_MISSING",
+    });
+  }
+
+  const clientIp = request.headers.get("CF-Connecting-IP") ?? "";
+  const secretKey = await env.TURNSTILE_SECRET_KEY.get();
+
+  if (!(await verifyTurnstile(turnstileToken, secretKey, clientIp))) {
+    return outputHTML({
+      provider,
+      error: "Verification challenge failed. Please try again.",
+      errorCode: "TURNSTILE_FAILED",
     });
   }
 
@@ -274,6 +386,10 @@ export default {
     const { pathname } = new URL(url);
 
     if (method === "GET" && ["/auth", "/oauth/authorize"].includes(pathname)) {
+      return handleAuthChallenge(request, env);
+    }
+
+    if (method === "POST" && ["/auth", "/oauth/authorize"].includes(pathname)) {
       return handleAuth(request, env);
     }
 

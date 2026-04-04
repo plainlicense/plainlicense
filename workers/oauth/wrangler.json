@@ -1,47 +1,24 @@
 {
+  "$schema": "./node_modules/wrangler/config-schema.json",
   "account_id": "1bb2d128ac96f8ee9dc75e99a54e9260",
+  "assets": {
+    "binding": "ASSETS",
+    "directory": "./public",
+    "html_handling": "auto-trailing-slash",
+    "run_worker_first": false
+  },
   "compatibility_date": "2025-03-20",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
   "main": "src/index.ts",
   "minify": true,
-  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
   "name": "plainlicense-oauth-proxy",
-  "routes": [
-    {
-      "pattern": "auth.plainlicense.org",
-      "custom_domain": true
-    }
-  ],
-  "$schema": "./node_modules/wrangler/config-schema.json",
-  "vars": {
-    "ALLOWED_DOMAINS": "plainlicense.org,*.plainlicense.org,github.com,*.github.com"
-  },
   "observability": {
     "enabled": true
   },
   "placement": {
     "mode": "smart"
   },
-  "secrets_store_secrets": [
-    {
-      "secret_name": "GITHUB_CLIENT_ID",
-      "binding": "GITHUB_CLIENT_ID",
-      "store_id": "98acd7f077774ecfb34a31ac8cce6c98"
-    },
-    {
-      "secret_name": "GITHUB_CLIENT_SECRET",
-      "binding": "GITHUB_CLIENT_SECRET",
-      "store_id": "98acd7f077774ecfb34a31ac8cce6c98"
-    }
-  ],
   "preview_urls": false,
-  "workers_dev": false,
-  "assets": {
-    "binding": "ASSETS",
-    "directory": "./public",
-    "run_worker_first": false,
-    "html_handling": "auto-trailing-slash"
-  },
-
   "ratelimits": [
     {
       "name": "OAUTH_PROXY_RATE_LIMIT",
@@ -51,5 +28,33 @@
         "period": 60
       }
     }
-  ]
+  ],
+  "routes": [
+    {
+      "custom_domain": true,
+      "pattern": "auth.plainlicense.org"
+    }
+  ],
+  "secrets_store_secrets": [
+    {
+      "binding": "GITHUB_CLIENT_ID",
+      "secret_name": "GITHUB_CLIENT_ID",
+      "store_id": "98acd7f077774ecfb34a31ac8cce6c98"
+    },
+    {
+      "binding": "GITHUB_CLIENT_SECRET",
+      "secret_name": "GITHUB_CLIENT_SECRET",
+      "store_id": "98acd7f077774ecfb34a31ac8cce6c98"
+    },
+    {
+      "binding": "TURNSTILE_SECRET_KEY",
+      "secret_name": "TURNSTILE_SECRET_KEY",
+      "store_id": "98acd7f077774ecfb34a31ac8cce6c98"
+    }
+  ],
+  "vars": {
+    "ALLOWED_DOMAINS": "plainlicense.org,*.plainlicense.org,github.com,*.github.com",
+    "TURNSTILE_SITE_KEY": "0x4AAAAAAC0oYIe6F8T0nJHd"
+  },
+  "workers_dev": false
 }

@@ -3,7 +3,7 @@ import { defineCollection } from "./utils";
 export const seriesCollection = defineCollection({
   label: "Series",
   name: "series",
-  folder: "/content/blog/series",
+  folder: "content/blog/series",
   label_singular: "Series",
   create: true,
   delete: true,
@@ -64,7 +64,7 @@ export const tagsCollection = defineCollection({
   name: "blog-tags",
   label: "Blog Tags",
   label_singular: "Tag",
-  folder: "/content/blog/tags",
+  folder: "content/blog/tags",
   create: true,
   delete: true,
   extension: "toml",
@@ -112,7 +112,7 @@ export const featuredPostsCollection = defineCollection({
   name: "featured",
   label: "Featured Posts",
   label_singular: "Featured Post",
-  folder: "/content/featured",
+  folder: "content/featured",
   format: "json",
   extension: "json",
   slug: "{{slug}}",
@@ -177,7 +177,7 @@ export const featuredPostsCollection = defineCollection({
 export const blogPostsCollection = defineCollection({
   name: "blog-posts",
   label: "Blog Posts",
-  folder: "/content/blog/posts",
+  folder: "content/blog/posts",
   create: true,
   delete: true,
   format: "yaml-frontmatter",
@@ -248,13 +248,13 @@ export const blogPostsCollection = defineCollection({
       collection: "blog-tags",
       search_fields: ["name"],
       value_field: "uuid",
+      multiple: true,
       required: false,
     },
     {
       label: "Category",
       name: "category",
       widget: "select",
-
       options: [
         "announcements",
         "guides",

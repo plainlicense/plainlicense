@@ -154,25 +154,6 @@
   border: 0;
 }
 
-/* ===  Blog page layout refinements  ===
- * Starlight blog pages use Starlight's full chrome (sidebar, TOC panel).
- * These rules reduce the visual complexity to be closer to BaseLayout pages.
- * Blog pages are identified by data-is-blog set via the Sidebar override script.
- */
-html[data-is-blog] .right-sidebar-container {
-  display: none;
-}
-
-/* When TOC is hidden, let the main content area expand */
-html[data-is-blog] .main-pane {
-  --sl-content-width: 55rem;
-}
-
-/* Ensure blog content is comfortably readable */
-html[data-is-blog] .sl-markdown-content {
-  max-width: 50rem;
-}
-
 /* Category Color System */
 .cat-permissive {
   --cat-color: var(--cat-permissive);

@@ -42,7 +42,7 @@ export async function getPublishedLicenses(): Promise<LicenseEntryT[]> {
  */
 export async function getPublishedBlogPosts(): Promise<BlogPostEntryT[]> {
   return await getCollection(
-    "blog-posts",
+    "blogPosts",
     ({ data }) => data.status === "published",
   );
 }

@@ -1,16 +1,60 @@
 ---
-export const prerender = true;
+export const prerender = false;
+
+import { env } from "cloudflare:workers";
+const turnstileSiteKey =
+  (env as unknown as { TURNSTILE_SITE_KEY?: string }).TURNSTILE_SITE_KEY ?? "";
 ---
 
 <!doctype html>
 <html lang="en">
   <head>
+    <link rel="preconnect" href="https://challenges.cloudflare.com" />
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="robots" content="noindex,nofollow" />
     <title>Plain License CMS</title>
+    {
+      turnstileSiteKey && (
+        <script
+          is:inline
+          src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"
+          defer
+        />
+      )
+    }
+    <style>
+      #turnstile-gate {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        margin: 0;
+        font-family: system-ui, sans-serif;
+        background: #f8f9fa;
+        color: #1a1a2e;
+        flex-direction: column;
+      }
+      #turnstile-gate p {
+        margin: 1rem 0 1.5rem;
+        color: #555;
+      }
+      #turnstile-gate .error {
+        color: #c00;
+        margin-top: 1rem;
+      }
+      #turnstile-gate.hidden {
+        display: none;
+      }
+    </style>
   </head>
   <body>
+    <div id="turnstile-gate" data-sitekey={turnstileSiteKey}>
+      <p>Verifying you are human&hellip;</p>
+      <div id="turnstile-widget"></div>
+      <p id="turnstile-error" class="error" style="display:none"></p>
+    </div>
+    <div id="widget-container"></div>
     <script>
       // @ts-expect-error - typescript struggles to infer the virtual module's shape, but we know it has these exports
       import { config, title } from "virtual:astro-loader-sveltia-cms/config";
@@ -18,15 +62,79 @@ export const prerender = true;
       import { registerHooks } from "../hooks";
       import { prefetchSpdxData } from "../spdx-cache";
 
-      if (title !== undefined) {
-        document.title = title;
+      function loadCMS() {
+        if (title !== undefined) {
+          document.title = title;
+        }
+        registerHooks();
+        prefetchSpdxData();
+        init({ config });
       }
 
-      // Register field auto-resolution hooks before CMS init
-      registerHooks();
-      // Start SPDX/GitHub license data prefetch (non-blocking)
-      prefetchSpdxData();
-      init({ config });
+      const gate = document.getElementById("turnstile-gate")!;
+      const siteKey = gate.dataset.sitekey;
+
+      if (!siteKey) {
+        gate.classList.add("hidden");
+        loadCMS();
+      } else {
+        function waitForTurnstile(): Promise<void> {
+          return new Promise((resolve) => {
+            if (typeof window.turnstile !== "undefined") {
+              resolve();
+              return;
+            }
+            const check = setInterval(() => {
+              if (typeof window.turnstile !== "undefined") {
+                clearInterval(check);
+                resolve();
+              }
+            }, 50);
+          });
+        }
+
+        function showError(msg: string) {
+          const el = document.getElementById("turnstile-error")!;
+          el.textContent = msg;
+          el.style.display = "block";
+        }
+
+        waitForTurnstile().then(() => {
+          window.turnstile.render("#turnstile-widget", {
+            sitekey: siteKey,
+            theme: "auto",
+            callback: async (token: string) => {
+              try {
+                const res = await fetch("/api/verify-turnstile/", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ token }),
+                });
+
+                const data: { success: boolean } = await res.json();
+
+                if (data.success) {
+                  gate.classList.add("hidden");
+                  loadCMS();
+                } else {
+                  showError(
+                    "Verification failed. Please refresh and try again.",
+                  );
+                }
+              } catch {
+                showError(
+                  "Verification request failed. Please refresh and try again.",
+                );
+              }
+            },
+            "error-callback": () => {
+              showError(
+                "Verification challenge failed. Please refresh and try again.",
+              );
+            },
+          });
+        });
+      }
     </script>
   </body>
 </html>
