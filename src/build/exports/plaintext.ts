@@ -128,6 +128,16 @@ function renderTokens(tokens: Token[]): string {
       case "hr":
         result += HR_LINE + "\n\n";
         break;
+      case "text": {
+        // Tight list items produce block-level text tokens with inline sub-tokens
+        const textTok = token as Tokens.Text;
+        if (textTok.tokens) {
+          result += renderInline(textTok.tokens) + "\n\n";
+        } else {
+          result += textTok.text + "\n\n";
+        }
+        break;
+      }
       case "html":
         // Strip HTML — already handled by pre-processing
         break;
@@ -221,7 +231,12 @@ export async function generatePlaintext(ctx: ExportContext) {
   if (endnotes.length > 0) {
     const notesSeparator = "----------------------------------------";
     const notesHeader = `\n\n${notesSeparator}\nNotes\n${notesSeparator}\n\n`;
-    const notesBody = endnotes.map((note, i) => `[${i + 1}] ${note}`).join("\n\n");
+    const notesBody = endnotes.map((note, i) => {
+      // Strip markdown from endnote text via AST
+      const tokens = marked.lexer(note);
+      const plain = renderTokens(tokens).trim();
+      return `[${i + 1}] ${plain}`;
+    }).join("\n\n");
     fullContent += notesHeader + notesBody;
   }
 
