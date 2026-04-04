@@ -9,13 +9,17 @@ on:
       - "content/mappings/**"
       - "src/data/license-families/**"
 
+permissions:
+  contents: read
+  issues: read
+
 jobs:
   check-mappings:
     runs-on: ubuntu-latest
     permissions:
       issues: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - uses: oven-sh/setup-bun@v2
 
