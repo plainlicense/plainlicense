@@ -10,6 +10,7 @@ import { sha256 } from "../../utils/hash";
 import { generateMarkdown } from "./markdown";
 import { generatePDF } from "./pdf";
 import { generatePlaintext } from "./plaintext";
+import { licenseUrl } from "../../utils/constants";
 
 export interface ExportContext {
   licenseId: string;
@@ -182,7 +183,7 @@ export class ExportOrchestrator {
     const filePath = path.join(outputDir, fileName);
 
     const html = `<div class="pl-embed" data-license="${licenseId}" data-version="${version}">
-  <a href="https://plainlicense.org/licenses/${metadata.slug}">${metadata.title}</a>
+  <a href="${licenseUrl(metadata.slug)}">${metadata.title}</a>
 </div>`;
 
     await fs.mkdir(outputDir, { recursive: true });

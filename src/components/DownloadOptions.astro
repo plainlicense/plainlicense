@@ -1,6 +1,7 @@
 ---
 import type { LicenseEntryT } from "../_types/licenses";
 import { derivePlainId } from "../utils/plain-id";
+import { GITHUB_DISCUSSIONS, licenseUrl } from "../utils/constants";
 import { ICONS } from "./license/icons";
 
 interface Props {
@@ -55,7 +56,7 @@ const formats = [
   },
 ];
 
-const embedUrl = `https://plainlicense.org/licenses/${data.license_family}/${spdxDir}`;
+const embedUrl = licenseUrl(`${data.license_family}/${spdxDir}`);
 const embedCode = `<iframe
   id="license-embed"
   src="${embedUrl}"
@@ -228,7 +229,7 @@ document.addEventListener("themeChange", syncTheme);`}</code></pre>
 
     <p class="embed-help">
       Need help? Ask in our <a
-        href="https://github.com/plainlicense/plainlicense/discussions"
+        href={GITHUB_DISCUSSIONS}
         >GitHub Discussions</a
       >.
     </p>

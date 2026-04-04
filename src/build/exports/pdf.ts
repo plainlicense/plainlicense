@@ -3,6 +3,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { marked } from "marked";
 import type { ExportContext } from "./index.ts";
+import { licenseUrl } from "../../utils/constants";
 
 /**
  * Generates PDF exports using Typst.
@@ -183,6 +184,6 @@ ${body}
 #set text(size: 9pt, fill: gray)
 *Disclaimer:* This is a plain language summary and version of the original license. It is intended for accessibility and understanding. 
 
-*Canonical URL:* https://plainlicense.org/licenses/${metadata.slug}
+*Canonical URL:* ${licenseUrl(metadata.slug)}
   `;
 }

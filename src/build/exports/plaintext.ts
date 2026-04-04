@@ -1,6 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import type { ExportContext } from "./index.ts";
+import { licenseUrl } from "../../utils/constants";
 
 /**
  * Generates plaintext exports.
@@ -24,7 +25,7 @@ export async function generatePlaintext(ctx: ExportContext) {
     : ctx.licenseId.toLowerCase();
   const header =
     `Plain License: ${plainId} ${version}\n` +
-    `Attribution: https://plainlicense.org/licenses/${slug}\n\n` +
+    `Attribution: ${licenseUrl(slug)}\n\n` +
     `========================================\n\n`;
 
   const fullContent = header + text;

@@ -4,6 +4,8 @@ interface Props {
   description?: string;
 }
 
+import { GITHUB_REPO, ROUTES, FAVICON_PATH, SITE_TAGLINE } from "../utils/constants";
+
 const { title, description = "Plain language versions of popular licenses" } =
   Astro.props;
 const currentPath = Astro.url.pathname;
@@ -14,7 +16,7 @@ const currentPath = Astro.url.pathname;
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="icon" type="image/svg+xml" href={FAVICON_PATH}>
     <meta name="generator" content={Astro.generator}>
     <meta name="description" content={description}>
     <title>{title} | Plain License</title>
@@ -24,7 +26,7 @@ const currentPath = Astro.url.pathname;
     <header class="site-header">
       <div class="header-inner">
         <a href="/" class="site-brand" aria-label="Plain License home">
-          <img src="/favicon.svg" alt="" class="brand-logo" width="32" height="32" aria-hidden="true" />
+          <img src={FAVICON_PATH} alt="" class="brand-logo" width="32" height="32" aria-hidden="true" />
           <span class="brand-name">Plain <strong>License</strong></span>
         </a>
         <nav class="site-nav" aria-label="Main navigation">
@@ -32,27 +34,27 @@ const currentPath = Astro.url.pathname;
             >Home</a
           >
           <a
-            href="/licenses/"
-            class:list={["nav-link", { active: currentPath.startsWith("/licenses/") }]}
+            href={ROUTES.LICENSES}
+            class:list={["nav-link", { active: currentPath.startsWith(ROUTES.LICENSES) }]}
             >Licenses</a
           >
           <a
-            href="/faq/"
-            class:list={["nav-link", { active: currentPath.startsWith("/faq/") }]}
+            href={ROUTES.FAQ}
+            class:list={["nav-link", { active: currentPath.startsWith(ROUTES.FAQ) }]}
             >FAQ</a
           >
           <a
-            href="/about/"
-            class:list={["nav-link", { active: currentPath.startsWith("/about/") }]}
+            href={ROUTES.ABOUT}
+            class:list={["nav-link", { active: currentPath.startsWith(ROUTES.ABOUT) }]}
             >About</a
           >
           <a
-            href="/blog/"
-            class:list={["nav-link", { active: currentPath.startsWith("/blog/") }]}
+            href={ROUTES.BLOG}
+            class:list={["nav-link", { active: currentPath.startsWith(ROUTES.BLOG) }]}
             >Blog</a
           >
           <a
-            href="https://github.com/plainlicense/plainlicense"
+            href={GITHUB_REPO}
             class="nav-link nav-github"
             target="_blank"
             rel="noopener noreferrer"
@@ -91,27 +93,27 @@ const currentPath = Astro.url.pathname;
           >Home</a
         >
         <a
-          href="/licenses/"
-          class:list={["nav-link", { active: currentPath.startsWith("/licenses/") }]}
+          href={ROUTES.LICENSES}
+          class:list={["nav-link", { active: currentPath.startsWith(ROUTES.LICENSES) }]}
           >Licenses</a
         >
         <a
-          href="/faq/"
-          class:list={["nav-link", { active: currentPath.startsWith("/faq/") }]}
+          href={ROUTES.FAQ}
+          class:list={["nav-link", { active: currentPath.startsWith(ROUTES.FAQ) }]}
           >FAQ</a
         >
         <a
-          href="/about/"
-          class:list={["nav-link", { active: currentPath.startsWith("/about/") }]}
+          href={ROUTES.ABOUT}
+          class:list={["nav-link", { active: currentPath.startsWith(ROUTES.ABOUT) }]}
           >About</a
         >
         <a
-          href="/blog/"
-          class:list={["nav-link", { active: currentPath.startsWith("/blog/") }]}
+          href={ROUTES.BLOG}
+          class:list={["nav-link", { active: currentPath.startsWith(ROUTES.BLOG) }]}
           >Blog</a
         >
         <a
-          href="https://github.com/plainlicense/plainlicense"
+          href={GITHUB_REPO}
           class="nav-link"
           target="_blank"
           rel="noopener noreferrer"
@@ -125,8 +127,8 @@ const currentPath = Astro.url.pathname;
     <footer class="site-footer">
       <div class="footer-inner">
         <div class="footer-brand">
-          <img src="/favicon.svg" alt="" class="footer-logo" width="24" height="24" aria-hidden="true" />
-          <span class="footer-tagline">Licenses you can actually understand.</span>
+          <img src={FAVICON_PATH} alt="" class="footer-logo" width="24" height="24" aria-hidden="true" />
+          <span class="footer-tagline">{SITE_TAGLINE}</span>
         </div>
         <p class="footer-copy">
           Plain License's authors dedicate all original content to the public
@@ -134,13 +136,13 @@ const currentPath = Astro.url.pathname;
           <strong>We reserve NO rights.</strong>
         </p>
         <nav class="footer-nav" aria-label="Footer navigation">
-          <a href="/licenses/">Licenses</a>
-          <a href="/faq/">FAQ</a>
-          <a href="/about/">About</a>
-          <a href="/helping/">Contributing</a>
-          <a href="/blog/">Blog</a>
+          <a href={ROUTES.LICENSES}>Licenses</a>
+          <a href={ROUTES.FAQ}>FAQ</a>
+          <a href={ROUTES.ABOUT}>About</a>
+          <a href={ROUTES.HELPING}>Contributing</a>
+          <a href={ROUTES.BLOG}>Blog</a>
           <a
-            href="https://github.com/plainlicense/plainlicense"
+            href={GITHUB_REPO}
             target="_blank"
             rel="noopener noreferrer"
             aria-label="GitHub (opens in new tab)"

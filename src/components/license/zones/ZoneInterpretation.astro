@@ -17,6 +17,7 @@ interface Props {
 }
 
 import { ICONS } from "../icons";
+import { GITHUB_REPO } from "../../../utils/constants";
 const {
   plain_name,
   license_family,
@@ -50,7 +51,7 @@ const isOriginal = !original; // PlainLicense original (no original object)
           the rest of the {licenseKind}'s rules still apply.
         </p>
         <p class="repo-link-text">
-          Source and full history: <a href="https://github.com/plainlicense/plainlicense" target="_blank" rel="noopener noreferrer">github.com/plainlicense/plainlicense<span class="sr-only"> (opens in new tab)</span></a>
+          Source and full history: <a href={GITHUB_REPO} target="_blank" rel="noopener noreferrer">github.com/plainlicense/plainlicense<span class="sr-only"> (opens in new tab)</span></a>
         </p>
       </div>
     ) : (

@@ -1,6 +1,7 @@
 ---
 import Default from "@astrojs/starlight/components/Footer.astro";
 import type { Props } from "@astrojs/starlight/props";
+import { GITHUB_REPO, ROUTES } from "../../utils/constants";
 ---
 
 <footer class="plain-footer">
@@ -10,13 +11,13 @@ import type { Props } from "@astrojs/starlight/props";
       domain. <strong>We reserve NO rights.</strong>
     </p>
     <nav class="footer-links" aria-label="Footer navigation">
-      <a href="/licenses/">Licenses</a>
-      <a href="/faq/">FAQ</a>
-      <a href="/about/">About</a>
-      <a href="/helping/">Contributing</a>
-      <a href="/blog/">Blog</a>
+      <a href={ROUTES.LICENSES}>Licenses</a>
+      <a href={ROUTES.FAQ}>FAQ</a>
+      <a href={ROUTES.ABOUT}>About</a>
+      <a href={ROUTES.HELPING}>Contributing</a>
+      <a href={ROUTES.BLOG}>Blog</a>
       <a
-        href="https://github.com/plainlicense/plainlicense"
+        href={GITHUB_REPO}
         target="_blank"
         rel="noopener noreferrer"
         aria-label="GitHub (opens in new tab)"
