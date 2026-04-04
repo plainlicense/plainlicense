@@ -181,6 +181,7 @@
     },
   },
   "trustedDependencies": [
+    "bun",
     "@swc/core",
     "@parcel/watcher",
   ],

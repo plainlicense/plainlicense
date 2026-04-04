@@ -1,24 +1,26 @@
 ---
-import type { CollectionEntry } from "astro:content";
+import type { LicenseEntryT } from "../_types/licenses";
 import { derivePlainId } from "../utils/plain-id";
 import { ICONS } from "./license/icons";
 
 interface Props {
-  license: CollectionEntry<"licenses">;
+  license: LicenseEntryT;
   processedBody?: string;
 }
 
 const { license, processedBody } = Astro.props;
-const { data } = license as CollectionEntry<"licenses">;
-
+const { data } = license;
 const clipboardContent = processedBody || license.body;
 
-const plainId =
-  (data as typeof license.data).plain_id ||
-  derivePlainId(data.spdx_id || data.original?.spdx_id || data?.name);
-const version = (data as typeof license.data).plain_version;
+const rawSpdxId = data.spdx_id || data.original?.spdx_id;
+if (!rawSpdxId) {
+  throw new Error(`License "${license.id}" is missing spdx_id and original.spdx_id`);
+}
+const plainId = data.plain_id || derivePlainId(rawSpdxId);
+const spdxDir = rawSpdxId.toLowerCase();
+const version = data.plain_version;
 const baseName = `${plainId}-${version}`;
-const exportBase = `/exports/${data.spdx_id.toLowerCase()}/${version}/`;
+const exportBase = `/exports/${spdxDir}/${version}/`;
 
 const formats = [
   {
@@ -33,13 +35,27 @@ const formats = [
     path: `${exportBase}${baseName}.cm.md`,
     icon: "document",
   },
-  { name: "Plaintext", ext: ".txt", path: `${exportBase}${baseName}.txt`, icon: "file-text" },
-  { name: "PDF", ext: ".pdf", path: `${exportBase}${baseName}.pdf`, icon: "file-text" },
-  { name: "SPDX XML", ext: ".xml", path: `${exportBase}${baseName}.xml`, icon: "tag" },
+  {
+    name: "Plaintext",
+    ext: ".txt",
+    path: `${exportBase}${baseName}.txt`,
+    icon: "file-text",
+  },
+  {
+    name: "PDF",
+    ext: ".pdf",
+    path: `${exportBase}${baseName}.pdf`,
+    icon: "file-text",
+  },
+  {
+    name: "SPDX XML",
+    ext: ".xml",
+    path: `${exportBase}${baseName}.xml`,
+    icon: "tag",
+  },
 ];
 
-const slug = data.spdx_id.toLowerCase();
-const embedUrl = `https://plainlicense.org/licenses/${slug}`;
+const embedUrl = `https://plainlicense.org/licenses/${data.license_family}/${spdxDir}`;
 const embedCode = `<iframe
   id="license-embed"
   src="${embedUrl}"
@@ -52,36 +68,58 @@ const embedCode = `<iframe
 
 <section class="download-section" aria-labelledby="download-heading">
   <h3 id="download-heading">Get this license</h3>
-  <div class="download-grid" role="list" aria-label="Download formats">
+  <ul class="download-grid" aria-label="Download formats">
     {
       formats.map((format) => (
-        <a
-          role="listitem"
-          href={format.path}
-          class="download-card"
-          download
-          aria-label={`Download ${data.spdx_id} as ${format.name} (${format.ext})`}
-        >
-          <svg class="format-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" set:html={ICONS[format.icon] ?? ""} />
-          <span class="format-name">{format.name}</span>
-          <span class="format-ext">{format.ext}</span>
-        </a>
+        <li>
+          <a
+            href={format.path}
+            class="download-card"
+            download
+            aria-label={`Download ${data.plain_name} as ${format.name} (${format.ext})`}
+          >
+            <svg
+              class="format-icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+              set:html={ICONS[format.icon] ?? ""}
+            />
+            <span class="format-name">{format.name}</span>
+            <span class="format-ext">{format.ext}</span>
+          </a>
+        </li>
       ))
     }
-    <button
-      role="listitem"
-      type="button"
-      class="download-card embed-toggle"
-      id="embed-toggle"
-      aria-expanded="false"
-      aria-controls="embed-panel"
-      aria-label="Show embed instructions for iframe integration"
-    >
-      <svg class="format-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" set:html={ICONS.code ?? ""} />
-      <span class="format-name">Embed</span>
-      <span class="format-ext">&lt;iframe&gt;</span>
-    </button>
-  </div>
+    <li>
+      <button
+        type="button"
+        class="download-card embed-toggle"
+        id="embed-toggle"
+        aria-expanded="false"
+        aria-controls="embed-panel"
+        aria-label="Show embed instructions for iframe integration"
+      >
+        <svg
+          class="format-icon"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+          set:html={ICONS.code ?? ""}
+        />
+        <span class="format-name">Embed</span>
+        <span class="format-ext">&lt;iframe&gt;</span>
+      </button>
+    </li>
+  </ul>
 
   <!-- Embed instructions panel -->
   <div
@@ -94,22 +132,50 @@ const embedCode = `<iframe
   >
     <div class="embed-panel-header">
       <h4 id="embed-panel-heading">Embed this license</h4>
-      <button type="button" class="embed-close" id="embed-close" aria-label="Close embed instructions">
+      <button
+        type="button"
+        class="embed-close"
+        id="embed-close"
+        aria-label="Close embed instructions"
+      >
         <span aria-hidden="true">&times;</span>
       </button>
     </div>
 
     <p class="embed-intro">
-      Copy the code below and paste it into your HTML. The iframe displays the license as it appears on Plain License, sandboxed so it won't affect your site.
+      Copy the code below and paste it into your HTML. The iframe displays the
+      license as it appears on Plain License, sandboxed so it won't affect your
+      site.
     </p>
 
     <div class="embed-code-block" role="group" aria-label="Embed code snippet">
       <pre><code id="embed-code">{embedCode}</code></pre>
-      <button type="button" class="embed-copy-btn" id="embed-copy" aria-label="Copy embed code to clipboard">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" set:html={ICONS.copy ?? ""} />
+      <button
+        type="button"
+        class="embed-copy-btn"
+        id="embed-copy"
+        aria-label="Copy embed code to clipboard"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+          set:html={ICONS.copy ?? ""}
+        />
         <span>Copy</span>
       </button>
-      <div id="embed-copy-status" role="status" aria-live="polite" aria-atomic="true" class="sr-only"></div>
+      <div
+        id="embed-copy-status"
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+        class="sr-only"
+      >
+      </div>
     </div>
 
     <details class="embed-details">
@@ -127,15 +193,25 @@ style="width: 100%; min-height: 500px; border: none;"`}</code></pre>
 
     <details class="embed-details">
       <summary>Color scheme</summary>
-      <p>The embed matches your visitors' system preference (light/dark) by default.</p>
-      <p><strong>Force a theme</strong> by adding <code>?theme=light</code> or <code>?theme=dark</code> to the URL:</p>
+      <p>
+        The embed matches your visitors' system preference (light/dark) by
+        default.
+      </p>
+      <p>
+        <strong>Force a theme</strong> by adding <code>?theme=light</code> or <code
+          >?theme=dark</code
+        > to the URL:
+      </p>
       <pre><code>{`src="${embedUrl}?theme=light"
 src="${embedUrl}?theme=dark"`}</code></pre>
     </details>
 
     <details class="embed-details">
       <summary>Sync theme with your site</summary>
-      <p>Send a <code>postMessage</code> to keep the embed in sync with your site's theme toggle:</p>
+      <p>
+        Send a <code>postMessage</code> to keep the embed in sync with your site's
+        theme toggle:
+      </p>
       <pre><code>{`const syncTheme = () => {
   const iframe = document.getElementById("license-embed");
   const theme = document.documentElement.classList.contains("dark")
@@ -151,7 +227,10 @@ document.addEventListener("themeChange", syncTheme);`}</code></pre>
     </details>
 
     <p class="embed-help">
-      Need help? Ask in our <a href="https://github.com/plainlicense/plainlicense/discussions">GitHub Discussions</a>.
+      Need help? Ask in our <a
+        href="https://github.com/plainlicense/plainlicense/discussions"
+        >GitHub Discussions</a
+      >.
     </p>
   </div>
 
@@ -247,7 +326,8 @@ document.addEventListener("themeChange", syncTheme);`}</code></pre>
           if (label) {
             label.textContent = "Copied!";
             embedCopy.classList.add("success");
-            if (embedCopyStatus) embedCopyStatus.textContent = "Embed code copied to clipboard.";
+            if (embedCopyStatus)
+              embedCopyStatus.textContent = "Embed code copied to clipboard.";
             setTimeout(() => {
               label.textContent = "Copy";
               embedCopy.classList.remove("success");
@@ -256,13 +336,21 @@ document.addEventListener("themeChange", syncTheme);`}</code></pre>
           }
         })
         .catch(() => {
-          if (embedCopyStatus) embedCopyStatus.textContent = "Copy failed. Please try again.";
+          if (embedCopyStatus)
+            embedCopyStatus.textContent = "Copy failed. Please try again.";
         });
     });
   }
 </script>
 
 <style>
+  .format-icon {
+    width: 1.5rem;
+    height: 1.5rem;
+    color: var(--sl-color-gray-3);
+    transition: color 0.2s;
+  }
+
   .download-section {
     margin-top: 4rem;
     padding: 2rem;
@@ -308,6 +396,7 @@ document.addEventListener("themeChange", syncTheme);`}</code></pre>
     font-family: inherit;
     font-size: inherit;
   }
+
   .embed-toggle.active {
     background: var(--sl-color-gray-4);
     border-color: var(--cat-color, var(--sl-color-accent));
@@ -316,12 +405,7 @@ document.addEventListener("themeChange", syncTheme);`}</code></pre>
   .embed-toggle.active .format-icon {
     color: var(--cat-color, var(--sl-color-accent));
   }
-  .format-icon {
-    width: 1.5rem;
-    height: 1.5rem;
-    color: var(--sl-color-gray-3);
-    transition: color 0.2s;
-  }
+
   .format-name {
     font-size: 0.85rem;
     font-weight: 600;
@@ -359,8 +443,14 @@ document.addEventListener("themeChange", syncTheme);`}</code></pre>
     animation: embed-slide-in 0.2s ease-out;
   }
   @keyframes embed-slide-in {
-    from { opacity: 0; transform: translateY(-8px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+      opacity: 0;
+      transform: translateY(-8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
   @media (prefers-reduced-motion: reduce) {
     .embed-panel {

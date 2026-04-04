@@ -11,7 +11,7 @@ import DownloadOptions from "../../components/DownloadOptions.astro";
 import VersionHistory from "../../components/VersionHistory.astro";
 import NotLegalAdvice from "../../components/NotLegalAdvice.astro";
 import { getLicenseSlug, getPublishedLicenses } from "../../utils/collections";
-import { buildOriginalTextSeparator, stripComponentPlaceholders, stripTemplatePlaceholders } from "../../utils/templates";
+import { buildOriginalTextSeparator, stripComponentPlaceholders } from "../../utils/templates";
 
 export const prerender = true;
 /**
@@ -103,9 +103,6 @@ const fullProcessedBody = stripComponentPlaceholders(
   (originalBody ? buildOriginalTextSeparator() + originalBody : "")
 ).trim();
 
-// Strip template directives from plainBody for mapping anchors (they serve no purpose in aria-hidden divs)
-const cleanPlainBody = stripTemplatePlaceholders(plainBody);
-
 // For the full text view: use the fully processed body (blocks resolved, vars replaced, components stripped)
 // Split off any original text that was appended for the clipboard version
 const fullTextBody = stripComponentPlaceholders(resolvedBody);
@@ -113,8 +110,7 @@ const renderedPlainHtml = renderMarkdownWithDivs(fullTextBody);
 
 // The fullProcessedBody (used for clipboard) has blocks resolved via the export pipeline,
 // but the in-page rendering uses resolvedBody which may have unresolved blocks if
-// getCollection("template-blocks") returns IDs that don't match. This is a pre-existing
-// content pipeline issue affecting the hidden mapping-anchors div too.
+// getCollection("template-blocks") returns IDs that don't match.
 ---
 
 <BaseLayout title={data.plain_name}>
@@ -132,33 +128,27 @@ const renderedPlainHtml = renderMarkdownWithDivs(fullTextBody);
 
     <!-- Quick Reference panel (zone-based view) -->
     <div id="panel-reference" role="tabpanel" aria-labelledby="tab-reference" class="tab-panel active">
-      <div class="license-layout">
-        <div class="license-column plain-version">
-          <LicenseLayout license={license} />
-          {data.has_mapping && (
-            <div
-              class="mapping-anchors"
-              aria-hidden="true"
-              set:html={renderMarkdownWithDivs(cleanPlainBody)}
-            />
-          )}
-        </div>
-
-        {data.show_original_comparison !== false && originalBody && (
-          <div class="license-column original-version">
-            <h2 class="original-heading">{data.original?.name ?? "Original License"}</h2>
-            <div
-              class="license-content prose"
-              set:html={renderMarkdownWithDivs(originalBody)}
-            />
-          </div>
-        )}
-      </div>
+      <LicenseLayout license={license} />
     </div>
 
     <!-- Full License Text panel -->
     <div id="panel-fulltext" role="tabpanel" aria-labelledby="tab-fulltext" class="tab-panel" hidden>
-      <article class="full-license-text prose" set:html={renderedPlainHtml} />
+      {data.has_mapping && (
+        <div id="comparison-toggle-wrapper" hidden>
+          <ComparisonToggle hasMapping={true} />
+        </div>
+      )}
+      <div class="license-layout">
+        <div class="license-column plain-version">
+          <article class="full-license-text prose" set:html={renderedPlainHtml} />
+        </div>
+        {data.show_original_comparison !== false && originalBody && (
+          <div class="license-column original-version">
+            <h2 class="original-heading">{data.original?.name ?? "Original License"}</h2>
+            <div class="license-content prose" set:html={renderMarkdownWithDivs(originalBody)} />
+          </div>
+        )}
+      </div>
     </div>
 
     <DownloadOptions license={license} processedBody={fullProcessedBody} />
@@ -175,7 +165,6 @@ const renderedPlainHtml = renderMarkdownWithDivs(fullTextBody);
         original_gunning_fog={data.original?.gunning_fog}
         shame_words_count={data.shame_words_count}
       />
-      <ComparisonToggle hasMapping={!!data.has_mapping} />
       <VersionHistory license={license} />
       <NotLegalAdvice />
     </div>
@@ -191,8 +180,13 @@ const spdxId = container?.dataset.spdxId;
 
 if (spdxId) {
   fetch(`/mappings/${spdxId}-mapping.json`)
-    .then((res) => res.json())
+    .then((res) => {
+      if (!res.ok) throw new Error(`Failed to fetch mapping: HTTP ${res.status} for /mappings/${spdxId}-mapping.json`);
+      return res.json();
+    })
     .then((mappingData) => {
+      const wrapper = document.getElementById("comparison-toggle-wrapper");
+      if (wrapper) wrapper.hidden = false;
       initMappingViewer(mappingData);
     })
     .catch(() => {
@@ -418,23 +412,6 @@ tabs.forEach(tab => {
   background: rgba(var(--sl-color-gray-6-rgb, 0, 0, 0), 0.3);
   border: 1px solid var(--sl-color-gray-5);
   border-radius: 12px;
-}
-
-/* ── Mapping anchors ── */
-.mapping-anchors {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
-  pointer-events: none;
-}
-
-.comparison-active .mapping-anchors [id].highlight-active,
-.comparison-active .mapping-anchors [id].highlight-match {
-  /* no visual change; zone elements get highlight instead */
 }
 
 .comparison-active .license-content [id] {

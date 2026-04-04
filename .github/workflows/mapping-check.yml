@@ -1,0 +1,117 @@
+name: Stale Mapping Detection
+
+on:
+  push:
+    branches: [dev, main]
+    paths:
+      - "content/licenses/**"
+      - "content/template-blocks/**"
+      - "content/mappings/**"
+      - "src/data/license-families/**"
+
+permissions:
+  contents: read
+  issues: read
+
+jobs:
+  check-mappings:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: oven-sh/setup-bun@v2
+
+      - run: bun install --frozen-lockfile
+
+      - name: Validate mappings
+        id: validate
+        run: |
+          set +e
+          output=$(bun run src/build/validate-mappings.ts 2>&1)
+          exit_code=$?
+          set -e
+          echo "$output"
+          {
+            echo "output<<MAPPING_EOF"
+            echo "$output"
+            echo "MAPPING_EOF"
+          } >> "$GITHUB_OUTPUT"
+          echo "has_failure=$([ $exit_code -ne 0 ] && echo 'true' || echo 'false')" >> "$GITHUB_OUTPUT"
+
+      - name: Open issue for stale mappings
+        if: steps.validate.outputs.has_failure == 'true'
+        uses: actions/github-script@v7
+        env:
+          VALIDATION_OUTPUT: ${{ steps.validate.outputs.output }}
+        with:
+          script: |
+            const output = process.env.VALIDATION_OUTPUT;
+
+            // Extract license IDs from lines like "  MIT: validation failed"
+            const staleIds = [];
+            for (const line of output.split('\n')) {
+              const match = line.match(/^\s+(\S+):\s+validation failed/);
+              if (match) {
+                staleIds.push(match[1]);
+              }
+            }
+
+            if (staleIds.length === 0) {
+              console.log('No stale license IDs found in output');
+              return;
+            }
+
+            const title = `Stale mapping detected: ${staleIds.join(', ')}`;
+            const label = 'mapping-stale';
+
+            // Check for existing open issue with same title and label
+            const { data: existingIssues } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: label,
+            });
+
+            const duplicate = existingIssues.find(issue => issue.title === title);
+            if (duplicate) {
+              console.log(`Duplicate issue already exists: #${duplicate.number}`);
+              return;
+            }
+
+            const body = [
+              '## Stale Mapping Detected',
+              '',
+              `The following license mapping(s) have stale hashes: **${staleIds.join(', ')}**`,
+              '',
+              '### Validation Output',
+              '',
+              '```',
+              output.trim(),
+              '```',
+              '',
+              '### Instructions',
+              '',
+              'To regenerate the stale mapping(s):',
+              '',
+              '1. Read the license markdown at `content/licenses/{category}/{spdx-id}.md`',
+              '2. Read the mapping schema at `workers/cms-admin/src/schemas/mapping-schema.json`',
+              '3. Read the existing mapping at `content/mappings/{spdx-id}-mapping.json`',
+              '4. Follow the prompt guide at `.github/MAPPING_GENERATION_PROMPT.md`',
+              '5. Regenerate the mapping with updated hashes',
+              '6. Submit a PR with the updated mapping',
+              '',
+              `Stale IDs: ${staleIds.map(id => '`' + id + '`').join(', ')}`,
+            ].join('\n');
+
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title,
+              body,
+              labels: [label],
+              assignees: ['claude'],
+            });
+
+            console.log(`Created issue: ${title}`);

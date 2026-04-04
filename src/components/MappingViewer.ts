@@ -3,13 +3,13 @@
  * Implements hover highlighting and SVG connectors between plain and original sections.
  */
 
+type ClauseRef = { id: string; content: string };
+
 type LicenseMapping = {
   id: string;
   type: string;
-  plain_clause?: { id: string; content: string };
-  plain_clauses: { id: string; content: string }[];
-  original_clause?: { id: string; content: string };
-  original_clauses: { id: string; content: string }[];
+  plain_clause?: ClauseRef | ClauseRef[] | null;
+  original_clause?: ClauseRef | ClauseRef[] | null;
 };
 
 type LicenseMappings = {
@@ -40,13 +40,16 @@ export function initMappingViewer(mappingData: LicenseMappings) {
   } | null = null;
 
   mappings.forEach((mapping: LicenseMapping) => {
-    // ... support both old and new mapping structure ...
-    const plainClauses =
-      mapping.plain_clauses ||
-      (mapping.plain_clause ? [mapping.plain_clause] : []);
-    const originalClauses =
-      mapping.original_clauses ||
-      (mapping.original_clause ? [mapping.original_clause] : []);
+    const plainClauses = Array.isArray(mapping.plain_clause)
+      ? mapping.plain_clause
+      : mapping.plain_clause
+        ? [mapping.plain_clause]
+        : [];
+    const originalClauses = Array.isArray(mapping.original_clause)
+      ? mapping.original_clause
+      : mapping.original_clause
+        ? [mapping.original_clause]
+        : [];
 
     const plainEls = plainClauses
       .map((c: { id: string; content: string }) =>
@@ -146,43 +149,36 @@ export function initMappingViewer(mappingData: LicenseMappings) {
       plainEls.forEach((plainEl: HTMLElement | null) => {
         if (!plainEl) return;
 
-        // Skip making elements focusable when they are inside visually-hidden / aria-hidden containers
-        const isInHiddenContainer = !!plainEl.closest(
-          '.mapping-anchors, [aria-hidden="true"]',
-        );
-
-        if (!isInHiddenContainer) {
-          // Make element focusable for keyboard users
-          if (!plainEl.getAttribute("tabindex")) {
-            plainEl.setAttribute("tabindex", "0");
-          }
-
-          // Keyboard focus equivalents (desktop)
-          plainEl.addEventListener("focus", () => {
-            if (
-              window.innerWidth < 1024 ||
-              !container.classList.contains("comparison-active")
-            )
-              return;
-            activateFromPlain();
-          });
-
-          plainEl.addEventListener("blur", () => {
-            if (window.innerWidth < 1024) return;
-            handleBlur();
-          });
-
-          plainEl.addEventListener("keydown", (e: KeyboardEvent) => {
-            if (
-              (e.key === "Enter" || e.key === " ") &&
-              window.innerWidth < 1024 &&
-              container.classList.contains("comparison-active")
-            ) {
-              e.preventDefault();
-              showMobileModal(originalEls, plainEl);
-            }
-          });
+        // Make element focusable for keyboard users
+        if (!plainEl.getAttribute("tabindex")) {
+          plainEl.setAttribute("tabindex", "0");
         }
+
+        // Keyboard focus equivalents (desktop)
+        plainEl.addEventListener("focus", () => {
+          if (
+            window.innerWidth < 1024 ||
+            !container.classList.contains("comparison-active")
+          )
+            return;
+          activateFromPlain();
+        });
+
+        plainEl.addEventListener("blur", () => {
+          if (window.innerWidth < 1024) return;
+          handleBlur();
+        });
+
+        plainEl.addEventListener("keydown", (e: KeyboardEvent) => {
+          if (
+            (e.key === "Enter" || e.key === " ") &&
+            window.innerWidth < 1024 &&
+            container.classList.contains("comparison-active")
+          ) {
+            e.preventDefault();
+            showMobileModal(originalEls, plainEl);
+          }
+        });
 
         // Desktop Hover Effects
         plainEl.addEventListener("mouseenter", () => {

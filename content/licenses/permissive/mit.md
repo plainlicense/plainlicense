@@ -63,7 +63,8 @@ original:
 
 Copyright Notice: (c) {{ year }} `[copyright holders]`
 
-<div id="plain-perm-use">
+<div id="plain-permissions">
+
 ## You Can Do Anything with The Work
 
 We give you permission to:
@@ -77,7 +78,10 @@ We give you permission to:
 
 You can do all of these things **for free**. You can do them for any reason.
 Everyone else can do these things too, as long as they follow these rules.
+
 </div>
+
+<div id="plain-conditions">
 
 ## **If** You Give Us Credit and Keep This Notice
 
@@ -90,7 +94,13 @@ You can do any of these things with the work, **if you follow these two rules**:
    3. [Link to this notice](https://plainlicense.org/licenses/permissive/mit/) from the work.
    4. Use an accepted standard for linking to licenses, like the [SPDX Identifier](https://spdx.dev/learn/handling-license-info/): `SPDX-LICENSE-IDENTIFIER: MIT`.
 
+</div>
+
+<div id="plain-protections">
+
 {{block:warranty}}
+
+</div>
 
 {{block:interpretation}}
 
@@ -104,20 +114,28 @@ You can do any of these things with the work, **if you follow these two rules**:
 
 Copyright (c) {{ year }} `<copyright holders>`
 
-<div id="original-grant-use">
+<div id="original-permissions">
+
 Permission is hereby granted, free of charge, to any person
 obtaining a copy of this software and associated documentation
-files (the “Software”), to deal in the Software without
+files (the "Software"), to deal in the Software without
 restriction, including without limitation the rights to use,
 copy, modify, merge, publish, distribute, sublicense, and/or sell
 copies of the Software, and to permit persons to whom the
 Software is furnished to do so, subject to the following conditions:
+
 </div>
+
+<div id="original-conditions">
 
 The above copyright notice and this permission notice shall be
 included in all copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND,
+</div>
+
+<div id="original-protections">
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
 OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
 NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
@@ -125,3 +143,5 @@ HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
+
+</div>
