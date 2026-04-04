@@ -1,6 +1,7 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { getLicenseSlug, getPublishedLicenses } from "../../utils/collections";
+import { FAMILY_LABELS, FAMILY_ORDER, FAMILY_DESCRIPTIONS } from "../../data/license-families/index";
 import "../../assets/stylesheets/custom.css";
 
 export const prerender = true;
@@ -16,27 +17,6 @@ const byFamily = licenses.reduce<Record<string, typeof licenses>>(
   {},
 );
 
-const familyOrder = [
-  "public-domain",
-  "permissive",
-  "copyleft",
-  "source-available",
-  "proprietary",
-];
-const familyLabels: Record<string, string> = {
-  "public-domain": "Public Domain",
-  permissive: "Permissive",
-  copyleft: "Copyleft",
-  "source-available": "Source Available",
-  proprietary: "Proprietary",
-};
-const familyDescriptions: Record<string, string> = {
-  "public-domain": "No rights reserved — use any way you want.",
-  permissive: "Few restrictions — use freely in almost any project.",
-  copyleft: "Share-alike — changes must stay under the same license.",
-  "source-available": "Source visible but with usage restrictions.",
-  proprietary: "All rights reserved — usage governed by specific terms.",
-};
 ---
 
 <BaseLayout
@@ -50,16 +30,16 @@ const familyDescriptions: Record<string, string> = {
         Plain-language rewrites of popular software licenses, organized by family.
       </p>
       <p class="page-count">
-        {licenses.length} licenses across {familyOrder.filter(fam => byFamily[fam]?.length).length} families
+        {licenses.length} licenses across {FAMILY_ORDER.filter(fam => byFamily[fam]?.length).length} families
       </p>
     </header>
 
     <div class="categories">
-      {familyOrder.filter(fam => byFamily[fam]?.length).map(fam => (
+      {FAMILY_ORDER.filter(fam => byFamily[fam]?.length).map(fam => (
         <section class={`category-section cat-${fam}`} id={fam} key={fam}>
           <div class="category-header">
-            <span class="category-pill">{familyLabels[fam]}</span>
-            <p>{familyDescriptions[fam]}</p>
+            <span class="category-pill">{FAMILY_LABELS[fam]}</span>
+            <p>{FAMILY_DESCRIPTIONS[fam]}</p>
           </div>
           <div class="license-grid">
             {byFamily[fam].map(license => (

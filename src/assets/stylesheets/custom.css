@@ -25,6 +25,9 @@
   --sl-color-gray-6: #161923;
   --sl-color-gray-7: #0d0f15;
   --sl-color-black: #0d0f15;
+  --sl-color-green: var(--emerald);
+  --sl-color-yellow: var(--saffron);
+  --sl-color-red: var(--restriction-red);
 }
 
 /* Header Brand Styling */

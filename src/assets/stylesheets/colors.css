@@ -94,6 +94,16 @@
   --white-rgb: 255, 255, 255;
   --zaffre-rgb: 13, 25, 163;
 
+  /* Adjustable colors */
+  --restriction-red: rgb(234, 100, 80);
+  --restriction-red-rgb: 234, 100, 80;
+  --restriction-red-light: rgb(234, 140, 100);
+  --accent-purple: #883aea;
+  --success-green: #28a745;
+  --success-green-rgb: 40, 167, 69;
+  --callout-orange: rgb(234, 140, 58);
+  --callout-orange-rgb: 234, 140, 58;
+
   /* Category Colors */
   --cat-permissive: var(--emerald);
   --cat-permissive-rgb: var(--emerald-rgb);

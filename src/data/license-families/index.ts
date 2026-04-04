@@ -110,3 +110,19 @@ export const FAMILY_LABELS: Record<string, string> = {
   "source-available": "Source Available",
   proprietary: "Proprietary",
 };
+
+export const FAMILY_ORDER = [
+  "public-domain",
+  "permissive",
+  "copyleft",
+  "source-available",
+  "proprietary",
+] as const;
+
+export const FAMILY_DESCRIPTIONS: Record<string, string> = {
+  "public-domain": "No rights reserved — use any way you want.",
+  permissive: "Few restrictions — use freely in almost any project.",
+  copyleft: "Share-alike — changes must stay under the same license.",
+  "source-available": "Source visible but with usage restrictions.",
+  proprietary: "All rights reserved — usage governed by specific terms.",
+};
