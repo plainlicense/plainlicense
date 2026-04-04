@@ -22,11 +22,11 @@ maker_pitch: Do almost anything with this work. Just give credit.
 commercial_restrictions: []
 compare_to:
   - spdx_id: Unlicense
-    contrast: 'Share with no restrictions or credit required'
+    contrast: Share with no restrictions or credit required
   - spdx_id: MPL-2.0
-    contrast: 'Requires sharing changes to licensed files'
+    contrast: Requires sharing changes to licensed files
   - spdx_id: Elastic-2.0
-    contrast: 'Prevents offering your work as a hosted service'
+    contrast: Prevents offering your work as a hosted service
 uuid: 87a537b5-b43f-4832-9983-33577b0a9828
 meta_description: Plain language MIT license for all creative works
 has_mapping: true
@@ -34,7 +34,7 @@ mapping_version: 1.0.0
 show_original_comparison: true
 show_shame_counter: true
 featured: true
-plain_gunning_fog: 7.8
+plain_gunning_fog: 8.21
 shame_words_count: 0
 original:
   name: MIT License
@@ -56,7 +56,7 @@ original:
   limitations:
     - liability
     - warranty
-  gunning_fog: 31.51
+  gunning_fog: 26.39
 ---
 
 # Plain MIT License

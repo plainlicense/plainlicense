@@ -30,74 +30,69 @@ const improvement = hasComparison
 ---
 
 {hasData && (
-  <details class="readability-sidebar">
-    <summary class="readability-summary">
+  <section class="readability-card" aria-label="Readability">
+    <h3 class="readability-heading">
       <svg class="readability-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" set:html={ICONS["bar-chart"]} />
-      <span class="readability-label">Readability</span>
-      {plain_gunning_fog !== undefined && (
-        <span class="readability-score">{plain_gunning_fog} ({readabilityLevel(plain_gunning_fog)})</span>
-      )}
-      <svg class="summary-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" set:html={ICONS["chevron-down"]} />
-    </summary>
-    <div class="readability-body">
-      {hasComparison && (
-        <div class="comparison-row">
-          <div class="comparison-item">
-            <span class="comparison-label">Plain version</span>
-            <span class="comparison-value plain-value">{plain_gunning_fog} <small>({readabilityLevel(plain_gunning_fog!)})</small></span>
-          </div>
-          <div class="comparison-item">
-            <span class="comparison-label">Original</span>
-            <span class="comparison-value original-value">{original_gunning_fog} <small>({readabilityLevel(original_gunning_fog!)})</small></span>
-          </div>
-          {improvement !== undefined && improvement > 0 && (
-            <div class="improvement">
-              <span class="improvement-value">{improvement} grades easier</span>
-            </div>
-          )}
-        </div>
-      )}
-      {shame_words_count !== undefined && (
-        <div class="shame-row">
-          <span class="shame-label">Legal jargon remaining</span>
-          <span class={`shame-value ${shame_words_count === 0 ? "shame-zero" : ""}`}>{shame_words_count}</span>
-        </div>
-      )}
-      <p class="readability-note">
-        Measured with the Gunning Fog Index — lower scores mean easier reading.
-      </p>
-    </div>
-  </details>
+      Readability
+    </h3>
+
+    {plain_gunning_fog !== undefined && (
+      <div class="stat-row">
+        <span class="stat-label">Reading level</span>
+        <span class="stat-value plain-value">
+          {plain_gunning_fog}
+          <small>({readabilityLevel(plain_gunning_fog)})</small>
+        </span>
+      </div>
+    )}
+
+    {hasComparison && (
+      <div class="stat-row">
+        <span class="stat-label">Original</span>
+        <span class="stat-value original-value">
+          {original_gunning_fog}
+          <small>({readabilityLevel(original_gunning_fog!)})</small>
+        </span>
+      </div>
+    )}
+
+    {improvement !== undefined && improvement > 0 && (
+      <div class="improvement">
+        {improvement} grades easier to read
+      </div>
+    )}
+
+    {shame_words_count !== undefined && (
+      <div class="stat-row">
+        <span class="stat-label">Legal jargon remaining</span>
+        <span class={`stat-value ${shame_words_count === 0 ? "shame-zero" : ""}`}>{shame_words_count}</span>
+      </div>
+    )}
+
+    <p class="readability-note">
+      Measured with the Gunning Fog Index — lower scores mean easier reading.
+    </p>
+  </section>
 )}
 
 <style>
-.readability-sidebar {
+.readability-card {
   background: var(--sl-color-gray-6);
   border: 1px solid var(--sl-color-gray-5);
   border-radius: 8px;
+  padding: 1rem 1.25rem;
   margin-bottom: 1rem;
-  overflow: hidden;
+  max-width: 28rem;
 }
 
-.readability-summary {
+.readability-heading {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.75rem 1rem;
-  cursor: pointer;
-  list-style: none;
-  user-select: none;
   font-size: var(--sl-text-sm);
-  color: var(--sl-color-gray-1);
   font-weight: 600;
-}
-
-.readability-summary::-webkit-details-marker {
-  display: none;
-}
-
-.readability-summary:hover {
-  background: var(--sl-color-gray-5);
+  color: var(--sl-color-gray-1);
+  margin: 0 0 0.75rem 0;
 }
 
 .readability-icon {
@@ -107,62 +102,25 @@ const improvement = hasComparison
   color: var(--cat-color, var(--sl-color-accent));
 }
 
-.readability-label {
-  flex: 0;
-  white-space: nowrap;
-}
-
-.readability-score {
-  font-weight: normal;
-  color: var(--sl-color-gray-3);
-  font-size: var(--sl-text-xs);
-  margin-left: auto;
-}
-
-.summary-arrow {
-  width: 0.85rem;
-  height: 0.85rem;
-  color: var(--sl-color-gray-3);
-  transition: transform 0.2s;
-  flex-shrink: 0;
-}
-
-details[open] .summary-arrow {
-  transform: rotate(180deg);
-}
-
-.readability-body {
-  padding: 0 1rem 1rem;
-  border-top: 1px solid var(--sl-color-gray-5);
-}
-
-.comparison-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.75rem;
-  margin-top: 0.75rem;
-  margin-bottom: 0.75rem;
-}
-
-.comparison-item {
+.stat-row {
   display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
+  align-items: baseline;
+  gap: 0.75rem;
+  padding: 0.3rem 0;
 }
 
-.comparison-label {
-  font-size: var(--sl-text-2xs, 0.6875rem);
-  color: var(--sl-color-gray-4);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+.stat-label {
+  font-size: var(--sl-text-xs);
+  color: var(--sl-color-gray-3);
 }
 
-.comparison-value {
-  font-size: var(--sl-text-lg);
+.stat-value {
   font-weight: 700;
+  font-size: var(--sl-text-base);
+  color: var(--sl-color-gray-1);
 }
 
-.comparison-value small {
+.stat-value small {
   font-size: var(--sl-text-xs);
   font-weight: normal;
   color: var(--sl-color-gray-3);
@@ -176,40 +134,18 @@ details[open] .summary-arrow {
   color: var(--sl-color-gray-2);
 }
 
-.improvement {
-  grid-column: 1 / -1;
-  text-align: center;
-  padding: 0.35rem 0.75rem;
-  background: rgba(var(--cat-color-rgb, 21, 219, 149), 0.08);
-  border-radius: 6px;
-}
-
-.improvement-value {
-  font-size: var(--sl-text-xs);
-  font-weight: 600;
+.shame-zero {
   color: var(--cat-color, var(--sl-color-accent));
 }
 
-.shame-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.5rem 0;
-  font-size: var(--sl-text-sm);
-  color: var(--sl-color-gray-2);
-}
-
-.shame-label {
+.improvement {
+  text-align: center;
+  padding: 0.35rem 0.75rem;
+  margin: 0.4rem 0;
+  background: rgba(var(--cat-color-rgb, 21, 219, 149), 0.08);
+  border-radius: 6px;
   font-size: var(--sl-text-xs);
-  color: var(--sl-color-gray-3);
-}
-
-.shame-value {
-  font-weight: 700;
-  font-size: var(--sl-text-base);
-}
-
-.shame-zero {
+  font-weight: 600;
   color: var(--cat-color, var(--sl-color-accent));
 }
 

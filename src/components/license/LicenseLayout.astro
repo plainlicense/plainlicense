@@ -88,8 +88,12 @@ const compareEntries = (data.compare_to ?? []).map(c => ({
   )}
 
   <!-- Zone 5: What you cannot do -->
-  {limitations.length > 0 && (
-    <ZoneRestrictions limitations={limitations} aboveFold={true} />
+  {(limitations.length > 0 || (data.commercial_restrictions ?? []).length > 0) && (
+    <ZoneRestrictions
+      limitations={limitations}
+      commercialRestrictions={data.commercial_restrictions ?? []}
+      aboveFold={true}
+    />
   )}
 
   <!-- Compare with similar licenses -->

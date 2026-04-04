@@ -29,6 +29,13 @@ export const LIMITATION_MAP = {
   "patent-use": "no-patent",
 } as const;
 
+export const COMMERCIAL_RESTRICTION_MAP = {
+  "no-managed-service": "no-managed-service",
+  "no-selling": "no-selling",
+  "network-copyleft": "network-copyleft",
+  "time-delayed-open": "time-delayed-open",
+} as const;
+
 export const TAG_DESCRIPTIONS: Record<string, string> = {
   "can-sell": "You can sell this work or use it in a paid product.",
   "can-share": "You can share or give copies of this work to anyone.",
@@ -56,6 +63,13 @@ export const TAG_DESCRIPTIONS: Record<string, string> = {
   "no-trademark":
     "You can't use the creators' names or marks to endorse your product.",
   "no-patent": "You can't sue users of this work for patent infringement.",
+  "no-managed-service":
+    "You can't offer this work as a hosted or managed service for others.",
+  "no-selling": "You can't sell this work or charge for access to it.",
+  "network-copyleft":
+    "Letting users access this work over a network triggers sharing requirements.",
+  "time-delayed-open":
+    "The source must be released openly after a set time period.",
 };
 
 export const PERMISSION_LABELS: Record<string, string> = {
@@ -83,6 +97,13 @@ export const LIMITATION_LABELS: Record<string, string> = {
   warranty: "No warranty",
   "trademark-use": "No trademark use",
   "patent-use": "No patent claims",
+};
+
+export const COMMERCIAL_RESTRICTION_LABELS: Record<string, string> = {
+  "no-managed-service": "No hosted service",
+  "no-selling": "No selling",
+  "network-copyleft": "Network copyleft",
+  "time-delayed-open": "Delayed open source",
 };
 
 export const PERMISSION_WHY: Record<string, string> = {
@@ -119,6 +140,17 @@ export const LIMITATION_WHY: Record<string, string> = {
     "So the creators are not exposed to patent lawsuits from users.",
 };
 
+export const COMMERCIAL_RESTRICTION_WHY: Record<string, string> = {
+  "no-managed-service":
+    "So only the creators can offer the work as a service to paying customers.",
+  "no-selling":
+    "So the creators retain exclusive commercial rights to the work.",
+  "network-copyleft":
+    "So network use is treated the same as distributing a copy.",
+  "time-delayed-open":
+    "So the creators have a window of commercial exclusivity before open release.",
+};
+
 export const PERMISSION_ICONS: Record<string, string> = {
   "commercial-use": "dollar",
   distribution: "share",
@@ -144,4 +176,11 @@ export const LIMITATION_ICONS: Record<string, string> = {
   warranty: "shield-off",
   "trademark-use": "trademark",
   "patent-use": "certificate",
+};
+
+export const COMMERCIAL_RESTRICTION_ICONS: Record<string, string> = {
+  "no-managed-service": "ban",
+  "no-selling": "dollar",
+  "network-copyleft": "globe",
+  "time-delayed-open": "clock",
 };

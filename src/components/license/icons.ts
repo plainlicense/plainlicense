@@ -66,6 +66,9 @@ export const ICONS: Record<string, string> = {
 	"chevron-down":
 		'<polyline points="6 9 12 15 18 9"/>',
 
+	clock:
+		'<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>',
+
 	// Readability
 	"bar-chart":
 		'<line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/>',

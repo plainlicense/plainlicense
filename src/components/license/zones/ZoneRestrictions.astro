@@ -6,6 +6,10 @@
  * For source-available licenses, aboveFold=true moves it above the fold.
  */
 import {
+  COMMERCIAL_RESTRICTION_ICONS,
+  COMMERCIAL_RESTRICTION_LABELS,
+  COMMERCIAL_RESTRICTION_MAP,
+  COMMERCIAL_RESTRICTION_WHY,
   LIMITATION_ICONS,
   LIMITATION_LABELS,
   LIMITATION_MAP,
@@ -16,14 +20,15 @@ import { ICONS } from "../icons";
 
 interface Props {
   limitations?: string[];
+  commercialRestrictions?: string[];
   aboveFold?: boolean;
 }
 
-const { limitations = [], aboveFold = false } = Astro.props as Props;
+const { limitations = [], commercialRestrictions = [], aboveFold = false } = Astro.props as Props;
 
-// Deduplicate
+// Build limitation cards (deduplicated)
 const seen = new Set<string>();
-const cards = limitations
+const limitationCards = limitations
   .filter((tag) => {
     const display = LIMITATION_MAP[tag as keyof typeof LIMITATION_MAP];
     if (!display || seen.has(display)) return false;
@@ -35,11 +40,25 @@ const cards = limitations
     return {
       tag,
       label: LIMITATION_LABELS[tag] ?? tag,
-      icon: LIMITATION_ICONS[tag] ?? "✗",
+      icon: LIMITATION_ICONS[tag] ?? "ban",
       description: TAG_DESCRIPTIONS[display] ?? "",
       why: LIMITATION_WHY[tag] ?? "",
     };
   });
+
+// Build commercial restriction cards
+const commercialCards = commercialRestrictions
+  .filter((tag) => tag in COMMERCIAL_RESTRICTION_MAP)
+  .map((tag) => ({
+    tag,
+    label: COMMERCIAL_RESTRICTION_LABELS[tag] ?? tag,
+    icon: COMMERCIAL_RESTRICTION_ICONS[tag] ?? "ban",
+    description: TAG_DESCRIPTIONS[tag] ?? "",
+    why: COMMERCIAL_RESTRICTION_WHY[tag] ?? "",
+  }));
+
+// Commercial restrictions first (more important), then general limitations
+const cards = [...commercialCards, ...limitationCards];
 ---
 
 {cards.length > 0 && (
