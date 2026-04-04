@@ -31,6 +31,22 @@ const SEMANTIC_ALERT_MAP: Record<string, { gfm: string; cm: string }> = {
   interpretation: { gfm: "NOTE", cm: "Note" },
 };
 
+// ── Content Stripping ─────────────────────────────────────────────
+
+/**
+ * Strips the original license text from markdown content.
+ * Exports only contain the plain language version, not the original.
+ * Original text appears after a `---` separator followed by `# Original License Text`.
+ */
+export function stripOriginalLicenseText(markdown: string): string {
+  const separatorPattern = /\n---\s*\n+#\s*Original\s+License\s+Text/i;
+  const match = markdown.match(separatorPattern);
+  if (match?.index != null) {
+    return markdown.slice(0, match.index).trimEnd();
+  }
+  return markdown;
+}
+
 // ── Shared Transforms ──────────────────────────────────────────────
 
 /**

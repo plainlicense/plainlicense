@@ -7,10 +7,11 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { parseComponentPlaceholders } from "../../utils/component-parser";
 import { sha256 } from "../../utils/hash";
+import { generateEmbed } from "./embed";
 import { generateMarkdown } from "./markdown";
 import { generatePDF } from "./pdf";
 import { generatePlaintext } from "./plaintext";
-import { licenseUrl } from "../../utils/constants";
+import { stripOriginalLicenseText } from "./transforms";
 
 export interface ExportContext {
   licenseId: string;
@@ -54,8 +55,9 @@ export class ExportOrchestrator {
 
     console.log(`Generating exports for ${licenseId}@${version}...`);
 
-    // Process reactive components for static formats
-    const staticContent = this.processReactiveComponents(content);
+    // Strip original license text and process reactive components for static formats
+    const plainOnly = stripOriginalLicenseText(content);
+    const staticContent = this.processReactiveComponents(plainOnly);
     const staticCtx = {
       ...ctx,
       content: staticContent,
@@ -70,7 +72,7 @@ export class ExportOrchestrator {
       generatePlaintext(staticCtx),
       generatePDF(staticCtx),
       this.generateSPDX(staticCtx),
-      this.generateEmbed(staticCtx),
+      generateEmbed(staticCtx),
     ]);
 
     const allResults = { markdown, plaintext, pdf, spdx, embed };
@@ -175,19 +177,5 @@ export class ExportOrchestrator {
     await fs.mkdir(outputDir, { recursive: true });
     await fs.writeFile(filePath, xml);
     console.log(`Generated SPDX XML export: ${filePath}`);
-  }
-
-  private async generateEmbed(ctx: ExportContext) {
-    const { plainId, version, licenseId, metadata, outputDir } = ctx;
-    const fileName = `${plainId}-${version}-embed.html`;
-    const filePath = path.join(outputDir, fileName);
-
-    const html = `<div class="pl-embed" data-license="${licenseId}" data-version="${version}">
-  <a href="${licenseUrl(metadata.slug)}">${metadata.title}</a>
-</div>`;
-
-    await fs.mkdir(outputDir, { recursive: true });
-    await fs.writeFile(filePath, html);
-    console.log(`Generated Embed HTML export: ${filePath}`);
   }
 }

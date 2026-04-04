@@ -16,14 +16,10 @@ interface Props {
   };
 }
 
-import { ICONS } from "../icons";
 import { GITHUB_REPO } from "../../../utils/constants";
-const {
-  plain_name,
-  license_family,
-  is_dedication = false,
-  original,
-} = Astro.props as Props;
+import { ICONS } from "../icons";
+
+const { plain_name, is_dedication = false, original } = Astro.props as Props;
 
 const licenseKind = is_dedication ? "dedication" : "license";
 const originalVersionDisplay =
@@ -35,139 +31,163 @@ const isOriginal = !original; // PlainLicense original (no original object)
 
 <details class="zone zone-interpretation">
   <summary class="interpretation-summary">
-    <svg class="summary-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" set:html={ICONS.scale} />
+    <svg
+      class="summary-icon"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      aria-hidden="true"
+      set:html={ICONS.scale}
+    />
     <span class="summary-heading">Legal interpretation</span>
     <span class="summary-arrow" aria-hidden="true">▾</span>
   </summary>
   <div class="interpretation-body">
-    {isOriginal ? (
-      <div class="interpretation-content">
-        <p>
-          The {plain_name} is an original plain language {licenseKind} published by PlainLicense.
-          It is not derived from any other license.
-        </p>
-        <p>
-          If a court finds that any part of this {licenseKind} can't be enforced,
-          the rest of the {licenseKind}'s rules still apply.
-        </p>
-        <p class="repo-link-text">
-          Source and full history: <a href={GITHUB_REPO} target="_blank" rel="noopener noreferrer">github.com/plainlicense/plainlicense<span class="sr-only"> (opens in new tab)</span></a>
-        </p>
-      </div>
-    ) : (
-      <div class="interpretation-content">
-        <p>
-          The {plain_name} is a plain language version of the{' '}
-          {canonicalUrl ? (
-            <a href={canonicalUrl} target="_blank" rel="noopener noreferrer">{originalVersionDisplay}<span class="sr-only"> (opens in new tab)</span></a>
-          ) : (
-            <strong>{originalVersionDisplay}</strong>
-          )}.
-          We wrote it to make the {originalVersionDisplay} more accessible and understandable,
-          without changing its legal intent.
-        </p>
-        <p>
-          If precise legal language matters for your situation — for example, if you're in a
-          dispute or reviewing compliance — refer to the official{' '}
-          {canonicalUrl ? (
-            <a href={canonicalUrl} target="_blank" rel="noopener noreferrer">{originalName}<span class="sr-only"> (opens in new tab)</span></a>
-          ) : (
-            <strong>{originalName}</strong>
-          )}.
-        </p>
-        <p>
-          If a court finds that any part of this {licenseKind} can't be enforced,
-          the rest of the {licenseKind}'s rules still apply.
-        </p>
-      </div>
-    )}
+    {
+      isOriginal ? (
+        <div class="interpretation-content">
+          <p>
+            The {plain_name} is an original plain language {licenseKind}{" "}
+            published by PlainLicense. It is not derived from any other license.
+          </p>
+          <p>
+            If a court finds that any part of this {licenseKind} can't be
+            enforced, the rest of the {licenseKind}'s rules still apply.
+          </p>
+          <p class="repo-link-text">
+            Source and full history:{" "}
+            <a href={GITHUB_REPO} target="_blank" rel="noopener noreferrer">
+              github.com/plainlicense/plainlicense
+              <span class="sr-only"> (opens in new tab)</span>
+            </a>
+          </p>
+        </div>
+      ) : (
+        <div class="interpretation-content">
+          <p>
+            The {plain_name} is a plain language version of the{" "}
+            {canonicalUrl ? (
+              <a href={canonicalUrl} target="_blank" rel="noopener noreferrer">
+                {originalVersionDisplay}
+                <span class="sr-only"> (opens in new tab)</span>
+              </a>
+            ) : (
+              <strong>{originalVersionDisplay}</strong>
+            )}
+            . We wrote it to make the {originalVersionDisplay} more accessible
+            and understandable, without changing its legal intent.
+          </p>
+          <p>
+            If precise legal language matters for your situation — for example,
+            if you're in a dispute or reviewing compliance — refer to the
+            official{" "}
+            {canonicalUrl ? (
+              <a href={canonicalUrl} target="_blank" rel="noopener noreferrer">
+                {originalName}
+                <span class="sr-only"> (opens in new tab)</span>
+              </a>
+            ) : (
+              <strong>{originalName}</strong>
+            )}
+            .
+          </p>
+          <p>
+            If a court finds that any part of this {licenseKind} can't be
+            enforced, the rest of the {licenseKind}'s rules still apply.
+          </p>
+        </div>
+      )
+    }
   </div>
 </details>
 
 <style>
-.zone-interpretation {
-  background: var(--sl-color-gray-6);
-  border: 1px solid var(--sl-color-gray-5);
-  border-left: 3px solid rgba(228, 197, 129, 0.3);
-  border-radius: 0 8px 8px 0;
-  margin-bottom: 1rem;
-  overflow: hidden;
-}
+  .zone-interpretation {
+    background: var(--sl-color-gray-6);
+    border: 1px solid var(--sl-color-gray-5);
+    border-left: 3px solid rgba(228, 197, 129, 0.3);
+    border-radius: 0 8px 8px 0;
+    margin-bottom: 1rem;
+    overflow: hidden;
+  }
 
-.interpretation-summary {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.9rem 1.25rem;
-  cursor: pointer;
-  list-style: none;
-  user-select: none;
-  color: var(--sl-color-gray-1);
-  font-weight: 600;
-  font-size: var(--sl-text-sm);
-}
+  .interpretation-summary {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.9rem 1.25rem;
+    cursor: pointer;
+    list-style: none;
+    user-select: none;
+    color: var(--sl-color-gray-1);
+    font-weight: 600;
+    font-size: var(--sl-text-sm);
+  }
 
-.interpretation-summary::-webkit-details-marker {
-  display: none;
-}
+  .interpretation-summary::-webkit-details-marker {
+    display: none;
+  }
 
-.interpretation-summary:hover {
-  background: var(--sl-color-gray-5);
-}
+  .interpretation-summary:hover {
+    background: var(--sl-color-gray-5);
+  }
 
-.summary-icon {
-  width: 1rem;
-  height: 1rem;
-  flex-shrink: 0;
-  color: var(--ecru);
-}
+  .summary-icon {
+    width: 1rem;
+    height: 1rem;
+    flex-shrink: 0;
+    color: var(--ecru);
+  }
 
-.summary-heading {
-  flex: 1;
-  font-weight: 700;
-}
+  .summary-heading {
+    flex: 1;
+    font-weight: 700;
+  }
 
-.summary-arrow {
-  font-size: 0.8rem;
-  color: var(--sl-color-gray-3);
-  transition: transform 0.2s;
-}
+  .summary-arrow {
+    font-size: 0.8rem;
+    color: var(--sl-color-gray-3);
+    transition: transform 0.2s;
+  }
 
-details[open] .summary-arrow {
-  transform: rotate(180deg);
-}
+  details[open] .summary-arrow {
+    transform: rotate(180deg);
+  }
 
-.interpretation-body {
-  padding: 0 1.25rem 1.25rem;
-  border-top: 1px solid var(--sl-color-gray-5);
-}
+  .interpretation-body {
+    padding: 0 1.25rem 1.25rem;
+    border-top: 1px solid var(--sl-color-gray-5);
+  }
 
-.interpretation-content {
-  margin-top: 1rem;
-  font-size: var(--sl-text-sm);
-  color: var(--sl-color-gray-2);
-  line-height: 1.6;
-}
+  .interpretation-content {
+    margin-top: 1rem;
+    font-size: var(--sl-text-sm);
+    color: var(--sl-color-gray-2);
+    line-height: 1.6;
+  }
 
-.interpretation-content p {
-  margin: 0 0 0.75rem 0;
-}
+  .interpretation-content p {
+    margin: 0 0 0.75rem 0;
+  }
 
-.interpretation-content p:last-child {
-  margin-bottom: 0;
-}
+  .interpretation-content p:last-child {
+    margin-bottom: 0;
+  }
 
-.interpretation-content a {
-  color: var(--sl-color-accent);
-  text-underline-offset: 3px;
-}
+  .interpretation-content a {
+    color: var(--sl-color-accent);
+    text-underline-offset: 3px;
+  }
 
-.interpretation-content strong {
-  color: var(--sl-color-gray-1);
-}
+  .interpretation-content strong {
+    color: var(--sl-color-gray-1);
+  }
 
-.repo-link-text {
-  font-size: var(--sl-text-xs);
-  color: var(--sl-color-gray-3);
-}
+  .repo-link-text {
+    font-size: var(--sl-text-xs);
+    color: var(--sl-color-gray-3);
+  }
 </style>

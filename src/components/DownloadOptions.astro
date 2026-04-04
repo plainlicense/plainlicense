@@ -1,7 +1,7 @@
 ---
 import type { LicenseEntryT } from "../_types/licenses";
-import { derivePlainId } from "../utils/plain-id";
 import { GITHUB_DISCUSSIONS, licenseUrl } from "../utils/constants";
+import { derivePlainId } from "../utils/plain-id";
 import { ICONS } from "./license/icons";
 
 interface Props {
@@ -49,6 +49,12 @@ const formats = [
     icon: "file-text",
   },
   {
+    name: "Embed HTML",
+    ext: ".html",
+    path: `${exportBase}${baseName}-embed.html`,
+    icon: "code",
+  },
+  {
     name: "SPDX XML",
     ext: ".xml",
     path: `${exportBase}${baseName}.xml`,
@@ -57,8 +63,7 @@ const formats = [
 ];
 
 const embedUrl = licenseUrl(`${data.license_family}/${spdxDir}`);
-const embedCode = `<iframe
-  id="license-embed"
+const iframeCode = `<iframe
   src="${embedUrl}"
   style="width: 100%; height: 600px; border: none;"
   title="${data.plain_name}"
@@ -103,7 +108,7 @@ const embedCode = `<iframe
         id="embed-toggle"
         aria-expanded="false"
         aria-controls="embed-panel"
-        aria-label="Show embed instructions for iframe integration"
+        aria-label="Show embedding options and instructions"
       >
         <svg
           class="format-icon"
@@ -116,8 +121,8 @@ const embedCode = `<iframe
           aria-hidden="true"
           set:html={ICONS.code ?? ""}
         />
-        <span class="format-name">Embed</span>
-        <span class="format-ext">&lt;iframe&gt;</span>
+        <span class="format-name">How to embed</span>
+        <span class="format-ext">options</span>
       </button>
     </li>
   </ul>
@@ -144,87 +149,70 @@ const embedCode = `<iframe
     </div>
 
     <p class="embed-intro">
-      Copy the code below and paste it into your HTML. The iframe displays the
-      license as it appears on Plain License, sandboxed so it won't affect your
-      site.
+      The <strong>Embed HTML</strong> download above is a self-contained HTML
+      file with the full license text and inlined styles. Drop it into your
+      project, serve it in an iframe, or include it directly. It auto-adapts to
+      light and dark mode via <code>prefers-color-scheme</code>.
     </p>
 
-    <div class="embed-code-block" role="group" aria-label="Embed code snippet">
-      <pre><code id="embed-code">{embedCode}</code></pre>
-      <button
-        type="button"
-        class="embed-copy-btn"
-        id="embed-copy"
-        aria-label="Copy embed code to clipboard"
-      >
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          aria-hidden="true"
-          set:html={ICONS.copy ?? ""}
-        />
-        <span>Copy</span>
-      </button>
-      <div
-        id="embed-copy-status"
-        role="status"
-        aria-live="polite"
-        aria-atomic="true"
-        class="sr-only"
-      >
+    <details class="embed-details">
+      <summary>Use as an iframe</summary>
+      <p>Copy the code below to embed the live version from Plain License:</p>
+      <div class="embed-code-block" role="group" aria-label="Iframe code snippet">
+        <pre><code id="embed-code">{iframeCode}</code></pre>
+        <button
+          type="button"
+          class="embed-copy-btn"
+          id="embed-copy"
+          aria-label="Copy iframe code to clipboard"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+            set:html={ICONS.copy ?? ""}
+          />
+          <span>Copy</span>
+        </button>
+        <div
+          id="embed-copy-status"
+          role="status"
+          aria-live="polite"
+          aria-atomic="true"
+          class="sr-only"
+        >
+        </div>
       </div>
-    </div>
-
-    <details class="embed-details">
-      <summary>Customizing size</summary>
-      <p>Adjust the <code>style</code> attribute on the iframe:</p>
-      <pre><code>{`<!-- Full width, taller -->
-style="width: 100%; height: 800px; border: none;"
-
-<!-- Fixed width -->
-style="width: 800px; height: 500px; border: none;"
-
-<!-- Full width, minimum height -->
-style="width: 100%; min-height: 500px; border: none;"`}</code></pre>
+      <p>
+        The iframe renders the full license page (dark theme) and stays
+        up&#8209;to&#8209;date automatically. For offline use or theme
+        adaptation, use the Embed HTML download instead.
+      </p>
     </details>
 
     <details class="embed-details">
-      <summary>Color scheme</summary>
+      <summary>Customise the embed file</summary>
       <p>
-        The embed matches your visitors' system preference (light/dark) by
-        default.
+        The embed file uses CSS custom properties you can override from a parent
+        element or your own stylesheet:
       </p>
+      <pre><code>{`/* Override on the embed container or :root */
+.pl-embed {
+  --pl-bg: #your-background;
+  --pl-text: #your-text-color;
+  --pl-accent: #your-accent-color;
+  --pl-border: #your-border-color;
+  --pl-surface: #your-surface-color;
+}`}</code></pre>
       <p>
-        <strong>Force a theme</strong> by adding <code>?theme=light</code> or <code
-          >?theme=dark</code
-        > to the URL:
+        Or simply let <code>prefers-color-scheme</code> handle it &mdash; the
+        file ships with light and dark modes that match your visitors' system
+        preference.
       </p>
-      <pre><code>{`src="${embedUrl}?theme=light"
-src="${embedUrl}?theme=dark"`}</code></pre>
-    </details>
-
-    <details class="embed-details">
-      <summary>Sync theme with your site</summary>
-      <p>
-        Send a <code>postMessage</code> to keep the embed in sync with your site's
-        theme toggle:
-      </p>
-      <pre><code>{`const syncTheme = () => {
-  const iframe = document.getElementById("license-embed");
-  const theme = document.documentElement.classList.contains("dark")
-    ? "dark" : "light";
-  iframe.contentWindow.postMessage({ theme }, "${embedUrl}");
-};
-
-// Call on load
-syncTheme();
-
-// Call when your site's theme changes
-document.addEventListener("themeChange", syncTheme);`}</code></pre>
     </details>
 
     <p class="embed-help">

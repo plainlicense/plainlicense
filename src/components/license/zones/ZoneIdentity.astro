@@ -26,7 +26,6 @@ const {
   tldr,
   is_dedication = false,
   maker_pitch,
-  original,
 } = Astro.props as Props;
 
 const familyLabel = FAMILY_LABELS[license_family] ?? license_family;
@@ -42,208 +41,248 @@ const isSourceAvailable = license_family === "source-available";
     >
       {familyLabel}
     </span>
-    {is_dedication && (
-      <span class="dedication-badge" role="note" aria-label="Public domain dedication">
-        Dedication
-      </span>
-    )}
+    {
+      is_dedication && (
+        <span
+          class="dedication-badge"
+          role="note"
+          aria-label="Public domain dedication"
+        >
+          Dedication
+        </span>
+      )
+    }
   </div>
 
-  {maker_pitch && (
-    <p class="maker-pitch">{maker_pitch}</p>
-  )}
+  {maker_pitch && <p class="maker-pitch">{maker_pitch}</p>}
 
   <p class="license-description">{description}</p>
 
-  {isSourceAvailable && (
-    <section class="callout callout--important" aria-label="Important notice">
-      <svg class="callout-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" set:html={ICONS.warning} />
-      <span>This license has <strong>commercial restrictions</strong> — see <em>What you cannot do</em> below.</span>
-    </section>
-  )}
+  {
+    isSourceAvailable && (
+      <section class="callout callout--important" aria-label="Important notice">
+        <svg
+          class="callout-icon"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+          set:html={ICONS.warning}
+        />
+        <span>
+          This license has <strong>commercial restrictions</strong> — see{" "}
+          <em>What you cannot do</em> below.
+        </span>
+      </section>
+    )
+  }
 
   <div class="tldr-block" role="note" aria-label="Quick summary">
     <div class="tldr-header">
-      <svg class="tldr-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" set:html={ICONS["list-format"]} />
+      <svg
+        class="tldr-icon"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+        set:html={ICONS["list-format"]}
+      />
       <strong>The short version:</strong>
     </div>
     <ul class="tldr-list">
-      {tldr.map((bullet) => (
-        <li>{bullet}</li>
-      ))}
+      {tldr.map((bullet) => <li>{bullet}</li>)}
     </ul>
   </div>
 
-  {!is_dedication && (
-    <div class="copyright-block">
-      <p class="copyright-label">Copyright notice — replace the bracketed text with your own details:</p>
-      <code class="copyright-template">
-        Copyright &copy; <span class="placeholder" data-placeholder="year">[Year]</span>{' '}
-        <span class="placeholder" data-placeholder="holder">[Copyright holder name]</span>
-      </code>
-    </div>
-  )}
+  {
+    !is_dedication && (
+      <div class="copyright-block">
+        <p class="copyright-label">
+          Copyright notice — replace the bracketed text with your own details:
+        </p>
+        <code class="copyright-template">
+          Copyright &copy;{" "}
+          <span class="placeholder" data-placeholder="year">
+            [Year]
+          </span>{" "}
+          <span class="placeholder" data-placeholder="holder">
+            [Copyright holder name]
+          </span>
+        </code>
+      </div>
+    )
+  }
 </section>
 
 <style>
-.zone-identity {
-  margin-bottom: 2.5rem;
-}
+  .zone-identity {
+    margin-bottom: 2.5rem;
+  }
 
-.zone-header {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  margin-bottom: 1rem;
-}
+  .zone-header {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
 
-.license-title {
-  font-size: clamp(1.5rem, 4vw, 2.25rem);
-  font-weight: 800;
-  margin: 0;
-  color: var(--sl-color-white);
-  line-height: 1.2;
-}
+  .license-title {
+    font-size: clamp(1.5rem, 4vw, 2.25rem);
+    font-weight: 800;
+    margin: 0;
+    color: var(--sl-color-white);
+    line-height: 1.2;
+  }
 
-.family-badge {
-  display: inline-block;
-  padding: 0.25rem 0.75rem;
-  border-radius: 99px;
-  font-size: var(--sl-text-xs);
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  white-space: nowrap;
-  background: rgba(var(--cat-color-rgb, 21, 219, 149), 0.15);
-  color: var(--cat-color, var(--emerald));
-  border: 1px solid rgba(var(--cat-color-rgb, 21, 219, 149), 0.3);
-}
+  .family-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 99px;
+    font-size: var(--sl-text-xs);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    white-space: nowrap;
+    background: rgba(var(--cat-color-rgb, 21, 219, 149), 0.15);
+    color: var(--cat-color, var(--emerald));
+    border: 1px solid rgba(var(--cat-color-rgb, 21, 219, 149), 0.3);
+  }
 
-.dedication-badge {
-  display: inline-block;
-  padding: 0.25rem 0.75rem;
-  border-radius: 99px;
-  font-size: var(--sl-text-xs);
-  font-weight: 600;
-  background: rgba(var(--ecru-rgb), 0.1);
-  color: var(--ecru);
-  border: 1px solid rgba(var(--ecru-rgb), 0.2);
-}
+  .dedication-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 99px;
+    font-size: var(--sl-text-xs);
+    font-weight: 600;
+    background: rgba(var(--ecru-rgb), 0.1);
+    color: var(--ecru);
+    border: 1px solid rgba(var(--ecru-rgb), 0.2);
+  }
 
-.maker-pitch {
-  font-size: clamp(1.1rem, 2.5vw, 1.3rem);
-  color: var(--cat-color, var(--sl-color-accent));
-  font-weight: 600;
-  margin: 0 0 0.5rem 0;
-  line-height: 1.4;
-  letter-spacing: -0.01em;
-}
+  .maker-pitch {
+    font-size: clamp(1.1rem, 2.5vw, 1.3rem);
+    color: var(--cat-color, var(--sl-color-accent));
+    font-weight: 600;
+    margin: 0 0 0.5rem 0;
+    line-height: 1.4;
+    letter-spacing: -0.01em;
+  }
 
-.license-description {
-  font-size: var(--sl-text-base);
-  color: var(--sl-color-gray-3);
-  margin: 0 0 1.5rem 0;
-  line-height: 1.6;
-}
+  .license-description {
+    font-size: var(--sl-text-base);
+    color: var(--sl-color-gray-3);
+    margin: 0 0 1.5rem 0;
+    line-height: 1.6;
+  }
 
-.callout {
-  display: flex;
-  gap: 0.75rem;
-  align-items: flex-start;
-  padding: 1rem 1.25rem;
-  border-radius: 8px;
-  margin-bottom: 1.5rem;
-  font-size: var(--sl-text-sm);
-  line-height: 1.5;
-}
+  .callout {
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+    padding: 1rem 1.25rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    font-size: var(--sl-text-sm);
+    line-height: 1.5;
+  }
 
-.callout--important {
-  background: rgba(var(--callout-orange-rgb), 0.1);
-  border: 1px solid rgba(var(--callout-orange-rgb), 0.3);
-  color: var(--sl-color-gray-1);
-}
+  .callout--important {
+    background: rgba(var(--callout-orange-rgb), 0.1);
+    border: 1px solid rgba(var(--callout-orange-rgb), 0.3);
+    color: var(--sl-color-gray-1);
+  }
 
-.callout-icon {
-  width: 1.1rem;
-  height: 1.1rem;
-  flex-shrink: 0;
-  margin-top: 0.15rem;
-  color: var(--callout-orange);
-}
+  .callout-icon {
+    width: 1.1rem;
+    height: 1.1rem;
+    flex-shrink: 0;
+    margin-top: 0.15rem;
+    color: var(--callout-orange);
+  }
 
-.tldr-block {
-  background:
-    linear-gradient(135deg, rgba(var(--cat-color-rgb, 21, 219, 149), 0.07) 0%, transparent 60%),
-    var(--sl-color-gray-6);
-  border: 1px solid rgba(var(--cat-color-rgb, 21, 219, 149), 0.15);
-  border-left: 4px solid var(--cat-color, var(--sl-color-accent));
-  border-radius: 0 12px 12px 0;
-  padding: 1.5rem 1.75rem;
-  margin-bottom: 2rem;
-}
+  .tldr-block {
+    background:
+      linear-gradient(
+        135deg,
+        rgba(var(--cat-color-rgb, 21, 219, 149), 0.07) 0%,
+        transparent 60%
+      ),
+      var(--sl-color-gray-6);
+    border: 1px solid rgba(var(--cat-color-rgb, 21, 219, 149), 0.15);
+    border-left: 4px solid var(--cat-color, var(--sl-color-accent));
+    border-radius: 0 12px 12px 0;
+    padding: 1.5rem 1.75rem;
+    margin-bottom: 2rem;
+  }
 
-.tldr-header {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
-  font-size: var(--sl-text-base);
-  color: var(--sl-color-gray-1);
-}
+  .tldr-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    font-size: var(--sl-text-base);
+    color: var(--sl-color-gray-1);
+  }
 
-.tldr-header strong {
-  color: var(--cat-color, var(--sl-color-accent));
-}
+  .tldr-header strong {
+    color: var(--cat-color, var(--sl-color-accent));
+  }
 
-.tldr-icon {
-  width: 1.1rem;
-  height: 1.1rem;
-  flex-shrink: 0;
-  color: var(--cat-color, var(--sl-color-accent));
-}
+  .tldr-icon {
+    width: 1.1rem;
+    height: 1.1rem;
+    flex-shrink: 0;
+    color: var(--cat-color, var(--sl-color-accent));
+  }
 
-.tldr-list {
-  margin: 0;
-  padding-left: 1.25rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
+  .tldr-list {
+    margin: 0;
+    padding-left: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
 
-.tldr-list li {
-  font-size: var(--sl-text-base);
-  color: var(--sl-color-white);
-  line-height: 1.6;
-}
+  .tldr-list li {
+    font-size: var(--sl-text-base);
+    color: var(--sl-color-white);
+    line-height: 1.6;
+  }
 
-.copyright-block {
-  background: var(--sl-color-gray-7, var(--sl-color-black));
-  border: 1px solid var(--sl-color-gray-5);
-  border-radius: 8px;
-  padding: 1rem 1.25rem;
-  margin-top: 1rem;
-}
+  .copyright-block {
+    background: var(--sl-color-gray-7, var(--sl-color-black));
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+    margin-top: 1rem;
+  }
 
-.copyright-label {
-  font-size: var(--sl-text-xs);
-  color: var(--sl-color-gray-3);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  margin: 0 0 0.5rem 0;
-}
+  .copyright-label {
+    font-size: var(--sl-text-xs);
+    color: var(--sl-color-gray-3);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin: 0 0 0.5rem 0;
+  }
 
-.copyright-template {
-  font-family: var(--sl-font-mono, monospace);
-  font-size: var(--sl-text-sm);
-  color: var(--sl-color-gray-1);
-  display: block;
-  white-space: pre-wrap;
-  word-break: break-word;
-}
+  .copyright-template {
+    font-family: var(--sl-font-mono, monospace);
+    font-size: var(--sl-text-sm);
+    color: var(--sl-color-gray-1);
+    display: block;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
 
-.placeholder {
-  color: var(--sl-color-accent);
-  font-style: italic;
-}
+  .placeholder {
+    color: var(--sl-color-accent);
+    font-style: italic;
+  }
 </style>

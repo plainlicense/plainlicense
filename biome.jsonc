@@ -131,6 +131,16 @@
       "linter": {
         "enabled": false
       }
+    },
+    {
+      "includes": ["src/**/*.css"],
+      "linter": {
+        "rules": {
+          "complexity": {
+            "noImportantStyles": "off"
+          }
+        }
+      }
     }
   ]
 }

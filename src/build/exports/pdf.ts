@@ -7,7 +7,6 @@ import { licenseUrl, SITE_URL } from "../../utils/constants";
 
 /**
  * Color palettes per license family, matching the website's CSS variables.
- * Each tuple: [primary accent, muted accent for backgrounds].
  */
 const FAMILY_COLORS: Record<string, { accent: string; muted: string; label: string }> = {
   permissive: { accent: "rgb(21, 219, 149)", muted: "rgb(9, 93, 64)", label: "Permissive" },
@@ -85,8 +84,6 @@ function generateTypst(
   const description = metadata.description || "";
   const isDedication = metadata.is_dedication || false;
   const originalName = metadata.original?.name || "";
-  const readabilityScore = metadata.plain_gunning_fog;
-  const originalScore = metadata.original?.original_gunning_fog;
 
   // Track which zone we're currently inside
   let currentZone: string | null = null;
@@ -104,9 +101,57 @@ function generateTypst(
       .replace(/>/g, "\\>");
   }
 
+  /**
+   * Detect definition list patterns: a paragraph containing only a code span
+   * followed by a paragraph starting with `:`.
+   */
+  function isDefinitionTerm(token: any): boolean {
+    if (token.type !== "paragraph" || !token.tokens) return false;
+    // All non-space tokens should be codespans (possibly with surrounding text tokens that are just whitespace/connectors)
+    const meaningful = token.tokens.filter((t: any) => t.type !== "space");
+    // Simple case: single codespan, or codespans joined by "and"/"/"
+    const hasCodespan = meaningful.some((t: any) => t.type === "codespan");
+    const onlyCodesAndText = meaningful.every((t: any) =>
+      t.type === "codespan" || (t.type === "text" && /^\s*(and|\/|,)\s*$/.test(t.text))
+    );
+    return hasCodespan && onlyCodesAndText;
+  }
+
+  function isDefinitionBody(token: any): boolean {
+    if (token.type !== "paragraph" || !token.tokens) return false;
+    const firstText = token.tokens[0];
+    return firstText?.type === "text" && /^:\s+/.test(firstText.text);
+  }
+
   function processTokens(tokens: any[], depth = 0): string {
     let result = "";
-    for (const token of tokens) {
+    for (let i = 0; i < tokens.length; i++) {
+      const token = tokens[i];
+
+      // Definition list detection: term paragraph followed by definition paragraph
+      if (isDefinitionTerm(token)) {
+        const termText = processTokens(token.tokens, depth);
+        // Look ahead for the definition body
+        const nextNonSpace = tokens.slice(i + 1).find((t: any) => t.type !== "space");
+        if (nextNonSpace && isDefinitionBody(nextNonSpace)) {
+          // Skip the space token(s) between term and definition
+          while (i + 1 < tokens.length && tokens[i + 1].type === "space") i++;
+          i++; // skip the definition body token
+          // Process definition body, stripping the leading `: `
+          const defTokens = [...nextNonSpace.tokens];
+          if (defTokens[0]?.type === "text") {
+            defTokens[0] = { ...defTokens[0], text: defTokens[0].text.replace(/^:\s+/, "") };
+          }
+          const defText = processTokens(defTokens, depth);
+
+          result += `#block(inset: (left: 12pt, top: 6pt, bottom: 6pt), stroke: (left: 2pt + rgb(50, 55, 70)))[\n`;
+          result += `  #text(font: "JetBrains Mono", size: 9.5pt, weight: "bold", fill: ${colors.accent})[${termText.trim()}] \\\n`;
+          result += `  #text(size: 9.5pt, fill: rgb(180, 188, 200))[${defText.trim()}]\n`;
+          result += `]\n#v(0.3em)\n\n`;
+          continue;
+        }
+      }
+
       switch (token.type) {
         case "heading": {
           const headingText = processTokens(token.tokens, depth);
@@ -116,7 +161,7 @@ function generateTypst(
             break;
           }
           if (token.depth === 1) {
-            // H1 — major section header (e.g. "Original License Text")
+            // H1 — major section header
             result += `\n#v(1.5em)\n`;
             result += `#block(width: 100%, below: 1em)[\n`;
             result += `  #text(font: "Plus Jakarta Sans", size: 18pt, weight: "bold", fill: ${colors.accent})[${headingText}]\n`;
@@ -211,6 +256,17 @@ function generateTypst(
         case "space":
           break;
         case "html": {
+          // Handle inline <ins> tags → underline in Typst
+          if (token.text === "<ins>") {
+            insideIns = true;
+            result += "#underline[";
+            break;
+          }
+          if (token.text === "</ins>") {
+            insideIns = false;
+            result += "]";
+            break;
+          }
           // Parse zone divs to track current section for accent coloring
           const openMatch = token.text.match(/<div\s+id="([^"]+)"/);
           const closeMatch = token.text.match(/<\/div>/);
@@ -246,30 +302,6 @@ function generateTypst(
   #text(font: "Plus Jakarta Sans", size: 9pt, weight: "bold", fill: ${colors.accent})[TL;DR]
   #v(4pt)
   ${tldr.map(item => `- #text(size: 10pt)[${escapeTypst(item)}]`).join("\n  ")}
-]
-
-#v(0.75em)
-`
-    : "";
-
-  // Build readability stats if available
-  const readabilityBlock = readabilityScore != null
-    ? `#block(
-  fill: rgb(22, 25, 35),
-  inset: 12pt,
-  radius: 4pt,
-  width: 100%,
-)[
-  #text(font: "Plus Jakarta Sans", size: 9pt, weight: "bold", fill: rgb(160, 170, 185))[READABILITY]
-  #v(4pt)
-  #grid(
-    columns: (1fr, 1fr),
-    gutter: 8pt,
-    [#text(size: 9pt, fill: rgb(120, 130, 145))[Plain version:] #text(size: 10pt, weight: "bold", fill: ${colors.accent})[${readabilityScore.toFixed(1)}]],
-    [${originalScore != null ? `#text(size: 9pt, fill: rgb(120, 130, 145))[Original:] #text(size: 10pt, fill: rgb(160, 170, 185))[${originalScore.toFixed(1)}]` : ""}],
-  )
-  #v(2pt)
-  #text(size: 8pt, fill: rgb(100, 110, 125))[Gunning Fog Index — lower is easier to read. Aim for < 12.]
 ]
 
 #v(0.75em)
@@ -376,9 +408,6 @@ ${description ? `#text(size: 10.5pt, fill: rgb(180, 188, 200))[${escapeTypst(des
 // TL;DR callout
 ${tldrBlock}
 
-// Readability
-${readabilityBlock}
-
 // ── License Body ─────────────────────────────────────────
 
 ${body}
@@ -413,7 +442,5 @@ function getZoneColor(zone: string | null): string {
   if (zone.includes("restriction")) return ZONE_COLORS.restrictions;
   if (zone.includes("protection")) return ZONE_COLORS.protections;
   if (zone.includes("interpretation")) return ZONE_COLORS.interpretation;
-  // Original license sections get a muted treatment
-  if (zone.startsWith("original")) return "rgb(100, 110, 125)";
   return "rgb(160, 170, 185)";
 }

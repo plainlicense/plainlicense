@@ -20,7 +20,7 @@ export function initMappingViewer(mappingData: LicenseMappings) {
   console.log("Initializing Mapping Viewer for:", mappingData.license_id);
 
   const container =
-    (document.querySelector(".mapping-viewer") as HTMLElement) ?? document.body;
+    (document.querySelector(".license-container") as HTMLElement) ?? document.body;
 
   // Use existing SVG if present, or create new one
   let svg = document.querySelector("svg.mapping-connections") as SVGSVGElement;
