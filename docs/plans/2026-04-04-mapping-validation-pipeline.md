@@ -4,7 +4,7 @@
 
 **Goal:** Make the license comparison/mapping feature reliable: validate mappings at build time, hide stale ones, produce a correct MIT mapping, and set up CI to detect staleness and trigger LLM-based regeneration.
 
-**Architecture:** Build-time validation script reads license markdown + mapping JSON, resolves template blocks, extracts `<div id>` content, hashes it, and compares to stored hashes. Stale mappings get suppressed (not copied to public/). A CI workflow detects staleness on content changes and opens an issue assigned to `@claude` for automatic regeneration via Claude Code Action.
+**Architecture:** The comparison feature lives in the **Full License Text** tab, where the markdown body renders with `<div id>` wrappers that MappingViewer can attach to directly. Build-time validation reads license markdown + mapping JSON, resolves template blocks, extracts `<div id>` content, hashes it, and compares to stored hashes. Stale mappings are not copied to `public/` (hiding the feature). A CI workflow detects staleness on content changes and opens an issue assigned to `@claude` for regeneration via Claude Code Action.
 
 **Tech Stack:** TypeScript (Bun runtime), Vitest, GitHub Actions, `anthropics/claude-code-action@beta`
 
@@ -12,150 +12,104 @@
 
 ### Content Architecture (read this first)
 
-The plain license is rendered visually by **zone components** (`src/components/license/zones/`), NOT by the markdown body. The markdown body is used for:
-- Exports/clipboard (resolved with template blocks + vars)
-- Hidden mapping-anchors div (preserves `<div id>` elements for MappingViewer)
+The license page has two tabs (added in `b44f1f467`):
 
-Zone components already have some IDs:
-- `ZonePermissions` → `id="plain-permissions"`
-- `ZoneConditions` → `id="plain-conditions"`
-- `ZoneProtections` → no ID (uses `<details>`)
-- `ZoneInterpretation` → no ID (uses `<details>`)
+1. **Quick Reference** (`panel-reference`) — zone components render structured cards from frontmatter data. Not used for comparison.
+2. **Full License Text** (`panel-fulltext`) — renders the markdown body via `renderMarkdownWithDivs(fullTextBody)` where `fullTextBody` has template blocks resolved and vars replaced. This tab has visible `<div id>` elements from the markdown body.
 
-The **original** text is rendered from the markdown body (after `---` separator) and IS visible when comparison mode is active. Original-side `<div id>` elements are interactive.
+The **original** text column is in the Quick Reference panel and only shows when `comparison-active` class is on the container. We need to move it to the Full Text tab.
 
-### ID Mismatch Problem
+### What Renders Where
 
-The MIT markdown body has `id="plain-perm-use"` but the zone component has `id="plain-permissions"`. MappingViewer looks up elements by the ID in the mapping JSON. These must match.
+- **Quick Reference tab**: Zone components (ZonePermissions, ZoneConditions, etc.) from frontmatter + family data
+- **Full Text tab**: `renderedPlainHtml` = resolved markdown body with `<div id>` wrappers preserved by `renderMarkdownWithDivs()`
+- **Original text column**: Currently in Quick Reference panel. Needs to move to Full Text panel.
 
-### What Renders the Warranty/Protections
+### Key Simplification
 
-- **Zones** (visible to user): `src/data/license-families/index.ts` — family-level shared text
-- **Template blocks** (exports/clipboard): `content/template-blocks/warranty.md`
-- **Original text** (in markdown body): The actual original MIT warranty paragraph
-- These are THREE different texts. The mapping connects the **zone text** (what user sees) to the **original text** (in markdown body).
+Since comparison lives in the Full Text tab:
+- **No changes needed to zone components** — they don't participate in comparison
+- **Mapping-anchors div can be removed** — the Full Text tab already renders visible elements with the right IDs
+- **MappingViewer `isInHiddenContainer` check can be removed** — all elements are visible
+- **Hash validation checks markdown body content** — which IS what renders in the Full Text tab
 
 ### Source of Truth
 
 `content/mappings/` is canonical. `public/mappings/` should be gitignored and copied during build.
 
-### Duplicate ID Resolution
-
-Zone components will have the mapping IDs (e.g., `id="plain-permissions"`). The hidden mapping-anchors div also renders the markdown body which contains `<div id="plain-permissions">`. Duplicate IDs are invalid HTML. **Resolution**: Remove the mapping-anchors div entirely. Zone components provide the interactive elements MappingViewer needs. The markdown body `<div id>` blocks serve ONLY for build-time hash validation (read from file, not from DOM).
-
 ---
 
-### Task 1: Align Mapping IDs Between Zones and Markdown
+### Task 1: Add Missing `<div id>` Wrappers to MIT Markdown
 
-The zone components and the markdown body need consistent IDs so MappingViewer can find interactive elements and hash validation can verify content.
+The MIT markdown only has one `<div id>` pair. We need wrappers for all mapped sections.
 
 **Files:**
-- Modify: `content/licenses/permissive/mit.md:66` — update `plain-perm-use` to `plain-permissions`
-- Modify: `content/licenses/permissive/mit.md` — add div wrappers to original text sections
-- Modify: `content/licenses/permissive/mit.md` — add div wrappers around conditions and warranty block
-- Modify: `src/components/license/zones/ZoneProtections.astro:16` — add `id="plain-protections"`
-- Modify: `src/components/license/zones/ZoneInterpretation.astro:34` — add `id="plain-interpretation"`
+- Modify: `content/licenses/permissive/mit.md`
 
-**Step 1: Update MIT markdown body div IDs to match zone IDs**
+**Step 1: Rename existing plain-side ID**
 
-In `content/licenses/permissive/mit.md`, change:
-```html
-<div id="plain-perm-use">
-```
-to:
+Change `plain-perm-use` to `plain-permissions` (consistent naming):
 ```html
 <div id="plain-permissions">
 ```
 
-**Step 2: Add plain-side div wrappers for conditions and warranty**
+**Step 2: Add plain-side div wrappers**
 
-In the MIT markdown body, wrap the conditions section:
+Wrap the conditions section:
 ```html
 <div id="plain-conditions">
 ## **If** You Give Us Credit and Keep This Notice
-
-You can do any of these things with the work, **if you follow these two rules**:
-
-1.  **You must keep our copyright notice**. This tells people who created the work and when.
-2.  **You must *also* keep this notice with all versions of the work**. You can give this notice a few ways:
-   1. Include this complete notice in the work (the Plain MIT License).
-   2. Include this notice in materials that come with the work.
-   3. [Link to this notice](https://plainlicense.org/licenses/permissive/mit/) from the work.
-   4. Use an accepted standard for linking to licenses, like the [SPDX Identifier](https://spdx.dev/learn/handling-license-info/): `SPDX-LICENSE-IDENTIFIER: MIT`.
+...entire conditions section...
 </div>
 ```
 
-And wrap the warranty template block:
+Wrap the warranty template block:
 ```html
 <div id="plain-protections">
 {{block:warranty}}
 </div>
 ```
 
-**Step 3: Add div wrappers to MIT original text**
+**Step 3: Add original-side div wrappers**
 
-In the original text section (after `---`), wrap the conditions and warranty paragraphs:
+Rename existing `original-grant-use` to `original-permissions` (consistent naming):
+```html
+<div id="original-permissions">
+Permission is hereby granted...
+</div>
+```
 
+Wrap the conditions paragraph:
 ```html
 <div id="original-conditions">
 The above copyright notice and this permission notice shall be
 included in all copies or substantial portions of the Software.
 </div>
+```
 
-<div id="original-warranty">
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
-OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
-HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
-WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
-OTHER DEALINGS IN THE SOFTWARE.
+Wrap the warranty/liability paragraph:
+```html
+<div id="original-protections">
+THE SOFTWARE IS PROVIDED "AS IS"...
 </div>
 ```
 
-**Step 4: Add IDs to ZoneProtections and ZoneInterpretation**
+**Step 4: Verify rendering**
 
-In `src/components/license/zones/ZoneProtections.astro`, change:
-```html
-<details class="zone zone-protections">
-```
-to:
-```html
-<details id="plain-protections" class="zone zone-protections">
-```
+Run: `mise run dev`
+Navigate to MIT license page, switch to Full License Text tab. Inspect DOM — all `<div id="plain-*">` and `<div id="original-*">` elements should be present and visible.
 
-In `src/components/license/zones/ZoneInterpretation.astro`, change:
-```html
-<details class="zone zone-interpretation">
-```
-to:
-```html
-<details id="plain-interpretation" class="zone zone-interpretation">
-```
-
-**Step 5: Verify all IDs are present**
-
-Run: `mise run dev` and inspect the MIT license page. Confirm these elements exist:
-- `document.getElementById("plain-permissions")` — ZonePermissions section
-- `document.getElementById("plain-conditions")` — ZoneConditions section
-- `document.getElementById("plain-protections")` — ZoneProtections details
-- `document.getElementById("plain-interpretation")` — ZoneInterpretation details
-- `document.getElementById("original-grant-use")` — original permission paragraph
-- `document.getElementById("original-conditions")` — original conditions paragraph
-- `document.getElementById("original-warranty")` — original warranty paragraph
-
-**Step 6: Commit**
+**Step 5: Commit**
 
 ```
-refactor(ui): align mapping IDs between zone components and markdown body
+refactor(mit): add div id wrappers for all mapped sections in plain and original text
 ```
 
 ---
 
 ### Task 2: Build-Time Mapping Validation Script
 
-Create a script that validates mapping JSON hashes against actual license content. If hashes don't match, the mapping is stale and won't be served.
+Create a script that validates mapping JSON hashes against actual license content.
 
 **Files:**
 - Create: `src/build/validate-mappings.ts`
@@ -200,83 +154,89 @@ describe("Mapping Validation", () => {
       const { generateClauseHash } = await import("../../src/utils/hash");
       const hash = `sha256:${await generateClauseHash("Hello world")}`;
 
-      const divContent = { "plain-test": "Hello world" };
-      const mapping = {
-        license_id: "TEST",
-        version: "1.0.0",
-        mapping_philosophy: "clause-level with interpretive correspondence",
-        mappings: [{
-          id: "map-test",
-          type: "one-to-one",
-          plain_clause: { id: "plain-test", hash, content: "Hello world" },
-          original_clause: null,
-          confidence: 0.95,
-        }],
-      };
-
-      const result = await validateMappingHashes(mapping, divContent, {});
+      const result = await validateMappingHashes(
+        {
+          license_id: "TEST",
+          version: "1.0.0",
+          mapping_philosophy: "clause-level with interpretive correspondence",
+          mappings: [{
+            id: "map-test",
+            type: "one-to-one",
+            plain_clause: { id: "plain-test", hash, content: "Hello world" },
+            original_clause: null,
+            confidence: 0.95,
+          }],
+        },
+        { "plain-test": "Hello world" },
+        {},
+      );
       expect(result.valid).toBe(true);
       expect(result.staleClauseIds).toHaveLength(0);
     });
 
     it("should detect stale hashes", async () => {
-      const divContent = { "plain-test": "Updated content" };
-      const mapping = {
-        license_id: "TEST",
-        version: "1.0.0",
-        mapping_philosophy: "clause-level with interpretive correspondence",
-        mappings: [{
-          id: "map-test",
-          type: "one-to-one",
-          plain_clause: {
-            id: "plain-test",
-            hash: "sha256:0000000000000000000000000000000000000000000000000000000000000000",
-            content: "Old content",
-          },
-          original_clause: null,
-          confidence: 0.95,
-        }],
-      };
-
-      const result = await validateMappingHashes(mapping, divContent, {});
+      const result = await validateMappingHashes(
+        {
+          license_id: "TEST",
+          version: "1.0.0",
+          mapping_philosophy: "clause-level with interpretive correspondence",
+          mappings: [{
+            id: "map-test",
+            type: "one-to-one",
+            plain_clause: {
+              id: "plain-test",
+              hash: "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+              content: "Old content",
+            },
+            original_clause: null,
+            confidence: 0.95,
+          }],
+        },
+        { "plain-test": "Updated content" },
+        {},
+      );
       expect(result.valid).toBe(false);
       expect(result.staleClauseIds).toContain("plain-test");
     });
 
     it("should detect missing div IDs", async () => {
-      const mapping = {
-        license_id: "TEST",
-        version: "1.0.0",
-        mapping_philosophy: "clause-level with interpretive correspondence",
-        mappings: [{
-          id: "map-test",
-          type: "one-to-one",
-          plain_clause: { id: "plain-missing", hash: "sha256:abc", content: "x" },
-          original_clause: null,
-          confidence: 0.95,
-        }],
-      };
-
-      const result = await validateMappingHashes(mapping, {}, {});
+      const result = await validateMappingHashes(
+        {
+          license_id: "TEST",
+          version: "1.0.0",
+          mapping_philosophy: "clause-level with interpretive correspondence",
+          mappings: [{
+            id: "map-test",
+            type: "one-to-one",
+            plain_clause: { id: "plain-missing", hash: "sha256:abc", content: "x" },
+            original_clause: null,
+            confidence: 0.95,
+          }],
+        },
+        {},
+        {},
+      );
       expect(result.valid).toBe(false);
       expect(result.missingIds).toContain("plain-missing");
     });
 
     it("should skip unmapped entries", async () => {
-      const mapping = {
-        license_id: "TEST",
-        version: "1.0.0",
-        mapping_philosophy: "clause-level with interpretive correspondence",
-        mappings: [{
-          id: "unmapped-1",
-          type: "unmapped-original",
-          plain_clause: null,
-          original_clause: { id: "original-title", hash: "sha256:x", content: "Title" },
-          confidence: null,
-        }],
-      };
-
-      const result = await validateMappingHashes(mapping, {}, {});
+      const result = await validateMappingHashes(
+        {
+          license_id: "TEST",
+          version: "1.0.0",
+          mapping_philosophy: "clause-level with interpretive correspondence",
+          mappings: [{
+            id: "unmapped-1",
+            type: "unmapped-original",
+            plain_clause: null,
+            original_clause: { id: "original-title", hash: "sha256:x", content: "Title" },
+            confidence: null,
+          }],
+        },
+        {},
+        {},
+      );
       expect(result.valid).toBe(true);
     });
   });
@@ -290,18 +250,19 @@ Expected: FAIL — module not found
 
 **Step 3: Write the validation module**
 
-Create `src/build/validate-mappings.ts`. Key exports:
+Create `src/build/validate-mappings.ts` with these exports:
 
 - `extractDivContent(md: string): Record<string, string>` — regex-extracts `<div id="...">` content
-- `validateMappingHashes(mapping, plainDivs, originalDivs): Promise<MappingValidationResult>` — checks each clause ref hash against actual content
-- `validateAllMappings(): Promise<MappingValidationResult[]>` — orchestrates: reads mapping files from `content/mappings/`, finds license markdown, resolves template blocks via `content/template-blocks/`, splits plain/original bodies, extracts divs, validates hashes
-- CLI entry: validates all mappings, copies valid ones to `public/mappings/`, removes stale ones from `public/mappings/`
+- `validateMappingHashes(mapping, plainDivs, originalDivs): Promise<MappingValidationResult>` — checks each clause ref hash against actual content using `generateClauseHash` from `src/utils/hash.ts`
+- `validateAllMappings(): Promise<MappingValidationResult[]>` — orchestrates: reads mapping files from `content/mappings/`, finds license markdown, resolves template blocks via `content/template-blocks/` (read raw files with gray-matter, NOT via Astro collections), splits plain/original bodies on `---[\s\n]+# Original License Text`, extracts divs, validates
 
-Template block resolution: read `content/template-blocks/{blockId}.md`, parse with `gray-matter`, replace `{{block:blockId}}` with body content.
+CLI entry: validates all mappings, copies valid ones to `public/mappings/`, removes stale ones from `public/mappings/`.
 
-Split plain/original: `fullBody.split(/---[\s\n]+# Original License Text/i)`
-
-Use `generateClauseHash` from `src/utils/hash.ts` for hashing.
+Key implementation details:
+- Template block resolution: read `content/template-blocks/{blockId}.md`, parse with `gray-matter`, replace `{{block:blockId}}` with body content (this mirrors what `[...slug].astro` does at lines 77-88 but from raw files, since this runs outside Astro)
+- `MappingValidationResult`: `{ licenseId, valid, staleClauseIds, missingIds, errors }`
+- Normalize mapping entry access: support both `plain_clause`/`original_clause` (singular) and `plain_clauses`/`original_clauses` (plural array)
+- Skip entries with type `unmapped-plain` or `unmapped-original`
 
 **Step 4: Run tests to verify they pass**
 
@@ -320,7 +281,7 @@ new(infra): add build-time mapping validation with hash checking
 
 **Files:**
 - Modify: `.gitignore` — add `public/mappings/`
-- Delete: `public/mappings/MIT-mapping.json` (tracked stale file)
+- Delete: `public/mappings/MIT-mapping.json`
 - Modify: `mise.toml` — add validate-mappings step
 
 **Step 1: Add to gitignore**
@@ -335,7 +296,7 @@ git rm public/mappings/MIT-mapping.json
 
 **Step 3: Wire validation into build**
 
-Read `mise.toml` to understand current build task structure. Add `bun run src/build/validate-mappings.ts` as a step that runs before `astro build` (since it populates `public/mappings/`).
+Read `mise.toml` to understand the build task. Add `bun run src/build/validate-mappings.ts` as a step that runs **before** `astro build` (since it populates `public/mappings/` which Astro needs to serve).
 
 **Step 4: Verify**
 
@@ -352,7 +313,7 @@ chore(infra): gitignore public/mappings, wire validation into build
 
 ### Task 4: Generate Correct MIT Mapping JSON
 
-Replace the placeholder MIT mapping with a complete, correct one.
+Replace the placeholder with a complete, correct mapping.
 
 **Files:**
 - Modify: `content/mappings/MIT-mapping.json`
@@ -361,27 +322,38 @@ Replace the placeholder MIT mapping with a complete, correct one.
 
 Write a one-off script to compute hashes for each `<div id>` block's content in the MIT markdown (after Task 1's changes). Use `generateClauseHash` from `src/utils/hash.ts`.
 
-For the `plain-protections` div, resolve `{{block:warranty}}` first by reading `content/template-blocks/warranty.md` body.
+For `plain-protections`, resolve `{{block:warranty}}` first by reading `content/template-blocks/warranty.md` body (after frontmatter).
+
+```
+bun -e "
+import { generateClauseHash } from './src/utils/hash';
+// ... compute hash for each clause's content
+// print: id: sha256:hash
+"
+```
 
 **Step 2: Write the mapping JSON**
 
-The mapping should have these entries:
+Three mapping entries:
 
 1. **map-permissions** (`one-to-one-expanded`, confidence 0.90, semantic_tag `permissions`)
-   - `plain-permissions` — the "You Can Do Anything" section
-   - `original-grant-use` — "Permission is hereby granted..."
+   - `plain_clause`: id `plain-permissions`, content = permissions section text, hash from step 1
+   - `original_clause`: id `original-permissions`, content = original grant text, hash from step 1
 
 2. **map-conditions** (`one-to-one-expanded`, confidence 0.87, semantic_tag `conditions`)
-   - `plain-conditions` — the "If You Give Us Credit" section
-   - `original-conditions` — "The above copyright notice..."
+   - `plain_clause`: id `plain-conditions`, content = conditions section text, hash from step 1
+   - `original_clause`: id `original-conditions`, content = original conditions text, hash from step 1
 
 3. **map-protections** (`one-to-one-expanded`, confidence 0.90, semantic_tag `warranty`)
-   - `plain-protections` — resolved warranty block content
-   - `original-warranty` — "THE SOFTWARE IS PROVIDED AS IS..."
+   - `plain_clause`: id `plain-protections`, content = resolved warranty block text, hash from step 1
+   - `original_clause`: id `original-protections`, content = original WARRANTY paragraph, hash from step 1
 
-Set top-level fields:
-- `generation_method: "ai-generated"`
-- `human_reviewed: false`
+Top-level fields:
+- `license_id`: `"MIT"`
+- `version`: `"0.2.1"` (match package version)
+- `mapping_philosophy`: `"clause-level with interpretive correspondence"`
+- `generation_method`: `"ai-generated"`
+- `human_reviewed`: `false`
 - `last_updated`: current ISO timestamp
 
 **Step 3: Validate**
@@ -397,58 +369,105 @@ new(mit): complete mapping with real hashes covering all clause groups
 
 ---
 
-### Task 5: Remove Mapping-Anchors and Update MappingViewer
+### Task 5: Move Comparison Feature to Full Text Tab
 
-With zone components now providing the mapping IDs, remove the hidden mapping-anchors div and simplify MappingViewer.
+The comparison toggle and original text column need to operate within the Full Text tab. Remove mapping-anchors. Simplify MappingViewer.
 
 **Files:**
-- Modify: `src/pages/licenses/[...slug].astro:117-128` — remove mapping-anchors div
-- Modify: `src/pages/licenses/[...slug].astro:106` — remove `cleanPlainBody` variable
-- Modify: `src/pages/licenses/[...slug].astro` — remove `.mapping-anchors` CSS
-- Modify: `src/components/MappingViewer.ts:150-151` — remove `isInHiddenContainer` check
-- Modify: `src/utils/templates.ts` — `stripTemplatePlaceholders` may become unused; verify and remove if so
+- Modify: `src/pages/licenses/[...slug].astro`
+- Modify: `src/components/MappingViewer.ts`
 
-**Step 1: Remove mapping-anchors from slug page**
+**Step 1: Move original text column to Full Text panel**
 
-In `src/pages/licenses/[...slug].astro`, remove:
+In `src/pages/licenses/[...slug].astro`, restructure. Currently the original text is inside `panel-reference` (Quick Reference tab). Move it into `panel-fulltext`:
+
+Before (current):
 ```astro
-{data.has_mapping && (
-  <div
-    class="mapping-anchors"
-    aria-hidden="true"
-    set:html={renderMarkdownWithDivs(cleanPlainBody)}
-  />
-)}
+<!-- Quick Reference panel -->
+<div id="panel-reference" ...>
+  <div class="license-layout">
+    <div class="license-column plain-version">
+      <LicenseLayout ... />
+      {mapping-anchors}
+    </div>
+    {original text column}
+  </div>
+</div>
+
+<!-- Full Text panel -->
+<div id="panel-fulltext" ...>
+  <article class="full-license-text prose" set:html={renderedPlainHtml} />
+</div>
 ```
 
-Remove the `cleanPlainBody` variable (line 106):
-```typescript
-const cleanPlainBody = stripTemplatePlaceholders(plainBody);
+After:
+```astro
+<!-- Quick Reference panel -->
+<div id="panel-reference" ...>
+  <LicenseLayout ... />
+</div>
+
+<!-- Full Text panel -->
+<div id="panel-fulltext" ...>
+  <div class="license-layout">
+    <div class="license-column plain-version">
+      <article class="full-license-text prose" set:html={renderedPlainHtml} />
+    </div>
+    {data.show_original_comparison !== false && originalBody && (
+      <div class="license-column original-version">
+        <h2 class="original-heading">{data.original?.name ?? "Original License"}</h2>
+        <div class="license-content prose" set:html={renderMarkdownWithDivs(originalBody)} />
+      </div>
+    )}
+  </div>
+</div>
 ```
 
-Remove `.mapping-anchors` CSS rules (lines 217-233).
+**Step 2: Remove mapping-anchors div and related code**
 
-**Step 2: Simplify MappingViewer**
+Remove:
+- The mapping-anchors div (lines 138-144)
+- The `cleanPlainBody` variable (line 107)
+- The `.mapping-anchors` CSS rules (lines 423-438)
+- The import of `stripTemplatePlaceholders` if no longer used (check with grep first)
 
-In `src/components/MappingViewer.ts`, remove the `isInHiddenContainer` check and the `if (!isInHiddenContainer)` guard. All mapping elements are now in visible containers, so focus/keyboard handlers should always attach.
+**Step 3: Simplify MappingViewer**
 
-**Step 3: Check for dead code**
+In `src/components/MappingViewer.ts`, remove the `isInHiddenContainer` check (line 150-151) and the `if (!isInHiddenContainer)` guard. All mapping elements are now visible in the Full Text tab. The focus/keyboard handlers should always attach.
 
-If `stripTemplatePlaceholders` in `src/utils/templates.ts` is no longer imported anywhere, remove it. Check with grep first.
+**Step 4: Move ComparisonToggle into Full Text tab context**
 
-**Step 4: Manual verification**
+The ComparisonToggle is currently in the reference section below the fold. It should be either:
+- Inside or immediately above the Full Text panel
+- Or: the Full Text tab button itself could double as the comparison activation
+
+Simplest approach: put the ComparisonToggle inside `panel-fulltext`, above the license-layout div:
+
+```astro
+<div id="panel-fulltext" ...>
+  <ComparisonToggle hasMapping={!!data.has_mapping} />
+  <div class="license-layout">
+    ...
+  </div>
+</div>
+```
+
+Remove it from the `reference-section` div.
+
+**Step 5: Verify**
 
 Run: `mise run dev`
-Navigate to MIT license page. Enable comparison mode:
-- Hover permissions zone — original grant text highlights, SVG connectors draw
-- Hover original warranty — protections zone highlights
-- Mobile: tap a section — modal opens with original text
-- No duplicate IDs in DOM (check with `document.querySelectorAll('[id]')`)
+1. Navigate to MIT license page
+2. Switch to Full License Text tab
+3. Enable comparison toggle
+4. Verify: original text column appears, hover highlighting works, SVG connectors draw
+5. Switch to Quick Reference tab — no comparison elements visible
+6. No duplicate IDs in DOM
 
-**Step 5: Commit**
+**Step 6: Commit**
 
 ```
-refactor(ui): remove mapping-anchors, simplify MappingViewer for zone architecture
+refactor(ui): move comparison feature to Full Text tab, remove mapping-anchors
 ```
 
 ---
@@ -460,14 +479,21 @@ refactor(ui): remove mapping-anchors, simplify MappingViewer for zone architectu
 
 **Step 1: Write the workflow**
 
-Trigger on pushes to `dev`/`main` when `content/licenses/**`, `content/template-blocks/**`, `content/mappings/**`, or `src/data/license-families/**` change.
+Trigger on pushes to `dev`/`main` when these paths change:
+- `content/licenses/**`
+- `content/template-blocks/**`
+- `content/mappings/**`
+- `src/data/license-families/**`
 
 Steps:
-1. Checkout, setup Bun, install deps
-2. Run `bun run src/build/validate-mappings.ts`, capture output
-3. If any mapping is stale, use `actions/github-script@v7` to open an issue with label `mapping-stale`, assigned to `claude`, with body instructing Claude to regenerate the mapping and submit a PR
-
-Include dedup logic: check for existing open issue with same title before creating.
+1. `actions/checkout@v4`
+2. `oven-sh/setup-bun@v2`
+3. `bun install --frozen-lockfile`
+4. Run `bun run src/build/validate-mappings.ts`, capture output
+5. If output contains "STALE", use `actions/github-script@v7` to:
+   - Check for existing open issue with same title (dedup)
+   - Create issue with label `mapping-stale`, assigned to `claude`
+   - Issue body instructs Claude to read the license markdown, schema, and existing mapping, then regenerate and submit a PR
 
 **Step 2: Create the label**
 
@@ -490,12 +516,12 @@ new(infra): CI workflow for stale mapping detection and auto-issue creation
 
 **Step 1: Write the prompt template**
 
-Document for Claude Code Action reference covering:
-- Which files to read (license markdown, mapping schema, template blocks, existing mapping)
-- Hash generation algorithm (normalize, strip markdown, SHA-256, `sha256:` prefix)
-- Template block resolution procedure
-- Confidence scoring rubric (pure translation 0.95-0.99, expansion 0.85-0.94, interpretive 0.70-0.84)
-- Required fields per mapping entry
+Reference doc for Claude Code Action covering:
+- Input files to read: license markdown, mapping schema (`workers/cms-admin/src/schemas/mapping-schema.json`), template blocks, existing mapping
+- Hash generation: normalize (lowercase, collapse whitespace, trim), strip markdown (`**`, `*`, `__`, `[text](url)` to `text`), SHA-256, `sha256:` prefix
+- Template block resolution: read `content/template-blocks/{id}.md`, use body after frontmatter
+- Confidence rubric: pure translation 0.95-0.99 (`one-to-one`), expansion 0.85-0.94 (`one-to-one-expanded`), interpretive 0.70-0.84 (`one-to-one-expanded`), one-to-many/many-to-one for split mappings
+- Required fields per entry: id, type, plain_clause, original_clause, confidence, semantic_tag
 - Validation command: `bun run src/build/validate-mappings.ts`
 - PR title format: `bot(mappings): regenerate {SPDX-ID} mapping`
 
@@ -510,26 +536,26 @@ new(infra): add mapping generation prompt template for Claude Code Action
 ## Dependency Graph
 
 ```
-Task 1 (align IDs) ──────┐
-                          ├──→ Task 4 (MIT mapping JSON) ──→ Task 5 (remove anchors + viewer)
-Task 2 (validation) ─────┤
-                          │
-Task 3 (gitignore+build) ┘
+Task 1 (MIT div wrappers) ────┐
+                               ├──→ Task 4 (MIT mapping JSON) ──→ Task 5 (move to Full Text tab)
+Task 2 (validation script) ───┤
+                               │
+Task 3 (gitignore + build) ───┘
 
-Task 6 (CI workflow) ── independent of 1-5
-Task 7 (prompt template) ── independent of 1-5
+Task 6 (CI workflow) ── independent
+Task 7 (prompt template) ── independent
 ```
 
-Tasks 1, 2, 3 can run in parallel. Task 4 depends on 1+2+3. Task 5 depends on 4. Tasks 6 and 7 are independent.
+Tasks 1, 2, 3 run in parallel. Task 4 depends on 1+2+3. Task 5 depends on 4. Tasks 6, 7 independent.
 
 ## Verification Checklist
 
-After all tasks complete:
 - [ ] `bunx vitest run tests/unit/validate-mappings.test.ts` — all pass
 - [ ] `bun run src/build/validate-mappings.ts` — MIT shows valid
 - [ ] `mise run build` — completes without errors
 - [ ] `public/mappings/MIT-mapping.json` exists after build (copied by validation)
-- [ ] Dev server: MIT comparison toggle works, hover highlighting works on both sides
-- [ ] No duplicate HTML IDs in rendered page (mapping-anchors removed)
+- [ ] Full Text tab: comparison toggle works, hover highlighting works, SVG connectors draw
+- [ ] Quick Reference tab: no comparison elements, no mapping-anchors
+- [ ] No duplicate HTML IDs in rendered page
 - [ ] `.gitignore` includes `public/mappings/`
 - [ ] `mapping-stale` label exists in GitHub repo
