@@ -12,8 +12,12 @@ const { license, processedBody } = Astro.props;
 const { data } = license;
 const clipboardContent = processedBody || license.body;
 
-const plainId = data.plain_id || derivePlainId(data.spdx_id || data.original?.spdx_id || "");
-const spdxDir = (data.spdx_id || data.original?.spdx_id || "").toLowerCase();
+const rawSpdxId = data.spdx_id || data.original?.spdx_id;
+if (!rawSpdxId) {
+  throw new Error(`License "${license.id}" is missing spdx_id and original.spdx_id`);
+}
+const plainId = data.plain_id || derivePlainId(rawSpdxId);
+const spdxDir = rawSpdxId.toLowerCase();
 const version = data.plain_version;
 const baseName = `${plainId}-${version}`;
 const exportBase = `/exports/${spdxDir}/${version}/`;

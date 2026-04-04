@@ -181,7 +181,7 @@ const spdxId = container?.dataset.spdxId;
 if (spdxId) {
   fetch(`/mappings/${spdxId}-mapping.json`)
     .then((res) => {
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      if (!res.ok) throw new Error(`Failed to fetch mapping: HTTP ${res.status} for /mappings/${spdxId}-mapping.json`);
       return res.json();
     })
     .then((mappingData) => {
