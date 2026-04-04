@@ -19,11 +19,14 @@ attribution_required: false
 fair_code: false
 maker_pitch: No restrictions at all. Your work belongs to everyone.
 commercial_restrictions: []
+has_mapping: true
+mapping_version: 1.0.0
+show_original_comparison: true
 compare_to:
   - spdx_id: MIT
     contrast: 'Maximum freedom, but requires giving credit'
 uuid: f7905ee1-c1c1-4e8b-9ffd-27cb7fc77de1
-plain_gunning_fog: 10.44
+plain_gunning_fog: 11.21
 shame_words_count: 0
 original:
   name: The Unlicense
@@ -43,9 +46,11 @@ original:
   limitations:
     - liability
     - warranty
-  original_gunning_fog: 16.27
+  original_gunning_fog: 16.92
 ---
 # Plain Unlicense
+
+<div id="plain-permissions">
 
 ## The Work is Everyone's Work - Use it Freely
 
@@ -62,13 +67,25 @@ The person who created the work has given up their copyright. This means you can
 
 You can do all of these things **for free**. You don't have to follow any rules or include any notices.
 
+</div>
+
+<div id="plain-dedication">
+
 ## We Also Give Everyone a License Without Restrictions
 
 In places that follow copyright laws, we give up all our rights to the work. Everyone can use it freely, and with no benefit to us or our children. We give up all rights permanently. We want everyone to know we give up our rights to the work now and forever.
 
+</div>
+
+<div id="plain-relicense">
+
 ## You can Change the License
 
 **You can share the work under any other license.** This includes "copyleft" licenses (like the GPL) and "proprietary" licenses (where you keep all rights).
+
+</div>
+
+<div id="plain-warranty">
 
 ## We Offer No Warranty
 
@@ -78,11 +95,15 @@ In places that follow copyright laws, we give up all our rights to the work. Eve
 - We are not responsible for any problems or damages caused by using the work.
 - We don't have to fix any problems you find.
 
+</div>
+
 {{block:interpretation}}
 
 ---
 
 # Original License Text
+
+<div id="original-permissions">
 
 This is free and unencumbered software released into the public domain.
 
@@ -90,6 +111,10 @@ Anyone is free to copy, modify, publish, use, compile, sell, or
 distribute this software, either in source code form or as a compiled
 binary, for any purpose, commercial or non-commercial, and by any
 means.
+
+</div>
+
+<div id="original-dedication">
 
 In jurisdictions that recognize copyright laws, the author or authors
 of this software dedicate any and all copyright interest in the
@@ -99,6 +124,10 @@ successors. We intend this dedication to be an overt act of
 relinquishment in perpetuity of all present and future rights to this
 software under copyright law.
 
+</div>
+
+<div id="original-warranty">
+
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
@@ -106,5 +135,7 @@ IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR
 OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
+
+</div>
 
 For more information, please refer to <http://unlicense.org/>
