@@ -2,6 +2,7 @@
 import type { CollectionEntry } from "astro:content";
 import fs from "node:fs/promises";
 import path from "node:path";
+import { FAMILY_ORDER } from "../../data/license-families/index";
 
 interface Props {
   license: CollectionEntry<"licenses">;
@@ -11,7 +12,7 @@ const { license } = Astro.props;
 const { license_family, spdx_id } = license.data;
 
 // Look for versions.json in the content directory
-const category = license_family || "permissive";
+const category = license_family || FAMILY_ORDER[1];
 const slug =
   spdx_id?.toLowerCase() || license.id.split("/").pop()?.replace(/\.md$/, "");
 const versionsPath = path.resolve(
