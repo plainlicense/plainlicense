@@ -54,7 +54,7 @@ deps:
 
 scripts:
   - changed-files:
-      - any-glob-to-any-files:
+      - any-glob-to-any-file:
           [
             "*.js",
             "*.ts",
