@@ -241,6 +241,7 @@
     "update": "mise run update"
   },
   "trustedDependencies": [
+    "bun",
     "@parcel/watcher",
     "@swc/core"
   ],

@@ -12,11 +12,6 @@
     }
   ],
   "$schema": "./node_modules/wrangler/config-schema.json",
-  "build": {
-    "command": "node node_modules/bun/install.js || true; bunx wrangler types; bunx wrangler build; bunx wrangler deploy",
-    "cwd": "./",
-    "watch_dir": "./src"
-  },
   "vars": {
     "ALLOWED_DOMAINS": "plainlicense.org,*.plainlicense.org,github.com,*.github.com"
   },

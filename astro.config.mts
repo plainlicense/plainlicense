@@ -28,6 +28,18 @@ if (!rootDir) {
     "Could not find workspace root. Ensure that this project is within a valid workspace with a package.json file.",
   );
 }
+
+const headers = {
+  "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+  "x-frame-options": "SAMEORIGIN",
+  "x-content-type-options": "nosniff",
+  "referrer-policy": "strict-origin-when-cross-origin",
+  "permissions-policy":
+    "accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()",
+  "content-security-policy":
+    "default-src 'self'; script-src 'self' 'unsafe-inline'; connect-src 'self'; img-src 'self' data: avatars.githubusercontent.com ui-avatars.com; style-src 'self' 'unsafe-inline' fonts.googleapis.com; font-src 'self' fonts.gstatic.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'",
+};
+
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 type LicenseCategory =
@@ -442,6 +454,9 @@ export default defineConfig({
     }),
   },
   site: "https://plainlicense.org",
+  server: {
+    headers: headers,
+  },
   vite: {
     assetsInclude: [
       "src/*.webp",
@@ -472,17 +487,7 @@ export default defineConfig({
       fs: {
         allow: [rootDir],
       },
-      headers: {
-        "strict-transport-security":
-          "max-age=31536000; includeSubDomains; preload",
-        "x-frame-options": "SAMEORIGIN",
-        "x-content-type-options": "nosniff",
-        "referrer-policy": "strict-origin-when-cross-origin",
-        "permissions-policy":
-          "accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()",
-        "content-security-policy":
-          "default-src 'self'; script-src 'self' 'unsafe-inline'; connect-src 'self'; img-src 'self' data: avatars.githubusercontent.com ui-avatars.com; style-src 'self' 'unsafe-inline' fonts.googleapis.com; font-src 'self' fonts.gstatic.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'",
-      },
+      headers: headers,
     },
   },
 });

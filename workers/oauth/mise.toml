@@ -1,11 +1,11 @@
 [tasks]
 [tasks.gentypes]
-run = "bunx wrangler types"
+run = "bunx wrangler -c ./wrangler.json types"
 
 [tasks.build]
 depends = ["gentypes"]
-run = "bunx wrangler build"
+run = "bunx wrangler -c ./wrangler.json build"
 
 [tasks.deploy]
 depends = ["build"]
-run = "bunx wrangler deploy"
+run = "bunx wrangler -c ./wrangler.json deploy"

@@ -417,23 +417,17 @@ run = '''
 bun run src/build/validate.ts
 bun run src/build/update-metrics.ts
 bunx astro sync
-bunx wrangler types
+bunx wrangler -c ./wrangler.json types
 bun run src/build/generate-og-images.ts
 bunx astro build
 bun run src/build/build-versions.ts
 '''
 
 [tasks.deploy]
-usage = '''
-arg "[env]" help "The environment to deploy to" default "production"
-{
-  choices "production" "staging"
-  }
-'''
 tools.bun = "latest"
 depends = ["build"]
 run = '''
-bunx wrangler deploy --env "$usage_env"
+bunx wrangler deploy -c ./wrangler.json
 '''
 
 [tasks.ci]
