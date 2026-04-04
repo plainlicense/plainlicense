@@ -55,7 +55,7 @@ original:
     - liability
     - trademark-use
     - warranty
-  gunning_fog: 14.1
+  original_gunning_fog: 14.1
 ---
 # Plain MPL
 

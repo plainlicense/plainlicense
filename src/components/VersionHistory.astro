@@ -70,14 +70,29 @@ function getDatetime(date: string): string | undefined {
   flex-direction: column;
   gap: 1.5rem;
   margin-top: 1.5rem;
+  border-left: 2px solid var(--sl-color-gray-5);
+  padding-left: 1.5rem;
+  margin-left: 0.5rem;
 }
 .version-item {
   display: flex;
   gap: 1.5rem;
   align-items: flex-start;
+  position: relative;
+}
+.version-item::before {
+  content: "";
+  position: absolute;
+  left: -1.85rem;
+  top: 0.45rem;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--cat-color, var(--sl-color-accent));
+  border: 2px solid var(--sl-color-gray-6);
 }
 .version-badge {
-  background: var(--sl-color-accent);
+  background: var(--cat-color, var(--sl-color-accent));
   color: var(--sl-color-black);
   padding: 0.25rem 0.75rem;
   border-radius: 99px;

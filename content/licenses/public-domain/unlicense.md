@@ -43,7 +43,7 @@ original:
   limitations:
     - liability
     - warranty
-  gunning_fog: 16.27
+  original_gunning_fog: 16.27
 ---
 # Plain Unlicense
 

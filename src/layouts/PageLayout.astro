@@ -1,5 +1,7 @@
 ---
 import BaseLayout from "./BaseLayout.astro";
+import FootnoteScript from "../components/FootnoteScript.astro";
+import "../assets/stylesheets/footnotes.css";
 
 const { frontmatter } = Astro.props;
 ---
@@ -15,6 +17,7 @@ const { frontmatter } = Astro.props;
       <article class="prose"><slot /></article>
     </div>
   </div>
+  <FootnoteScript />
 </BaseLayout>
 
 <style>

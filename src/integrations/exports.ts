@@ -5,6 +5,7 @@ import type { AstroIntegration, AstroIntegrationLogger } from "astro";
 import matter from "gray-matter";
 import type { InferCollectionOutput, licensesCollection } from "~cfg";
 import { type ExportContext, ExportOrchestrator } from "../build/exports/index";
+import { injectTemplateBlocks } from "../build/exports/transforms";
 import { getFileAtCommit, getTaggedVersions } from "../utils/git-versions";
 import { derivePlainId } from "../utils/plain-id";
 
@@ -30,17 +31,6 @@ function resolveTemplateVars(
   });
 }
 
-/**
- * Injects template block content into {{block:id}} placeholders.
- */
-function injectTemplateBlocks(
-  content: string,
-  templateBlocks: Record<string, string>,
-): string {
-  return content.replace(/\{\{block:([a-z0-9-]+)\}\}/g, (match, id) => {
-    return templateBlocks[id] || match;
-  });
-}
 
 /**
  * Copies versioned export files to a "latest" directory with version stripped.

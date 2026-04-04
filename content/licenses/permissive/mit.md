@@ -56,7 +56,7 @@ original:
   limitations:
     - liability
     - warranty
-  gunning_fog: 26.39
+  original_gunning_fog: 26.39
 ---
 
 # Plain MIT License

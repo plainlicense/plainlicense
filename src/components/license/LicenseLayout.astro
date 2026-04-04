@@ -44,13 +44,14 @@ const limitations = (data.original?.limitations ?? []).filter(
 // Resolve compare_to entries to slugs and names
 const allLicenses = await getPublishedLicenses();
 const spdxLookup = new Map(
-  allLicenses.map(l => [l.data.spdx_id, { slug: getLicenseSlug(l), name: l.data.plain_name }])
+  allLicenses.map(l => [l.data.spdx_id, { slug: getLicenseSlug(l), name: l.data.plain_name, family: l.data.license_family }])
 );
 const compareEntries = (data.compare_to ?? []).map(c => ({
   spdx_id: c.spdx_id,
   contrast: c.contrast,
   slug: spdxLookup.get(c.spdx_id)?.slug,
   name: spdxLookup.get(c.spdx_id)?.name ?? c.spdx_id,
+  family: spdxLookup.get(c.spdx_id)?.family,
 })).filter(c => c.slug);
 ---
 
@@ -131,7 +132,8 @@ const compareEntries = (data.compare_to ?? []).map(c => ({
   display: flex;
   align-items: center;
   gap: 1rem;
-  margin: 2.5rem 0 1.5rem;
+  margin: 3rem 0 2rem;
+  padding: 0.6rem 0;
   color: var(--sl-color-gray-3);
 }
 
@@ -140,14 +142,17 @@ const compareEntries = (data.compare_to ?? []).map(c => ({
   content: "";
   flex: 1;
   height: 1px;
-  background: var(--sl-color-gray-5);
+  background: linear-gradient(to right, transparent, var(--sl-color-gray-4), var(--sl-color-gray-5), transparent);
 }
 
 .fold-label {
-  font-size: var(--sl-text-xs);
+  font-size: var(--sl-text-2xs, 0.6875rem);
   white-space: nowrap;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  padding: 0 0.5rem;
+  padding: 0.25rem 1rem;
+  background: var(--sl-color-gray-6);
+  border: 1px solid var(--sl-color-gray-5);
+  border-radius: 99px;
 }
 </style>

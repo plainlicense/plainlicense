@@ -7,6 +7,7 @@ import { marked } from "marked";
 import ComparisonModal from "../../components/ComparisonModal.astro";
 import ComparisonToggle from "../../components/ComparisonToggle.astro";
 import ReadabilitySidebar from "../../components/license/ReadabilitySidebar.astro";
+import { ICONS } from "../../components/license/icons";
 import DownloadOptions from "../../components/DownloadOptions.astro";
 import VersionHistory from "../../components/VersionHistory.astro";
 import NotLegalAdvice from "../../components/NotLegalAdvice.astro";
@@ -28,28 +29,80 @@ export const prerender = true;
  * Limitation: the regex matches non-nested <div id="..."> blocks only.
  * Nested divs are not supported and should not appear in license content.
  */
+/**
+ * Convert mkdocs-style definition lists to semantic HTML <dl> blocks.
+ *
+ * Recognises two patterns (with optional blank line between term and definition):
+ *   `term`           OR   `term` and `alias`
+ *   :    Definition        :    Definition
+ */
+function convertDefinitionLists(md: string): string {
+  // Match a ## Definitions heading followed by consecutive definition entries
+  const sectionPattern = /(## Definitions\n)([\s\S]*?)(?=\n##\s|\n\{\{block:|\n---|\n$)/g;
+
+  return md.replace(sectionPattern, (_match, heading: string, body: string) => {
+    const entries: { term: string; definition: string }[] = [];
+    // Split into blocks separated by blank lines, then pair terms with definitions
+    const lines = body.split("\n");
+    let i = 0;
+
+    while (i < lines.length) {
+      const line = lines[i].trim();
+      // Match a term line: `term` or `term` and `alias`
+      const termMatch = line.match(/^`([^`]+)`(?:\s+and\s+`([^`]+)`)?$/);
+      if (termMatch) {
+        const term = termMatch[2]
+          ? `${termMatch[1]} / ${termMatch[2]}`
+          : termMatch[1];
+        // Look ahead for the definition line (skip blank lines)
+        i++;
+        while (i < lines.length && lines[i].trim() === "") i++;
+        if (i < lines.length && lines[i].trim().startsWith(":")) {
+          const def = lines[i].trim().replace(/^:\s+/, "");
+          entries.push({ term, definition: def });
+        }
+      }
+      i++;
+    }
+
+    if (entries.length === 0) return heading + body;
+
+    const dlHtml = entries
+      .map(
+        (e) =>
+          `<dt>${e.term}</dt>\n<dd>${e.definition}</dd>`,
+      )
+      .join("\n");
+
+    return `${heading}\n<dl class="license-definitions">\n${dlHtml}\n</dl>\n\n`;
+  });
+}
+
 function renderMarkdownWithDivs(md: string): string {
+  // Pre-process mkdocs definition lists into HTML before marked sees them
+  const processed = convertDefinitionLists(md);
+
   // Regex: <div id="X"> ... </div>  (non-nested, one per section)
   const divPattern = /<div id="([^"]+)">([\s\S]*?)<\/div>/g;
   let result = "";
   let lastIndex = 0;
-  let match: RegExpExecArray | null = divPattern.exec(md);
+  let match: RegExpExecArray | null = divPattern.exec(processed);
 
   while (match !== null) {
     // Render any content before this div block
     if (match.index > lastIndex) {
-      result += marked.parse(md.slice(lastIndex, match.index)) as string;
+      result += marked.parse(processed.slice(lastIndex, match.index)) as string;
     }
     // Render the inner markdown and wrap in the div with its ID
     const innerHtml = marked.parse(match[2].trim()) as string;
     result += `<div id="${match[1]}">${innerHtml}</div>\n`;
     lastIndex = match.index + match[0].length;
-    match = divPattern.exec(md);
+    match = divPattern.exec(processed);
   }
 
   // Render any trailing content after the last div
-  if (lastIndex < md.length) {
-    result += marked.parse(md.slice(lastIndex)) as string;
+  if (lastIndex < processed.length) {
+    result += marked.parse(processed.slice(lastIndex)) as string;
   }
 
   return result;
@@ -115,6 +168,25 @@ const renderedPlainHtml = fnPostProcess(renderMarkdownWithDivs(fnCleanedBody));
 // The fullProcessedBody (used for clipboard) has blocks resolved via the export pipeline,
 // but the in-page rendering uses resolvedBody which may have unresolved blocks if
 // getCollection("template-blocks") returns IDs that don't match.
+
+// Readability data for the full text tab
+const plain_gunning_fog = data.plain_gunning_fog;
+const original_gunning_fog = data.original?.original_gunning_fog;
+const shame_words_count = data.shame_words_count;
+const hasData = plain_gunning_fog !== undefined || shame_words_count !== undefined;
+const hasComparison = plain_gunning_fog !== undefined && original_gunning_fog !== undefined;
+const improvement = hasComparison
+  ? parseFloat((original_gunning_fog! - plain_gunning_fog!).toFixed(1))
+  : undefined;
+
+function readabilityLevel(score: number): string {
+  if (score <= 6) return "6th grade";
+  if (score <= 8) return "8th grade";
+  if (score <= 10) return "10th grade";
+  if (score <= 12) return "High school";
+  if (score <= 14) return "College";
+  return "Post-graduate";
+}
 ---
 
 <BaseLayout title={data.plain_name}>
@@ -142,12 +214,59 @@ const renderedPlainHtml = fnPostProcess(renderMarkdownWithDivs(fnCleanedBody));
           <ComparisonToggle hasMapping={true} />
         </div>
       )}
+      {/* Readability comparison bar */}
+      {hasData && (
+        <div class="fulltext-readability">
+          <div class="readability-bar">
+            <svg class="readability-bar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" set:html={ICONS["bar-chart"]} />
+            <div class="readability-bar-stats">
+              {plain_gunning_fog !== undefined && (
+                <span class="bar-stat bar-stat--plain">
+                  <span class="bar-stat-label">Plain</span>
+                  <span class="bar-stat-score">{plain_gunning_fog}</span>
+                  <span class="bar-stat-level">{readabilityLevel(plain_gunning_fog)}</span>
+                </span>
+              )}
+              {hasComparison && (
+                <span class="bar-stat bar-stat--original">
+                  <span class="bar-stat-label">Original</span>
+                  <span class="bar-stat-score">{original_gunning_fog}</span>
+                  <span class="bar-stat-level">{readabilityLevel(original_gunning_fog!)}</span>
+                </span>
+              )}
+              {improvement !== undefined && improvement > 0 && (
+                <span class="bar-improvement">
+                  ↓ {improvement} grades easier
+                </span>
+              )}
+            </div>
+            {shame_words_count !== undefined && (
+              <span class="bar-shame">
+                <span class="bar-shame-count">{shame_words_count}</span> jargon
+              </span>
+            )}
+          </div>
+        </div>
+      )}
+
       <div class="license-layout">
         <div class="license-column plain-version">
+          <div class="column-badge column-badge--plain">
+            <svg class="column-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M12 20h9" /><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+            </svg>
+            Plain Language
+          </div>
           <article class="full-license-text prose" set:html={renderedPlainHtml} />
         </div>
         {data.show_original_comparison !== false && originalBody && (
           <div class="license-column original-version">
+            <div class="column-badge column-badge--original">
+              <svg class="column-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" /><line x1="16" y1="13" x2="8" y2="13" /><line x1="16" y1="17" x2="8" y2="17" /><polyline points="10 9 9 9 8 9" />
+              </svg>
+              Original
+            </div>
             <h2 class="original-heading">{data.original?.name ?? "Original License"}</h2>
             <div class="license-content prose" set:html={renderMarkdownWithDivs(originalBody)} />
           </div>
@@ -166,7 +285,7 @@ const renderedPlainHtml = fnPostProcess(renderMarkdownWithDivs(fnCleanedBody));
     <div class="reference-section">
       <ReadabilitySidebar
         plain_gunning_fog={data.plain_gunning_fog}
-        original_gunning_fog={data.original?.gunning_fog}
+        original_gunning_fog={data.original?.original_gunning_fog}
         shame_words_count={data.shame_words_count}
       />
       <VersionHistory license={license} />
@@ -187,7 +306,7 @@ if (spdxId) {
   fetch(`/mappings/${spdxId}-mapping.json`)
     .then((res) => {
       if (!res.ok) throw new Error(`Failed to fetch mapping: HTTP ${res.status} for /mappings/${spdxId}-mapping.json`);
-      return res.json();
+      return res.json() as Promise<Parameters<typeof initMappingViewer>[0]>;
     })
     .then((mappingData) => {
       const wrapper = document.getElementById("comparison-toggle-wrapper");
@@ -413,8 +532,8 @@ tabs.forEach(tab => {
 }
 
 .reference-section {
-  padding: 1.5rem;
-  background: rgba(var(--sl-color-gray-6-rgb, 0, 0, 0), 0.3);
+  padding: 2rem;
+  background: var(--sl-color-gray-7, #0d0f15);
   border: 1px solid var(--sl-color-gray-5);
   border-radius: 12px;
 }
@@ -450,6 +569,174 @@ tabs.forEach(tab => {
   transition: all 0.2s ease;
 }
 
+/* ── Column badges ── */
+.column-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.85rem;
+  border-radius: 99px;
+  font-size: var(--sl-text-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 1rem;
+}
+
+.column-badge-icon {
+  width: 0.85rem;
+  height: 0.85rem;
+  flex-shrink: 0;
+}
+
+.column-badge--plain {
+  background: rgba(var(--cat-color-rgb, 21, 219, 149), 0.12);
+  color: var(--cat-color, var(--sl-color-accent));
+  border: 1px solid rgba(var(--cat-color-rgb, 21, 219, 149), 0.25);
+}
+
+.column-badge--original {
+  background: rgba(var(--sl-color-gray-3-rgb, 155, 155, 155), 0.1);
+  color: var(--sl-color-gray-2);
+  border: 1px solid var(--sl-color-gray-5);
+}
+
+/* ── Fulltext readability bar ── */
+.fulltext-readability {
+  margin-bottom: 1.5rem;
+}
+
+.readability-bar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.6rem 1.25rem;
+  background: var(--sl-color-gray-6);
+  border: 1px solid var(--sl-color-gray-5);
+  border-radius: 8px;
+  flex-wrap: wrap;
+}
+
+.readability-bar-icon {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+  color: var(--cat-color, var(--sl-color-accent));
+}
+
+.readability-bar-stats {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  flex: 1;
+  flex-wrap: wrap;
+}
+
+.bar-stat {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  font-size: var(--sl-text-sm);
+}
+
+.bar-stat-label {
+  font-size: var(--sl-text-xs);
+  color: var(--sl-color-gray-3);
+  font-weight: 500;
+}
+
+.bar-stat-score {
+  font-weight: 700;
+}
+
+.bar-stat--plain .bar-stat-score {
+  color: var(--cat-color, var(--sl-color-accent));
+}
+
+.bar-stat--original .bar-stat-score {
+  color: var(--sl-color-gray-2);
+}
+
+.bar-stat-level {
+  font-size: var(--sl-text-xs);
+  color: var(--sl-color-gray-3);
+}
+
+.bar-improvement {
+  font-size: var(--sl-text-xs);
+  font-weight: 600;
+  color: var(--cat-color, var(--sl-color-accent));
+  background: rgba(var(--cat-color-rgb, 21, 219, 149), 0.08);
+  padding: 0.2rem 0.6rem;
+  border-radius: 99px;
+}
+
+.bar-shame {
+  font-size: var(--sl-text-xs);
+  color: var(--sl-color-gray-3);
+  margin-left: auto;
+}
+
+.bar-shame-count {
+  font-weight: 700;
+  color: var(--sl-color-gray-1);
+}
+
+/* ── Definition Lists (glossary) ── */
+.full-license-text :global(dl.license-definitions) {
+  margin: 1.5rem 0 2rem;
+  padding: 0;
+  display: grid;
+  gap: 0;
+}
+
+.full-license-text :global(dl.license-definitions dt) {
+  font-family: "JetBrains Mono", "Fira Code", "Cascadia Code", ui-monospace, monospace;
+  font-size: 0.95em;
+  font-weight: 600;
+  color: var(--cat-color, var(--sl-color-accent));
+  padding: 1rem 1.25rem 0.25rem;
+  margin: 0;
+  letter-spacing: 0.01em;
+  border-top: 1px solid var(--sl-color-gray-5);
+  background: linear-gradient(
+    135deg,
+    rgba(var(--cat-color-rgb, var(--emerald-rgb)), 0.04) 0%,
+    transparent 60%
+  );
+}
+
+.full-license-text :global(dl.license-definitions dt:first-child) {
+  border-top: none;
+  border-radius: 10px 10px 0 0;
+}
+
+.full-license-text :global(dl.license-definitions dd) {
+  margin: 0;
+  padding: 0.25rem 1.25rem 1rem 1.25rem;
+  color: var(--sl-color-gray-2);
+  font-size: var(--sl-text-sm);
+  line-height: 1.7;
+  background: linear-gradient(
+    135deg,
+    rgba(var(--cat-color-rgb, var(--emerald-rgb)), 0.04) 0%,
+    transparent 60%
+  );
+  border-top: none;
+}
+
+.full-license-text :global(dl.license-definitions dd:last-child) {
+  border-radius: 0 0 10px 10px;
+}
+
+/* Outer container feel — a subtle card around the whole list */
+.full-license-text :global(dl.license-definitions) {
+  border: 1px solid var(--sl-color-gray-5);
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--sl-color-gray-7, #0d0f15);
+}
+
 /* ── Mobile ── */
 @media (max-width: 640px) {
   .license-container {
@@ -461,6 +748,11 @@ tabs.forEach(tab => {
   }
   .reference-section {
     padding: 1rem;
+  }
+  .full-license-text :global(dl.license-definitions dt),
+  .full-license-text :global(dl.license-definitions dd) {
+    padding-left: 1rem;
+    padding-right: 1rem;
   }
 }
 </style>

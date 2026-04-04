@@ -39,7 +39,7 @@ async function updateMetrics() {
             ? calculateGunningFog(originalContent)
             : undefined;
 
-        const currentOriginalFog = data.original?.gunning_fog;
+        const currentOriginalFog = data.original?.original_gunning_fog;
         const needsUpdate =
           data.plain_gunning_fog !== newPlainFog ||
           data.shame_words_count !== newShameCount ||
@@ -53,9 +53,9 @@ async function updateMetrics() {
             if (!data.original) {
               data.original = {};
             }
-            data.original.gunning_fog = newOriginalFog;
-          } else if (data.original && "gunning_fog" in data.original) {
-            delete data.original.gunning_fog;
+            data.original.original_gunning_fog = newOriginalFog;
+          } else if (data.original && "original_gunning_fog" in data.original) {
+            delete data.original.original_gunning_fog;
             if (Object.keys(data.original).length === 0) {
               delete data.original;
             }

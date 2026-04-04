@@ -19,7 +19,7 @@ function readabilityScoreToLevel(score: number): string {
 }
 
 const plainFog = data.plain_gunning_fog;
-const originalFog = data.original?.gunning_fog;
+const originalFog = data.original?.original_gunning_fog;
 const plainLevel =
   plainFog !== undefined ? readabilityScoreToLevel(plainFog) : undefined;
 const originalLevel =

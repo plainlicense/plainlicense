@@ -53,7 +53,7 @@ original:
     - liability
     - trademark-use
     - warranty
-  gunning_fog: 16.96
+  original_gunning_fog: 16.96
 ---
 # Plain Elastic License
 

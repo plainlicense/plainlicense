@@ -38,7 +38,7 @@ interface LicenseRow {
 const rows: LicenseRow[] = licenses
   .filter((l) => l.data.original)
   .map((l) => {
-    const originalFog = l.data.original?.gunning_fog;
+    const originalFog = l.data.original?.original_gunning_fog;
     const plainFog = l.data.plain_gunning_fog;
     const improvement =
       originalFog !== undefined && plainFog !== undefined

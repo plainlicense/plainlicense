@@ -41,7 +41,7 @@ const headers = {
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-type LicenseCategory =
+type LicenseFamily =
   | "public-domain"
   | "permissive"
   | "copyleft"
@@ -61,9 +61,9 @@ const appName = "PlainLicense";
 function getLicenseRedirects() {
   const redirects: Record<string, string> = {};
   const contentBase = join(__dirname, "content/licenses");
-  let categories: LicenseCategory[];
+  let categories: LicenseFamily[];
   try {
-    categories = readdirSync(contentBase) as LicenseCategory[];
+    categories = readdirSync(contentBase) as LicenseFamily[];
   } catch (err) {
     if (err && (err as { code?: string }).code === "ENOENT") {
       // content/licenses does not exist; no license redirects to generate.
@@ -113,7 +113,7 @@ function getLicenseRedirects() {
   return redirects;
 }
 
-const categoryLabels: Record<LicenseCategory, string> = {
+const categoryLabels: Record<LicenseFamily, string> = {
   permissive: "Permissive",
   copyleft: "Copyleft",
   "public-domain": "Public Domain",
@@ -465,7 +465,11 @@ export default defineConfig({
       },
     },
     optimizeDeps: {
-      exclude: ["starlight-auto-drafts", "starlight-tags"],
+      exclude: [
+        "starlight-auto-drafts",
+        "starlight-tags",
+        "starlight-tags/middleware",
+      ],
     },
     plugins: [tsConfigPaths()],
     server: {

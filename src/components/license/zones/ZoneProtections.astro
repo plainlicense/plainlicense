@@ -30,7 +30,8 @@ const protectionsHtml = await marked.parse(protections);
 .zone-protections {
   background: var(--sl-color-gray-6);
   border: 1px solid var(--sl-color-gray-5);
-  border-radius: 8px;
+  border-left: 3px solid rgba(108, 166, 193, 0.3);
+  border-radius: 0 8px 8px 0;
   margin-bottom: 1rem;
   overflow: hidden;
 }
@@ -60,7 +61,7 @@ const protectionsHtml = await marked.parse(protections);
   width: 1rem;
   height: 1rem;
   flex-shrink: 0;
-  color: var(--sl-color-gray-2);
+  color: var(--air-superiority-blue);
 }
 
 .summary-heading {

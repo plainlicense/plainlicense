@@ -200,7 +200,7 @@ export function convertDefinitionLists(
   mode: "markdown" | "plaintext",
 ): string {
   return content.replace(
-    /`([^`]+)`\n\n:    (.*)/g,
+    /`([^`]+)`\n\n?:    (.*)/g,
     (_match, term: string, definition: string) => {
       if (mode === "plaintext") {
         return `${term.toUpperCase()} \u2014 ${definition}`;
