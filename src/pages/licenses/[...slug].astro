@@ -219,36 +219,43 @@ function readabilityLevel(score: number): string {
           <ComparisonToggle hasMapping={true} />
         </div>
       )}
-      {/* Readability comparison bar */}
+      {/* Readability comparison bar — columns align with plain/original license text */}
       {hasData && (
-        <div class="fulltext-readability">
+        <div class="fulltext-readability" role="region" aria-label="Readability scores">
           <div class="readability-bar">
-            <svg class="readability-bar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" set:html={ICONS["bar-chart"]} />
-            <div class="readability-bar-stats">
+            {/* Plain license stats — left side, aligns with plain column */}
+            <div class="bar-side bar-side--plain">
+              <svg class="readability-bar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" set:html={ICONS["bar-chart"]} />
               {plain_gunning_fog !== undefined && (
-                <span class="bar-stat bar-stat--plain">
+                <span class="bar-stat">
                   <span class="bar-stat-label">Plain</span>
-                  <span class="bar-stat-score">{plain_gunning_fog}</span>
+                  <span class="bar-stat-score bar-score--plain">{plain_gunning_fog}</span>
                   <span class="bar-stat-level">{readabilityLevel(plain_gunning_fog)}</span>
                 </span>
               )}
-              {hasComparison && (
-                <span class="bar-stat bar-stat--original">
-                  <span class="bar-stat-label">Original</span>
-                  <span class="bar-stat-score">{original_gunning_fog}</span>
-                  <span class="bar-stat-level">{readabilityLevel(original_gunning_fog!)}</span>
-                </span>
-              )}
-              {improvement !== undefined && improvement > 0 && (
-                <span class="bar-improvement">
-                  ↓ {improvement} grades easier
+              {shame_words_count !== undefined && (
+                <span class="bar-shame">
+                  <span class="bar-shame-count">{shame_words_count}</span> jargon
                 </span>
               )}
             </div>
-            {shame_words_count !== undefined && (
-              <span class="bar-shame">
-                <span class="bar-shame-count">{shame_words_count}</span> jargon
-              </span>
+
+            {/* Improvement badge — center */}
+            {improvement !== undefined && improvement > 0 && (
+              <div class="bar-center">
+                <span class="bar-improvement">↓ {improvement} grades easier</span>
+              </div>
+            )}
+
+            {/* Original license stats — right side, aligns with original column */}
+            {hasComparison && (
+              <div class="bar-side bar-side--original">
+                <span class="bar-stat">
+                  <span class="bar-stat-label">Original</span>
+                  <span class="bar-stat-score bar-score--original">{original_gunning_fog}</span>
+                  <span class="bar-stat-level">{readabilityLevel(original_gunning_fog!)}</span>
+                </span>
+              </div>
             )}
           </div>
         </div>
@@ -348,6 +355,19 @@ tabs.forEach(tab => {
         panel.hidden = false;
         panel.classList.add('active');
       }
+    }
+    // Hide the reference-section readability card when fulltext tab is active
+    // (fulltext has its own inline readability bar, so showing both is redundant)
+    container?.classList.toggle('fulltext-active', panelId === 'panel-fulltext');
+
+    // Coordinate comparison-active class with active tab
+    const compToggle = document.getElementById("comparison-toggle") as HTMLButtonElement | null;
+    if (panelId === 'panel-fulltext') {
+      if (compToggle?.getAttribute('aria-pressed') === 'true') {
+        container?.classList.add('comparison-active');
+      }
+    } else {
+      container?.classList.remove('comparison-active');
     }
   });
 
@@ -622,19 +642,26 @@ tabs.forEach(tab => {
   flex-wrap: wrap;
 }
 
+.bar-side {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.bar-side--original {
+  margin-left: auto;
+}
+
+.bar-center {
+  display: flex;
+  align-items: center;
+}
+
 .readability-bar-icon {
   width: 1rem;
   height: 1rem;
   flex-shrink: 0;
   color: var(--cat-color, var(--sl-color-accent));
-}
-
-.readability-bar-stats {
-  display: flex;
-  align-items: center;
-  gap: 1.25rem;
-  flex: 1;
-  flex-wrap: wrap;
 }
 
 .bar-stat {
@@ -654,11 +681,11 @@ tabs.forEach(tab => {
   font-weight: 700;
 }
 
-.bar-stat--plain .bar-stat-score {
+.bar-score--plain {
   color: var(--cat-color, var(--sl-color-accent));
 }
 
-.bar-stat--original .bar-stat-score {
+.bar-score--original {
   color: var(--sl-color-gray-2);
 }
 
@@ -674,17 +701,46 @@ tabs.forEach(tab => {
   background: rgba(var(--cat-color-rgb, 21, 219, 149), 0.08);
   padding: 0.2rem 0.6rem;
   border-radius: 99px;
+  white-space: nowrap;
 }
 
 .bar-shame {
   font-size: var(--sl-text-xs);
   color: var(--sl-color-gray-3);
-  margin-left: auto;
 }
 
 .bar-shame-count {
   font-weight: 700;
   color: var(--sl-color-gray-1);
+}
+
+/* Comparison mode: readability bar becomes a 3-column grid matching the license columns */
+@media (min-width: 1024px) {
+  .comparison-active .readability-bar {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 1.5rem;
+    flex-wrap: nowrap;
+  }
+
+  .comparison-active .bar-side--plain {
+    justify-self: start;
+  }
+
+  .comparison-active .bar-center {
+    justify-self: center;
+  }
+
+  .comparison-active .bar-side--original {
+    justify-self: end;
+    margin-left: 0;
+  }
+}
+
+/* Hide reference-section readability card when fulltext tab is active (it has its own inline bar) */
+.fulltext-active :global(.readability-card) {
+  display: none;
 }
 
 /* ── Insert/underline emphasis (^^text^^) ── */
@@ -766,6 +822,15 @@ tabs.forEach(tab => {
   }
   .reference-section {
     padding: 1rem;
+  }
+  .readability-bar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+  }
+  .bar-side--original {
+    margin-left: 0;
   }
   .full-license-text :global(dl.license-definitions dt),
   .full-license-text :global(dl.license-definitions dd) {
