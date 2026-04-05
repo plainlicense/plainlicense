@@ -16,8 +16,45 @@ tldr:
   - >-
     Keep all copyright notices and include a copy of this license with any copy
     you share.
-  - There's no warranty. Use at your own risk.
-attribution_required: false
+attribution_required: true
+credit:
+  examples:
+    - context: In a source file header
+      code: |-
+        // Copyright (c) 2025 Your Name
+        // You may use this work under the terms of the [Plain MPL](https://plainlicense.org/mpl-2.0/) or the [Mozilla Public License 2.0](https://www.mozilla.org/en-US/MPL/2.0/). 
+        // If you didn't get a copy of the Plain MPL with this work, you can find it at: [plainlicense.org](https://plainlicense.org).
+    - context: In a README or document
+      code: |-
+        You may use this work under the terms of the [Plain MPL](https://plainlicense.org/mpl-2.0/) or the [Mozilla Public License 2.0](https://www.mozilla.org/en-US/MPL/2.0/). 
+        If you didn't get a copy of the Plain MPL with this work, you can find it at: [plainlicense.org](https://plainlicense.org).
+        See LICENSE for more details.
+    - context: On a website or app
+      code: '© 2026 Your Name — <a href="https://plainlicense.org/mpl-2.0/">Plain MPL</a>'
+  not_required:
+    - Use a specific location for the credit (like a NOTICE file or an "About" page)
+    - Ask for permission before using the work
+    - Include the full license text everywhere — just include one of the two approved notices. Only use one of the two approved notices, not both. See [How to Provide Notices](#how-to-provide-notices) in the full text for the exact notice templates.
+  extra: >-
+    The MPL requires you include one of two specific notices with any parts of
+    the work you share. See [How to Provide Notices](#how-to-provide-notices) in
+    the full text for the exact notice templates.
+faq:
+  - question: Do I have to share my entire project under the MPL?
+    answer: >-
+      No. The MPL is a "file-level" copyleft license. You only need to share
+      changes to the MPL-licensed materials themselves. Your own new materials can use
+      any license you want.
+  - question: Can I use MPL-licensed materials in a proprietary project?
+    answer: >-
+      Yes. You can combine MPL-licensed materials with proprietary materials in a larger
+      project. The MPL parts must stay under the MPL, but your own materials can be
+      proprietary.
+  - question: Is the MPL compatible with the GPL?
+    answer: >-
+      Yes. The MPL 2.0 is designed to be compatible with the GPL, LGPL, and
+      AGPL. Materials under the MPL can be combined with GPL-licensed materials in the
+      same project, unless the authors explicitly use the [Same-License Notice](#same-license-notice--optional) to prevent that.
 fair_code: false
 maker_pitch: >-
   People can use your work freely, but must share changes to your source
@@ -147,7 +184,7 @@ You can still share a version of the work people can’t change or edit (like a 
 - The new license can't stop people from easily getting the source materials of the parts under this license.
 - You must provide a practical way for them to get the source materials.
 
-## We Offer No Warranty and Accept No Blame
+## We Offer No Promises or Warranty
 
 {{block:warranty}}
 
@@ -205,7 +242,7 @@ Include this notice **or** the [Same-License Notice](#same-license-notice--optio
 
 ```markdown
 
-You may use this work under the terms of the [Plain MPL](https://plainlicense.org/licenses/copyleft/mpl-2.0) or the [Mozilla Public License 2.0](https://www.mozilla.org/en-US/MPL/2.0/). If you didn't get a copy of the Plain MPL with this work, you can find it at: [plainlicense.org](https://plainlicense.org).
+You may use this work under the terms of the [Plain MPL](https://plainlicense.org/mpl-2.0/) or the [Mozilla Public License 2.0](https://www.mozilla.org/en-US/MPL/2.0/). If you didn't get a copy of the Plain MPL with this work, you can find it at: [plainlicense.org](https://plainlicense.org).
 
 ```
 
@@ -215,7 +252,7 @@ If you want to share the work under the Plain MPL **and** not allow people to sh
 
 ```markdown
 
-You may use the work under the [Plain MPL](https://plainlicense.org/licenses/copyleft/mpl-2.0), or the [Mozilla Public License 2.0](https://www.mozilla.org/en-US/MPL/2.0/). You can't change the work's license; the authors require you share the work and any changes you make to it under the Plain MPL or the Mozilla Public License 2.0. If you didn't get a copy of the Plain MPL with this work, you can find it at: [plainlicense.org](https://plainlicense.org).
+You may use the work under the [Plain MPL](https://plainlicense.org/mpl-2.0/), or the [Mozilla Public License 2.0](https://www.mozilla.org/en-US/MPL/2.0/). You can't change the work's license; the authors require you share the work and any changes you make to it under the Plain MPL or the Mozilla Public License 2.0. If you didn't get a copy of the Plain MPL with this work, you can find it at: [plainlicense.org](https://plainlicense.org).
 
 ```
 

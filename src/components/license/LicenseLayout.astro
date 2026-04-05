@@ -23,6 +23,7 @@ import ZonePermissions from "./zones/ZonePermissions.astro";
 import ZoneProtections from "./zones/ZoneProtections.astro";
 import ZoneRestrictions from "./zones/ZoneRestrictions.astro";
 import TermDefinitions from "./TermDefinitions.astro";
+import FAQ from "../reactive/FAQ.astro";
 
 interface Props {
   license: LicenseEntryT;
@@ -85,7 +86,7 @@ const compareEntries = (data.compare_to ?? []).map(c => ({
   {data.attribution_required && (
     <ZoneCredit
       plain_name={data.plain_name}
-      original={data.original}
+      credit={data.credit}
     />
   )}
 
@@ -123,6 +124,11 @@ const compareEntries = (data.compare_to ?? []).map(c => ({
     is_dedication={data.is_dedication}
     original={data.original}
   />
+
+  <!-- FAQ (from frontmatter) -->
+  {(data.faq ?? []).length > 0 && (
+    <FAQ items={data.faq} />
+  )}
 
   <!-- Optional slot for exceptional MDX body content -->
   <slot name="outro" />

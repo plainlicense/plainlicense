@@ -142,10 +142,72 @@ export const licensesCollection = defineCollection({
       required: false,
     },
     {
-      label: "Additional how-to instructions (leave blank for most licenses)",
-      name: "extra_how",
-      widget: "richtext",
+      label: "Credit guidance (customizes Zone 4: How to give credit)",
+      name: "credit",
+      widget: "object",
       required: false,
+      fields: [
+        {
+          label: "Examples of where to put attribution",
+          name: "examples",
+          widget: "list",
+          required: false,
+          hint: "Context-specific examples shown under 'Where to put it'. Leave blank for defaults (source header, README, website).",
+          fields: [
+            {
+              label: "Context (e.g. 'In a source file header')",
+              name: "context",
+              widget: "string",
+              required: true,
+            },
+            {
+              label: "Code example",
+              name: "code",
+              widget: "code",
+              required: true,
+              default_language: "text",
+              output_code_only: true,
+            },
+          ],
+        },
+        {
+          label: "What you do NOT need to do",
+          name: "not_required",
+          widget: "list",
+          required: false,
+          hint: "Items for the 'You do not need to' box. Leave blank for defaults.",
+          field: { widget: "string" },
+        },
+        {
+          label: "Extra notes (rendered below the examples)",
+          name: "extra",
+          widget: "richtext",
+          required: false,
+        },
+      ],
+    },
+    // FAQ
+    {
+      label: "Frequently asked questions (3 recommended, 5 max)",
+      name: "faq",
+      widget: "list",
+      required: false,
+      max: 5,
+      hint: "Common questions about this specific license. 3 items is the sweet spot.",
+      fields: [
+        {
+          label: "Question",
+          name: "question",
+          widget: "string",
+          required: true,
+        },
+        {
+          label: "Answer",
+          name: "answer",
+          widget: "text",
+          required: true,
+        },
+      ],
     },
     // Display controls
     {

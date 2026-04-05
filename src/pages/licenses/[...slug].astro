@@ -11,6 +11,7 @@ import DownloadOptions from "../../components/DownloadOptions.astro";
 import VersionHistory from "../../components/VersionHistory.astro";
 import NotLegalAdvice from "../../components/NotLegalAdvice.astro";
 import { getLicenseSlug, getPublishedLicenses } from "../../utils/collections";
+import { derivePlainId } from "../../utils/plain-id";
 import { buildOriginalTextSeparator, stripComponentPlaceholders } from "../../utils/templates";
 import { prepareFootnotes } from "../../utils/footnotes";
 import "../../assets/stylesheets/footnotes.css";
@@ -113,8 +114,10 @@ const plainBody = bodyParts[0].replace(
   },
 );
 // Resolve {{var:...}} placeholders from frontmatter
+const rawSpdxId = data.spdx_id || data.original?.spdx_id || "";
 const templateVars: Record<string, string> = {
   plain_name: data.plain_name || "",
+  plain_id: data.plain_id || derivePlainId(rawSpdxId),
   original_name: data.original?.name || "",
   original_version_name: data.original?.version_display || data.original?.name || "",
   license_type: data.is_dedication ? "dedication" : "license",

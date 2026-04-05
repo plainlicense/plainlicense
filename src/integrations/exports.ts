@@ -24,6 +24,8 @@ function resolveTemplateVars(
     original_version_name:
       data.original?.version_display || data.original?.name || "",
     license_type: data.is_dedication ? "dedication" : "license",
+    spdx_id: data.spdx_id || "",
+    spdx_id_lower: (data.spdx_id || "").toLowerCase(),
   };
 
   return content.replace(/\{\{var:([a-z_]+)\}\}/g, (_match, key) => {

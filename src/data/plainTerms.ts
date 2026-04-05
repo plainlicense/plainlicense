@@ -41,63 +41,80 @@ export const PLAIN_TERMS: readonly PlainTerm[] = [
     term: "source materials",
     hover: "the editable, human-readable form of the work",
     footnote:
-      '"Source materials" means the editable, human-readable form of the work — what others call "source code" or "source form."',
+      '"Source materials" are the editable, human-readable form of the work — what others call "source code" or "source form."',
     replaces: ["source code", "source form"],
   },
   {
     term: "the work",
     hover: "the creative work covered by this license",
     footnote:
-      '"The work" means the creative work (software, documents, art, music, or other materials) covered by this license.',
+      '"The work" is the creative work (software, documents, art, music, or other materials) covered by this license.',
     replaces: ["licensed work", "the Software", "covered work"],
   },
   {
     term: "authors",
     hover: "the copyright holders who license the work to you",
     footnote:
-      '"Authors" means the copyright holders who created or own the work and license it to you.',
-    replaces: ["licensor", "copyright holders", "provider", "owner"],
+      '"Authors" are the copyright holders who created or own the work and license it to you.',
+    replaces: [
+      "licensor",
+      "copyright holder",
+      "provider",
+      "creator",
+      "owner",
+      "licensors",
+      "copyright holders",
+      "providers",
+      "creators",
+      "owners",
+    ],
   },
   {
     term: "restrictions",
     hover: "the things this license does not allow",
     footnote:
-      '"Restrictions" means the activities or uses this license does not permit.',
+      '"Restrictions" are the activities or uses this license does not permit.',
     replaces: [],
   },
   {
     term: "promises",
     hover: "legal warranties and guarantees",
-    footnote:
-      '"Promises" refers to legal warranties and guarantees about the work.',
-    replaces: ["warranties", "guarantees"],
+    footnote: '"Promises" are legal warranties and guarantees about the work.',
+    replaces: ["warranties", "guarantees", "representations"],
   },
   {
     term: "rules",
     hover: "the obligations you must follow under this license",
     footnote:
-      '"Rules" means the conditions, terms, and obligations you must follow under this license.',
-    replaces: ["conditions", "limitations", "terms"],
+      '"Rules" are the conditions, terms, and obligations you must follow under this license.',
+    replaces: ["conditions", "limitations", "obligations"],
   },
   {
     term: "share",
     hover: "includes distributing and making available to others",
     footnote:
-      '"Share" means distribute, redistribute, or otherwise make the work available to others, as described in the original license.',
-    replaces: ["distribute", "redistribute", "convey"],
+      '"Share" includes distributing the work to others, making it publicly available, or offering it in a way that allows others to access or obtain it.',
+    replaces: ["distribute", "redistribute", "convey", "offer", "publish"],
   },
   {
     term: "change",
     hover: "includes modifying, altering, or creating derivative works",
     footnote:
-      '"Change" means modify, alter, or create derivative works, as described in the original license.',
-    replaces: ["modify", "alter", "amend"],
+      '"Change" includes modifying, altering, or creating derivative works, as described in the original license.',
+    replaces: [
+      "modify",
+      "alter",
+      "amend",
+      "adapt",
+      "create derivative",
+      "transform",
+    ],
   },
   {
     term: "give",
     hover: "includes granting rights or permissions",
     footnote:
-      '"Give" means grant or convey rights, as described in the original license.',
+      '"Give" includes granting rights or permissions, such as allowing others to use, modify, or distribute the work.',
     replaces: ["grant", "convey"],
   },
   {
@@ -105,8 +122,16 @@ export const PLAIN_TERMS: readonly PlainTerm[] = [
     hover:
       "includes running, copying, and exercising rights under this license",
     footnote:
-      '"Use" means run, copy, and exercise the rights given to you under this license.',
+      '"Use" includes running, copying, and exercising the rights given to you under this license.',
     replaces: ["utilize", "exploit", "exercise"],
+  },
+  {
+    term: "damages",
+    hover:
+      "harm or loss — financial, data, or any other negative impact — caused by or related to the work",
+    footnote:
+      '"Damages" are any harm or loss a person or organization suffers as a result of using the work. They include financial loss, data loss, legal consequences, lost profits, physical or emotional harm, or business interruption.',
+    replaces: ["liability", "losses"],
   },
 ];
 

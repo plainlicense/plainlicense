@@ -15,16 +15,46 @@ tldr:
     You can use, copy, change, and share this work for any reason, including
     commercially.
   - You must keep the copyright notice and this license with any copy you share.
-  - There's no warranty. Use at your own risk.
 attribution_required: true
+credit:
+  examples:
+    - context: In a source file header
+      code: |-
+        // Copyright (c) 2026 Your Name. [Plain MIT License](https://plainlicense.org/mit/).
+        // Keep the copyright notice and this license with any copy you share.
+    - context: In a README or document
+      code: |-
+        This project is licensed under the [Plain MIT License](https://plainlicense.org/mit/).
+        See LICENSE for details.
+    - context: On a website or app
+      code: '© 2026 Your Name — <a href="https://plainlicense.org/mit/">Plain MIT License</a>'
+  not_required:
+    - Use a specific format or location
+    - Ask for permission before using the work
+    - Include the full license text everywhere you use the work
+    - Use our exact wording — just keep the copyright notice and a reference to the license
+faq:
+  - question: Can I use this for commercial projects?
+    answer: >-
+      Yes. The MIT license lets you use, sell, and share the work for any
+      reason, including commercial products and services. Just keep the
+      copyright notice and license with any copies you share.
+  - question: Do I have to share my own materials if I use MIT-licensed work?
+    answer: >-
+      No. You can use MIT-licensed work in closed-source, proprietary projects.
+      The only thing you must do is keep the copyright notice and license with any copies of the MIT-licensed work you share.
+  - question: Can I change the license on my copy?
+    answer: >-
+      Yes. You can relicense your own project however you want, even
+      proprietary. The MIT-licensed portions still carry the MIT copyright
+      notice, but your additions can use any license, including additions or changes to the MIT-licensed work.
 fair_code: false
 maker_pitch: Do almost anything with this work. Just give credit.
 commercial_restrictions: []
 compare_to:
   - spdx_id: Unlicense
     contrast: >-
-      Completely free to share and use without any restrictions, even giving
-      credit
+      Completely free to use, share and change. You don't even have to give credit if you don't want to.
   - spdx_id: MPL-2.0
     contrast: Requires sharing changes to licensed files
   - spdx_id: Elastic-2.0
@@ -87,11 +117,11 @@ You can do any of these things with the work, **if you follow these two rules**:
 
 {{block:notice}}
 
+## We Offer No Promises
+
 {{block:warranty}}
 
 {{block:interpretation}}
-
-{{component:faq id="mit-faq"}}
 
 ---
 
