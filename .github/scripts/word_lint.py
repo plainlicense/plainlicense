@@ -4,6 +4,7 @@
 # requires-python=">=3.8"
 # ///
 # sourcery skip: avoid-builtin-shadow, avoid-global-variables
+# ty: ignore[unresolved-import]
 """Lint script for checking word usage and style across the project."""
 
 import argparse
@@ -13,7 +14,7 @@ from functools import partial
 from pathlib import Path
 
 from ez_yaml import yaml
-from gitignore_parser import parse_gitignore_str
+from gitignobre_parser import parse_gitignore_str
 from joblib import delayed
 from joblib.parallel import Parallel
 from rich.console import Console
@@ -302,7 +303,7 @@ def write_matches(
 
 def _check_file_in_license_paths(file: Path) -> bool:
     """Check if the file is in the license paths."""
-    return any(file.full_match(str(license_path)) for license_path in LICENSE_PATHS)
+    return any(file.match(str(license_path)) for license_path in LICENSE_PATHS)
 
 
 def _check_file_for_pattern(

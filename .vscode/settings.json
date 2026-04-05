@@ -196,8 +196,8 @@
   "npm.packageManager": "bun",
   "npm.scriptRunner": "bun",
   "python-envs.defaultEnvManager": "ms-python.python:venv",
-  "python.languageServer": "Pylance",
-  "terminal.integrated.fontFamily": "monospace",
+  "python.languageServer": "None",
+  "terminal.integrated.fontFamily": "'Iosevka Nerd Font'",
   "debug.javascript.defaultRuntimeExecutable": {
     "pwa-node": "/home/knitli/.local/share/mise/shims/node"
   },
