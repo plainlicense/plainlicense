@@ -22,7 +22,7 @@ maker_pitch: Do almost anything with this work. Just give credit.
 commercial_restrictions: []
 compare_to:
   - spdx_id: Unlicense
-    contrast: Share with no restrictions or credit required
+    contrast: Completely free to share and use without any restrictions, even giving credit
   - spdx_id: MPL-2.0
     contrast: Requires sharing changes to licensed files
   - spdx_id: Elastic-2.0
