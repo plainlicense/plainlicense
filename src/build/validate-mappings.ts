@@ -26,10 +26,14 @@ export function stripMarkdown(md: string): string {
     .replace(/\*\*([^*]+)\*\*/g, "$1") // bold
     .replace(/\*([^*]+)\*/g, "$1") // italic
     .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1") // links
+    .replace(/\[\^[^\]]*\]/g, "") // footnote references
+    .replace(/^>\s?/gm, "") // blockquotes
     .replace(/^[-*+]\s+/gm, "") // unordered lists
     .replace(/^\d+\.\s+/gm, "") // ordered lists
     .replace(/`([^`]+)`/g, "$1") // inline code
+    .replace(/\^\^([^^]+)\^\^/g, "$1") // caret insert (^^text^^)
     .replace(/<[^>]+>/g, "") // HTML tags
+    .replace(/\\([\\`*_{}[\]()#+\-.!])/g, "$1") // markdown escape sequences
     .replace(/\n{3,}/g, "\n\n") // collapse newlines
     .trim();
 }

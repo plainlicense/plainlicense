@@ -69,22 +69,22 @@
 /* ── Dimming (non-active text fades) ── */
 
 .compare-original-text.concept-dimmed {
-  color: rgba(var(--sl-color-gray-1-rgb, 200, 200, 200), 0.15);
-  transition: color 0.25s ease;
+  opacity: 0.15;
+  transition: opacity 0.25s ease;
 }
 
 .compare-original-text.concept-dimmed .concept-span {
-  color: var(--sl-color-gray-1);
-  transition: color 0.25s ease;
+  opacity: 1;
+  transition: opacity 0.25s ease;
 }
 
 .compare-original-text.concept-dimmed .concept-span:not(.concept-active):not(.concept-child-active) {
+  opacity: 0.35;
   border-bottom-color: rgba(var(--cat-color-rgb, var(--emerald-rgb)), 0.15);
-  color: rgba(var(--sl-color-gray-1-rgb, 200, 200, 200), 0.35);
 }
 
 .compare-original-text.concept-dimmed .concept-filler:not(.concept-active) {
-  color: rgba(var(--sl-color-gray-1-rgb, 200, 200, 200), 0.1);
+  opacity: 0.1;
   border-bottom-color: transparent;
 }
 

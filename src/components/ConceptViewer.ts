@@ -97,10 +97,13 @@ function wrapConceptsInDom(container: HTMLElement, entries: ConceptEntry[]) {
 				span.dataset.conceptId = entry.id;
 				if (entry.kind === "filler") {
 					span.dataset.tooltip = FILLER_TOOLTIP;
+					span.setAttribute("aria-label", FILLER_TOOLTIP);
 				}
 				span.setAttribute("tabindex", "0");
 
-				range.surroundContents(span);
+				const extracted = range.extractContents();
+				span.appendChild(extracted);
+				range.insertNode(span);
 			} catch {
 				console.warn(`Could not wrap concept "${entry.id}" segment`);
 			}
@@ -297,6 +300,26 @@ function setupInteraction(
 			}
 		});
 	}
+
+	// Escape key clears active highlighting on desktop
+	document.addEventListener("keydown", (e: KeyboardEvent) => {
+		if (e.key === "Escape" && activeConcept) {
+			originalEl.classList.remove("concept-dimmed");
+			for (const el of originalEl.querySelectorAll(
+				".concept-active, .concept-child-active",
+			)) {
+				el.classList.remove("concept-active", "concept-child-active");
+			}
+			activeConcept = null;
+			// Remove focus from concept span
+			if (
+				document.activeElement instanceof HTMLElement &&
+				document.activeElement.classList.contains("concept-span")
+			) {
+				document.activeElement.blur();
+			}
+		}
+	});
 
 	// Modal close handlers
 	const modalClose = modalEl?.querySelector(".concept-modal-close");

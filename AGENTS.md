@@ -74,7 +74,7 @@ Each license has a workspace package at `packages/{spdx-id}/` with its own `pack
 
 - `src/components/overrides/` — Starlight layout overrides (Header, Footer, Sidebar)
 - `src/components/reactive/` — Preact interactive components (DecisionTree.tsx, ComparisonTable.astro, FAQ.astro)
-- `src/components/*.astro` — License-specific components (LicenseSummary, ComparisonModal, DownloadOptions, VersionHistory)
+- `src/components/*.astro` — License-specific components (LicenseSummary, CompareTab, DownloadOptions, VersionHistory)
 
 Preact is used for interactive components. JSX factory is `h` (configured in tsconfig). Path alias `~` maps to `./src`.
 

@@ -69,7 +69,7 @@
     {
       "id": "as-is-warranty",
       "original": "THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND,",
-      "plain": ["The work is provided \"as is\" with no warranties."]
+      "plain": ["We give you the work as it is, with no promises or guarantees."]
     },
     {
       "id": "filler-express-implied",
@@ -79,7 +79,7 @@
     {
       "id": "no-liability",
       "original": "IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR\nOTHER LIABILITY,",
-      "plain": ["We are not responsible for any problems or damages caused by using the work."]
+      "plain": ["We are not responsible for any problems or damages that happen because of the work. You use it at your own risk."]
     },
     {
       "id": "filler-contract-tort",
