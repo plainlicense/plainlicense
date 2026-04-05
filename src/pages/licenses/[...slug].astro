@@ -278,6 +278,9 @@ function readabilityLevel(score: number): string {
 </BaseLayout>
 
 <script>
+import { initConceptViewer } from "../../components/ConceptViewer";
+import type { ResolvedMappingFile } from "../../types/concept-mapping";
+
 // Tab switching
 const container = document.querySelector(".license-container") as HTMLElement;
 const tabs = document.querySelectorAll<HTMLButtonElement>('[role="tab"]');
@@ -324,6 +327,27 @@ tabs.forEach(tab => {
     }
   });
 });
+
+// Concept mapping viewer initialization
+const spdxId = container?.dataset.spdxId;
+if (spdxId) {
+  fetch(`/mappings/${spdxId}-mapping.resolved.json`)
+    .then((res) => {
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return res.json() as Promise<ResolvedMappingFile>;
+    })
+    .then((data) => {
+      initConceptViewer(data);
+      // Show Compare tab now that mapping data is available
+      const compareTab = document.getElementById("tab-compare");
+      if (compareTab) compareTab.style.display = "";
+    })
+    .catch(() => {
+      // No mapping available — keep Compare tab hidden
+      const compareTab = document.getElementById("tab-compare");
+      if (compareTab) compareTab.style.display = "none";
+    });
+}
 </script>
 
 <style>
