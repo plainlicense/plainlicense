@@ -1,5 +1,6 @@
 ---
-import { type CollectionEntry, getEntry } from "astro:content";
+import { getEntry } from "astro:content";
+import type { LicenseEntryT } from "../../_types/licenses";
 import LicenseLayout from "../../layouts/LicenseLayout.astro";
 
 // This is a dynamic route (for previewing ANY content)
@@ -11,10 +12,7 @@ const { slug } = Astro.params;
 if (!slug) return Astro.redirect("/404");
 
 // Try fetching as a license first
-let entry: CollectionEntry<"licenses"> | null = await getEntry(
-  "licenses",
-  slug,
-);
+let entry = await getEntry("licenses", slug) as LicenseEntryT | undefined;
 
 if (!entry) {
   // Handle other types of previews (e.g., blog) if needed

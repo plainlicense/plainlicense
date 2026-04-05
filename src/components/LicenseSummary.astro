@@ -1,8 +1,8 @@
 ---
-import type { CollectionEntry } from "astro:content";
+import type { LicenseEntryT } from "../_types/licenses";
 
 interface Props {
-  license: CollectionEntry<"licenses">;
+  license: LicenseEntryT;
 }
 
 const { license } = Astro.props;

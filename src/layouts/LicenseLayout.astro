@@ -1,34 +1,32 @@
 ---
-import type { CollectionEntry } from "astro:content";
+import type { LicenseEntryT } from "../_types/licenses";
 import BaseLayout from "./BaseLayout.astro";
 
 interface Props {
-  license: CollectionEntry<"licenses">;
+  license: LicenseEntryT;
 }
 
 const { license } = Astro.props;
 const { data } = license;
 
-// Try to load mapping data if it exists
-let mappingData = null;
-try {
-  // Use id instead of slug for consistent mapping file lookup
-  const mappingPath = `/content/mappings/${data.spdx_id}-mapping.json`;
-  // In a real app, we'd fetch this or use Astro.glob
-} catch (e) {}
+const spdxIdentifier = data.original?.spdx_id || data.spdx_id;
 ---
 
 <BaseLayout
-  title={data.plain_name || data.spdx_id}
+  title={data.plain_name}
   description={data.description}
 >
-  <main class="license-page" data-spdx-id={data.spdx_id}>
+  <main class="license-page" data-spdx-id={spdxIdentifier}>
     <header>
       <h1>{data.plain_name}</h1>
       <div class="metadata">
-        <span class="spdx-id">{data.spdx_id}</span>
+        <span class="spdx-id">{spdxIdentifier}</span>
         <span class="category">{data.license_family}</span>
-        {data.plain_version && <span class="version">v{data.plain_version}</span>}
+        {
+          data.plain_version && (
+            <span class="version">v{data.plain_version}</span>
+          )
+        }
       </div>
     </header>
 
@@ -40,96 +38,116 @@ try {
       <article class="prose"><slot /></article>
 
       <aside class="sidebar">
-        {data.original?.permissions && (
-          <section>
-            <h3>Permissions</h3>
-            <ul>{data.original.permissions.map(p => <li>{p}</li>)}</ul>
-          </section>
-        )}
-        {data.original?.conditions && (
-          <section>
-            <h3>Conditions</h3>
-            <ul>{data.original.conditions.map(c => <li>{c}</li>)}</ul>
-          </section>
-        )}
-        {data.original?.limitations && (
-          <section>
-            <h3>Limitations</h3>
-            <ul>{data.original.limitations.map(l => <li>{l}</li>)}</ul>
-          </section>
-        )}
+        {
+          data.original?.permissions && (
+            <section>
+              <h3>Permissions</h3>
+              <ul>
+                {data.original.permissions.map((p) => (
+                  <li>{p}</li>
+                ))}
+              </ul>
+            </section>
+          )
+        }
+        {
+          data.original?.conditions && (
+            <section>
+              <h3>Conditions</h3>
+              <ul>
+                {data.original.conditions.map((c) => (
+                  <li>{c}</li>
+                ))}
+              </ul>
+            </section>
+          )
+        }
+        {
+          data.original?.limitations && (
+            <section>
+              <h3>Limitations</h3>
+              <ul>
+                {data.original.limitations.map((l) => (
+                  <li>{l}</li>
+                ))}
+              </ul>
+            </section>
+          )
+        }
       </aside>
     </div>
   </main>
 </BaseLayout>
 
 <script>
-import { initMappingViewer } from "../components/MappingViewer";
+  import { initMappingViewer } from "../components/MappingViewer";
 
-async function loadMappings() {
-  const main = document.querySelector(".license-page");
-  const spdxId = main?.getAttribute("data-spdx-id");
+  async function loadMappings() {
+    const main = document.querySelector(".license-page");
+    const spdxId = main?.getAttribute("data-spdx-id");
 
-  if (spdxId) {
-    try {
-      // In prototype, we try to fetch the local JSON
-      const response = await fetch(`/mappings/${spdxId}-mapping.json`);
-      if (response.ok) {
-        const mappingData = await response.json() as Parameters<typeof initMappingViewer>[0];
-        initMappingViewer(mappingData);
+    if (spdxId) {
+      try {
+        // In prototype, we try to fetch the local JSON
+        const response = await fetch(`/mappings/${spdxId}-mapping.json`);
+        if (response.ok) {
+          const mappingData = (await response.json()) as Parameters<
+            typeof initMappingViewer
+          >[0];
+          initMappingViewer(mappingData);
+        }
+      } catch (e) {
+        console.warn("Mapping data not found for:", spdxId);
       }
-    } catch (e) {
-      console.warn("Mapping data not found for:", spdxId);
     }
   }
-}
 
-loadMappings();
+  loadMappings();
 </script>
 
 <style>
-.license-page {
-  max-width: 1000px;
-  margin: 0 auto;
-  padding: 2rem;
-}
-header {
-  margin-bottom: 2rem;
-  border-bottom: 1px solid var(--sl-color-gray-5);
-  padding-bottom: 1rem;
-}
-.plain-name {
-  font-size: 1.5rem;
-  color: #aaa;
-}
-.metadata {
-  display: flex;
-  gap: 1rem;
-  font-size: 0.9rem;
-  color: #888;
-}
-.content-wrapper {
-  display: grid;
-  grid-template-columns: 1fr 250px;
-  gap: 3rem;
-}
-.prose {
-  line-height: 1.6;
-}
-aside section {
-  margin-bottom: 1.5rem;
-}
-h3 {
-  font-size: 1.1rem;
-  margin-bottom: 0.5rem;
-  color: #888;
-}
-ul {
-  list-style: none;
-  padding: 0;
-}
-li {
-  font-size: 0.9rem;
-  margin-bottom: 0.3rem;
-}
+  .license-page {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+  header {
+    margin-bottom: 2rem;
+    border-bottom: 1px solid var(--sl-color-gray-5);
+    padding-bottom: 1rem;
+  }
+  .plain-name {
+    font-size: 1.5rem;
+    color: #aaa;
+  }
+  .metadata {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.9rem;
+    color: #888;
+  }
+  .content-wrapper {
+    display: grid;
+    grid-template-columns: 1fr 250px;
+    gap: 3rem;
+  }
+  .prose {
+    line-height: 1.6;
+  }
+  aside section {
+    margin-bottom: 1.5rem;
+  }
+  h3 {
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+    color: #888;
+  }
+  ul {
+    list-style: none;
+    padding: 0;
+  }
+  li {
+    font-size: 0.9rem;
+    margin-bottom: 0.3rem;
+  }
 </style>

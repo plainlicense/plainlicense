@@ -1,6 +1,5 @@
 ---
 import Default from "@astrojs/starlight/components/Footer.astro";
-import type { Props } from "@astrojs/starlight/props";
 import { GITHUB_REPO, ROUTES } from "../../utils/constants";
 ---
 
@@ -8,8 +7,9 @@ import { GITHUB_REPO, ROUTES } from "../../utils/constants";
   <div class="footer-content">
     <p>
       Plain License's authors dedicate all original content to the public
-      domain. <strong>We reserve NO rights.</strong>
+      domain.
     </p>
+    <p><strong>We reserve NO rights.</strong></p>
     <nav class="footer-links" aria-label="Footer navigation">
       <a href={ROUTES.LICENSES}>Licenses</a>
       <a href={ROUTES.FAQ}>FAQ</a>
@@ -20,8 +20,7 @@ import { GITHUB_REPO, ROUTES } from "../../utils/constants";
         href={GITHUB_REPO}
         target="_blank"
         rel="noopener noreferrer"
-        aria-label="GitHub (opens in new tab)"
-        >GitHub</a
+        aria-label="GitHub (opens in new tab)">GitHub</a
       >
     </nav>
   </div>
@@ -40,63 +39,66 @@ import { GITHUB_REPO, ROUTES } from "../../utils/constants";
 </button>
 
 <script>
-(() => {
-  const btn = document.getElementById("scroll-to-top") as HTMLElement | null;
-  if (!btn) return;
-  const scrollBtn: HTMLElement = btn;
-  const threshold = Math.max(document.documentElement.clientHeight * 0.3, 200);
-  function onScroll() {
-    if (window.scrollY > threshold) {
-      scrollBtn.classList.add("visible");
-    } else {
-      scrollBtn.classList.remove("visible");
+  (() => {
+    const btn = document.getElementById("scroll-to-top") as HTMLElement | null;
+    if (!btn) return;
+    const scrollBtn: HTMLElement = btn;
+    const threshold = Math.max(
+      document.documentElement.clientHeight * 0.3,
+      200,
+    );
+    function onScroll() {
+      if (window.scrollY > threshold) {
+        scrollBtn.classList.add("visible");
+      } else {
+        scrollBtn.classList.remove("visible");
+      }
     }
-  }
-  window.addEventListener("scroll", onScroll, { passive: true });
-  scrollBtn.addEventListener("click", () => {
-    const prefersReducedMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)",
-    ).matches;
-    window.scrollTo({
-      top: 0,
-      behavior: prefersReducedMotion ? "auto" : "smooth",
-    });
-  });
-  document.addEventListener("astro:page-load", () => {
-    onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
-  });
-  document.addEventListener("astro:before-preparation", () => {
-    window.removeEventListener("scroll", onScroll);
-  });
-})();
+    scrollBtn.addEventListener("click", () => {
+      const prefersReducedMotion = window.matchMedia(
+        "(prefers-reduced-motion: reduce)",
+      ).matches;
+      window.scrollTo({
+        top: 0,
+        behavior: prefersReducedMotion ? "auto" : "smooth",
+      });
+    });
+    document.addEventListener("astro:page-load", () => {
+      onScroll();
+      window.addEventListener("scroll", onScroll, { passive: true });
+    });
+    document.addEventListener("astro:before-preparation", () => {
+      window.removeEventListener("scroll", onScroll);
+    });
+  })();
 </script>
 
 <style>
-.plain-footer {
-  border-top: 1px solid var(--sl-color-gray-5);
-  padding: 2rem 0;
-  margin-top: 3rem;
-}
-.footer-content {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 1rem;
-  font-size: var(--sl-text-sm);
-  color: var(--sl-color-gray-3);
-}
-.footer-links {
-  display: flex;
-  gap: 1.5rem;
-}
-.footer-links a {
-  color: var(--sl-color-text-accent);
-  text-decoration: none;
-}
-.footer-links a:hover {
-  text-decoration: underline;
-}
+  .plain-footer {
+    border-top: 1px solid var(--sl-color-gray-5);
+    padding: 2rem 0;
+    margin-top: 3rem;
+  }
+  .footer-content {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    font-size: var(--sl-text-sm);
+    color: var(--sl-color-gray-3);
+  }
+  .footer-links {
+    display: flex;
+    gap: 1.5rem;
+  }
+  .footer-links a {
+    color: var(--sl-color-text-accent);
+    text-decoration: none;
+  }
+  .footer-links a:hover {
+    text-decoration: underline;
+  }
 </style>

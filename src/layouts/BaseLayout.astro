@@ -5,45 +5,61 @@ interface Props {
   ogImage?: string;
 }
 
-import { FAVICON_PATH, GITHUB_REPO, ROUTES, SITE_TAGLINE } from "../utils/constants";
+import {
+  FAVICON_PATH,
+  GITHUB_REPO,
+  ROUTES,
+  SITE_TAGLINE,
+} from "../utils/constants";
 import "../assets/stylesheets/print.css";
 
-const { title, description = "Plain language versions of popular licenses", ogImage } =
-  Astro.props;
+const {
+  title,
+  description = "Plain language versions of popular licenses",
+  ogImage,
+} = Astro.props;
 const currentPath = Astro.url.pathname;
 const canonicalUrl = new URL(currentPath, Astro.site);
 const ogImageUrl = ogImage
   ? new URL(ogImage, Astro.site).href
-  : new URL(`/open-graph${currentPath.replace(/\/$/, "")}.png`, Astro.site).href;
+  : new URL(`/open-graph${currentPath.replace(/\/$/, "")}.png`, Astro.site)
+      .href;
 ---
 
 <!doctype html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/svg+xml" href={FAVICON_PATH}>
-    <meta name="generator" content={Astro.generator}>
-    <meta name="description" content={description}>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href={FAVICON_PATH} />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="description" content={description} />
     <title>{title} | Plain License</title>
-    <link rel="canonical" href={canonicalUrl}>
-    <meta property="og:type" content="website">
-    <meta property="og:url" content={canonicalUrl}>
-    <meta property="og:title" content={`${title} | Plain License`}>
-    <meta property="og:description" content={description}>
-    <meta property="og:image" content={ogImageUrl}>
-    <meta property="og:site_name" content="Plain License">
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content={`${title} | Plain License`}>
-    <meta name="twitter:description" content={description}>
-    <meta name="twitter:image" content={ogImageUrl}>
+    <link rel="canonical" href={canonicalUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:title" content={`${title} | Plain License`} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={ogImageUrl} />
+    <meta property="og:site_name" content="Plain License" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={`${title} | Plain License`} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageUrl} />
   </head>
   <body>
     <a href="#main-content" class="skip-link">Skip to main content</a>
     <header class="site-header">
       <div class="header-inner">
         <a href="/" class="site-brand" aria-label="Plain License home">
-          <img src={FAVICON_PATH} alt="" class="brand-logo" width="32" height="32" aria-hidden="true" />
+          <img
+            src={FAVICON_PATH}
+            alt=""
+            class="brand-logo"
+            width="32"
+            height="32"
+            aria-hidden="true"
+          />
           <span class="brand-name">Plain <strong>License</strong></span>
         </a>
         <nav class="site-nav" aria-label="Main navigation">
@@ -52,23 +68,31 @@ const ogImageUrl = ogImage
           >
           <a
             href={ROUTES.LICENSES}
-            class:list={["nav-link", { active: currentPath.startsWith(ROUTES.LICENSES) }]}
-            >Licenses</a
+            class:list={[
+              "nav-link",
+              { active: currentPath.startsWith(ROUTES.LICENSES) },
+            ]}>Licenses</a
           >
           <a
             href={ROUTES.FAQ}
-            class:list={["nav-link", { active: currentPath.startsWith(ROUTES.FAQ) }]}
-            >FAQ</a
+            class:list={[
+              "nav-link",
+              { active: currentPath.startsWith(ROUTES.FAQ) },
+            ]}>FAQ</a
           >
           <a
             href={ROUTES.ABOUT}
-            class:list={["nav-link", { active: currentPath.startsWith(ROUTES.ABOUT) }]}
-            >About</a
+            class:list={[
+              "nav-link",
+              { active: currentPath.startsWith(ROUTES.ABOUT) },
+            ]}>About</a
           >
           <a
             href={ROUTES.BLOG}
-            class:list={["nav-link", { active: currentPath.startsWith(ROUTES.BLOG) }]}
-            >Blog</a
+            class:list={[
+              "nav-link",
+              { active: currentPath.startsWith(ROUTES.BLOG) },
+            ]}>Blog</a
           >
           <a
             href={GITHUB_REPO}
@@ -86,7 +110,7 @@ const ogImageUrl = ogImage
             >
               <path
                 d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"
-              />
+              ></path>
             </svg>
           </a>
         </nav>
@@ -111,23 +135,31 @@ const ogImageUrl = ogImage
         >
         <a
           href={ROUTES.LICENSES}
-          class:list={["nav-link", { active: currentPath.startsWith(ROUTES.LICENSES) }]}
-          >Licenses</a
+          class:list={[
+            "nav-link",
+            { active: currentPath.startsWith(ROUTES.LICENSES) },
+          ]}>Licenses</a
         >
         <a
           href={ROUTES.FAQ}
-          class:list={["nav-link", { active: currentPath.startsWith(ROUTES.FAQ) }]}
-          >FAQ</a
+          class:list={[
+            "nav-link",
+            { active: currentPath.startsWith(ROUTES.FAQ) },
+          ]}>FAQ</a
         >
         <a
           href={ROUTES.ABOUT}
-          class:list={["nav-link", { active: currentPath.startsWith(ROUTES.ABOUT) }]}
-          >About</a
+          class:list={[
+            "nav-link",
+            { active: currentPath.startsWith(ROUTES.ABOUT) },
+          ]}>About</a
         >
         <a
           href={ROUTES.BLOG}
-          class:list={["nav-link", { active: currentPath.startsWith(ROUTES.BLOG) }]}
-          >Blog</a
+          class:list={[
+            "nav-link",
+            { active: currentPath.startsWith(ROUTES.BLOG) },
+          ]}>Blog</a
         >
         <a
           href={GITHUB_REPO}
@@ -144,7 +176,14 @@ const ogImageUrl = ogImage
     <footer class="site-footer">
       <div class="footer-inner">
         <div class="footer-brand">
-          <img src={FAVICON_PATH} alt="" class="footer-logo" width="24" height="24" aria-hidden="true" />
+          <img
+            src={FAVICON_PATH}
+            alt=""
+            class="footer-logo"
+            width="24"
+            height="24"
+            aria-hidden="true"
+          />
           <span class="footer-tagline">{SITE_TAGLINE}</span>
         </div>
         <p class="footer-copy">
@@ -162,8 +201,7 @@ const ogImageUrl = ogImage
             href={GITHUB_REPO}
             target="_blank"
             rel="noopener noreferrer"
-            aria-label="GitHub (opens in new tab)"
-            >GitHub</a
+            aria-label="GitHub (opens in new tab)">GitHub</a
           >
         </nav>
       </div>
@@ -172,359 +210,363 @@ const ogImageUrl = ogImage
 </html>
 
 <script>
-const toggle = document.querySelector(
-  ".mobile-menu-toggle",
-) as HTMLButtonElement | null;
-const mobileNav = document.getElementById("mobile-nav");
-if (toggle && mobileNav) {
-  toggle.addEventListener("click", () => {
-    const expanded = toggle.getAttribute("aria-expanded") === "true";
-    toggle.setAttribute("aria-expanded", String(!expanded));
-    if (expanded) {
-      mobileNav.setAttribute("hidden", "");
-    } else {
-      mobileNav.removeAttribute("hidden");
-    }
-  });
-}
+  const toggle = document.querySelector(
+    ".mobile-menu-toggle",
+  ) as HTMLButtonElement | null;
+  const mobileNav = document.getElementById("mobile-nav");
+  if (toggle && mobileNav) {
+    toggle.addEventListener("click", () => {
+      const expanded = toggle.getAttribute("aria-expanded") === "true";
+      toggle.setAttribute("aria-expanded", String(!expanded));
+      if (expanded) {
+        mobileNav.setAttribute("hidden", "");
+      } else {
+        mobileNav.removeAttribute("hidden");
+      }
+    });
+  }
 
-// Print: force all <details> open and all tab panels visible
-window.addEventListener("beforeprint", () => {
-  document.querySelectorAll("details:not([open])").forEach((d) => {
-    d.setAttribute("open", "");
-    d.setAttribute("data-print-opened", "");
+  // Print: force all <details> open and all tab panels visible
+  window.addEventListener("beforeprint", () => {
+    document.querySelectorAll("details:not([open])").forEach((d) => {
+      d.setAttribute("open", "");
+      d.setAttribute("data-print-opened", "");
+    });
+    document
+      .querySelectorAll<HTMLElement>(".tab-panel[hidden]")
+      .forEach((p) => {
+        p.removeAttribute("hidden");
+        p.setAttribute("data-print-shown", "");
+      });
   });
-  document.querySelectorAll<HTMLElement>(".tab-panel[hidden]").forEach((p) => {
-    p.removeAttribute("hidden");
-    p.setAttribute("data-print-shown", "");
-  });
-});
 
-window.addEventListener("afterprint", () => {
-  document.querySelectorAll("[data-print-opened]").forEach((d) => {
-    d.removeAttribute("open");
-    d.removeAttribute("data-print-opened");
+  window.addEventListener("afterprint", () => {
+    document.querySelectorAll("[data-print-opened]").forEach((d) => {
+      d.removeAttribute("open");
+      d.removeAttribute("data-print-opened");
+    });
+    document
+      .querySelectorAll<HTMLElement>("[data-print-shown]")
+      .forEach((p) => {
+        p.setAttribute("hidden", "");
+        p.removeAttribute("data-print-shown");
+      });
   });
-  document.querySelectorAll<HTMLElement>("[data-print-shown]").forEach((p) => {
-    p.setAttribute("hidden", "");
-    p.removeAttribute("data-print-shown");
-  });
-});
 </script>
 
 <style is:global>
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
-
-:root {
-  --accent: 21, 219, 149; /* emerald */
-  --accent-dark: 9, 93, 64; /* castleton-green */
-  --accent-text: 106, 241, 194; /* aquamarine */
-  --bg: #0d0f15;
-  --bg-surface: #161923;
-  --bg-border: #242836;
-  --text: #e8eaf0;
-  --text-muted: #8b90a0;
-  --header-h: 3.5rem;
-}
-
-html {
-  font-family: var(--sl-font, "Lexend", "Noto Sans", system-ui, sans-serif);
-  background: var(--bg);
-  color: var(--text);
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  html {
-    scroll-behavior: smooth;
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
   }
-}
 
-body {
-  margin: 0;
-  min-height: 100dvh;
-  display: flex;
-  flex-direction: column;
-}
+  :root {
+    --accent: 21, 219, 149; /* emerald */
+    --accent-dark: 9, 93, 64; /* castleton-green */
+    --accent-text: 106, 241, 194; /* aquamarine */
+    --bg: #0d0f15;
+    --bg-surface: #161923;
+    --bg-border: #242836;
+    --text: #f7f8fa;
+    --text-muted: #ced0d7;
+    --header-h: 3.5rem;
+  }
 
-.page-main {
-  flex: 1;
-}
+  html {
+    font-family: var(--sl-font, "Lexend", "Noto Sans", system-ui, sans-serif);
+    background: var(--bg);
+    color: var(--text);
+  }
 
-/* ── Skip Link ──────────────────────────────────────────── */
-.skip-link {
-  position: absolute;
-  top: -100%;
-  left: 1rem;
-  z-index: 9999;
-  background: rgb(var(--accent));
-  color: #0d0f15;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  font-weight: 700;
-  font-size: 0.9rem;
-  text-decoration: none;
-  transition: top 0.1s;
-}
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
 
-.skip-link:focus {
-  top: 0.5rem;
-}
+  body {
+    margin: 0;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+  }
 
-/* ── Global Focus Styles ─────────────────────────────────── */
-:focus-visible {
-  outline: 2px solid rgb(var(--accent));
-  outline-offset: 2px;
-}
+  .page-main {
+    flex: 1;
+  }
 
-/* Remove default outline only when :focus-visible is used */
-:focus:not(:focus-visible) {
-  outline: none;
-}
+  /* ── Skip Link ──────────────────────────────────────────── */
+  .skip-link {
+    position: absolute;
+    top: -100%;
+    left: 1rem;
+    z-index: 9999;
+    background: rgb(var(--accent));
+    color: #0d0f15;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    text-decoration: none;
+    transition: top 0.1s;
+  }
 
-code {
-  font-family: var(--sl-font-mono, "JetBrains Mono", "Fira Code", monospace);
-}
+  .skip-link:focus {
+    top: 0.5rem;
+  }
 
-a {
-  color: rgb(var(--accent));
-}
-a:hover {
-  color: rgb(var(--accent-text));
-}
+  /* ── Global Focus Styles ─────────────────────────────────── */
+  :focus-visible {
+    outline: 2px solid rgb(var(--accent));
+    outline-offset: 2px;
+  }
 
-/* ── Site Header ─────────────────────────────────────────── */
-.site-header {
-  position: sticky;
-  top: 0;
-  z-index: 200;
-  background: rgba(13, 15, 21, 0.92);
-  backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--bg-border);
-}
+  /* Remove default outline only when :focus-visible is used */
+  :focus:not(:focus-visible) {
+    outline: none;
+  }
 
-.header-inner {
-  max-width: 72rem;
-  margin: 0 auto;
-  padding: 0 1.5rem;
-  height: var(--header-h);
-  display: flex;
-  align-items: center;
-  gap: 2rem;
-}
+  code {
+    font-family: var(--sl-font-mono, "JetBrains Mono", "Fira Code", monospace);
+  }
 
-.site-brand {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  text-decoration: none;
-  color: var(--text);
-  flex-shrink: 0;
-}
+  a {
+    color: rgb(var(--accent));
+  }
+  a:hover {
+    color: rgb(var(--accent-text));
+  }
 
-.brand-logo {
-  width: 2rem;
-  height: 2rem;
-  flex-shrink: 0;
-}
+  /* ── Site Header ─────────────────────────────────────────── */
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 200;
+    background: rgba(13, 15, 21, 0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--bg-border);
+  }
 
-.brand-name {
-  font-size: 1.05rem;
-  font-weight: 400;
-  letter-spacing: -0.01em;
-}
+  .header-inner {
+    max-width: 72rem;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+    height: var(--header-h);
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+  }
 
-.brand-name strong {
-  font-weight: 700;
-}
+  .site-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    text-decoration: none;
+    color: var(--text);
+    flex-shrink: 0;
+  }
 
-.site-nav {
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-  margin-left: auto;
-}
+  .brand-logo {
+    width: 2rem;
+    height: 2rem;
+    flex-shrink: 0;
+  }
 
-.nav-link {
-  padding: 0.4rem 0.75rem;
-  border-radius: 6px;
-  font-size: 0.9rem;
-  font-weight: 500;
-  text-decoration: none;
-  color: var(--text-muted);
-  transition:
-    color 0.15s,
-    background 0.15s;
-  display: flex;
-  align-items: center;
-  gap: 0.3rem;
-}
+  .brand-name {
+    font-size: 1.05rem;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+  }
 
-.nav-link:hover,
-.nav-link.active {
-  color: var(--text);
-  background: rgba(255, 255, 255, 0.06);
-}
+  .brand-name strong {
+    font-weight: 700;
+  }
 
-.nav-github {
-  margin-left: 0.5rem;
-}
-
-.mobile-menu-toggle {
-  display: none;
-  flex-direction: column;
-  gap: 5px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0.4rem;
-  margin-left: auto;
-}
-
-.mobile-menu-toggle span {
-  display: block;
-  width: 22px;
-  height: 2px;
-  background: var(--text);
-  border-radius: 2px;
-  transition:
-    transform 0.2s,
-    opacity 0.2s;
-}
-
-.mobile-nav {
-  display: flex;
-  flex-direction: column;
-  padding: 0.5rem 1.5rem 1rem;
-  border-top: 1px solid var(--bg-border);
-  background: var(--bg-surface);
-}
-
-/* Respect the `hidden` attribute — prevents CSS flex from overriding it */
-.mobile-nav[hidden] {
-  display: none;
-}
-
-.mobile-nav .nav-link {
-  padding: 0.7rem 0.5rem;
-  font-size: 1rem;
-  border-bottom: 1px solid var(--bg-border);
-}
-
-@media (max-width: 640px) {
   .site-nav {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    margin-left: auto;
+  }
+
+  .nav-link {
+    padding: 0.4rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-decoration: none;
+    color: var(--text-muted);
+    transition:
+      color 0.15s,
+      background 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+  }
+
+  .nav-link:hover,
+  .nav-link.active {
+    color: var(--text);
+    background: rgba(255, 255, 255, 0.06);
+  }
+
+  .nav-github {
+    margin-left: 0.5rem;
+  }
+
+  .mobile-menu-toggle {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.4rem;
+    margin-left: auto;
+  }
+
+  .mobile-menu-toggle span {
+    display: block;
+    width: 22px;
+    height: 2px;
+    background: var(--text);
+    border-radius: 2px;
+    transition:
+      transform 0.2s,
+      opacity 0.2s;
+  }
+
+  .mobile-nav {
+    display: flex;
+    flex-direction: column;
+    padding: 0.5rem 1.5rem 1rem;
+    border-top: 1px solid var(--bg-border);
+    background: var(--bg-surface);
+  }
+
+  /* Respect the `hidden` attribute — prevents CSS flex from overriding it */
+  .mobile-nav[hidden] {
     display: none;
   }
-  .mobile-menu-toggle {
-    display: flex;
+
+  .mobile-nav .nav-link {
+    padding: 0.7rem 0.5rem;
+    font-size: 1rem;
+    border-bottom: 1px solid var(--bg-border);
   }
-}
 
-/* ── Site Footer ─────────────────────────────────────────── */
-.site-footer {
-  border-top: 1px solid var(--bg-border);
-  margin-top: 4rem;
-}
+  @media (max-width: 640px) {
+    .site-nav {
+      display: none;
+    }
+    .mobile-menu-toggle {
+      display: flex;
+    }
+  }
 
-.footer-inner {
-  max-width: 72rem;
-  margin: 0 auto;
-  padding: 2rem 1.5rem;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  font-size: 0.875rem;
-  color: var(--text-muted);
-}
+  /* ── Site Footer ─────────────────────────────────────────── */
+  .site-footer {
+    border-top: 1px solid var(--bg-border);
+    margin-top: 4rem;
+  }
 
-.footer-brand {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  width: 100%;
-  margin-bottom: 0.75rem;
-}
+  .footer-inner {
+    max-width: 72rem;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    font-size: 0.875rem;
+    color: var(--text-muted);
+  }
 
-.footer-logo {
-  width: 1.5rem;
-  height: 1.5rem;
-}
+  .footer-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+    margin-bottom: 0.75rem;
+  }
 
-.footer-tagline {
-  font-size: 0.85rem;
-  color: var(--text-muted);
-  font-style: italic;
-}
+  .footer-logo {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
 
-.footer-copy {
-  margin: 0;
-}
-.footer-copy strong {
-  color: var(--text);
-}
+  .footer-tagline {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    font-style: italic;
+  }
 
-.footer-nav {
-  display: flex;
-  gap: 1.5rem;
-}
+  .footer-copy {
+    margin: 0;
+  }
+  .footer-copy strong {
+    color: var(--text);
+  }
 
-.footer-nav a {
-  color: var(--text-muted);
-  text-decoration: none;
-}
+  .footer-nav {
+    display: flex;
+    gap: 1.5rem;
+  }
 
-.footer-nav a:hover {
-  color: rgb(var(--accent));
-}
+  .footer-nav a {
+    color: var(--text-muted);
+    text-decoration: none;
+  }
 
-/* ── Prose base ──────────────────────────────────────────── */
-.prose {
-  line-height: 1.75;
-  max-width: 70ch;
-}
+  .footer-nav a:hover {
+    color: rgb(var(--accent));
+  }
 
-.prose h1,
-.prose h2,
-.prose h3 {
-  color: var(--text);
-  line-height: 1.3;
-}
+  /* ── Prose base ──────────────────────────────────────────── */
+  .prose {
+    line-height: 1.75;
+    max-width: 70ch;
+  }
 
-.prose a {
-  color: rgb(var(--accent));
-}
+  .prose h1,
+  .prose h2,
+  .prose h3 {
+    color: var(--text);
+    line-height: 1.3;
+  }
 
-.prose code {
-  background: var(--bg-surface);
-  border: 1px solid var(--bg-border);
-  border-radius: 4px;
-  padding: 0.1em 0.35em;
-  font-size: 0.875em;
-}
+  .prose a {
+    color: rgb(var(--accent));
+  }
 
-.prose pre {
-  background: var(--bg-surface);
-  border: 1px solid var(--bg-border);
-  border-radius: 8px;
-  padding: 1rem;
-  overflow-x: auto;
-}
+  .prose code {
+    background: var(--bg-surface);
+    border: 1px solid var(--bg-border);
+    border-radius: 4px;
+    padding: 0.1em 0.35em;
+    font-size: 0.875em;
+  }
 
-.prose pre code {
-  background: none;
-  border: none;
-  padding: 0;
-}
+  .prose pre {
+    background: var(--bg-surface);
+    border: 1px solid var(--bg-border);
+    border-radius: 8px;
+    padding: 1rem;
+    overflow-x: auto;
+  }
 
-.prose blockquote {
-  border-left: 3px solid rgb(var(--accent));
-  margin-left: 0;
-  padding-left: 1.25rem;
-  color: var(--text-muted);
-}
+  .prose pre code {
+    background: none;
+    border: none;
+    padding: 0;
+  }
+
+  .prose blockquote {
+    border-left: 3px solid rgb(var(--accent));
+    margin-left: 0;
+    padding-left: 1.25rem;
+    color: var(--text-muted);
+  }
 </style>

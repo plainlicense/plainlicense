@@ -11,7 +11,7 @@
  * Zone 6: Standard protections    — collapsed
  * Zone 7: Legal interpretation    — collapsed
  */
-import type { CollectionEntry } from "astro:content";
+import type { LicenseEntryT } from "../../_types/licenses";
 import { getFamilyData } from "../../data/license-families/index";
 import { getLicenseSlug, getPublishedLicenses } from "../../utils/collections";
 import CompareWith from "./CompareWith.astro";
@@ -24,7 +24,7 @@ import ZoneProtections from "./zones/ZoneProtections.astro";
 import ZoneRestrictions from "./zones/ZoneRestrictions.astro";
 
 interface Props {
-  license: CollectionEntry<"licenses">;
+  license: LicenseEntryT;
 }
 
 const { license } = Astro.props;

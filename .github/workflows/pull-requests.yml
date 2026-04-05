@@ -15,7 +15,7 @@ jobs:
       pull-requests: write
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           submodules: recursive
       - name: inspect links
@@ -47,11 +47,11 @@ jobs:
           git push
 
   notify:
-      needs: [pr-check]
-      if: failure()
-      uses: ./.github/workflows/notify.yml
-      permissions:
-        contents: read
-        pull-requests: read
-        statuses: write
-        issues: write
+    needs: [pr-check]
+    if: failure()
+    uses: ./.github/workflows/notify.yml
+    permissions:
+      contents: read
+      pull-requests: read
+      statuses: write
+      issues: write

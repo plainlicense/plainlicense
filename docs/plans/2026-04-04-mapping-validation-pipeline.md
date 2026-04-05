@@ -486,7 +486,7 @@ Trigger on pushes to `dev`/`main` when these paths change:
 - `src/data/license-families/**`
 
 Steps:
-1. `actions/checkout@v4`
+1. `actions/checkout@v6`
 2. `oven-sh/setup-bun@v2`
 3. `bun install --frozen-lockfile`
 4. Run `bun run src/build/validate-mappings.ts`, capture output

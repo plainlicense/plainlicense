@@ -2,7 +2,7 @@
 import type { LicenseEntryT } from "../_types/licenses";
 import { GITHUB_DISCUSSIONS, licenseUrl } from "../utils/constants";
 import { derivePlainId } from "../utils/plain-id";
-import { ICONS } from "./license/icons";
+import { ICONS, MATERIAL_ICONS } from "./license/icons";
 
 interface Props {
   license: LicenseEntryT;
@@ -28,13 +28,13 @@ const formats = [
     name: "Markdown (GFM)",
     ext: ".gfm.md",
     path: `${exportBase}${baseName}.gfm.md`,
-    icon: "document",
+    icon: "markdown",
   },
   {
     name: "Markdown (CommonMark)",
     ext: ".cm.md",
     path: `${exportBase}${baseName}.cm.md`,
-    icon: "document",
+    icon: "markdown",
   },
   {
     name: "Plaintext",
@@ -84,17 +84,27 @@ const iframeCode = `<iframe
             download
             aria-label={`Download ${data.plain_name} as ${format.name} (${format.ext})`}
           >
-            <svg
-              class="format-icon"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              aria-hidden="true"
-              set:html={ICONS[format.icon] ?? ""}
-            />
+            {MATERIAL_ICONS.has(format.icon) ? (
+              <svg
+                class="format-icon"
+                viewBox="0 -960 960 960"
+                fill="currentColor"
+                aria-hidden="true"
+                set:html={ICONS[format.icon] ?? ""}
+              />
+            ) : (
+              <svg
+                class="format-icon"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+                set:html={ICONS[format.icon] ?? ""}
+              />
+            )}
             <span class="format-name">{format.name}</span>
             <span class="format-ext">{format.ext}</span>
           </a>
@@ -230,7 +240,14 @@ const iframeCode = `<iframe
     data-content={clipboardContent}
     aria-label="Copy license text to clipboard"
   >
-    Copy to Clipboard
+    <svg
+      class="copy-icon"
+      viewBox="0 -960 960 960"
+      fill="currentColor"
+      aria-hidden="true"
+      set:html={ICONS["markdown-paste"] ?? ""}
+    />
+    <span>Copy to Clipboard</span>
   </button>
   <div
     id="copy-status"
@@ -247,21 +264,24 @@ const iframeCode = `<iframe
   const button = document.getElementById("copy-clipboard");
   const statusEl = document.getElementById("copy-status");
   if (button) {
+    const label = button.querySelector("span");
     button.addEventListener("click", () => {
       const content = button.dataset.content || "";
       navigator.clipboard
         .writeText(content)
         .then(() => {
-          const originalText = button.textContent;
-          button.textContent = "Copied!";
-          button.classList.add("success");
-          if (statusEl)
-            statusEl.textContent = "License text copied to clipboard.";
-          setTimeout(() => {
-            button.textContent = originalText;
-            button.classList.remove("success");
-            if (statusEl) statusEl.textContent = "";
-          }, 2000);
+          if (label) {
+            const originalText = label.textContent;
+            label.textContent = "Copied!";
+            button.classList.add("success");
+            if (statusEl)
+              statusEl.textContent = "License text copied to clipboard.";
+            setTimeout(() => {
+              label.textContent = originalText;
+              button.classList.remove("success");
+              if (statusEl) statusEl.textContent = "";
+            }, 2000);
+          }
         })
         .catch(() => {
           if (statusEl) statusEl.textContent = "Copy failed. Please try again.";
@@ -604,6 +624,10 @@ const iframeCode = `<iframe
 
   /* ── Copy to clipboard button ── */
   .copy-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
     width: 100%;
     padding: 0.85rem;
     background: transparent;
@@ -613,6 +637,11 @@ const iframeCode = `<iframe
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s;
+  }
+  .copy-icon {
+    width: 1.25rem;
+    height: 1.25rem;
+    flex-shrink: 0;
   }
   .copy-button:hover {
     border-color: var(--cat-color, var(--sl-color-accent));

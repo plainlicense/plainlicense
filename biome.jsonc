@@ -133,7 +133,7 @@
       }
     },
     {
-      "includes": ["src/**/*.css"],
+      "includes": ["src/**/*.css", "src/**/*.astro"],
       "linter": {
         "rules": {
           "complexity": {

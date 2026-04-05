@@ -1,11 +1,11 @@
 ---
-import type { CollectionEntry } from "astro:content";
+import type { LicenseEntryT } from "../_types/licenses";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { FAMILY_ORDER } from "../data/license-families/index";
 
 interface Props {
-  license: CollectionEntry<"licenses">;
+  license: LicenseEntryT;
 }
 
 const { license } = Astro.props;

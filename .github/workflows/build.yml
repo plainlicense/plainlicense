@@ -13,63 +13,63 @@ permissions:
 
 jobs:
   build:
-      name: Build
-      runs-on: ubuntu-latest
-      permissions:
-        contents: write
-        pull-requests: read
-      steps:
-        - name: Checkout
-          uses: actions/checkout@v4
-          with:
-            submodules: recursive
-        - name: Setup Bun
-          uses: oven-sh/setup-bun@v2
-          with:
-            bun-version: latest
-        - name: cache
-          uses: actions/cache@v4
-          with:
-            path: |
-              ~/.bun/install/cache
-            key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lockb') }}
-            restore-keys: |
-              ${{ runner.os }}-bun-
-        - name: install dependencies
-          if: steps.cache.outputs.cache-hit != 'true'
-          run: |
-            bun i -d --peer --optional --no-interactive &&
-            export NODE_ENV=production &&
-            bun run build
+    name: Build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          submodules: recursive
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - name: cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.bun/install/cache
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lockb') }}
+          restore-keys: |
+            ${{ runner.os }}-bun-
+      - name: install dependencies
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          bun i -d --peer --optional --no-interactive &&
+          export NODE_ENV=production &&
+          bun run build
 
-        - name: Update LICENSE from Plain Unlicense export
-          run: |
-            EXPORT_FILE="dist/exports/unlicense/latest/Plain-Unlicense.gfm.md"
-            if [ -f "$EXPORT_FILE" ]; then
-              if ! diff -q "$EXPORT_FILE" LICENSE 2>/dev/null; then
-                cp "$EXPORT_FILE" LICENSE
-                echo "LICENSE updated from build export"
-              else
-                echo "LICENSE unchanged"
-              fi
+      - name: Update LICENSE from Plain Unlicense export
+        run: |
+          EXPORT_FILE="dist/exports/unlicense/latest/Plain-Unlicense.gfm.md"
+          if [ -f "$EXPORT_FILE" ]; then
+            if ! diff -q "$EXPORT_FILE" LICENSE 2>/dev/null; then
+              cp "$EXPORT_FILE" LICENSE
+              echo "LICENSE updated from build export"
             else
-              echo "::warning::Plain Unlicense GFM export not found at $EXPORT_FILE"
+              echo "LICENSE unchanged"
             fi
-        - name: Configure Git Credentials
-          run: |
-            git config user.name github-actions[bot]
-            git config user.email "action@github.com"
-        - name: Commit build
-          run: |
-            git add --all
-            git diff-index --quiet HEAD || git commit -m "bot(infra): update build artifacts"
-            git push
+          else
+            echo "::warning::Plain Unlicense GFM export not found at $EXPORT_FILE"
+          fi
+      - name: Configure Git Credentials
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email "action@github.com"
+      - name: Commit build
+        run: |
+          git add --all
+          git diff-index --quiet HEAD || git commit -m "bot(infra): update build artifacts"
+          git push
   notify:
-      needs: [build]
-      if: failure()
-      uses: ./.github/workflows/notify.yml
-      permissions:
-        contents: read
-        pull-requests: read
-        statuses: write
-        issues: write
+    needs: [build]
+    if: failure()
+    uses: ./.github/workflows/notify.yml
+    permissions:
+      contents: read
+      pull-requests: read
+      statuses: write
+      issues: write

@@ -1,3 +1,9 @@
+#!/usr/bin/env -S uv run -s
+# ///script
+# requires-python: ">=3.11"
+# dependencies = ["ez_yaml", "requests"]
+# ///
+# ty: ignore[unresolved-import]
 """
 Update the sponsors' donation markdown file.
 
