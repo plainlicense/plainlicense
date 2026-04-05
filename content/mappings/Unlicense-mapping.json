@@ -1,72 +1,100 @@
 {
-  "$schema": "../../workers/cms-admin/src/schemas/mapping-schema.json",
+  "$schema": "../../workers/cms-admin/src/schemas/concept-mapping-schema.json",
   "license_id": "Unlicense",
-  "version": "0.2.0",
-  "last_updated": "2026-04-04T00:00:00Z",
-  "mapping_philosophy": "clause-level with interpretive correspondence",
-  "generation_method": "ai-generated",
-  "human_reviewed": false,
-  "mappings": [
+  "version": "1.0.0",
+  "last_updated": "2026-04-05T00:00:00Z",
+  "generation_method": "manual",
+  "human_reviewed": true,
+  "concepts": [
     {
-      "id": "map-permissions",
-      "type": "one-to-one-expanded",
-      "confidence": 0.92,
-      "semantic_tag": "permissions",
-      "plain_clause": {
-        "id": "plain-permissions",
-        "hash": "sha256:d2f4a48b01c509b91cc1f88230389ca43b16e8a4259141c705ec76a346584157",
-        "content": "## The Work is Everyone's Work - Use it Freely\n\n**You can do whatever you want with the work.**\n\nThe person who created the work has given up their copyright. This means you can:\n\n- **Use the work** for any reason\n- **Copy the work**\n- **Change the work**\n- **Share the work**\n- **Sell the work**\n- **Mix the work** with other materials\n\nYou can do all of these things **for free**. You don't have to follow any rules or include any notices."
-      },
-      "original_clause": {
-        "id": "original-permissions",
-        "hash": "sha256:a8109362d51b20ab9ff7957674ac68ee2bb2e569b191b6b11477ccde75ba7ccc",
-        "content": "This is free and unencumbered software released into the public domain.\n\nAnyone is free to copy, modify, publish, use, compile, sell, or\ndistribute this software, either in source code form or as a compiled\nbinary, for any purpose, commercial or non-commercial, and by any\nmeans."
-      }
+      "id": "public-domain-release",
+      "original": "This is free and unencumbered software released into the public domain.",
+      "plain": ["The person who created the work has given up their copyright."]
     },
     {
-      "id": "map-dedication",
-      "type": "one-to-one-expanded",
-      "confidence": 0.9,
-      "semantic_tag": "scope",
-      "plain_clause": {
-        "id": "plain-dedication",
-        "hash": "sha256:3ebfef087c11cfb486903104d35639daecbbec264f81d89480896c3c8ed16906",
-        "content": "## We Also Give Everyone a License Without Restrictions\n\nIn places that follow copyright laws, we give up all our rights to the work. Everyone can use it freely, and with no benefit to us or our children. We give up all rights permanently. We want everyone to know we give up our rights to the work now and forever."
-      },
-      "original_clause": {
-        "id": "original-dedication",
-        "hash": "sha256:d783b85c9dd9fef5a520400d644feb8d258f5f300ae14de734af036403962f51",
-        "content": "In jurisdictions that recognize copyright laws, the author or authors\nof this software dedicate any and all copyright interest in the\nsoftware to the public domain. We make this dedication for the benefit\nof the public at large and to the detriment of our heirs and\nsuccessors. We intend this dedication to be an overt act of\nrelinquishment in perpetuity of all present and future rights to this\nsoftware under copyright law."
-      }
+      "id": "free-to-copy",
+      "original": "copy",
+      "plain": ["Copy the work"]
     },
     {
-      "id": "map-relicense",
-      "type": "unmapped-plain",
-      "confidence": null,
-      "semantic_tag": "permissions",
-      "notes": "The right to relicense is implied by the public domain dedication in the original but not stated as a separate clause. The plain version makes this implicit right explicit.",
-      "plain_clause": {
-        "id": "plain-relicense",
-        "hash": "sha256:b5296fdb3dbf7dbb4d104c7abaabd3a789cbfec0b492ccb49729d5857607f891",
-        "content": "## You can Change the License\n\n**You can share the work under any other license.** This includes \"copyleft\" licenses (like the GPL) and \"proprietary\" licenses (where you keep all rights)."
-      },
-      "original_clause": null
+      "id": "free-to-modify",
+      "original": "modify",
+      "plain": ["Change the work"]
     },
     {
-      "id": "map-warranty",
-      "type": "one-to-one-expanded",
-      "confidence": 0.93,
-      "semantic_tag": "warranty",
-      "plain_clause": {
-        "id": "plain-warranty",
-        "hash": "sha256:45cf5b4f45d4f4b7ac76410e064cc24f98ad7b2b1f752eed2cd564d040212726",
-        "content": "## We Offer No Warranty\n\n**Use the work at your own risk.**\n\n- **The work is provided \"as is\" with no warranties.**\n- We are not responsible for any problems or damages caused by using the work.\n- We don't have to fix any problems you find."
-      },
-      "original_clause": {
-        "id": "original-warranty",
-        "hash": "sha256:5e7a6c06138c894ee89e78fe3ee26d36128ad247a86b4df2e9e92149269d2494",
-        "content": "THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND,\nEXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF\nMERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.\nIN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR\nOTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,\nARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR\nOTHER DEALINGS IN THE SOFTWARE."
-      }
+      "id": "free-to-publish",
+      "original": "publish",
+      "plain": ["Share the work"]
+    },
+    {
+      "id": "free-to-use",
+      "original": "use",
+      "plain": ["Use the work for any reason"]
+    },
+    {
+      "id": "free-to-sell",
+      "original": "sell, or\ndistribute this software",
+      "plain": ["Sell the work"]
+    },
+    {
+      "id": "source-or-binary",
+      "original": "either in source code form or as a compiled\nbinary",
+      "plain": ["Mix the work with other materials"]
+    },
+    {
+      "id": "any-purpose",
+      "original": "for any purpose, commercial or non-commercial, and by any\nmeans.",
+      "plain": ["You can do all of these things for free. You don't have to follow any rules or include any notices."]
+    },
+    {
+      "id": "copyright-dedication",
+      "original": "the author or authors\nof this software dedicate any and all copyright interest in the\nsoftware to the public domain.",
+      "plain": ["we give up all our rights to the work."]
+    },
+    {
+      "id": "benefit-of-public",
+      "original": "We make this dedication for the benefit\nof the public at large and to the detriment of our heirs and\nsuccessors.",
+      "plain": ["Everyone can use it freely, and with no benefit to us or our children."]
+    },
+    {
+      "id": "overt-relinquishment",
+      "original": "We intend this dedication to be an overt act of\nrelinquishment in perpetuity of all present and future rights to this\nsoftware under copyright law.",
+      "plain": ["We give up all rights permanently. We want everyone to know we give up our rights to the work now and forever."]
+    },
+    {
+      "id": "filler-jurisdictions",
+      "original": "In jurisdictions that recognize copyright laws,",
+      "type": "filler"
+    },
+    {
+      "id": "as-is-warranty",
+      "original": "THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND,",
+      "plain": ["The work is provided \"as is\" with no warranties."]
+    },
+    {
+      "id": "filler-express-implied",
+      "original": "EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF\nMERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.",
+      "type": "filler"
+    },
+    {
+      "id": "no-liability",
+      "original": "IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR\nOTHER LIABILITY,",
+      "plain": ["We are not responsible for any problems or damages caused by using the work."]
+    },
+    {
+      "id": "filler-contract-tort",
+      "original": "WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,",
+      "type": "filler"
+    },
+    {
+      "id": "filler-arising-from",
+      "original": "ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR\nOTHER DEALINGS IN THE SOFTWARE.",
+      "type": "filler"
+    },
+    {
+      "id": "filler-more-info",
+      "original": "For more information, please refer to",
+      "type": "filler"
     }
   ]
 }
