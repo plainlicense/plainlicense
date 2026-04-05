@@ -79,7 +79,7 @@ if (toggleBtn) {
   const savedPreference = localStorage.getItem(STORAGE_KEY) === "true";
   const fulltextPanel = document.getElementById("panel-fulltext");
   const isFulltextActive = fulltextPanel && !fulltextPanel.hidden;
-  updateUI(savedPreference && isFulltextActive);
+  updateUI(savedPreference && !!isFulltextActive);
 
   toggleBtn.addEventListener("click", () => {
     const isNowActive = !container.classList.contains("comparison-active");

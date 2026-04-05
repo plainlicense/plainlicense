@@ -483,10 +483,12 @@
   }
 
   /* ── Highlight strips (mapping viewer) ────────────────────── */
-  .highlight-active,
-  .highlight-match {
+  .mapping-source,
+  .mapping-target,
+  .mapping-cutout {
     background: none !important;
     box-shadow: none !important;
+    border-bottom: none !important;
   }
 
   /* ── Print header — branding at top of first page ─────────── */
