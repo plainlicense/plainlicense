@@ -5,27 +5,27 @@ plain_id: Plain-MPL
 spdx_id: MPL-2.0
 plain_version: 0.1.1
 description: >-
-  The MPL is a weak copyleft license requiring sharing source materials for its
+  The MPL is a "weak copyleft" license. It requires sharing source materials for its
   parts. It includes a patent grant and is compatible with GPL/LGPL.
 license_family: copyleft
 is_dedication: false
 status: published
 tldr:
   - 'You can use, copy, change, and share this work, including commercially.'
-  - You must share source materials for any changes you make under this license.
+  - You must share any changes you make to source materials under this license.
   - >-
     Keep all copyright notices and include a copy of this license with any copy
     you share.
   - There's no warranty. Use at your own risk.
 attribution_required: false
 fair_code: false
-maker_pitch: 'People can use your work freely, but must share changes to your files.'
+maker_pitch: 'People can use your work freely, but must share changes to your source materials.'
 commercial_restrictions: []
 compare_to:
   - spdx_id: MIT
     contrast: 'No sharing requirement — just give credit'
   - spdx_id: Elastic-2.0
-    contrast: 'Adds commercial restrictions on hosted services'
+    contrast: 'Prevents others from using your work as a commercial service'
 uuid: ac0d1786-e005-415d-a0ed-be10bf5cbc65
 plain_gunning_fog: 9.47
 shame_words_count: 0
