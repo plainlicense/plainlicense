@@ -3,6 +3,39 @@
    Applied dynamically by ConceptViewer.ts
    ────────────────────────────────────────────── */
 
+/* ── Column badges (scoped page styles don't reach into this component) ── */
+
+.compare-layout .column-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.85rem;
+  border-radius: 99px;
+  font-size: var(--sl-text-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 1rem;
+}
+
+.compare-layout .column-badge-icon {
+  width: 0.85rem;
+  height: 0.85rem;
+  flex-shrink: 0;
+}
+
+.compare-layout .column-badge--plain {
+  background: rgba(var(--cat-color-rgb, 21, 219, 149), 0.12);
+  color: var(--cat-color, var(--sl-color-accent));
+  border: 1px solid rgba(var(--cat-color-rgb, 21, 219, 149), 0.25);
+}
+
+.compare-layout .column-badge--original {
+  background: rgba(var(--sl-color-gray-3-rgb, 155, 155, 155), 0.1);
+  color: var(--sl-color-gray-2);
+  border: 1px solid var(--sl-color-gray-5);
+}
+
 /* ── Layout ── */
 
 .compare-layout {
