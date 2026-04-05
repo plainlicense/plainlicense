@@ -145,6 +145,12 @@ export async function resolveAndExportMappings(): Promise<
     const raw = await fs.readFile(mappingPath, "utf8");
     const mappingFile: ConceptMappingFile = JSON.parse(raw);
 
+    // Skip files in the old format (no concepts array)
+    if (!Array.isArray(mappingFile.concepts)) {
+      console.warn(`  Skipping ${file}: not in concept mapping format`);
+      continue;
+    }
+
     const licenseFile = await findLicenseFile(mappingFile.license_id);
     if (!licenseFile) {
       results.push({
