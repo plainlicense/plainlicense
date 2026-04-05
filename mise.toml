@@ -419,7 +419,6 @@ bun run src/build/validate-mappings.ts
 bun run src/build/update-metrics.ts
 bunx astro sync
 bunx wrangler -c ./wrangler.json types
-bun run src/build/generate-og-images.ts
 bunx astro build
 bun run src/build/build-versions.ts
 '''

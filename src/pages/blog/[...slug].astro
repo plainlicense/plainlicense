@@ -1,11 +1,11 @@
 ---
-import BaseLayout from "../../layouts/BaseLayout.astro";
 import { getCollection } from "astro:content";
 import { marked } from "marked";
+import BaseLayout from "../../layouts/BaseLayout.astro";
 import "../../assets/stylesheets/custom.css";
 import "../../assets/stylesheets/footnotes.css";
-import { prepareFootnotes } from "../../utils/footnotes";
 import FootnoteScript from "../../components/FootnoteScript.astro";
+import { prepareFootnotes } from "../../utils/footnotes";
 
 export const prerender = true;
 

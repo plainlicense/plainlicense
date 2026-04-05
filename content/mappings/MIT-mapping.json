@@ -10,7 +10,7 @@
     {
       "id": "map-permissions",
       "type": "one-to-one-expanded",
-      "confidence": 0.90,
+      "confidence": 0.9,
       "semantic_tag": "permissions",
       "plain_clause": {
         "id": "plain-permissions",
@@ -42,7 +42,7 @@
     {
       "id": "map-protections",
       "type": "one-to-one-expanded",
-      "confidence": 0.90,
+      "confidence": 0.9,
       "semantic_tag": "warranty",
       "plain_clause": {
         "id": "plain-protections",

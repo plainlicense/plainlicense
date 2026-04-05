@@ -26,7 +26,7 @@
     {
       "id": "map-dedication",
       "type": "one-to-one-expanded",
-      "confidence": 0.90,
+      "confidence": 0.9,
       "semantic_tag": "scope",
       "plain_clause": {
         "id": "plain-dedication",

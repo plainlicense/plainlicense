@@ -31,7 +31,6 @@ function resolveTemplateVars(
   });
 }
 
-
 /**
  * Copies versioned export files to a "latest" directory with version stripped.
  */

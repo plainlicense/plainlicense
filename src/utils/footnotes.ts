@@ -25,14 +25,14 @@ export function extractFootnoteDefinitions(md: string): {
 
   // Match footnote definitions: `[^id]: content` potentially spanning multiple lines
   // A continuation line is indented (2+ spaces or tab) and not another definition
-  const defPattern = /^\[\^([^\]]+)\]:\s*(.+)$/gm;
   const lines = md.split("\n");
+  const defPattern = /^\[\^([^\]]+)\]:\s*(.+)$/;
   const cleanedLines: string[] = [];
   let currentId: string | null = null;
   let currentText = "";
 
   for (const line of lines) {
-    const defMatch = line.match(/^\[\^([^\]]+)\]:\s*(.+)$/);
+    const defMatch = line.match(defPattern);
     if (defMatch) {
       // Save previous definition if any
       if (currentId !== null) {
@@ -44,8 +44,8 @@ export function extractFootnoteDefinitions(md: string): {
     }
 
     // Check for continuation line (indented, and we're inside a definition)
-    if (currentId !== null && /^(?:  |\t)/.test(line)) {
-      currentText += " " + line.trim();
+    if (currentId !== null && /^(?: {2}|\t)/.test(line)) {
+      currentText += ` ${line.trim()}`;
       continue;
     }
 

@@ -74,9 +74,7 @@ export function injectTemplateBlocks(
  * preserving inner content. Leaves non-div HTML alone.
  */
 export function stripHtmlDivs(content: string): string {
-  return content
-    .replace(/<div[^>]*>\n?/g, "")
-    .replace(/<\/div>\n?/g, "");
+  return content.replace(/<div[^>]*>\n?/g, "").replace(/<\/div>\n?/g, "");
 }
 
 /**
@@ -216,7 +214,7 @@ export function convertDefinitionLists(
   mode: "markdown" | "plaintext",
 ): string {
   return content.replace(
-    /`([^`]+)`\n\n?:    (.*)/g,
+    /`([^`]+)`\n\n?: {4}(.*)/g,
     (_match, term: string, definition: string) => {
       if (mode === "plaintext") {
         return `${term.toUpperCase()} \u2014 ${definition}`;

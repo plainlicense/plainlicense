@@ -2,26 +2,49 @@ import { spawn } from "node:child_process";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { marked } from "marked";
-import type { ExportContext } from "./index.ts";
 import { licenseUrl, SITE_URL } from "../../utils/constants";
+import type { ExportContext } from "./index.ts";
 
 /**
  * Color palettes per license family, matching the website's CSS variables.
  */
-const FAMILY_COLORS: Record<string, { accent: string; muted: string; label: string }> = {
-  permissive: { accent: "rgb(21, 219, 149)", muted: "rgb(9, 93, 64)", label: "Permissive" },
-  copyleft: { accent: "rgb(58, 198, 240)", muted: "rgb(18, 34, 43)", label: "Copyleft" },
-  "source-available": { accent: "rgb(232, 197, 71)", muted: "rgb(50, 38, 11)", label: "Source Available" },
-  "public-domain": { accent: "rgb(212, 153, 255)", muted: "rgb(63, 39, 63)", label: "Public Domain" },
-  proprietary: { accent: "rgb(255, 142, 71)", muted: "rgb(82, 31, 0)", label: "Proprietary" },
+const FAMILY_COLORS: Record<
+  string,
+  { accent: string; muted: string; label: string }
+> = {
+  permissive: {
+    accent: "rgb(21, 219, 149)",
+    muted: "rgb(9, 93, 64)",
+    label: "Permissive",
+  },
+  copyleft: {
+    accent: "rgb(58, 198, 240)",
+    muted: "rgb(18, 34, 43)",
+    label: "Copyleft",
+  },
+  "source-available": {
+    accent: "rgb(232, 197, 71)",
+    muted: "rgb(50, 38, 11)",
+    label: "Source Available",
+  },
+  "public-domain": {
+    accent: "rgb(212, 153, 255)",
+    muted: "rgb(63, 39, 63)",
+    label: "Public Domain",
+  },
+  proprietary: {
+    accent: "rgb(255, 142, 71)",
+    muted: "rgb(82, 31, 0)",
+    label: "Proprietary",
+  },
 };
 
 /** Zone-specific accent colors matching the website's semantic coloring. */
 const ZONE_COLORS = {
-  permissions: "rgb(21, 219, 149)",    // emerald
-  conditions: "rgb(228, 197, 129)",    // ecru
-  restrictions: "rgb(234, 100, 80)",   // restriction-red
-  protections: "rgb(108, 166, 193)",   // air-superiority-blue
+  permissions: "rgb(21, 219, 149)", // emerald
+  conditions: "rgb(228, 197, 129)", // ecru
+  restrictions: "rgb(234, 100, 80)", // restriction-red
+  protections: "rgb(108, 166, 193)", // air-superiority-blue
   interpretation: "rgb(228, 197, 129)", // ecru (matches website)
 };
 
@@ -111,8 +134,10 @@ function generateTypst(
     const meaningful = token.tokens.filter((t: any) => t.type !== "space");
     // Simple case: single codespan, or codespans joined by "and"/"/"
     const hasCodespan = meaningful.some((t: any) => t.type === "codespan");
-    const onlyCodesAndText = meaningful.every((t: any) =>
-      t.type === "codespan" || (t.type === "text" && /^\s*(and|\/|,)\s*$/.test(t.text))
+    const onlyCodesAndText = meaningful.every(
+      (t: any) =>
+        t.type === "codespan" ||
+        (t.type === "text" && /^\s*(and|\/|,)\s*$/.test(t.text)),
     );
     return hasCodespan && onlyCodesAndText;
   }
@@ -132,7 +157,9 @@ function generateTypst(
       if (isDefinitionTerm(token)) {
         const termText = processTokens(token.tokens, depth);
         // Look ahead for the definition body
-        const nextNonSpace = tokens.slice(i + 1).find((t: any) => t.type !== "space");
+        const nextNonSpace = tokens
+          .slice(i + 1)
+          .find((t: any) => t.type !== "space");
         if (nextNonSpace && isDefinitionBody(nextNonSpace)) {
           // Skip the space token(s) between term and definition
           while (i + 1 < tokens.length && tokens[i + 1].type === "space") i++;
@@ -140,7 +167,10 @@ function generateTypst(
           // Process definition body, stripping the leading `: `
           const defTokens = [...nextNonSpace.tokens];
           if (defTokens[0]?.type === "text") {
-            defTokens[0] = { ...defTokens[0], text: defTokens[0].text.replace(/^:\s+/, "") };
+            defTokens[0] = {
+              ...defTokens[0],
+              text: defTokens[0].text.replace(/^:\s+/, ""),
+            };
           }
           const defText = processTokens(defTokens, depth);
 
@@ -186,7 +216,9 @@ function generateTypst(
           result += `${processTokens(token.tokens, depth)}\n\n`;
           break;
         case "text":
-          result += token.tokens ? processTokens(token.tokens, depth) : escapeTypst(token.text);
+          result += token.tokens
+            ? processTokens(token.tokens, depth)
+            : escapeTypst(token.text);
           break;
         case "strong":
           result += `*${processTokens(token.tokens, depth)}*`;
@@ -200,7 +232,7 @@ function generateTypst(
             const bullet = token.ordered ? "+ " : "- ";
             const content = processTokens(item.tokens, depth + 1)
               .trim()
-              .replace(/\n{2,}/g, "\n")   // collapse double newlines to preserve Typst nesting
+              .replace(/\n{2,}/g, "\n") // collapse double newlines to preserve Typst nesting
               .replace(/\n/g, `\n${indent}  `);
             return `${indent}${bullet}${content}`;
           });
@@ -234,7 +266,9 @@ function generateTypst(
             .join(", ");
           const rows = token.rows
             .map((row: any) =>
-              row.map((cell: any) => `[${processTokens(cell.tokens, depth)}]`).join(", "),
+              row
+                .map((cell: any) => `[${processTokens(cell.tokens, depth)}]`)
+                .join(", "),
             )
             .join(",\n    ");
           result += `#table(\n`;
@@ -291,8 +325,9 @@ function generateTypst(
   body = processTokens(tokens);
 
   // Build the TL;DR callout
-  const tldrBlock = tldr.length > 0
-    ? `#block(
+  const tldrBlock =
+    tldr.length > 0
+      ? `#block(
   fill: rgb(22, 25, 35),
   stroke: (left: 4pt + ${colors.accent}),
   inset: (left: 16pt, right: 16pt, top: 12pt, bottom: 12pt),
@@ -301,12 +336,12 @@ function generateTypst(
 )[
   #text(font: "Plus Jakarta Sans", size: 9pt, weight: "bold", fill: ${colors.accent})[TL;DR]
   #v(4pt)
-  ${tldr.map(item => `- #text(size: 10pt)[${escapeTypst(item)}]`).join("\n  ")}
+  ${tldr.map((item) => `- #text(size: 10pt)[${escapeTypst(item)}]`).join("\n  ")}
 ]
 
 #v(0.75em)
 `
-    : "";
+      : "";
 
   // Family badge text
   const familyBadge = isDedication ? "Public Domain Dedication" : colors.label;

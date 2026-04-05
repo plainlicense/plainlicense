@@ -8,6 +8,7 @@
    - No interactive elements (buttons, toggles, modals)
    - Clean page breaks between major sections
    ══════════════════════════════════════════════════════════════ */
+/** biome-ignore-all lint/style/noDescendingSpecificity: <Higher specificity classes are for clearing styles before redefining> */
 
 @media print {
   /* ── Reset: white canvas ──────────────────────────────────── */
@@ -142,7 +143,12 @@
     page-break-before: always;
   }
 
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     break-after: avoid;
     page-break-after: avoid;
   }
@@ -199,6 +205,31 @@
 
   .full-license-text strong {
     color: #1a1a1a;
+  }
+
+  /* ── Blockquotes ──────────────────────────────────────────── */
+  .prose blockquote,
+  blockquote {
+    border-left: 3pt solid #999;
+    color: #333;
+  }
+
+  /* ── Code blocks ──────────────────────────────────────────── */
+  .full-license-text code,
+  code {
+    background: #f0f0f0;
+    border: 0.5pt solid #ccc;
+    color: #1a1a1a;
+  }
+
+  pre {
+    background: #f5f5f5 !important;
+    border: 1pt solid #ccc !important;
+  }
+
+  pre code {
+    border: none !important;
+    background: none !important;
   }
 
   /* ── Links: show URL ──────────────────────────────────────── */
@@ -422,31 +453,6 @@
     color: #333;
   }
 
-  /* ── Code blocks ──────────────────────────────────────────── */
-  .full-license-text code,
-  code {
-    background: #f0f0f0;
-    border: 0.5pt solid #ccc;
-    color: #1a1a1a;
-  }
-
-  pre {
-    background: #f5f5f5 !important;
-    border: 1pt solid #ccc !important;
-  }
-
-  pre code {
-    border: none !important;
-    background: none !important;
-  }
-
-  /* ── Blockquotes ──────────────────────────────────────────── */
-  .prose blockquote,
-  blockquote {
-    border-left: 3pt solid #999;
-    color: #333;
-  }
-
   /* ── Insert/underline emphasis ─────────────────────────────── */
   .full-license-text ins {
     background: none;
@@ -521,6 +527,7 @@
 
   /* ── Page margins ─────────────────────────────────────────── */
   @page {
+    /* biome-ignore lint/suspicious/noShorthandPropertyOverrides: <It is functionally a different block> */
     margin: 2cm 2.5cm;
     size: auto;
   }

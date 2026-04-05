@@ -1,5 +1,6 @@
 import fs from "node:fs/promises";
 import path from "node:path";
+import { licenseUrl } from "../../utils/constants";
 import type { ExportContext } from "./index.ts";
 import {
   convertDefinitionLists,
@@ -9,7 +10,6 @@ import {
   semanticBlockToGfmAlert,
   stripHtmlDivs,
 } from "./transforms.ts";
-import { licenseUrl } from "../../utils/constants";
 
 /**
  * Applies GFM-specific transforms to license content.

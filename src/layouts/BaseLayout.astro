@@ -2,14 +2,19 @@
 interface Props {
   title: string;
   description?: string;
+  ogImage?: string;
 }
 
-import { GITHUB_REPO, ROUTES, FAVICON_PATH, SITE_TAGLINE } from "../utils/constants";
+import { FAVICON_PATH, GITHUB_REPO, ROUTES, SITE_TAGLINE } from "../utils/constants";
 import "../assets/stylesheets/print.css";
 
-const { title, description = "Plain language versions of popular licenses" } =
+const { title, description = "Plain language versions of popular licenses", ogImage } =
   Astro.props;
 const currentPath = Astro.url.pathname;
+const canonicalUrl = new URL(currentPath, Astro.site);
+const ogImageUrl = ogImage
+  ? new URL(ogImage, Astro.site).href
+  : new URL(`/open-graph${currentPath.replace(/\/$/, "")}.png`, Astro.site).href;
 ---
 
 <!doctype html>
@@ -21,6 +26,17 @@ const currentPath = Astro.url.pathname;
     <meta name="generator" content={Astro.generator}>
     <meta name="description" content={description}>
     <title>{title} | Plain License</title>
+    <link rel="canonical" href={canonicalUrl}>
+    <meta property="og:type" content="website">
+    <meta property="og:url" content={canonicalUrl}>
+    <meta property="og:title" content={`${title} | Plain License`}>
+    <meta property="og:description" content={description}>
+    <meta property="og:image" content={ogImageUrl}>
+    <meta property="og:site_name" content="Plain License">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content={`${title} | Plain License`}>
+    <meta name="twitter:description" content={description}>
+    <meta name="twitter:image" content={ogImageUrl}>
   </head>
   <body>
     <a href="#main-content" class="skip-link">Skip to main content</a>

@@ -21,6 +21,7 @@
     "@plainlicense/plain-unlicense": "workspace:*",
     "@sveltia/cms": "catalog:workers",
     "astro-loader-sveltia-cms": "catalog:workers",
+    "astro-og-canvas": "^0.11.0",
     "starlight-markdown": "^0.1.5"
   },
   "description": "Plain language versions of popular creative licenses",

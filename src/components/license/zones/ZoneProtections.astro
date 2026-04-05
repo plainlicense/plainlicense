@@ -10,6 +10,7 @@ interface Props {
 }
 
 import { ICONS } from "../icons";
+
 const { protections } = Astro.props as Props;
 const protectionsHtml = await marked.parse(protections);
 ---

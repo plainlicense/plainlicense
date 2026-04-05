@@ -1,7 +1,7 @@
+import { getCollection } from "astro:content";
 import rss from "@astrojs/rss";
 import type { APIContext } from "astro";
-import { getCollection } from "astro:content";
-import { SITE_URL, SITE_TITLE } from "../../utils/constants";
+import { SITE_TITLE, SITE_URL } from "../../utils/constants";
 
 export const prerender = true;
 
@@ -17,8 +17,7 @@ export async function GET(context: APIContext) {
 
   return rss({
     title: `${SITE_TITLE} Blog`,
-    description:
-      "News, guides, and updates from the Plain License project.",
+    description: "News, guides, and updates from the Plain License project.",
     site: context.site ?? SITE_URL,
     items: posts.map((post) => {
       const slug = post.id.replace(/^posts\//, "").replace(/\.mdx?$/, "");

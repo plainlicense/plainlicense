@@ -1,16 +1,16 @@
 /// <reference types="astro/client" />
 
+import { readdirSync, readFileSync, statSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import cloudflare from "@astrojs/cloudflare";
 import mdx from "@astrojs/mdx";
 import preact from "@astrojs/preact";
 import sitemap from "@astrojs/sitemap";
 import starlight from "@astrojs/starlight";
+import { defineConfig, fontProviders, sessionDrivers } from "astro/config";
 import astroCloudflarePagesHeaders from "astro-cloudflare-pages-headers";
 import favicons from "astro-favicons";
-import { defineConfig, fontProviders, sessionDrivers } from "astro/config";
-import { readdirSync, readFileSync, statSync } from "node:fs";
-import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
 import rehypeExternalLinks from "rehype-external-links";
 import starlightAutoDrafts from "starlight-auto-drafts";
 import starlightHeadingBadges from "starlight-heading-badges";
@@ -321,6 +321,7 @@ export default defineConfig({
         },
       ],
       components: {
+        Head: "./src/components/overrides/Head.astro",
         Header: "./src/components/overrides/Header.astro",
         Footer: "./src/components/overrides/Footer.astro",
         Sidebar: "./src/components/overrides/Sidebar.astro",
