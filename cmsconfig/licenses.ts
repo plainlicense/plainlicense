@@ -147,23 +147,6 @@ export const licensesCollection = defineCollection({
       widget: "richtext",
       required: false,
     },
-    // Claude mapping fields
-    {
-      label: "Has a clause map?",
-      name: "has_mapping",
-      widget: "hidden",
-      default: false,
-      required: false,
-    },
-    {
-      label: "Clause map version",
-      name: "mapping_version",
-      readonly: true,
-      widget: "string",
-      pattern: "^[0-9]+\\.[0-9]+\\.[0-9]+$",
-      default: "0.1.0",
-      required: false,
-    },
     // Display controls
     {
       label: "Show original comparison?",
@@ -419,6 +402,40 @@ export const licensesCollection = defineCollection({
           multiple: true,
           required: false,
           options: ["liability", "patent-use", "trademark-use", "warranty"],
+        },
+      ],
+    },
+    // Per-license extended term definitions (for terms unique to this license)
+    {
+      name: "defined_terms",
+      label: "Extended term definitions",
+      widget: "list",
+      required: false,
+      hint: "Terms unique to this license that need visible definitions (e.g. 'contributor', 'managed service'). Global terms like 'share', 'the work' are handled automatically.",
+      fields: [
+        {
+          label: "Term",
+          name: "term",
+          widget: "string",
+          required: true,
+        },
+        {
+          label: "Hover text (short, for tooltip)",
+          name: "hover",
+          widget: "string",
+          required: true,
+        },
+        {
+          label: "Footnote text (longer, for exports)",
+          name: "footnote",
+          widget: "text",
+          required: true,
+        },
+        {
+          label: "Show in visible definition section?",
+          name: "show_definition",
+          widget: "boolean",
+          default: true,
         },
       ],
     },
