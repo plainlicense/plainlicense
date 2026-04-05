@@ -17,7 +17,7 @@ tldr:
   - There's no warranty. Use at your own risk.
 attribution_required: false
 fair_code: false
-maker_pitch: No restrictions. No requirements. Your work belongs to everyone.
+maker_pitch: No restrictions. No rules. Your work belongs to everyone.
 commercial_restrictions: []
 has_mapping: true
 mapping_version: 1.0.0

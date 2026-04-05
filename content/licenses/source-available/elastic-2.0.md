@@ -102,7 +102,7 @@ If you use the work in a way that breaks these rules, you lose your rights to us
 
 ## We Offer No Promises or Guarantees
 
-We give the work to you **as it is**. This means:
+We give the work to you **"as is."** This means:
 
 - You get the work *exactly how it is*, including anything broken.
 - We don't promise it will work well for any specific tasks, or that it will not break any rules. It may not work at all.

@@ -65,7 +65,7 @@ original:
 
 **You can:**
 
-- **Use, copy, change, distribute, and sell the work**
+- **Use, copy, change, share, and sell the work**
 - **Use any patents we have that you need to use the work**
 
 This license covers the original work and any changes anyone makes to it.

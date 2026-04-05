@@ -5,7 +5,7 @@ plain_id: Plain-MIT
 spdx_id: MIT
 plain_version: 0.2.1
 description: >-
-  A short, permissive software license. Lets people do almost anything they want
+  A short, permissive license. Lets people do almost anything they want
   with your project.
 license_family: permissive
 is_dedication: false
