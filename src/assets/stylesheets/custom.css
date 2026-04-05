@@ -82,19 +82,6 @@
   margin-bottom: 2rem;
 }
 
-/* Custom Highlights (from main.css) */
-.highlight-match {
-  background-color: rgba(21, 219, 149, 0.2);
-  transition: background-color 0.2s;
-  border-radius: 4px;
-}
-
-.highlight-active {
-  background-color: rgba(21, 219, 149, 0.4);
-  transition: background-color 0.2s;
-  border-radius: 4px;
-}
-
 /* Scroll-to-top button */
 #scroll-to-top {
   position: fixed;

@@ -504,12 +504,7 @@ tabs.forEach(tab => {
 
 .original-version {
   display: none;
-  opacity: 0.6;
   transition: opacity 0.3s;
-}
-
-.original-version:hover {
-  opacity: 1;
 }
 
 @media (min-width: 1024px) {
@@ -523,11 +518,29 @@ tabs.forEach(tab => {
 
   .comparison-active .original-version {
     display: block;
+    position: sticky;
+    top: 4rem;
+    max-height: calc(100vh - 6rem);
+    overflow-y: auto;
+    align-self: start;
+    scrollbar-width: thin;
+    scrollbar-color: var(--sl-color-gray-4) transparent;
   }
 
   .comparison-active.license-container {
     max-width: 1400px;
   }
+}
+
+/* When mapping-dim is active, fade all direct content in original column */
+.comparison-active .original-version.mapping-dim > * {
+  opacity: 0.15;
+  transition: opacity 0.25s ease;
+}
+
+/* Mapping targets stay fully visible (exempt from dim) */
+.comparison-active .original-version.mapping-dim > .mapping-target {
+  opacity: 1;
 }
 
 .license-content {
@@ -563,35 +576,43 @@ tabs.forEach(tab => {
   border-radius: 12px;
 }
 
-.comparison-active .license-content [id] {
+.comparison-active .license-content [id],
+.comparison-active .full-license-text [id] {
   cursor: pointer;
   position: relative;
   border-radius: 4px;
-  transition: background-color 0.2s;
+  transition: background-color 0.2s, border-color 0.2s, opacity 0.25s;
 }
 
-@media (max-width: 1023px) {
-  .comparison-active .license-content [id]:active {
-    background-color: rgba(var(--sl-color-accent-rgb), 0.1);
-  }
-}
-
-.comparison-active .license-content [id]:hover {
-  background-color: rgba(var(--sl-color-accent-rgb), 0.05);
-}
-
-:global(.highlight-active) {
-  background-color: rgba(var(--sl-color-accent-rgb), 0.2);
+/* Source: the plain-language section being hovered/focused */
+:global(.mapping-source) {
+  border-bottom: 3px solid var(--cat-color, var(--sl-color-accent));
+  background: rgba(var(--cat-color-rgb, var(--emerald-rgb)), 0.06);
   border-radius: 4px;
-  box-shadow: 0 0 0 4px rgba(var(--sl-color-accent-rgb), 0.2);
+  padding-bottom: 2px;
   transition: all 0.2s ease;
 }
 
-:global(.highlight-match) {
-  background-color: rgba(var(--sl-color-accent-rgb), 0.1);
+/* Target: the matching original-language section */
+:global(.mapping-target) {
+  border-bottom: 3px solid var(--cat-color, var(--sl-color-accent));
+  background: rgba(var(--cat-color-rgb, var(--emerald-rgb)), 0.08);
   border-radius: 4px;
-  box-shadow: 0 0 0 4px rgba(var(--sl-color-accent-rgb), 0.1);
+  padding-bottom: 2px;
   transition: all 0.2s ease;
+}
+
+/* Cut-out: one-to-many original blocks look like separate "paper" pieces */
+:global(.mapping-cutout) {
+  background: var(--sl-color-gray-6);
+  border: 1px solid rgba(var(--cat-color-rgb, var(--emerald-rgb)), 0.3);
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  margin: 0.5rem 0;
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.25),
+    0 1px 3px rgba(0, 0, 0, 0.15);
+  border-bottom: 3px solid var(--cat-color, var(--sl-color-accent));
 }
 
 /* ── Column badges ── */
