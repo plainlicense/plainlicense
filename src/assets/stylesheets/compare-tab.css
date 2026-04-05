@@ -119,22 +119,22 @@
   outline: none;
 }
 
-/* Filler tooltip via CSS */
+/* Filler tooltip via CSS — positioned to the right of the hovered element */
 .concept-filler:hover::after,
 .concept-filler:focus-visible::after {
   content: attr(data-tooltip);
   position: absolute;
-  bottom: calc(100% + 6px);
-  left: 50%;
-  transform: translateX(-50%);
+  top: 50%;
+  left: calc(100% + 8px);
+  transform: translateY(-50%);
   white-space: nowrap;
   padding: 0.35rem 0.65rem;
-  background: var(--sl-color-gray-6);
+  background: var(--sl-color-bg, #0a0c13);
   border: 1px solid var(--sl-color-gray-5);
   border-radius: 6px;
   font-size: var(--sl-text-xs);
   color: var(--sl-color-gray-2);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
   pointer-events: none;
   z-index: 10;
 }
