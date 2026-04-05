@@ -215,9 +215,6 @@ function setupInteraction(
 			activeConcept = conceptId;
 			interactionCount++;
 
-			// Dim original text
-			originalEl.classList.add("concept-dimmed");
-
 			// Clear all active states
 			for (const el of originalEl.querySelectorAll(
 				".concept-active, .concept-child-active",
@@ -304,7 +301,6 @@ function setupInteraction(
 	// Escape key clears active highlighting on desktop
 	document.addEventListener("keydown", (e: KeyboardEvent) => {
 		if (e.key === "Escape" && activeConcept) {
-			originalEl.classList.remove("concept-dimmed");
 			for (const el of originalEl.querySelectorAll(
 				".concept-active, .concept-child-active",
 			)) {

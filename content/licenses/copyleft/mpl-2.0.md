@@ -5,8 +5,8 @@ plain_id: Plain-MPL
 spdx_id: MPL-2.0
 plain_version: 0.1.1
 description: >-
-  The MPL is a "weak copyleft" license. It requires sharing source materials for its
-  parts. It includes a patent grant and is compatible with GPL/LGPL.
+  The MPL is a "weak copyleft" license. It requires sharing source materials for
+  its parts. It includes a patent grant and is compatible with GPL/LGPL.
 license_family: copyleft
 is_dedication: false
 status: published
@@ -19,15 +19,17 @@ tldr:
   - There's no warranty. Use at your own risk.
 attribution_required: false
 fair_code: false
-maker_pitch: 'People can use your work freely, but must share changes to your source materials.'
+maker_pitch: >-
+  People can use your work freely, but must share changes to your source
+  materials.
 commercial_restrictions: []
 compare_to:
   - spdx_id: MIT
-    contrast: 'No sharing requirement — just give credit'
+    contrast: No sharing requirement — just give credit
   - spdx_id: Elastic-2.0
-    contrast: 'Prevents others from using your work as a commercial service'
+    contrast: Prevents others from using your work as a commercial service
 uuid: ac0d1786-e005-415d-a0ed-be10bf5cbc65
-plain_gunning_fog: 9.47
+plain_gunning_fog: 9.32
 shame_words_count: 0
 original:
   name: Mozilla Public License 2.0
@@ -56,19 +58,20 @@ original:
     - trademark-use
     - warranty
   original_gunning_fog: 14.1
+  original_shame_words_count: 59
 defined_terms:
   - term: contributor
-    hover: 'anyone who adds to or changes the work under this license'
+    hover: anyone who adds to or changes the work under this license
     footnote: >-
-      A "contributor" is any person or organization that creates the work
-      or adds changes to it under this license. You may be a contributor,
-      a user, and an author at the same time.
+      A "contributor" is any person or organization that creates the work or
+      adds changes to it under this license. You may be a contributor, a user,
+      and an author at the same time.
     show_definition: true
   - term: larger work
-    hover: 'a project that includes this work alongside other code'
+    hover: a project that includes this work alongside other code
     footnote: >-
-      A "larger work" is a project that combines this work with other
-      code not covered by this license.
+      A "larger work" is a project that combines this work with other code not
+      covered by this license.
     show_definition: true
 ---
 # Plain MPL
@@ -146,11 +149,7 @@ You can still share a version of the work people can’t change or edit (like a 
 
 ## We Offer No Warranty and Accept No Blame
 
-Use the work at your own risk.
-
-- **We offer the work "as is" with no warranties**.
-- We are not responsible for any problems or damages caused by using the work, such as financial loss, data loss, or physical injury.
-- We don't have to fix any problems you find with the work.
+{{block:warranty}}
 
 You may offer a warranty yourself, but you must clearly state it’s *your warranty*, not ours. If we get sued because of your warranty, you agree to cover our costs.
 

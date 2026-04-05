@@ -118,6 +118,8 @@ const templateVars: Record<string, string> = {
   original_name: data.original?.name || "",
   original_version_name: data.original?.version_display || data.original?.name || "",
   license_type: data.is_dedication ? "dedication" : "license",
+  spdx_id: data.spdx_id || "",
+  spdx_id_lower: (data.spdx_id || "").toLowerCase(),
 };
 const resolvedBody = plainBody.replace(
   /\{\{var:([a-z_]+)\}\}/g,
@@ -139,10 +141,11 @@ const renderedPlainHtml = annotateHtmlString(fnPostProcess(renderLicenseMarkdown
 // but the in-page rendering uses resolvedBody which may have unresolved blocks if
 // getCollection("template-blocks") returns IDs that don't match.
 
-// Readability data for the full text tab
+// Readability data for the compare tab
 const plain_gunning_fog = data.plain_gunning_fog;
 const original_gunning_fog = data.original?.original_gunning_fog;
 const shame_words_count = data.shame_words_count;
+const original_shame_words_count = data.original?.original_shame_words_count;
 const hasData = plain_gunning_fog !== undefined || shame_words_count !== undefined;
 const hasComparison = plain_gunning_fog !== undefined && original_gunning_fog !== undefined;
 const improvement = hasComparison
@@ -182,48 +185,6 @@ function readabilityLevel(score: number): string {
 
     <!-- Full License Text panel -->
     <div id="panel-fulltext" role="tabpanel" aria-labelledby="tab-fulltext" class="tab-panel" hidden>
-      {/* Readability comparison bar — columns align with plain/original license text */}
-      {hasData && (
-        <div class="fulltext-readability" role="region" aria-label="Readability scores">
-          <div class="readability-bar">
-            {/* Plain license stats — left side, aligns with plain column */}
-            <div class="bar-side bar-side--plain">
-              <svg class="readability-bar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" set:html={ICONS["bar-chart"]} />
-              {plain_gunning_fog !== undefined && (
-                <span class="bar-stat">
-                  <span class="bar-stat-label">Plain</span>
-                  <span class="bar-stat-score bar-score--plain">{plain_gunning_fog}</span>
-                  <span class="bar-stat-level">{readabilityLevel(plain_gunning_fog)}</span>
-                </span>
-              )}
-              {shame_words_count !== undefined && (
-                <span class="bar-shame">
-                  <span class="bar-shame-count">{shame_words_count}</span> jargon
-                </span>
-              )}
-            </div>
-
-            {/* Improvement badge — center */}
-            {improvement !== undefined && improvement > 0 && (
-              <div class="bar-center">
-                <span class="bar-improvement">↓ {improvement} grades easier</span>
-              </div>
-            )}
-
-            {/* Original license stats — right side, aligns with original column */}
-            {hasComparison && (
-              <div class="bar-side bar-side--original">
-                <span class="bar-stat">
-                  <span class="bar-stat-label">Original</span>
-                  <span class="bar-stat-score bar-score--original">{original_gunning_fog}</span>
-                  <span class="bar-stat-level">{readabilityLevel(original_gunning_fog!)}</span>
-                </span>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
       <div class="license-layout">
         <div class="license-column plain-version">
           <div class="column-badge column-badge--plain">
@@ -250,6 +211,53 @@ function readabilityLevel(score: number): string {
     </div>
 
     <div id="panel-compare" role="tabpanel" aria-labelledby="tab-compare" class="tab-panel" hidden>
+      {/* Readability comparison bar — original left, plain right (matches compare layout) */}
+      {hasData && (
+        <div class="fulltext-readability" role="region" aria-label="Readability scores">
+          <div class="readability-bar">
+            {/* Original license stats — left side, aligns with original column */}
+            {hasComparison && (
+              <div class="bar-side bar-side--original">
+                <svg class="readability-bar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" set:html={ICONS["bar-chart"]} />
+                <span class="bar-stat">
+                  <span class="bar-stat-label">Original</span>
+                  <span class="bar-stat-score bar-score--original">{original_gunning_fog}</span>
+                  <span class="bar-stat-level">{readabilityLevel(original_gunning_fog!)}</span>
+                </span>
+                {original_shame_words_count !== undefined && (
+                  <span class="bar-shame">
+                    <span class="bar-shame-count">{original_shame_words_count}</span> jargon
+                  </span>
+                )}
+              </div>
+            )}
+
+            {/* Improvement badge — center */}
+            {improvement !== undefined && improvement > 0 && (
+              <div class="bar-center">
+                <span class="bar-improvement">↓ {improvement} grades easier</span>
+              </div>
+            )}
+
+            {/* Plain license stats — right side, aligns with teleprompter column */}
+            <div class="bar-side bar-side--plain">
+              {plain_gunning_fog !== undefined && (
+                <span class="bar-stat">
+                  <span class="bar-stat-label">Plain</span>
+                  <span class="bar-stat-score bar-score--plain">{plain_gunning_fog}</span>
+                  <span class="bar-stat-level">{readabilityLevel(plain_gunning_fog)}</span>
+                </span>
+              )}
+              {shame_words_count !== undefined && (
+                <span class="bar-shame">
+                  <span class="bar-shame-count">{shame_words_count}</span> jargon
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
       <CompareTab
         originalHtml={renderLicenseMarkdown(originalBody)}
         spdxId={data.spdx_id}
@@ -308,9 +316,9 @@ tabs.forEach(tab => {
         panel.classList.add('active');
       }
     }
-    // Hide the reference-section readability card when fulltext tab is active
-    // (fulltext has its own inline readability bar, so showing both is redundant)
-    container?.classList.toggle('fulltext-active', panelId === 'panel-fulltext');
+    // Hide the reference-section readability card when fulltext or compare tab is active
+    // (compare tab has its own readability bar, so showing both is redundant)
+    container?.classList.toggle('fulltext-active', panelId === 'panel-fulltext' || panelId === 'panel-compare');
 
   });
 
@@ -564,7 +572,7 @@ if (spdxId) {
   gap: 0.75rem;
 }
 
-.bar-side--original {
+.bar-side--plain {
   margin-left: auto;
 }
 
@@ -721,7 +729,7 @@ if (spdxId) {
     gap: 0.5rem;
     padding: 0.75rem 1rem;
   }
-  .bar-side--original {
+  .bar-side--plain {
     margin-left: 0;
   }
   .full-license-text :global(dl.license-definitions dt),

@@ -5,9 +5,9 @@ plain_id: Plain-Elastic
 spdx_id: Elastic-2.0
 plain_version: 0.1.0
 description: >-
-  The Elastic License 2.0 allows use, copying, and changes but you can't
-  offer the work as a managed service. You must keep notices and may lose
-  patent rights if you sue.
+  The Elastic License 2.0 allows use, copying, and changes but you can't offer
+  the work as a managed service. You must keep notices and may lose patent
+  rights if you sue.
 license_family: source-available
 is_dedication: false
 status: published
@@ -23,11 +23,11 @@ commercial_restrictions:
   - no-managed-service
 compare_to:
   - spdx_id: MPL-2.0
-    contrast: 'Does not restrict commercial use; must share changes to source materials'
+    contrast: Does not restrict commercial use; must share changes to source materials
   - spdx_id: MIT
     contrast: 'Use and share freely, give credit, but no sharing requirement'
 uuid: 00208272-a9cb-41b9-ad99-0bbb4078cb9a
-plain_gunning_fog: 8.71
+plain_gunning_fog: 9.02
 shame_words_count: 0
 original:
   name: Elastic License 2.0
@@ -54,18 +54,19 @@ original:
     - trademark-use
     - warranty
   original_gunning_fog: 16.96
+  original_shame_words_count: 17
 defined_terms:
   - term: managed service
-    hover: 'a hosted service where others use the work''s features directly'
+    hover: a hosted service where others use the work's features directly
     footnote: >-
-      A "managed service" means offering the work to others as a hosted
-      service, where they use its features without installing it themselves.
+      A "managed service" means offering the work to others as a hosted service,
+      where they use its features without installing it themselves.
     show_definition: true
   - term: your company
-    hover: 'you and any organization you control or that shares control with you'
+    hover: you and any organization you control or that shares control with you
     footnote: >-
-      "Your company" means you plus any legal entity that controls you,
-      that you control, or that shares common control with you.
+      "Your company" means you plus any legal entity that controls you, that you
+      control, or that shares common control with you.
     show_definition: true
 ---
 # Plain Elastic License
@@ -115,19 +116,13 @@ If you use the work in a way that breaks these rules, you lose your rights to us
 
 ## We Offer No Promises or Guarantees
 
-We give the work to you **"as is."** This means:
-
-- You get the work *exactly how it is*, including anything broken.
-- We don't promise it will work well for any specific tasks, or that it will not break any rules. It may not work at all.
-- We are not responsible for any problems or damages that happen because of the work. You use it at your own risk.
+{{block:warranty}}
 
 ## You Must Give This License to Others
 
-If you share any part of the work with anyone else, you must give them a copy of this license (these rules). You can do that a few ways:
-    1.  Include this complete notice in the work (the Plain Elastic License).
-    2.  Include this notice in materials that come with the work.
-    3.  [Link to this notice][selflink] from the work.
-    4.  Use an accepted standard for linking to licenses, like the [SPDX Identifier][spdx-guide]: `SPDX-LICENSE-IDENTIFIER: Elastic-2.0`.
+If you share any part of the work with anyone else, you must give them a copy of this license (these rules).
+
+{{block:notice}}
 
  You must also include our copyright notice in the work. This tells people who created the work and when.
 

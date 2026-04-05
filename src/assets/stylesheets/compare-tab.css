@@ -89,36 +89,18 @@
   outline: none;
 }
 
+/* ── Active concept emphasis (subtle — no dimming) ── */
+
 .concept-span.concept-active {
+  border-bottom-width: 3px;
   border-bottom-color: var(--cat-color, var(--sl-color-accent));
   background-color: rgba(var(--cat-color-rgb, var(--emerald-rgb)), 0.14);
 }
 
 .concept-span.concept-child-active {
+  border-bottom-width: 3px;
   border-bottom-color: rgba(var(--cat-color-rgb, var(--emerald-rgb)), 0.7);
   background-color: rgba(var(--cat-color-rgb, var(--emerald-rgb)), 0.08);
-}
-
-/* ── Dimming (non-active text fades) ── */
-
-.compare-original-text.concept-dimmed {
-  opacity: 0.15;
-  transition: opacity 0.25s ease;
-}
-
-.compare-original-text.concept-dimmed .concept-span {
-  opacity: 1;
-  transition: opacity 0.25s ease;
-}
-
-.compare-original-text.concept-dimmed .concept-span:not(.concept-active):not(.concept-child-active) {
-  opacity: 0.35;
-  border-bottom-color: rgba(var(--cat-color-rgb, var(--emerald-rgb)), 0.15);
-}
-
-.compare-original-text.concept-dimmed .concept-filler:not(.concept-active) {
-  opacity: 0.1;
-  border-bottom-color: transparent;
 }
 
 /* ── Filler (overrides concept styling) ── */

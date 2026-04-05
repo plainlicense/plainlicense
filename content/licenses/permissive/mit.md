@@ -5,8 +5,8 @@ plain_id: Plain-MIT
 spdx_id: MIT
 plain_version: 0.2.1
 description: >-
-  A short, permissive license. Lets people do almost anything they want
-  with your project.
+  A short, permissive license. Lets people do almost anything they want with
+  your project.
 license_family: permissive
 is_dedication: false
 status: published
@@ -22,7 +22,9 @@ maker_pitch: Do almost anything with this work. Just give credit.
 commercial_restrictions: []
 compare_to:
   - spdx_id: Unlicense
-    contrast: Completely free to share and use without any restrictions, even giving credit
+    contrast: >-
+      Completely free to share and use without any restrictions, even giving
+      credit
   - spdx_id: MPL-2.0
     contrast: Requires sharing changes to licensed files
   - spdx_id: Elastic-2.0
@@ -32,7 +34,7 @@ meta_description: Plain language MIT license for all creative works
 show_original_comparison: true
 show_shame_counter: true
 featured: true
-plain_gunning_fog: 8.21
+plain_gunning_fog: 9.63
 shame_words_count: 0
 original:
   name: MIT License
@@ -54,7 +56,8 @@ original:
   limitations:
     - liability
     - warranty
-  original_gunning_fog: 26.39
+  original_gunning_fog: 31.02
+  original_shame_words_count: 9
 ---
 
 # Plain MIT License
@@ -80,11 +83,9 @@ Everyone else can do these things too, as long as they follow these rules.
 You can do any of these things with the work, **if you follow these two rules**:
 
 1.  **You must keep our copyright notice**. This tells people who created the work and when.
-2.  **You must *also* keep this notice with all versions of the work**. You can give this notice a few ways:
-   1. Include this complete notice in the work (the Plain MIT License).
-   2. Include this notice in materials that come with the work.
-   3. [Link to this notice](https://plainlicense.org/licenses/permissive/mit/) from the work.
-   4. Use an accepted standard for linking to licenses, like the [SPDX Identifier](https://spdx.dev/learn/handling-license-info/): `SPDX-LICENSE-IDENTIFIER: MIT`.
+2.  **You must *also* keep this notice with all versions of the work**.
+
+{{block:notice}}
 
 {{block:warranty}}
 

@@ -22,9 +22,11 @@ commercial_restrictions: []
 show_original_comparison: true
 compare_to:
   - spdx_id: MIT
-    contrast: 'Same freedom to use and share, but requires giving credit and keeping notices'
+    contrast: >-
+      Same freedom to use and share, but requires giving credit and keeping
+      notices
 uuid: f7905ee1-c1c1-4e8b-9ffd-27cb7fc77de1
-plain_gunning_fog: 11.21
+plain_gunning_fog: 11.47
 shame_words_count: 0
 original:
   name: The Unlicense
@@ -44,7 +46,8 @@ original:
   limitations:
     - liability
     - warranty
-  original_gunning_fog: 16.92
+  original_gunning_fog: 16.27
+  original_shame_words_count: 4
 ---
 # Plain Unlicense
 
@@ -73,11 +76,7 @@ In places that follow copyright laws, we give up all our rights to the work. Eve
 
 ## We Offer No Warranty
 
-**Use the work at your own risk.**
-
-- **The work is provided "as is" with no warranties.**
-- We are not responsible for any problems or damages caused by using the work.
-- We don't have to fix any problems you find.
+{{block:warranty}}
 
 {{block:interpretation}}
 

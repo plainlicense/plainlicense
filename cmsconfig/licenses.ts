@@ -337,6 +337,15 @@ export const licensesCollection = defineCollection({
           required: false,
         },
         {
+          label: "Jargon count of original license text",
+          name: "original_shame_words_count",
+          widget: "hidden",
+          readonly: true,
+          default: 0,
+          value_type: "int",
+          required: false,
+        },
+        {
           label:
             "Does the original text include a link to its own canonical URL?",
           name: "link_in_original",
