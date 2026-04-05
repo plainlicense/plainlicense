@@ -56,6 +56,20 @@ original:
     - trademark-use
     - warranty
   original_gunning_fog: 14.1
+defined_terms:
+  - term: contributor
+    hover: 'anyone who adds to or changes the work under this license'
+    footnote: >-
+      A "contributor" is any person or organization that creates the work
+      or adds changes to it under this license. You may be a contributor,
+      a user, and an author at the same time.
+    show_definition: true
+  - term: larger work
+    hover: 'a project that includes this work alongside other code'
+    footnote: >-
+      A "larger work" is a project that combines this work with other
+      code not covered by this license.
+    show_definition: true
 ---
 # Plain MPL
 
@@ -205,23 +219,6 @@ If you want to share the work under the Plain MPL **and** not allow people to sh
 You may use the work under the [Plain MPL](https://plainlicense.org/licenses/copyleft/mpl-2.0), or the [Mozilla Public License 2.0](https://www.mozilla.org/en-US/MPL/2.0/). You can't change the work's license; the authors require you share the work and any changes you make to it under the Plain MPL or the Mozilla Public License 2.0. If you didn't get a copy of the Plain MPL with this work, you can find it at: [plainlicense.org](https://plainlicense.org).
 
 ```
-
-## Definitions
-
-`we` and `the authors`
-:    The people or organizations that created the work
-
-`you`
-
-:    Any person or organization getting, copying, changing, using or sharing the work
-
-`contributor`
-
-:    Anyone who contributes to the work. You may be a contributor, a user, and an author at the same time. Each role has its own rights and responsibilities.
-
-`the work`
-
-:    The materials covered by this license
 
 {{block:interpretation}}
 

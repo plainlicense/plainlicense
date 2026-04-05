@@ -54,6 +54,19 @@ original:
     - trademark-use
     - warranty
   original_gunning_fog: 16.96
+defined_terms:
+  - term: managed service
+    hover: 'a hosted service where others use the work''s features directly'
+    footnote: >-
+      A "managed service" means offering the work to others as a hosted
+      service, where they use its features without installing it themselves.
+    show_definition: true
+  - term: your company
+    hover: 'you and any organization you control or that shares control with you'
+    footnote: >-
+      "Your company" means you plus any legal entity that controls you,
+      that you control, or that shares common control with you.
+    show_definition: true
 ---
 # Plain Elastic License
 
@@ -121,24 +134,6 @@ If you share any part of the work with anyone else, you must give them a copy of
 ## Accepting these Rules
 
 When you use the work in any way, you agree to follow these rules. **If you don't agree to these rules, you can't use the work.** These rules are the *only rules* that apply to your use of the work -- you have no other rights to use it.
-
-## Definitions
-
-`we`
-
-:    The person, people, or company who own the work and give you permission to use it.
-
-`you`
-
-:    The person or group agreeing to these rules.
-
-`your company`
-
-:    The organization you work for and any related organizations. This includes any other businesses that have control over it, are controlled by the organization, or share control with it.
-
-`the work`
-
-:    The materials provided under this license.
 
 [^1]: You *can* build a product or service using the work, including a product or service for your company or customers. It just can't be a service where others use the work's features directly.
 

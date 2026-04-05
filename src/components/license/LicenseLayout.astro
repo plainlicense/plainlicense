@@ -22,6 +22,7 @@ import ZoneInterpretation from "./zones/ZoneInterpretation.astro";
 import ZonePermissions from "./zones/ZonePermissions.astro";
 import ZoneProtections from "./zones/ZoneProtections.astro";
 import ZoneRestrictions from "./zones/ZoneRestrictions.astro";
+import TermDefinitions from "./TermDefinitions.astro";
 
 interface Props {
   license: LicenseEntryT;
@@ -109,6 +110,11 @@ const compareEntries = (data.compare_to ?? []).map(c => ({
 
   <!-- Zone 6: Standard protections -->
   <ZoneProtections protections={family.protections} />
+
+  <!-- Extended term definitions (only for licenses with unique terms) -->
+  {(data.defined_terms ?? []).length > 0 && (
+    <TermDefinitions terms={data.defined_terms} />
+  )}
 
   <!-- Zone 7: Legal interpretation -->
   <ZoneInterpretation

@@ -5,8 +5,6 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 import LicenseLayout from "../../components/license/LicenseLayout.astro";
 import { marked } from "marked";
 import { annotateHtmlString } from "../../data/plainTerms";
-import ComparisonModal from "../../components/ComparisonModal.astro";
-import ComparisonToggle from "../../components/ComparisonToggle.astro";
 import ReadabilitySidebar from "../../components/license/ReadabilitySidebar.astro";
 import { ICONS } from "../../components/license/icons";
 import DownloadOptions from "../../components/DownloadOptions.astro";
@@ -179,11 +177,6 @@ function readabilityLevel(score: number): string {
 
     <!-- Full License Text panel -->
     <div id="panel-fulltext" role="tabpanel" aria-labelledby="tab-fulltext" class="tab-panel" hidden>
-      {data.has_mapping && (
-        <div id="comparison-toggle-wrapper" hidden>
-          <ComparisonToggle hasMapping={true} />
-        </div>
-      )}
       {/* Readability comparison bar — columns align with plain/original license text */}
       {hasData && (
         <div class="fulltext-readability" role="region" aria-label="Readability scores">
@@ -268,34 +261,13 @@ function readabilityLevel(score: number): string {
       <VersionHistory license={license} />
       <NotLegalAdvice />
     </div>
-    <ComparisonModal />
   </div>
   <FootnoteScript />
 </BaseLayout>
 
 <script>
-  import { initMappingViewer } from "../../components/MappingViewer";
-
-const container = document.querySelector(".license-container") as HTMLElement;
-const spdxId = container?.dataset.spdxId;
-
-if (spdxId) {
-  fetch(`/mappings/${spdxId}-mapping.json`)
-    .then((res) => {
-      if (!res.ok) throw new Error(`Failed to fetch mapping: HTTP ${res.status} for /mappings/${spdxId}-mapping.json`);
-      return res.json() as Promise<Parameters<typeof initMappingViewer>[0]>;
-    })
-    .then((mappingData) => {
-      const wrapper = document.getElementById("comparison-toggle-wrapper");
-      if (wrapper) wrapper.hidden = false;
-      initMappingViewer(mappingData);
-    })
-    .catch(() => {
-      console.log(`No mapping found for ${spdxId}`);
-    });
-}
-
 // Tab switching
+const container = document.querySelector(".license-container") as HTMLElement;
 const tabs = document.querySelectorAll<HTMLButtonElement>('[role="tab"]');
 const panels = document.querySelectorAll<HTMLElement>('[role="tabpanel"]');
 
@@ -325,15 +297,6 @@ tabs.forEach(tab => {
     // (fulltext has its own inline readability bar, so showing both is redundant)
     container?.classList.toggle('fulltext-active', panelId === 'panel-fulltext');
 
-    // Coordinate comparison-active class with active tab
-    const compToggle = document.getElementById("comparison-toggle") as HTMLButtonElement | null;
-    if (panelId === 'panel-fulltext') {
-      if (compToggle?.getAttribute('aria-pressed') === 'true') {
-        container?.classList.add('comparison-active');
-      }
-    } else {
-      container?.classList.remove('comparison-active');
-    }
   });
 
   tab.addEventListener('keydown', (e: KeyboardEvent) => {
@@ -476,36 +439,6 @@ tabs.forEach(tab => {
   .license-layout {
     gap: 4rem;
   }
-
-  .comparison-active .license-layout {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .comparison-active .original-version {
-    display: block;
-    position: sticky;
-    top: 4rem;
-    max-height: calc(100vh - 6rem);
-    overflow-y: auto;
-    align-self: start;
-    scrollbar-width: thin;
-    scrollbar-color: var(--sl-color-gray-4) transparent;
-  }
-
-  .comparison-active.license-container {
-    max-width: 1400px;
-  }
-}
-
-/* When mapping-dim is active, fade all direct content in original column */
-.comparison-active .original-version.mapping-dim > * {
-  opacity: 0.15;
-  transition: opacity 0.25s ease;
-}
-
-/* Mapping targets stay fully visible (exempt from dim) */
-.comparison-active .original-version.mapping-dim > .mapping-target {
-  opacity: 1;
 }
 
 .license-content {
@@ -539,45 +472,6 @@ tabs.forEach(tab => {
   background: var(--sl-color-gray-7, #0d0f15);
   border: 1px solid var(--sl-color-gray-5);
   border-radius: 12px;
-}
-
-.comparison-active .license-content [id],
-.comparison-active .full-license-text [id] {
-  cursor: pointer;
-  position: relative;
-  border-radius: 4px;
-  transition: background-color 0.2s, border-color 0.2s, opacity 0.25s;
-}
-
-/* Source: the plain-language section being hovered/focused */
-:global(.mapping-source) {
-  border-bottom: 3px solid var(--cat-color, var(--sl-color-accent));
-  background: rgba(var(--cat-color-rgb, var(--emerald-rgb)), 0.06);
-  border-radius: 4px;
-  padding-bottom: 2px;
-  transition: all 0.2s ease;
-}
-
-/* Target: the matching original-language section */
-:global(.mapping-target) {
-  border-bottom: 3px solid var(--cat-color, var(--sl-color-accent));
-  background: rgba(var(--cat-color-rgb, var(--emerald-rgb)), 0.08);
-  border-radius: 4px;
-  padding-bottom: 2px;
-  transition: all 0.2s ease;
-}
-
-/* Cut-out: one-to-many original blocks look like separate "paper" pieces */
-:global(.mapping-cutout) {
-  background: var(--sl-color-gray-6);
-  border: 1px solid rgba(var(--cat-color-rgb, var(--emerald-rgb)), 0.3);
-  border-radius: 8px;
-  padding: 1rem 1.25rem;
-  margin: 0.5rem 0;
-  box-shadow:
-    0 2px 8px rgba(0, 0, 0, 0.25),
-    0 1px 3px rgba(0, 0, 0, 0.15);
-  border-bottom: 3px solid var(--cat-color, var(--sl-color-accent));
 }
 
 /* ── Column badges ── */
@@ -698,30 +592,6 @@ tabs.forEach(tab => {
 .bar-shame-count {
   font-weight: 700;
   color: var(--sl-color-gray-1);
-}
-
-/* Comparison mode: readability bar becomes a 3-column grid matching the license columns */
-@media (min-width: 1024px) {
-  .comparison-active .readability-bar {
-    display: grid;
-    grid-template-columns: 1fr auto 1fr;
-    align-items: center;
-    gap: 1.5rem;
-    flex-wrap: nowrap;
-  }
-
-  .comparison-active .bar-side--plain {
-    justify-self: start;
-  }
-
-  .comparison-active .bar-center {
-    justify-self: center;
-  }
-
-  .comparison-active .bar-side--original {
-    justify-self: end;
-    margin-left: 0;
-  }
 }
 
 /* Hide reference-section readability card when fulltext tab is active (it has its own inline bar) */

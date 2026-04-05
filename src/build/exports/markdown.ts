@@ -3,6 +3,8 @@ import path from "node:path";
 import { licenseUrl } from "../../utils/constants";
 import type { ExportContext } from "./index.ts";
 import {
+  annotateTermsForMarkdown,
+  appendTermFootnotes,
   convertDefinitionLists,
   extractSemanticBlocks,
   footnotesToInline,
@@ -26,6 +28,9 @@ function transformGfm(content: string): string {
       semanticBlockToGfmAlert(block),
     );
   }
+  // Annotate plain terms as GFM footnotes (first instance only)
+  const { content: annotated, definitions } = annotateTermsForMarkdown(result);
+  result = appendTermFootnotes(annotated, definitions);
   return result;
 }
 
@@ -44,6 +49,9 @@ function transformCm(content: string): string {
       semanticBlockToCmBlockquote(block),
     );
   }
+  // Annotate terms before footnote inlining so they get converted to inline notes
+  const { content: annotated, definitions } = annotateTermsForMarkdown(result);
+  result = appendTermFootnotes(annotated, definitions);
   result = footnotesToInline(result);
   result = convertDefinitionLists(result, "markdown");
   return result;

@@ -224,6 +224,123 @@ export function convertDefinitionLists(
   );
 }
 
+// ── Plain Term Annotation ─────────────────────────────────────────
+
+import { PLAIN_TERMS } from "../../data/plainTerms";
+
+export interface TermAnnotationResult {
+  content: string;
+  definitions: { id: string; text: string }[];
+}
+
+/**
+ * Inserts GFM footnote markers at the first occurrence of each plain term
+ * in markdown content. Returns modified content and collected definitions.
+ *
+ * Skips matches inside:
+ *   - Code spans (backticks)
+ *   - Code blocks (```)
+ *   - Link text/URLs
+ *   - Heading lines (# ...)
+ *
+ * Uses a high footnote number offset (100+) to avoid collision with
+ * existing content footnotes which use low numbers.
+ */
+export function annotateTermsForMarkdown(
+  content: string,
+): TermAnnotationResult {
+  const definitions: { id: string; text: string }[] = [];
+  const matched = new Set<string>();
+  let result = content;
+
+  // Process terms longest-first (PLAIN_TERMS is already sorted this way)
+  for (const term of PLAIN_TERMS) {
+    if (matched.has(term.term)) continue;
+
+    const escaped = term.term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const pattern = new RegExp(`\\b(${escaped})\\b`, "i");
+
+    // Find first occurrence that isn't inside code or heading
+    const lines = result.split("\n");
+    let found = false;
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      // Skip code blocks, headings, and footnote definitions
+      if (
+        line.startsWith("```") ||
+        line.startsWith("#") ||
+        line.startsWith("[^")
+      )
+        continue;
+
+      const match = line.match(pattern);
+      if (match && match.index !== undefined) {
+        // Verify we're not inside a code span by counting backticks before the match
+        const before = line.slice(0, match.index);
+        const backtickCount = (before.match(/`/g) || []).length;
+        if (backtickCount % 2 !== 0) continue; // inside code span
+
+        const termId = term.term.replace(/\s+/g, "-").toLowerCase();
+        const footnoteRef = `[^${termId}]`;
+        lines[i] =
+          line.slice(0, match.index + match[0].length) +
+          footnoteRef +
+          line.slice(match.index + match[0].length);
+        definitions.push({ id: termId, text: term.footnote });
+        matched.add(term.term);
+        found = true;
+        break;
+      }
+    }
+    if (!found) continue;
+    result = lines.join("\n");
+  }
+
+  return { content: result, definitions };
+}
+
+/**
+ * Appends GFM footnote definitions for annotated terms.
+ * Call after annotateTermsForMarkdown and any other footnote processing.
+ */
+export function appendTermFootnotes(
+  content: string,
+  definitions: { id: string; text: string }[],
+): string {
+  if (definitions.length === 0) return content;
+
+  const footnotes = definitions
+    .map((d) => `[^${d.id}]: ${d.text}`)
+    .join("\n\n");
+
+  return `${content.trimEnd()}\n\n${footnotes}\n`;
+}
+
+/**
+ * Generates a plaintext "Terms We Use" section from terms found in content.
+ * Scans for which global terms appear, returns a formatted block.
+ */
+export function buildPlaintextTermSection(content: string): string {
+  const found: { term: string; footnote: string }[] = [];
+
+  for (const term of PLAIN_TERMS) {
+    const escaped = term.term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const pattern = new RegExp(`\\b${escaped}\\b`, "i");
+    if (pattern.test(content)) {
+      found.push({ term: term.term, footnote: term.footnote });
+    }
+  }
+
+  if (found.length === 0) return "";
+
+  const separator = "----------------------------------------";
+  const lines = found.map(
+    (t) => `  "${t.term}" -- ${t.footnote.replace(/^"[^"]*"\s*/, "")}`,
+  );
+
+  return `\n\n${separator}\nTerms We Use\n${separator}\n\n${lines.join("\n\n")}\n`;
+}
+
 // ── Semantic Block Format Converters ───────────────────────────────
 
 /**

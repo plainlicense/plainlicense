@@ -79,32 +79,6 @@ const spdxIdentifier = data.original?.spdx_id || data.spdx_id;
   </main>
 </BaseLayout>
 
-<script>
-  import { initMappingViewer } from "../components/MappingViewer";
-
-  async function loadMappings() {
-    const main = document.querySelector(".license-page");
-    const spdxId = main?.getAttribute("data-spdx-id");
-
-    if (spdxId) {
-      try {
-        // In prototype, we try to fetch the local JSON
-        const response = await fetch(`/mappings/${spdxId}-mapping.json`);
-        if (response.ok) {
-          const mappingData = (await response.json()) as Parameters<
-            typeof initMappingViewer
-          >[0];
-          initMappingViewer(mappingData);
-        }
-      } catch (e) {
-        console.warn("Mapping data not found for:", spdxId);
-      }
-    }
-  }
-
-  loadMappings();
-</script>
-
 <style>
   .license-page {
     max-width: 1000px;

@@ -12,6 +12,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { marked } from "marked";
+import { annotateHtmlString } from "../../data/plainTerms";
 import { licenseUrl } from "../../utils/constants";
 import type { ExportContext } from "./index";
 import { stripHtmlDivs } from "./transforms";
@@ -474,6 +475,21 @@ body {
   color: var(--pl-text-muted);
 }
 
+/* ── Plain Term Annotations ───────────────────────────── */
+
+abbr.plain-term {
+  text-decoration: underline dotted var(--pl-text-muted);
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 3px;
+  cursor: help;
+}
+
+abbr.plain-term:hover,
+abbr.plain-term:focus-visible {
+  text-decoration-color: var(--pl-accent);
+  outline: none;
+}
+
 /* ── Footer ────────────────────────────────────────────── */
 
 .pl-footer {
@@ -580,7 +596,7 @@ export async function generateEmbed(ctx: ExportContext): Promise<void> {
   const fileName = `${plainId}-${version}-embed.html`;
   const filePath = path.join(outputDir, fileName);
 
-  const renderedBody = renderContent(content);
+  const renderedBody = annotateHtmlString(renderContent(content));
   const html = buildEmbedHtml(ctx, renderedBody);
 
   await fs.mkdir(outputDir, { recursive: true });

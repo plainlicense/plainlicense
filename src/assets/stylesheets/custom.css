@@ -165,3 +165,34 @@
   --cat-color: var(--cat-proprietary);
   --cat-color-rgb: var(--cat-proprietary-rgb);
 }
+
+/* ── Plain Term Annotations ── */
+
+abbr.plain-term {
+  text-decoration: underline dotted var(--sl-color-gray-4);
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 3px;
+  cursor: help;
+}
+
+abbr.plain-term:hover,
+abbr.plain-term:focus-visible {
+  text-decoration-color: var(--sl-color-accent);
+  outline: none;
+}
+
+/* Definition list for per-license extended terms */
+.term-definitions dl {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.5rem 1.5rem;
+  margin: 0;
+}
+
+.term-definitions dt {
+  font-weight: 600;
+}
+
+.term-definitions dd {
+  margin: 0;
+}
