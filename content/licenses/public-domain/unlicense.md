@@ -17,14 +17,14 @@ tldr:
   - There's no warranty. Use at your own risk.
 attribution_required: false
 fair_code: false
-maker_pitch: No restrictions at all. Your work belongs to everyone.
+maker_pitch: No restrictions. No requirements. Your work belongs to everyone.
 commercial_restrictions: []
 has_mapping: true
 mapping_version: 1.0.0
 show_original_comparison: true
 compare_to:
   - spdx_id: MIT
-    contrast: 'Maximum freedom, but requires giving credit'
+    contrast: 'Same freedom to use and share, but requires giving credit and keeping notices'
 uuid: f7905ee1-c1c1-4e8b-9ffd-27cb7fc77de1
 plain_gunning_fog: 11.21
 shame_words_count: 0
