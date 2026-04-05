@@ -32,18 +32,24 @@ async function updateMetrics() {
         const newPlainFog = calculateGunningFog(plainContent);
         const newShameCount = countShameWords(plainContent);
 
-        // Calculate Gunning Fog for the original license text (if present)
+        // Calculate Gunning Fog and jargon count for the original license text (if present)
         const originalContent = extractOriginalSection(content);
         const newOriginalFog =
           originalContent.length > 0
             ? calculateGunningFog(originalContent)
             : undefined;
+        const newOriginalShameCount =
+          originalContent.length > 0
+            ? countShameWords(originalContent)
+            : undefined;
 
         const currentOriginalFog = data.original?.original_gunning_fog;
+        const currentOriginalShameCount = data.original?.original_shame_words_count;
         const needsUpdate =
           data.plain_gunning_fog !== newPlainFog ||
           data.shame_words_count !== newShameCount ||
-          currentOriginalFog !== newOriginalFog;
+          currentOriginalFog !== newOriginalFog ||
+          currentOriginalShameCount !== newOriginalShameCount;
 
         if (needsUpdate) {
           data.plain_gunning_fog = newPlainFog;
@@ -56,9 +62,19 @@ async function updateMetrics() {
             data.original.original_gunning_fog = newOriginalFog;
           } else if (data.original && "original_gunning_fog" in data.original) {
             delete data.original.original_gunning_fog;
-            if (Object.keys(data.original).length === 0) {
-              delete data.original;
+          }
+
+          if (newOriginalShameCount !== undefined) {
+            if (!data.original) {
+              data.original = {};
             }
+            data.original.original_shame_words_count = newOriginalShameCount;
+          } else if (data.original && "original_shame_words_count" in data.original) {
+            delete data.original.original_shame_words_count;
+          }
+
+          if (data.original && Object.keys(data.original).length === 0) {
+            delete data.original;
           }
 
           const newFileContent = matter.stringify(content, data);

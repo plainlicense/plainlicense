@@ -21,13 +21,13 @@ const byFamily = licenses.reduce<Record<string, typeof licenses>>(
 
 <BaseLayout
   title="All Licenses"
-  description="Browse all Plain License plain-language rewrites of popular software licenses."
+  description="Browse all Plain License plain-language rewrites of popular open source licenses."
 >
   <div class="licenses-page">
     <header class="page-header">
       <h1>All Licenses</h1>
       <p class="lead">
-        Plain-language rewrites of popular software licenses, organized by family.
+        Plain-language rewrites of popular open source licenses, organized by family.
       </p>
       <p class="page-count">
         {licenses.length} licenses across {FAMILY_ORDER.filter(fam => byFamily[fam]?.length).length} families

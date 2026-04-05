@@ -91,8 +91,8 @@ Standardized terminology:
 
 Standardized patterns:
 - Headers: Use empowering "You are Free to..." format
-- Permissions: "use, copy, change, distribute, [sell]"
-- Warranty language: "We offer the work 'as is' with no warranties.
+- Permissions: "use, copy, change, share, [sell]"
+- Warranty language: "We offer the work 'as is' with no promises.
   We are not responsible for any damages or issues"
 
 **Rationale**: Consistency across licenses enables users to build mental models and transfer

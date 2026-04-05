@@ -1,137 +1,50 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import matter from "gray-matter";
-import { generateClauseHash } from "../utils/hash.ts";
+import striptags from "striptags";
+import { resolveConceptMapping } from "./concept-resolver";
+import type {
+  ConceptMappingFile,
+  ResolvedMappingFile,
+} from "../types/concept-mapping";
 
-// ── Types ──────────────────────────────────────────────────────────────
-
-export interface ClauseRef {
-  id: string;
-  hash: string;
-  content: string;
-}
-
-interface MappingEntry {
-  id: string;
-  type: string;
-  plain_clause?: ClauseRef | ClauseRef[] | null;
-  original_clause?: ClauseRef | ClauseRef[] | null;
-  [key: string]: unknown;
-}
-
-interface MappingFile {
-  license_id: string;
-  version: string;
-  mapping_philosophy: string;
-  mappings: MappingEntry[];
-}
-
-export interface MappingValidationResult {
-  licenseId: string;
-  valid: boolean;
-  staleClauseIds: string[];
-  missingIds: string[];
-  errors: string[];
-}
-
-// ── Helpers ────────────────────────────────────────────────────────────
-
-/**
- * Extracts text inside `<div id="...">...</div>` blocks.
- * Returns a map of id → trimmed inner content.
- * Handles optional whitespace/newlines around the div tags.
- */
-export function extractDivContent(md: string): Record<string, string> {
-  const result: Record<string, string> = {};
-  const regex = /<div\s+id="([^"]+)"[^>]*>\s*([\s\S]*?)\s*<\/div>/g;
-
-  for (const match of md.matchAll(regex)) {
-    const id = match[1];
-    const content = match[2].trim();
-    result[id] = content;
-  }
-
-  return result;
-}
-
-/**
- * Collects all clause refs from a mapping entry.
- * Handles `plain_clause`/`original_clause` as either a single object or
- * an array (per the mapping schema's oneOf definition).
- */
-function collectClauseRefs(
-  entry: MappingEntry,
-): Array<{ ref: ClauseRef; side: "plain" | "original" }> {
-  const refs: Array<{ ref: ClauseRef; side: "plain" | "original" }> = [];
-
-  const addRefs = (
-    value: ClauseRef | ClauseRef[] | null | undefined,
-    side: "plain" | "original",
-  ) => {
-    if (!value) return;
-    if (Array.isArray(value)) {
-      for (const clause of value) {
-        refs.push({ ref: clause, side });
-      }
-    } else {
-      refs.push({ ref: value, side });
-    }
-  };
-
-  addRefs(entry.plain_clause, "plain");
-  addRefs(entry.original_clause, "original");
-
-  return refs;
-}
-
-/**
- * Validates mapping hashes against actual div content from a license file.
- */
-export async function validateMappingHashes(
-  mapping: MappingFile,
-  plainDivs: Record<string, string>,
-  originalDivs: Record<string, string>,
-): Promise<MappingValidationResult> {
-  const result: MappingValidationResult = {
-    licenseId: mapping.license_id,
-    valid: true,
-    staleClauseIds: [],
-    missingIds: [],
-    errors: [],
-  };
-
-  for (const entry of mapping.mappings) {
-    const clauseRefs = collectClauseRefs(entry);
-
-    for (const { ref, side } of clauseRefs) {
-      const divs = side === "plain" ? plainDivs : originalDivs;
-      const divContent = divs[ref.id];
-
-      if (divContent === undefined) {
-        result.missingIds.push(ref.id);
-        result.valid = false;
-        continue;
-      }
-
-      const actualHash = `sha256:${await generateClauseHash(divContent)}`;
-
-      if (actualHash !== ref.hash) {
-        result.staleClauseIds.push(ref.id);
-        result.valid = false;
-      }
-    }
-  }
-
-  return result;
-}
-
-// ── File-system operations ─────────────────────────────────────────────
+// ── Constants ─────────────────────────────────────────────────────────
 
 const CONTENT_DIR = path.resolve("content");
 const MAPPINGS_DIR = path.join(CONTENT_DIR, "mappings");
 const LICENSES_DIR = path.join(CONTENT_DIR, "licenses");
 const TEMPLATE_BLOCKS_DIR = path.join(CONTENT_DIR, "template-blocks");
 const PUBLIC_MAPPINGS_DIR = path.resolve("public", "mappings");
+
+// ── Helpers ───────────────────────────────────────────────────────────
+
+/**
+ * Strip markdown formatting to produce plain text for matching.
+ */
+export function stripMarkdown(md: string): string {
+  const withoutMarkdown = md
+    .replace(/^#{1,6}\s+/gm, "") // headers
+    .replace(/\*\*([^*]+)\*\*/g, "$1") // bold
+    .replace(/\*([^*]+)\*/g, "$1") // italic
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1") // links
+    .replace(/\[\^[^\]]*\]/g, "") // footnote references
+    .replace(/^>\s?/gm, "") // blockquotes
+    .replace(/^[-*+]\s+/gm, "") // unordered lists
+    .replace(/^\d+\.\s+/gm, "") // ordered lists
+    .replace(/`([^`]+)`/g, "$1") // inline code
+    .replace(/\^\^([^^]+)\^\^/g, "$1") // caret insert (^^text^^)
+    .replace(/\\([\\`*_{}[\]()#+\-.!])/g, "$1") // markdown escape sequences
+    .replace(/\n{3,}/g, "\n\n"); // collapse newlines
+
+  return striptags(withoutMarkdown).trim(); // remove any remaining HTML tags
+}
+
+/**
+ * Strip `{{component:...}}` placeholders from markdown.
+ */
+function stripComponents(md: string): string {
+  return md.replace(/\{\{component:[^}]+\}\}/g, "");
+}
 
 /**
  * Resolve `{{block:...}}` template placeholders by reading
@@ -150,7 +63,6 @@ async function resolveTemplateBlocks(md: string): Promise<string> {
       const { content } = matter(raw);
       resolved = resolved.replace(match[0], content.trim());
     } catch {
-      // If template block not found, leave placeholder
       console.warn(`Template block not found: ${blockPath}`);
     }
   }
@@ -183,7 +95,10 @@ async function findLicenseFile(spdxId: string): Promise<string | null> {
  * Split a license markdown body into plain and original sections.
  * Splits on `---` followed by `# Original License Text`.
  */
-function splitPlainOriginal(body: string): { plain: string; original: string } {
+function splitPlainOriginal(body: string): {
+  plain: string;
+  original: string;
+} {
   const separator = /---[\s\n]+#\s*Original License Text/;
   const match = separator.exec(body);
 
@@ -197,13 +112,26 @@ function splitPlainOriginal(body: string): { plain: string; original: string } {
   };
 }
 
+// ── Build result type ─────────────────────────────────────────────────
+
+export interface MappingBuildResult {
+  licenseId: string;
+  success: boolean;
+  warnings: string[];
+  errors: string[];
+  resolved?: ResolvedMappingFile;
+}
+
+// ── Orchestration ─────────────────────────────────────────────────────
+
 /**
- * Validate all mapping files against their corresponding license content.
+ * Resolve all concept mapping files and export resolved JSON to public/.
+ * Warnings don't fail the build — they're reported but mappings still export.
  */
-export async function validateAllMappings(): Promise<
-  MappingValidationResult[]
+export async function resolveAndExportMappings(): Promise<
+  MappingBuildResult[]
 > {
-  const results: MappingValidationResult[] = [];
+  const results: MappingBuildResult[] = [];
 
   let mappingFiles: string[];
   try {
@@ -215,111 +143,98 @@ export async function validateAllMappings(): Promise<
     return results;
   }
 
+  await fs.mkdir(PUBLIC_MAPPINGS_DIR, { recursive: true });
+
   for (const file of mappingFiles) {
     const mappingPath = path.join(MAPPINGS_DIR, file);
     const raw = await fs.readFile(mappingPath, "utf8");
-    const mapping: MappingFile = JSON.parse(raw);
+    const mappingFile: ConceptMappingFile = JSON.parse(raw);
 
-    const licenseFile = await findLicenseFile(mapping.license_id);
+    // Skip files in the old format (no concepts array)
+    if (!Array.isArray(mappingFile.concepts)) {
+      console.warn(`  Skipping ${file}: not in concept mapping format`);
+      continue;
+    }
+
+    const licenseFile = await findLicenseFile(mappingFile.license_id);
     if (!licenseFile) {
       results.push({
-        licenseId: mapping.license_id,
-        valid: false,
-        staleClauseIds: [],
-        missingIds: [],
-        errors: [`License file not found for ${mapping.license_id}`],
+        licenseId: mappingFile.license_id,
+        success: false,
+        warnings: [],
+        errors: [`License file not found for ${mappingFile.license_id}`],
       });
       continue;
     }
 
     const licenseRaw = await fs.readFile(licenseFile, "utf8");
     const { content: body } = matter(licenseRaw);
-
-    // Resolve template blocks
     const resolved = await resolveTemplateBlocks(body);
+    const cleaned = stripComponents(resolved);
+    const { plain, original } = splitPlainOriginal(cleaned);
 
-    // Split into plain / original
-    const { plain, original } = splitPlainOriginal(resolved);
+    const plainText = stripMarkdown(plain);
+    const originalText = stripMarkdown(original);
 
-    // Extract divs from each section
-    const plainDivs = extractDivContent(plain);
-    const originalDivs = extractDivContent(original);
-
-    const result = await validateMappingHashes(
-      mapping,
-      plainDivs,
-      originalDivs,
+    const resolvedMapping = resolveConceptMapping(
+      mappingFile,
+      originalText,
+      plainText,
     );
-    results.push(result);
+
+    const outPath = path.join(
+      PUBLIC_MAPPINGS_DIR,
+      `${mappingFile.license_id}-mapping.resolved.json`,
+    );
+    await fs.writeFile(outPath, JSON.stringify(resolvedMapping, null, 2));
+
+    results.push({
+      licenseId: mappingFile.license_id,
+      success: resolvedMapping.warnings.length === 0,
+      warnings: resolvedMapping.warnings,
+      errors: [],
+      resolved: resolvedMapping,
+    });
   }
 
   return results;
 }
 
-// ── CLI entry point ────────────────────────────────────────────────────
+// ── CLI entry point ───────────────────────────────────────────────────
 
 async function main() {
-  console.log("Validating mapping files...\n");
-
-  const results = await validateAllMappings();
-
-  let hasFailure = false;
-
-  // Ensure public/mappings directory exists
-  await fs.mkdir(PUBLIC_MAPPINGS_DIR, { recursive: true });
+  console.log("Resolving concept mappings...\n");
+  const results = await resolveAndExportMappings();
+  let hasWarnings = false;
 
   for (const result of results) {
-    if (result.valid) {
-      console.log(`  ${result.licenseId}: all hashes valid`);
-      // Copy valid mapping to public/mappings/
-      const srcFile = path.join(
-        MAPPINGS_DIR,
-        `${result.licenseId}-mapping.json`,
+    if (result.success) {
+      const count = result.resolved?.concepts.length ?? 0;
+      const fillerCount = result.resolved?.filler.length ?? 0;
+      console.log(
+        `  ${result.licenseId}: ${count} concepts, ${fillerCount} filler resolved`,
       );
-      const destFile = path.join(
-        PUBLIC_MAPPINGS_DIR,
-        `${result.licenseId}-mapping.json`,
-      );
-      await fs.copyFile(srcFile, destFile);
+    } else if (result.errors.length > 0) {
+      console.error(`  ${result.licenseId}: ERROR`);
+      for (const err of result.errors) console.error(`    ${err}`);
     } else {
-      hasFailure = true;
-      console.error(`  ${result.licenseId}: validation failed`);
-      if (result.errors.length > 0) {
-        for (const err of result.errors) {
-          console.error(`   Error: ${err}`);
-        }
-      }
-      if (result.staleClauseIds.length > 0) {
-        console.error(`   Stale: ${result.staleClauseIds.join(", ")}`);
-      }
-      if (result.missingIds.length > 0) {
-        console.error(`   Missing: ${result.missingIds.join(", ")}`);
-      }
-      // Remove stale mapping from public/mappings/ if it exists
-      const destFile = path.join(
-        PUBLIC_MAPPINGS_DIR,
-        `${result.licenseId}-mapping.json`,
+      hasWarnings = true;
+      console.warn(
+        `  ${result.licenseId}: resolved with ${result.warnings.length} warnings`,
       );
-      try {
-        await fs.unlink(destFile);
-        console.error(
-          `   Removed stale ${result.licenseId}-mapping.json from public/mappings/`,
-        );
-      } catch {
-        // File didn't exist, nothing to remove
-      }
+      for (const w of result.warnings) console.warn(`    ${w}`);
     }
   }
 
-  if (hasFailure) {
-    console.error("\nMapping validation failed.");
-    process.exit(1);
+  if (hasWarnings) {
+    console.warn(
+      "\nMapping resolution completed with warnings (mappings still exported).",
+    );
+  } else {
+    console.log("\nAll mappings resolved successfully.");
   }
-
-  console.log("\nAll mappings validated successfully.");
 }
 
-// Run as CLI when executed directly
 const isMainModule =
   process.argv[1] &&
   (process.argv[1].endsWith("validate-mappings.ts") ||

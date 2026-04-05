@@ -156,4 +156,6 @@ package-lock.json
 worker-configuration.d.ts
 .playwright-mcp/
 ./*.png
+test-results/
+.last-run.json
 !robots.txt

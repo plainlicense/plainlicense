@@ -42,14 +42,13 @@ export const TAG_DESCRIPTIONS: Record<string, string> = {
   "can-change": "You can change this work however you want.",
   "can-keep-private":
     "You have no obligation to publish or share your changes.",
-  "can-revoke":
-    "The copyright holder can revoke this license from future users.",
+  "can-revoke": "The authors can revoke this license from future users.",
   "patent-use": "You get an express license to use any contributor patents.",
   "give-credit": "You must name the original creator when you share this work.",
   "describe-changes":
-    "You must say what you changed when you share a modified version.",
+    "You must say what you changed when you share a changed version.",
   "share-source":
-    "You must make the source code available when you share this work.",
+    "You must make the source materials available when you share this work.",
   "share-alike-strict":
     "You must share changes under the same license — for the entire project.",
   "share-alike-relaxed":
@@ -57,7 +56,7 @@ export const TAG_DESCRIPTIONS: Record<string, string> = {
   "share-alike-network":
     "Letting users access this work over a network counts as sharing.",
   "no-liability":
-    "The copyright holders are not responsible for damages from using this work.",
+    "The authors are not responsible for damages from using this work.",
   "no-warranty":
     "No promises are made about whether this work is fit for any purpose.",
   "no-trademark":
@@ -126,7 +125,7 @@ export const CONDITION_WHY: Record<string, string> = {
   "network-use-disclose":
     "Because sharing over a network is still sharing the work.",
   "same-license": "So every version of the work stays equally free to use.",
-  "same-license--file": "So the modified files stay equally free to use.",
+  "same-license--file": "So the changed files stay equally free to use.",
   "same-license--library": "So the library stays equally free to use.",
 };
 
@@ -145,8 +144,7 @@ export const COMMERCIAL_RESTRICTION_WHY: Record<string, string> = {
     "So only the creators can offer the work as a service to paying customers.",
   "no-selling":
     "So the creators retain exclusive commercial rights to the work.",
-  "network-copyleft":
-    "So network use is treated the same as distributing a copy.",
+  "network-copyleft": "So network use is treated the same as sharing a copy.",
   "time-delayed-open":
     "So the creators have a window of commercial exclusivity before open release.",
 };

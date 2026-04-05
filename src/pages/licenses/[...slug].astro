@@ -4,31 +4,22 @@ import "../../assets/stylesheets/custom.css";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import LicenseLayout from "../../components/license/LicenseLayout.astro";
 import { marked } from "marked";
-import ComparisonModal from "../../components/ComparisonModal.astro";
-import ComparisonToggle from "../../components/ComparisonToggle.astro";
+import { annotateHtmlString } from "../../data/plainTerms";
 import ReadabilitySidebar from "../../components/license/ReadabilitySidebar.astro";
 import { ICONS } from "../../components/license/icons";
 import DownloadOptions from "../../components/DownloadOptions.astro";
 import VersionHistory from "../../components/VersionHistory.astro";
 import NotLegalAdvice from "../../components/NotLegalAdvice.astro";
 import { getLicenseSlug, getPublishedLicenses } from "../../utils/collections";
+import { derivePlainId } from "../../utils/plain-id";
 import { buildOriginalTextSeparator, stripComponentPlaceholders } from "../../utils/templates";
 import { prepareFootnotes } from "../../utils/footnotes";
 import "../../assets/stylesheets/footnotes.css";
+import "../../assets/stylesheets/compare-tab.css";
 import FootnoteScript from "../../components/FootnoteScript.astro";
+import CompareTab from "../../components/CompareTab.astro";
 
 export const prerender = true;
-/**
- * Render markdown content, correctly handling <div id="..."> wrappers.
- *
- * CommonMark treats <div> as an HTML block and does NOT process markdown
- * inside it. This function splits on those wrappers, renders the inner
- * markdown independently, then re-wraps in the original <div id="...">.
- * This preserves the element IDs that MappingViewer needs.
- *
- * Limitation: the regex matches non-nested <div id="..."> blocks only.
- * Nested divs are not supported and should not appear in license content.
- */
 /**
  * Convert mkdocs-style definition lists to semantic HTML <dl> blocks.
  *
@@ -83,34 +74,9 @@ function convertCaretInsert(md: string): string {
   return md.replace(/\^\^((?:[^^]|\^(?!\^))+?)\^\^/g, "<ins>$1</ins>");
 }
 
-function renderMarkdownWithDivs(md: string): string {
-  // Pre-process mkdocs extensions before marked sees them
+function renderLicenseMarkdown(md: string): string {
   const processed = convertCaretInsert(convertDefinitionLists(md));
-
-  // Regex: <div id="X"> ... </div>  (non-nested, one per section)
-  const divPattern = /<div id="([^"]+)">([\s\S]*?)<\/div>/g;
-  let result = "";
-  let lastIndex = 0;
-  let match: RegExpExecArray | null = divPattern.exec(processed);
-
-  while (match !== null) {
-    // Render any content before this div block
-    if (match.index > lastIndex) {
-      result += marked.parse(processed.slice(lastIndex, match.index)) as string;
-    }
-    // Render the inner markdown and wrap in the div with its ID
-    const innerHtml = marked.parse(match[2].trim()) as string;
-    result += `<div id="${match[1]}">${innerHtml}</div>\n`;
-    lastIndex = match.index + match[0].length;
-    match = divPattern.exec(processed);
-  }
-
-  // Render any trailing content after the last div
-  if (lastIndex < processed.length) {
-    result += marked.parse(processed.slice(lastIndex)) as string;
-  }
-
-  return result;
+  return marked.parse(processed) as string;
 }
 
 export async function getStaticPaths() {
@@ -148,11 +114,15 @@ const plainBody = bodyParts[0].replace(
   },
 );
 // Resolve {{var:...}} placeholders from frontmatter
+const rawSpdxId = data.spdx_id || data.original?.spdx_id || "";
 const templateVars: Record<string, string> = {
   plain_name: data.plain_name || "",
+  plain_id: data.plain_id || derivePlainId(rawSpdxId),
   original_name: data.original?.name || "",
   original_version_name: data.original?.version_display || data.original?.name || "",
   license_type: data.is_dedication ? "dedication" : "license",
+  spdx_id: data.spdx_id || "",
+  spdx_id_lower: (data.spdx_id || "").toLowerCase(),
 };
 const resolvedBody = plainBody.replace(
   /\{\{var:([a-z_]+)\}\}/g,
@@ -168,16 +138,17 @@ const fullProcessedBody = stripComponentPlaceholders(
 // Split off any original text that was appended for the clipboard version
 const fullTextBody = stripComponentPlaceholders(resolvedBody);
 const { cleaned: fnCleanedBody, postProcess: fnPostProcess } = prepareFootnotes(fullTextBody);
-const renderedPlainHtml = fnPostProcess(renderMarkdownWithDivs(fnCleanedBody));
+const renderedPlainHtml = annotateHtmlString(fnPostProcess(renderLicenseMarkdown(fnCleanedBody)));
 
 // The fullProcessedBody (used for clipboard) has blocks resolved via the export pipeline,
 // but the in-page rendering uses resolvedBody which may have unresolved blocks if
 // getCollection("template-blocks") returns IDs that don't match.
 
-// Readability data for the full text tab
+// Readability data for the compare tab
 const plain_gunning_fog = data.plain_gunning_fog;
 const original_gunning_fog = data.original?.original_gunning_fog;
 const shame_words_count = data.shame_words_count;
+const original_shame_words_count = data.original?.original_shame_words_count;
 const hasData = plain_gunning_fog !== undefined || shame_words_count !== undefined;
 const hasComparison = plain_gunning_fog !== undefined && original_gunning_fog !== undefined;
 const improvement = hasComparison
@@ -205,6 +176,9 @@ function readabilityLevel(score: number): string {
       <button role="tab" id="tab-fulltext" aria-controls="panel-fulltext" aria-selected="false" class="tab-button" tabindex="-1">
         Full License Text
       </button>
+      <button role="tab" id="tab-compare" aria-controls="panel-compare" aria-selected="false" class="tab-button" tabindex="-1" style="display: none;">
+        Compare
+      </button>
     </nav>
 
     <!-- Quick Reference panel (zone-based view) -->
@@ -214,53 +188,6 @@ function readabilityLevel(score: number): string {
 
     <!-- Full License Text panel -->
     <div id="panel-fulltext" role="tabpanel" aria-labelledby="tab-fulltext" class="tab-panel" hidden>
-      {data.has_mapping && (
-        <div id="comparison-toggle-wrapper" hidden>
-          <ComparisonToggle hasMapping={true} />
-        </div>
-      )}
-      {/* Readability comparison bar — columns align with plain/original license text */}
-      {hasData && (
-        <div class="fulltext-readability" role="region" aria-label="Readability scores">
-          <div class="readability-bar">
-            {/* Plain license stats — left side, aligns with plain column */}
-            <div class="bar-side bar-side--plain">
-              <svg class="readability-bar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" set:html={ICONS["bar-chart"]} />
-              {plain_gunning_fog !== undefined && (
-                <span class="bar-stat">
-                  <span class="bar-stat-label">Plain</span>
-                  <span class="bar-stat-score bar-score--plain">{plain_gunning_fog}</span>
-                  <span class="bar-stat-level">{readabilityLevel(plain_gunning_fog)}</span>
-                </span>
-              )}
-              {shame_words_count !== undefined && (
-                <span class="bar-shame">
-                  <span class="bar-shame-count">{shame_words_count}</span> jargon
-                </span>
-              )}
-            </div>
-
-            {/* Improvement badge — center */}
-            {improvement !== undefined && improvement > 0 && (
-              <div class="bar-center">
-                <span class="bar-improvement">↓ {improvement} grades easier</span>
-              </div>
-            )}
-
-            {/* Original license stats — right side, aligns with original column */}
-            {hasComparison && (
-              <div class="bar-side bar-side--original">
-                <span class="bar-stat">
-                  <span class="bar-stat-label">Original</span>
-                  <span class="bar-stat-score bar-score--original">{original_gunning_fog}</span>
-                  <span class="bar-stat-level">{readabilityLevel(original_gunning_fog!)}</span>
-                </span>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
       <div class="license-layout">
         <div class="license-column plain-version">
           <div class="column-badge column-badge--plain">
@@ -280,10 +207,64 @@ function readabilityLevel(score: number): string {
               Original
             </div>
             <h2 class="original-heading">{data.original?.name ?? "Original License"}</h2>
-            <div class="license-content prose" set:html={renderMarkdownWithDivs(originalBody)} />
+            <div class="license-content prose" set:html={renderLicenseMarkdown(originalBody)} />
           </div>
         )}
       </div>
+    </div>
+
+    <div id="panel-compare" role="tabpanel" aria-labelledby="tab-compare" class="tab-panel" hidden>
+      {/* Readability comparison bar — original left, plain right (matches compare layout) */}
+      {hasData && (
+        <div class="fulltext-readability" role="region" aria-label="Readability scores">
+          <div class="readability-bar">
+            {/* Original license stats — left side, aligns with original column */}
+            {hasComparison && (
+              <div class="bar-side bar-side--original">
+                <svg class="readability-bar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" set:html={ICONS["bar-chart"]} />
+                <span class="bar-stat">
+                  <span class="bar-stat-label">Original</span>
+                  <span class="bar-stat-score bar-score--original">{original_gunning_fog}</span>
+                  <span class="bar-stat-level">{readabilityLevel(original_gunning_fog!)}</span>
+                </span>
+                {original_shame_words_count !== undefined && (
+                  <span class="bar-shame">
+                    <span class="bar-shame-count">{original_shame_words_count}</span> jargon
+                  </span>
+                )}
+              </div>
+            )}
+
+            {/* Improvement badge — center */}
+            {improvement !== undefined && improvement > 0 && (
+              <div class="bar-center">
+                <span class="bar-improvement">↓ {improvement} grades easier</span>
+              </div>
+            )}
+
+            {/* Plain license stats — right side, aligns with teleprompter column */}
+            <div class="bar-side bar-side--plain">
+              {plain_gunning_fog !== undefined && (
+                <span class="bar-stat">
+                  <span class="bar-stat-label">Plain</span>
+                  <span class="bar-stat-score bar-score--plain">{plain_gunning_fog}</span>
+                  <span class="bar-stat-level">{readabilityLevel(plain_gunning_fog)}</span>
+                </span>
+              )}
+              {shame_words_count !== undefined && (
+                <span class="bar-shame">
+                  <span class="bar-shame-count">{shame_words_count}</span> jargon
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      <CompareTab
+        originalHtml={renderLicenseMarkdown(originalBody)}
+        spdxId={data.spdx_id}
+      />
     </div>
 
     <DownloadOptions license={license} processedBody={fullProcessedBody} />
@@ -303,34 +284,16 @@ function readabilityLevel(score: number): string {
       <VersionHistory license={license} />
       <NotLegalAdvice />
     </div>
-    <ComparisonModal />
   </div>
   <FootnoteScript />
 </BaseLayout>
 
 <script>
-  import { initMappingViewer } from "../../components/MappingViewer";
-
-const container = document.querySelector(".license-container") as HTMLElement;
-const spdxId = container?.dataset.spdxId;
-
-if (spdxId) {
-  fetch(`/mappings/${spdxId}-mapping.json`)
-    .then((res) => {
-      if (!res.ok) throw new Error(`Failed to fetch mapping: HTTP ${res.status} for /mappings/${spdxId}-mapping.json`);
-      return res.json() as Promise<Parameters<typeof initMappingViewer>[0]>;
-    })
-    .then((mappingData) => {
-      const wrapper = document.getElementById("comparison-toggle-wrapper");
-      if (wrapper) wrapper.hidden = false;
-      initMappingViewer(mappingData);
-    })
-    .catch(() => {
-      console.log(`No mapping found for ${spdxId}`);
-    });
-}
+import { initConceptViewer } from "../../components/ConceptViewer";
+import type { ResolvedMappingFile } from "../../types/concept-mapping";
 
 // Tab switching
+const container = document.querySelector(".license-container") as HTMLElement;
 const tabs = document.querySelectorAll<HTMLButtonElement>('[role="tab"]');
 const panels = document.querySelectorAll<HTMLElement>('[role="tabpanel"]');
 
@@ -356,19 +319,10 @@ tabs.forEach(tab => {
         panel.classList.add('active');
       }
     }
-    // Hide the reference-section readability card when fulltext tab is active
-    // (fulltext has its own inline readability bar, so showing both is redundant)
-    container?.classList.toggle('fulltext-active', panelId === 'panel-fulltext');
+    // Hide the reference-section readability card when fulltext or compare tab is active
+    // (compare tab has its own readability bar, so showing both is redundant)
+    container?.classList.toggle('fulltext-active', panelId === 'panel-fulltext' || panelId === 'panel-compare');
 
-    // Coordinate comparison-active class with active tab
-    const compToggle = document.getElementById("comparison-toggle") as HTMLButtonElement | null;
-    if (panelId === 'panel-fulltext') {
-      if (compToggle?.getAttribute('aria-pressed') === 'true') {
-        container?.classList.add('comparison-active');
-      }
-    } else {
-      container?.classList.remove('comparison-active');
-    }
   });
 
   tab.addEventListener('keydown', (e: KeyboardEvent) => {
@@ -384,6 +338,27 @@ tabs.forEach(tab => {
     }
   });
 });
+
+// Concept mapping viewer initialization
+const spdxId = container?.dataset.spdxId;
+if (spdxId) {
+  fetch(`/mappings/${spdxId}-mapping.resolved.json`)
+    .then((res) => {
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return res.json() as Promise<ResolvedMappingFile>;
+    })
+    .then((data) => {
+      initConceptViewer(data);
+      // Show Compare tab now that mapping data is available
+      const compareTab = document.getElementById("tab-compare");
+      if (compareTab) compareTab.style.display = "";
+    })
+    .catch(() => {
+      // No mapping available — keep Compare tab hidden
+      const compareTab = document.getElementById("tab-compare");
+      if (compareTab) compareTab.style.display = "none";
+    });
+}
 </script>
 
 <style>
@@ -511,36 +486,6 @@ tabs.forEach(tab => {
   .license-layout {
     gap: 4rem;
   }
-
-  .comparison-active .license-layout {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .comparison-active .original-version {
-    display: block;
-    position: sticky;
-    top: 4rem;
-    max-height: calc(100vh - 6rem);
-    overflow-y: auto;
-    align-self: start;
-    scrollbar-width: thin;
-    scrollbar-color: var(--sl-color-gray-4) transparent;
-  }
-
-  .comparison-active.license-container {
-    max-width: 1400px;
-  }
-}
-
-/* When mapping-dim is active, fade all direct content in original column */
-.comparison-active .original-version.mapping-dim > * {
-  opacity: 0.15;
-  transition: opacity 0.25s ease;
-}
-
-/* Mapping targets stay fully visible (exempt from dim) */
-.comparison-active .original-version.mapping-dim > .mapping-target {
-  opacity: 1;
 }
 
 .license-content {
@@ -574,45 +519,6 @@ tabs.forEach(tab => {
   background: var(--sl-color-gray-7, #0d0f15);
   border: 1px solid var(--sl-color-gray-5);
   border-radius: 12px;
-}
-
-.comparison-active .license-content [id],
-.comparison-active .full-license-text [id] {
-  cursor: pointer;
-  position: relative;
-  border-radius: 4px;
-  transition: background-color 0.2s, border-color 0.2s, opacity 0.25s;
-}
-
-/* Source: the plain-language section being hovered/focused */
-:global(.mapping-source) {
-  border-bottom: 3px solid var(--cat-color, var(--sl-color-accent));
-  background: rgba(var(--cat-color-rgb, var(--emerald-rgb)), 0.06);
-  border-radius: 4px;
-  padding-bottom: 2px;
-  transition: all 0.2s ease;
-}
-
-/* Target: the matching original-language section */
-:global(.mapping-target) {
-  border-bottom: 3px solid var(--cat-color, var(--sl-color-accent));
-  background: rgba(var(--cat-color-rgb, var(--emerald-rgb)), 0.08);
-  border-radius: 4px;
-  padding-bottom: 2px;
-  transition: all 0.2s ease;
-}
-
-/* Cut-out: one-to-many original blocks look like separate "paper" pieces */
-:global(.mapping-cutout) {
-  background: var(--sl-color-gray-6);
-  border: 1px solid rgba(var(--cat-color-rgb, var(--emerald-rgb)), 0.3);
-  border-radius: 8px;
-  padding: 1rem 1.25rem;
-  margin: 0.5rem 0;
-  box-shadow:
-    0 2px 8px rgba(0, 0, 0, 0.25),
-    0 1px 3px rgba(0, 0, 0, 0.15);
-  border-bottom: 3px solid var(--cat-color, var(--sl-color-accent));
 }
 
 /* ── Column badges ── */
@@ -669,7 +575,7 @@ tabs.forEach(tab => {
   gap: 0.75rem;
 }
 
-.bar-side--original {
+.bar-side--plain {
   margin-left: auto;
 }
 
@@ -733,30 +639,6 @@ tabs.forEach(tab => {
 .bar-shame-count {
   font-weight: 700;
   color: var(--sl-color-gray-1);
-}
-
-/* Comparison mode: readability bar becomes a 3-column grid matching the license columns */
-@media (min-width: 1024px) {
-  .comparison-active .readability-bar {
-    display: grid;
-    grid-template-columns: 1fr auto 1fr;
-    align-items: center;
-    gap: 1.5rem;
-    flex-wrap: nowrap;
-  }
-
-  .comparison-active .bar-side--plain {
-    justify-self: start;
-  }
-
-  .comparison-active .bar-center {
-    justify-self: center;
-  }
-
-  .comparison-active .bar-side--original {
-    justify-self: end;
-    margin-left: 0;
-  }
 }
 
 /* Hide reference-section readability card when fulltext tab is active (it has its own inline bar) */
@@ -850,7 +732,7 @@ tabs.forEach(tab => {
     gap: 0.5rem;
     padding: 0.75rem 1rem;
   }
-  .bar-side--original {
+  .bar-side--plain {
     margin-left: 0;
   }
   .full-license-text :global(dl.license-definitions dt),

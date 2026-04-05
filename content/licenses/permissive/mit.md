@@ -5,8 +5,8 @@ plain_id: Plain-MIT
 spdx_id: MIT
 plain_version: 0.2.1
 description: >-
-  A short, permissive software license. Lets people do almost anything they want
-  with your project.
+  A short, permissive license. Lets people do almost anything they want with
+  your project.
 license_family: permissive
 is_dedication: false
 status: published
@@ -15,26 +15,56 @@ tldr:
     You can use, copy, change, and share this work for any reason, including
     commercially.
   - You must keep the copyright notice and this license with any copy you share.
-  - There's no warranty. Use at your own risk.
 attribution_required: true
+credit:
+  examples:
+    - context: In a source file header
+      code: |-
+        // Copyright (c) 2026 Your Name. [Plain MIT License](https://plainlicense.org/mit/).
+        // Keep the copyright notice and this license with any copy you share.
+    - context: In a README or document
+      code: |-
+        This project is licensed under the [Plain MIT License](https://plainlicense.org/mit/).
+        See LICENSE for details.
+    - context: On a website or app
+      code: '© 2026 Your Name — <a href="https://plainlicense.org/mit/">Plain MIT License</a>'
+  not_required:
+    - Use a specific format or location
+    - Ask for permission before using the work
+    - Include the full license text everywhere you use the work
+    - Use our exact wording — just keep the copyright notice and a reference to the license
+faq:
+  - question: Can I use this for commercial projects?
+    answer: >-
+      Yes. The MIT license lets you use, sell, and share the work for any
+      reason, including commercial products and services. Just keep the
+      copyright notice and license with any copies you share.
+  - question: Do I have to share my own materials if I use MIT-licensed work?
+    answer: >-
+      No. You can use MIT-licensed work in closed-source, proprietary projects.
+      The only thing you must do is keep the copyright notice and license with any copies of the MIT-licensed work you share.
+  - question: Can I change the license on my copy?
+    answer: >-
+      Yes. You can relicense your own project however you want, even
+      proprietary. The MIT-licensed portions still carry the MIT copyright
+      notice, but your additions can use any license, including additions or changes to the MIT-licensed work.
 fair_code: false
 maker_pitch: Do almost anything with this work. Just give credit.
 commercial_restrictions: []
 compare_to:
   - spdx_id: Unlicense
-    contrast: Completely free to share and use without any restrictions, even giving credit
+    contrast: >-
+      Completely free to use, share and change. You don't even have to give credit if you don't want to.
   - spdx_id: MPL-2.0
     contrast: Requires sharing changes to licensed files
   - spdx_id: Elastic-2.0
     contrast: Prevents offering your work as a hosted service
 uuid: 87a537b5-b43f-4832-9983-33577b0a9828
 meta_description: Plain language MIT license for all creative works
-has_mapping: true
-mapping_version: 1.0.0
 show_original_comparison: true
 show_shame_counter: true
 featured: true
-plain_gunning_fog: 8.21
+plain_gunning_fog: 9.63
 shame_words_count: 0
 original:
   name: MIT License
@@ -56,14 +86,13 @@ original:
   limitations:
     - liability
     - warranty
-  original_gunning_fog: 26.39
+  original_gunning_fog: 31.02
+  original_shame_words_count: 9
 ---
 
 # Plain MIT License
 
 Copyright Notice: (c) {{ year }} `[copyright holders]`
-
-<div id="plain-permissions">
 
 ## You Can Do Anything with The Work
 
@@ -79,32 +108,20 @@ We give you permission to:
 You can do all of these things **for free**. You can do them for any reason.
 Everyone else can do these things too, as long as they follow these rules.
 
-</div>
-
-<div id="plain-conditions">
-
 ## **If** You Give Us Credit and Keep This Notice
 
 You can do any of these things with the work, **if you follow these two rules**:
 
 1.  **You must keep our copyright notice**. This tells people who created the work and when.
-2.  **You must *also* keep this notice with all versions of the work**. You can give this notice a few ways:
-   1. Include this complete notice in the work (the Plain MIT License).
-   2. Include this notice in materials that come with the work.
-   3. [Link to this notice](https://plainlicense.org/licenses/permissive/mit/) from the work.
-   4. Use an accepted standard for linking to licenses, like the [SPDX Identifier](https://spdx.dev/learn/handling-license-info/): `SPDX-LICENSE-IDENTIFIER: MIT`.
+2.  **You must *also* keep this notice with all versions of the work**.
 
-</div>
+{{block:notice}}
 
-<div id="plain-protections">
+## We Offer No Promises
 
 {{block:warranty}}
 
-</div>
-
 {{block:interpretation}}
-
-{{component:faq id="mit-faq"}}
 
 ---
 
@@ -114,8 +131,6 @@ You can do any of these things with the work, **if you follow these two rules**:
 
 Copyright (c) {{ year }} `<copyright holders>`
 
-<div id="original-permissions">
-
 Permission is hereby granted, free of charge, to any person
 obtaining a copy of this software and associated documentation
 files (the "Software"), to deal in the Software without
@@ -124,16 +139,8 @@ copy, modify, merge, publish, distribute, sublicense, and/or sell
 copies of the Software, and to permit persons to whom the
 Software is furnished to do so, subject to the following conditions:
 
-</div>
-
-<div id="original-conditions">
-
 The above copyright notice and this permission notice shall be
 included in all copies or substantial portions of the Software.
-
-</div>
-
-<div id="original-protections">
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
@@ -143,5 +150,3 @@ HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
-
-</div>

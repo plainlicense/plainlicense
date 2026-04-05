@@ -142,27 +142,72 @@ export const licensesCollection = defineCollection({
       required: false,
     },
     {
-      label: "Additional how-to instructions (leave blank for most licenses)",
-      name: "extra_how",
-      widget: "richtext",
+      label: "Credit guidance (customizes Zone 4: How to give credit)",
+      name: "credit",
+      widget: "object",
       required: false,
+      fields: [
+        {
+          label: "Examples of where to put attribution",
+          name: "examples",
+          widget: "list",
+          required: false,
+          hint: "Context-specific examples shown under 'Where to put it'. Leave blank for defaults (source header, README, website).",
+          fields: [
+            {
+              label: "Context (e.g. 'In a source file header')",
+              name: "context",
+              widget: "string",
+              required: true,
+            },
+            {
+              label: "Code example",
+              name: "code",
+              widget: "code",
+              required: true,
+              default_language: "text",
+              output_code_only: true,
+            },
+          ],
+        },
+        {
+          label: "What you do NOT need to do",
+          name: "not_required",
+          widget: "list",
+          required: false,
+          hint: "Items for the 'You do not need to' box. Leave blank for defaults.",
+          field: { widget: "string" },
+        },
+        {
+          label: "Extra notes (rendered below the examples)",
+          name: "extra",
+          widget: "richtext",
+          required: false,
+        },
+      ],
     },
-    // Claude mapping fields
+    // FAQ
     {
-      label: "Has a clause map?",
-      name: "has_mapping",
-      widget: "hidden",
-      default: false,
+      label: "Frequently asked questions (3 recommended, 5 max)",
+      name: "faq",
+      widget: "list",
       required: false,
-    },
-    {
-      label: "Clause map version",
-      name: "mapping_version",
-      readonly: true,
-      widget: "string",
-      pattern: "^[0-9]+\\.[0-9]+\\.[0-9]+$",
-      default: "0.1.0",
-      required: false,
+      max: 5,
+      hint: "Common questions about this specific license. 3 items is the sweet spot.",
+      fields: [
+        {
+          label: "Question",
+          name: "question",
+          widget: "string",
+          required: true,
+        },
+        {
+          label: "Answer",
+          name: "answer",
+          widget: "text",
+          required: true,
+        },
+      ],
     },
     // Display controls
     {
@@ -354,6 +399,15 @@ export const licensesCollection = defineCollection({
           required: false,
         },
         {
+          label: "Jargon count of original license text",
+          name: "original_shame_words_count",
+          widget: "hidden",
+          readonly: true,
+          default: 0,
+          value_type: "int",
+          required: false,
+        },
+        {
           label:
             "Does the original text include a link to its own canonical URL?",
           name: "link_in_original",
@@ -419,6 +473,40 @@ export const licensesCollection = defineCollection({
           multiple: true,
           required: false,
           options: ["liability", "patent-use", "trademark-use", "warranty"],
+        },
+      ],
+    },
+    // Per-license extended term definitions (for terms unique to this license)
+    {
+      name: "defined_terms",
+      label: "Extended term definitions",
+      widget: "list",
+      required: false,
+      hint: "Terms unique to this license that need visible definitions (e.g. 'contributor', 'managed service'). Global terms like 'share', 'the work' are handled automatically.",
+      fields: [
+        {
+          label: "Term",
+          name: "term",
+          widget: "string",
+          required: true,
+        },
+        {
+          label: "Hover text (short, for tooltip)",
+          name: "hover",
+          widget: "string",
+          required: true,
+        },
+        {
+          label: "Footnote text (longer, for exports)",
+          name: "footnote",
+          widget: "text",
+          required: true,
+        },
+        {
+          label: "Show in visible definition section?",
+          name: "show_definition",
+          widget: "boolean",
+          default: true,
         },
       ],
     },

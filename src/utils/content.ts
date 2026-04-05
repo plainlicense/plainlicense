@@ -171,6 +171,19 @@ export const SHAME_WORDS: readonly string[] = [
   "shall",
   "pursuant",
   "perpetually",
+  // Constitution preferred-term violations:
+  // "change" not "modify/amend", "share" not "distribute",
+  // "you" not "licensee/recipient", "authors" not "licensor",
+  // "use" not "exploit"
+  "modify",
+  "modification",
+  "distribute",
+  "distribution",
+  "licensor",
+  "licensee",
+  "recipient",
+  "amend",
+  "exploit",
 ];
 
 /**

@@ -74,7 +74,7 @@ Each license has a workspace package at `packages/{spdx-id}/` with its own `pack
 
 - `src/components/overrides/` — Starlight layout overrides (Header, Footer, Sidebar)
 - `src/components/reactive/` — Preact interactive components (DecisionTree.tsx, ComparisonTable.astro, FAQ.astro)
-- `src/components/*.astro` — License-specific components (LicenseSummary, ComparisonModal, DownloadOptions, VersionHistory)
+- `src/components/*.astro` — License-specific components (LicenseSummary, CompareTab, DownloadOptions, VersionHistory)
 
 Preact is used for interactive components. JSX factory is `h` (configured in tsconfig). Path alias `~` maps to `./src`.
 
@@ -122,7 +122,7 @@ All license and content writing must follow the project constitution (`.specify/
 
 - **Target 8th-grade reading level** — use Hemingway Editor or similar
 - **Address readers as "you"**; use "we, the authors" for licensors
-- **Preferred terminology**: "the work" (not "software/code"), "source materials" (not "source code"), "share" (not "distribute"), "change" (not "modify/amend"), "give" (not "grant/convey"), "use" (not "utilize/exploit"), "rules" or "terms" (not "conditions/limitations")
+- **Preferred terminology**: "the work" (not "software/code"), "source materials" (not "source code"), "share" (not "distribute"), "change" (not "modify/amend"), "give" (not "grant/convey"), "use" (not "utilize/exploit"), "promises" (not "warranties/guarantees"), "rules" for obligations (not "conditions/limitations"), "restrictions" for prohibitions (kept as-is), "recraft" as our signature verb for what we do to licenses
 - **Shame words**: Complex legal terms are tracked and flagged during build. PRs adding new content must pass shame word checks.
 - Headers should use empowering framing: "You are Free to..."
 - Use "source materials" instead of "source code" to cover all creative works

@@ -30,7 +30,7 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: "npx http-server dist -p 4321",
+    command: "bunx http-server dist/client -p 4321",
     url: "http://localhost:4321",
     reuseExistingServer: !process.env.CI,
   },

@@ -4,6 +4,7 @@ import path from "node:path";
 import { marked } from "marked";
 import { licenseUrl, SITE_URL } from "../../utils/constants";
 import type { ExportContext } from "./index.ts";
+import { annotateTermsForMarkdown, appendTermFootnotes } from "./transforms.ts";
 
 /**
  * Color palettes per license family, matching the website's CSS variables.
@@ -95,6 +96,63 @@ export async function generatePDF(ctx: ExportContext) {
   });
 }
 
+/**
+ * Resolves markdown footnotes into Typst #footnote[...] inline calls.
+ * Parses `[^id]: text` definitions, then replaces `[^id]` references
+ * with `#footnote[text]`. Handles both numeric and string IDs.
+ */
+function resolveFootnotesForTypst(content: string): string {
+  // Parse footnote definitions (handles both `[^1]: text` and `[^term-id]: text`)
+  const defs = new Map<string, string>();
+  const lines = content.split("\n");
+  const cleanedLines: string[] = [];
+  let currentId: string | null = null;
+  let currentLines: string[] = [];
+
+  const flush = () => {
+    if (currentId !== null) {
+      defs.set(currentId, currentLines.join(" ").trim());
+      currentId = null;
+      currentLines = [];
+    }
+  };
+
+  for (const line of lines) {
+    const defMatch = line.match(/^\[\^([^\]]+)\]:\s*(.*)/);
+    if (defMatch) {
+      flush();
+      currentId = defMatch[1];
+      currentLines = [defMatch[2]];
+      continue;
+    }
+    if (currentId !== null) {
+      if (line === "" || line.startsWith("[")) {
+        flush();
+        cleanedLines.push(line);
+      } else {
+        currentLines.push(line);
+      }
+      continue;
+    }
+    cleanedLines.push(line);
+  }
+  flush();
+
+  if (defs.size === 0) return content;
+
+  // Replace references with Typst footnote calls
+  let result = cleanedLines.join("\n");
+  result = result.replace(/\[\^([^\]]+)\]/g, (_match, id) => {
+    const text = defs.get(id);
+    if (!text) return _match;
+    // Strip surrounding quotes from term definitions for cleaner footnotes
+    const clean = text.replace(/^"[^"]*"\s*/, "").replace(/\.$/, "");
+    return `TYPST_FOOTNOTE{${clean}}`;
+  });
+
+  return result;
+}
+
 function generateTypst(
   markdown: string,
   metadata: any,
@@ -111,8 +169,6 @@ function generateTypst(
   // Track which zone we're currently inside
   let currentZone: string | null = null;
   let firstH1Skipped = false;
-  const tokens = marked.lexer(markdown);
-  let body = "";
 
   function escapeTypst(text: string): string {
     return text
@@ -123,6 +179,15 @@ function generateTypst(
       .replace(/</g, "\\<")
       .replace(/>/g, "\\>");
   }
+
+  // Pre-process: annotate terms as footnotes, then resolve all footnotes to Typst
+  const { content: annotated, definitions } =
+    annotateTermsForMarkdown(markdown);
+  const withDefs = appendTermFootnotes(annotated, definitions);
+  const preprocessed = resolveFootnotesForTypst(withDefs);
+
+  const tokens = marked.lexer(preprocessed);
+  let body = "";
 
   /**
    * Detect definition list patterns: a paragraph containing only a code span
@@ -323,6 +388,18 @@ function generateTypst(
   }
 
   body = processTokens(tokens);
+
+  // Convert TYPST_FOOTNOTE placeholders to actual Typst footnote calls.
+  // The placeholder survives escapeTypst because it contains no special chars
+  // except braces, which get escaped. Match both escaped and unescaped forms.
+  body = body.replace(
+    /TYPST_FOOTNOTE\\\{([^}]*?)\\\}/g,
+    (_match, text) => `#footnote[${text}]`,
+  );
+  body = body.replace(
+    /TYPST_FOOTNOTE\{([^}]*?)\}/g,
+    (_match, text) => `#footnote[${text}]`,
+  );
 
   // Build the TL;DR callout
   const tldrBlock =

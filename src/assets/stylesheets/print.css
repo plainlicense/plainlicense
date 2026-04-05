@@ -471,6 +471,52 @@
     color: #333;
   }
 
+  /* ── Plain term annotations ───────────────────────────────── */
+  /* Remove dotted underline — hover isn't available in print */
+  abbr.plain-term {
+    text-decoration: none;
+    cursor: default;
+  }
+
+  /* ── Term definition section (TermDefinitions.astro) ──────── */
+  .term-definitions {
+    break-inside: avoid;
+    page-break-inside: avoid;
+    background: #f8f8f8 !important;
+    border: 1pt solid #ccc !important;
+    border-radius: 6pt;
+    padding: 12pt 16pt;
+  }
+
+  .term-definitions h2 {
+    font-size: 12pt;
+    color: #1a1a1a;
+    border-bottom: 0.75pt solid #999;
+    padding-bottom: 4pt;
+    margin-bottom: 8pt;
+  }
+
+  .term-definitions dl {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 4pt 12pt;
+  }
+
+  .term-definitions dt {
+    font-weight: 700;
+    color: #1a1a1a;
+  }
+
+  .term-definitions dt abbr.plain-term {
+    text-decoration: none;
+  }
+
+  .term-definitions dd {
+    margin: 0;
+    color: #333;
+    font-size: 9.5pt;
+  }
+
   /* ── Suppress hover/transition effects ────────────────────── */
   * {
     transition: none !important;
@@ -480,15 +526,6 @@
   a {
     color: #1a1a1a;
     text-decoration: underline;
-  }
-
-  /* ── Highlight strips (mapping viewer) ────────────────────── */
-  .mapping-source,
-  .mapping-target,
-  .mapping-cutout {
-    background: none !important;
-    box-shadow: none !important;
-    border-bottom: none !important;
   }
 
   /* ── Print header — branding at top of first page ─────────── */

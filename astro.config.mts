@@ -1,17 +1,18 @@
 /// <reference types="astro/client" />
 
-import { readdirSync, readFileSync, statSync } from "node:fs";
-import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
 import cloudflare from "@astrojs/cloudflare";
 import mdx from "@astrojs/mdx";
 import preact from "@astrojs/preact";
 import sitemap from "@astrojs/sitemap";
 import starlight from "@astrojs/starlight";
-import { defineConfig, fontProviders, sessionDrivers } from "astro/config";
 import astroCloudflarePagesHeaders from "astro-cloudflare-pages-headers";
 import favicons from "astro-favicons";
+import { defineConfig, fontProviders, sessionDrivers } from "astro/config";
+import { readdirSync, readFileSync, statSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import rehypeExternalLinks from "rehype-external-links";
+import rehypePlainTerms from "./src/plugins/rehype-plain-terms.js";
 import starlightAutoDrafts from "starlight-auto-drafts";
 import starlightHeadingBadges from "starlight-heading-badges";
 import starlightLLMsTxt from "starlight-llms-txt";
@@ -40,6 +41,8 @@ const headers = {
 };
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
+
+const wranglerConfigPath = join(__dirname, "wrangler.json");
 
 type LicenseFamily =
   | "public-domain"
@@ -206,7 +209,7 @@ export default defineConfig({
     experimental: {
       headersAndRedirectsDevModeSupport: true,
     },
-    configPath: "./wrangler.json",
+    configPath: wranglerConfigPath,
     imagesBindingName: "IMAGES",
     sessionKVBindingName: "SESSION",
   }),
@@ -429,6 +432,7 @@ export default defineConfig({
           rel: ["nofollow"],
         },
       ],
+      rehypePlainTerms,
     ],
   },
   output: "static",
