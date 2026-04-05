@@ -1,6 +1,6 @@
 /**
  * Client-side mapping viewer for interactive comparison.
- * Implements hover highlighting and SVG connectors between plain and original sections.
+ * Implements hover/focus dim+highlight interaction between plain and original sections.
  */
 
 type ClauseRef = { id: string; content: string };
@@ -16,22 +16,15 @@ type LicenseMappings = {
   license_id: string;
   mappings: LicenseMapping[];
 };
-export function initMappingViewer(mappingData: LicenseMappings) {
-  console.log("Initializing Mapping Viewer for:", mappingData.license_id);
 
+export function initMappingViewer(mappingData: LicenseMappings) {
   const container =
     (document.querySelector(".license-container") as HTMLElement) ??
     document.body;
 
-  // Use existing SVG if present, or create new one
-  let svg = document.querySelector("svg.mapping-connections") as SVGSVGElement;
-  if (!svg) {
-    svg = createSVGOverlay(container);
-  }
-
   const mappings = mappingData.mappings || [];
 
-  // Track active elements to redraw on resize/scroll
+  // Track active elements for deactivation guards.
   // token identifies which mapping group is currently active, guarding against
   // stale blur-deferred deactivations racing with a newly focused group.
   let activeMapping: {
@@ -67,60 +60,71 @@ export function initMappingViewer(mappingData: LicenseMappings) {
       // Cache the combined array once to avoid repeated allocations during events
       const allMappedEls = [...plainEls, ...originalEls];
 
-      // Clear any previously active mapping group's highlights and SVG connections
+      // Clear any previously active mapping group's highlights
       const clearPreviousActiveMapping = () => {
         if (!activeMapping) return;
-        activeMapping.sources.forEach((el: HTMLElement) => {
-          el.classList.remove("highlight-match", "highlight-active");
+        const origColumn = container.querySelector(
+          ".original-version",
+        ) as HTMLElement | null;
+        if (origColumn) origColumn.classList.remove("mapping-dim");
+        activeMapping.sources.forEach((el) => {
+          el.classList.remove("mapping-source");
         });
-        activeMapping.targets.forEach((el: HTMLElement) => {
-          el.classList.remove("highlight-match", "highlight-active");
+        activeMapping.targets.forEach((el) => {
+          el.classList.remove("mapping-target", "mapping-cutout");
         });
-        clearConnections(svg);
         activeMapping = null;
       };
 
       // Shared helpers for activating/deactivating this mapping
       const activateFromPlain = () => {
         clearPreviousActiveMapping();
-        originalEls.forEach((o: HTMLElement | null) => {
-          if (o) o.classList.add("highlight-match");
+        const origColumn = container.querySelector(
+          ".original-version",
+        ) as HTMLElement | null;
+        if (origColumn) origColumn.classList.add("mapping-dim");
+
+        plainEls.forEach((p) => p.classList.add("mapping-source"));
+        originalEls.forEach((o) => {
+          o.classList.add("mapping-target");
+          if (originalEls.length > 1) o.classList.add("mapping-cutout");
         });
-        plainEls.forEach((p: HTMLElement | null) => {
-          if (p) p.classList.add("highlight-active");
-        });
-        if (plainEls.length === 0 || originalEls.length === 0) return;
+
         activeMapping = {
-          sources: plainEls as HTMLElement[],
-          targets: originalEls as HTMLElement[],
-          token: plainEls as HTMLElement[],
+          sources: plainEls,
+          targets: originalEls,
+          token: plainEls,
         };
-        drawConnections(
-          svg,
-          plainEls as HTMLElement[],
-          originalEls as HTMLElement[],
-        );
+
+        // Smooth-scroll first matching original into view within its scrollable column
+        if (originalEls.length > 0 && window.innerWidth >= 1024) {
+          originalEls[0].scrollIntoView({ behavior: "smooth", block: "nearest" });
+        }
       };
 
       const activateFromOriginal = () => {
         clearPreviousActiveMapping();
-        plainEls.forEach((p: HTMLElement | null) => {
-          if (p) p.classList.add("highlight-match");
+        const origColumn = container.querySelector(
+          ".original-version",
+        ) as HTMLElement | null;
+        if (origColumn) origColumn.classList.add("mapping-dim");
+
+        originalEls.forEach((o) => {
+          o.classList.add("mapping-target");
+          if (originalEls.length > 1) o.classList.add("mapping-cutout");
         });
-        originalEls.forEach((o: HTMLElement | null) => {
-          if (o) o.classList.add("highlight-active");
-        });
-        if (plainEls.length === 0 || originalEls.length === 0) return;
+        plainEls.forEach((p) => p.classList.add("mapping-source"));
+
         activeMapping = {
-          sources: plainEls as HTMLElement[],
-          targets: originalEls as HTMLElement[],
-          token: plainEls as HTMLElement[],
+          sources: plainEls,
+          targets: originalEls,
+          token: plainEls,
         };
-        drawConnections(
-          svg,
-          plainEls as HTMLElement[],
-          originalEls as HTMLElement[],
-        );
+
+        // Scroll the plain source into view for context
+        if (plainEls.length > 0 && window.innerWidth >= 1024) {
+          plainEls[0].scrollIntoView({ behavior: "smooth", block: "nearest" });
+        }
       };
 
       // Removes highlight classes and clears global state, but only if this
@@ -129,11 +133,14 @@ export function initMappingViewer(mappingData: LicenseMappings) {
       // focus handler ran first and set a new activeMapping.
       const deactivate = () => {
         if (activeMapping?.token !== plainEls) return;
-        allMappedEls.forEach((el: HTMLElement | null) => {
-          if (el) el.classList.remove("highlight-match", "highlight-active");
+        const origColumn = container.querySelector(
+          ".original-version",
+        ) as HTMLElement | null;
+        if (origColumn) origColumn.classList.remove("mapping-dim");
+        allMappedEls.forEach((el) => {
+          el.classList.remove("mapping-source", "mapping-target", "mapping-cutout");
         });
         activeMapping = null;
-        clearConnections(svg);
       };
 
       const handleBlur = () => {
@@ -147,9 +154,7 @@ export function initMappingViewer(mappingData: LicenseMappings) {
         });
       };
 
-      plainEls.forEach((plainEl: HTMLElement | null) => {
-        if (!plainEl) return;
-
+      plainEls.forEach((plainEl: HTMLElement) => {
         // Make element focusable for keyboard users
         if (!plainEl.getAttribute("tabindex")) {
           plainEl.setAttribute("tabindex", "0");
@@ -253,18 +258,6 @@ export function initMappingViewer(mappingData: LicenseMappings) {
       });
     }
   });
-
-  // Update SVG on resize or scroll
-  const handleUpdate = () => {
-    if (activeMapping) {
-      drawConnections(svg, activeMapping.sources, activeMapping.targets);
-    } else {
-      clearConnections(svg);
-    }
-  };
-
-  window.addEventListener("resize", handleUpdate);
-  window.addEventListener("scroll", handleUpdate);
 }
 
 function showMobileModal(originalEls: HTMLElement[], trigger?: HTMLElement) {
@@ -273,7 +266,7 @@ function showMobileModal(originalEls: HTMLElement[], trigger?: HTMLElement) {
   if (!modalBody) return;
 
   // Clone content from original elements to preserve formatting
-  modalBody.innerHTML = "";
+  modalBody.textContent = "";
   originalEls.forEach((el) => {
     const clone = el.cloneNode(true) as HTMLElement;
     // Remove IDs to prevent duplicate ID issues
@@ -297,64 +290,5 @@ function showMobileModal(originalEls: HTMLElement[], trigger?: HTMLElement) {
     modal.classList.add("open");
     modal.setAttribute("aria-hidden", "false");
     document.body.style.overflow = "hidden";
-  }
-}
-
-function createSVGOverlay(_container: HTMLElement): SVGSVGElement {
-  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-  svg.classList.add("mapping-connections"); // Added class for testing/reference
-  svg.style.position = "fixed";
-  svg.style.top = "0";
-  svg.style.left = "0";
-  svg.style.width = "100%";
-  svg.style.height = "100%";
-  svg.style.pointerEvents = "none";
-  svg.style.zIndex = "1000";
-  document.body.appendChild(svg);
-  return svg;
-}
-
-function drawConnections(
-  svg: SVGSVGElement,
-  sources: HTMLElement[],
-  targets: HTMLElement[],
-) {
-  clearConnections(svg);
-
-  // Do not draw connections on smaller screens where layout is single column
-  if (window.innerWidth < 1024) return;
-
-  sources.forEach((source) => {
-    targets.forEach((target) => {
-      const srcRect = source.getBoundingClientRect();
-      const tgtRect = target.getBoundingClientRect();
-
-      // Simple case: line from right of source to left of target
-      const x1 = srcRect.right;
-      const y1 = srcRect.top + srcRect.height / 2;
-      const x2 = tgtRect.left;
-      const y2 = tgtRect.top + tgtRect.height / 2;
-
-      const path = document.createElementNS(
-        "http://www.w3.org/2000/svg",
-        "path",
-      );
-      const d = `M ${x1} ${y1} C ${(x1 + x2) / 2} ${y1}, ${(x1 + x2) / 2} ${y2}, ${x2} ${y2}`;
-
-      path.setAttribute("d", d);
-      path.setAttribute("stroke", "var(--sl-color-accent)");
-      path.setAttribute("stroke-width", "2");
-      path.setAttribute("fill", "none");
-      path.setAttribute("opacity", "0.6");
-      path.style.transition = "opacity 0.2s";
-
-      svg.appendChild(path);
-    });
-  });
-}
-
-function clearConnections(svg: SVGSVGElement) {
-  while (svg.firstChild) {
-    svg.removeChild(svg.firstChild);
   }
 }
