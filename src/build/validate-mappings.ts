@@ -1,6 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import matter from "gray-matter";
+import striptags from "striptags";
 import { resolveConceptMapping } from "./concept-resolver";
 import type {
   ConceptMappingFile,
@@ -21,7 +22,7 @@ const PUBLIC_MAPPINGS_DIR = path.resolve("public", "mappings");
  * Strip markdown formatting to produce plain text for matching.
  */
 export function stripMarkdown(md: string): string {
-  return md
+  const withoutMarkdown = md
     .replace(/^#{1,6}\s+/gm, "") // headers
     .replace(/\*\*([^*]+)\*\*/g, "$1") // bold
     .replace(/\*([^*]+)\*/g, "$1") // italic
@@ -32,10 +33,10 @@ export function stripMarkdown(md: string): string {
     .replace(/^\d+\.\s+/gm, "") // ordered lists
     .replace(/`([^`]+)`/g, "$1") // inline code
     .replace(/\^\^([^^]+)\^\^/g, "$1") // caret insert (^^text^^)
-    .replace(/<[^>]+>/g, "") // HTML tags
     .replace(/\\([\\`*_{}[\]()#+\-.!])/g, "$1") // markdown escape sequences
-    .replace(/\n{3,}/g, "\n\n") // collapse newlines
-    .trim();
+    .replace(/\n{3,}/g, "\n\n"); // collapse newlines
+
+  return striptags(withoutMarkdown).trim(); // remove any remaining HTML tags
 }
 
 /**
