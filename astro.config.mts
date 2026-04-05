@@ -241,7 +241,7 @@ export default defineConfig({
         "sans-serif",
       ],
       formats: ["woff2", "woff"],
-      name: "Lexend",
+      name: "Lexend Giga",
       provider: fontProviders.google(),
       styles: ["normal"],
       subsets: ["latin", "latin-ext"],
