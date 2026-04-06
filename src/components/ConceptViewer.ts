@@ -98,6 +98,8 @@ function wrapConceptsInDom(container: HTMLElement, entries: ConceptEntry[]) {
 				if (entry.kind === "filler") {
 					span.dataset.tooltip = FILLER_TOOLTIP;
 					span.setAttribute("aria-label", FILLER_TOOLTIP);
+				} else {
+					span.setAttribute("role", "button");
 				}
 				span.setAttribute("tabindex", "0");
 

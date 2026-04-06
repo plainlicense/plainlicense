@@ -324,6 +324,7 @@ export default function LicenseFinder({ id, licenses }: Props) {
           <button
             type="button"
             class={`lf-mode-btn ${mode === "wizard" ? "lf-mode-btn--active" : ""}`}
+            aria-pressed={mode === "wizard"}
             onClick={() => {
               setMode("wizard");
               handleReset();
@@ -334,6 +335,7 @@ export default function LicenseFinder({ id, licenses }: Props) {
           <button
             type="button"
             class={`lf-mode-btn ${mode === "form" ? "lf-mode-btn--active" : ""}`}
+            aria-pressed={mode === "form"}
             onClick={() => {
               setMode("form");
               handleReset();

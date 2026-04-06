@@ -37,10 +37,10 @@ const spdxIdentifier = data.original?.spdx_id || data.spdx_id;
     <div class="content-wrapper">
       <article class="prose"><slot /></article>
 
-      <aside class="sidebar">
+      <aside class="sidebar" aria-label="License details">
         {
           data.original?.permissions && (
-            <section>
+            <section aria-label="Permissions">
               <h3>Permissions</h3>
               <ul>
                 {data.original.permissions.map((p) => (
@@ -52,7 +52,7 @@ const spdxIdentifier = data.original?.spdx_id || data.spdx_id;
         }
         {
           data.original?.conditions && (
-            <section>
+            <section aria-label="Conditions">
               <h3>Conditions</h3>
               <ul>
                 {data.original.conditions.map((c) => (
@@ -64,7 +64,7 @@ const spdxIdentifier = data.original?.spdx_id || data.spdx_id;
         }
         {
           data.original?.limitations && (
-            <section>
+            <section aria-label="Limitations">
               <h3>Limitations</h3>
               <ul>
                 {data.original.limitations.map((l) => (

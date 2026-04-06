@@ -49,12 +49,14 @@ const turnstileSiteKey =
     </style>
   </head>
   <body>
+    <main id="main-content">
     <div id="turnstile-gate" data-sitekey={turnstileSiteKey}>
       <p>Verifying you are human&hellip;</p>
       <div id="turnstile-widget"></div>
-      <p id="turnstile-error" class="error" style="display:none"></p>
+      <p id="turnstile-error" class="error" style="display:none" role="alert"></p>
     </div>
     <div id="widget-container"></div>
+    </main>
     <script>
       // @ts-expect-error - typescript struggles to infer the virtual module's shape, but we know it has these exports
       import { config, title } from "virtual:astro-loader-sveltia-cms/config";

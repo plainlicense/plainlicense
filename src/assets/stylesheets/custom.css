@@ -197,3 +197,9 @@ abbr.plain-term:focus-visible {
 .term-definitions dd {
   margin: 0;
 }
+
+.term-heading {
+  font-size: var(--sl-text-xl, 1.25rem);
+  font-weight: 700;
+  color: var(--sl-color-white);
+}
