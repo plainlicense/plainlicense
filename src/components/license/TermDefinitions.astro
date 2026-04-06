@@ -11,7 +11,7 @@ interface DefinedTerm {
   term: string;
   hover: string;
   footnote: string;
-  show_definition: boolean;
+  show_definition?: boolean;
 }
 
 interface Props {
@@ -19,7 +19,7 @@ interface Props {
 }
 
 const { terms } = Astro.props;
-const visible = terms.filter((t) => t.show_definition);
+const visible = terms.filter((t) => t.show_definition === undefined || t.show_definition);
 
 if (visible.length === 0) return;
 ---
@@ -29,12 +29,14 @@ if (visible.length === 0) return;
     <summary><h2>Terms We Use</h2></summary>
     <dl>
       {visible.map((t) => (
-        <dt>
-          <abbr title={t.hover} tabindex="0" class="plain-term">
-            {t.term}
-          </abbr>
-        </dt>
-        <dd>{t.footnote}</dd>
+        <>
+          <dt>
+            <abbr title={t.hover} tabindex="0" class="plain-term">
+              {t.term}
+            </abbr>
+          </dt>
+          <dd>{t.footnote}</dd>
+        </>
       ))}
     </dl>
   </details>

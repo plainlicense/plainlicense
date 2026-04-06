@@ -36,6 +36,7 @@ const family = getFamilyData(data.license_family);
 
 const permissions = data.original?.permissions ?? [];
 const conditions = data.original?.conditions ?? [];
+const definedTerms = data.defined_terms ?? [];
 // Filter out warranty/liability from limitations — they are licensor protections (Zone 6),
 // not user restrictions (Zone 5). Only trademark-use and patent-use are true restrictions.
 const PROTECTION_TAGS = new Set(["liability", "warranty"]);
@@ -105,11 +106,7 @@ const compareEntries = (data.compare_to ?? []).flatMap((c) => {
   {conditions.length > 0 && <ZoneConditions conditions={conditions} />}
 
   <!-- Zone 4: How to give credit -->
-  {
-    data.attribution_required && (
-      <ZoneCredit plain_name={data.plain_name} original={data.original} />
-    )
-  }
+  {data.attribution_required && <ZoneCredit plain_name={data.plain_name} />}
 
   <!-- Zone 5: What you cannot do -->
   {
@@ -135,11 +132,7 @@ const compareEntries = (data.compare_to ?? []).flatMap((c) => {
   <ZoneProtections protections={family.protections} />
 
   <!-- Extended term definitions (only for licenses with unique terms) -->
-  {
-    (data.defined_terms ?? []).length > 0 && (
-      <TermDefinitions terms={data.defined_terms} />
-    )
-  }
+  {definedTerms.length > 0 && <TermDefinitions terms={definedTerms} />}
 
   <!-- Zone 7: Legal interpretation -->
   <ZoneInterpretation

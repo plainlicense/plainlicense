@@ -384,7 +384,7 @@ function readabilityLevel(score: number): string {
 
       <CompareTab
         originalHtml={renderLicenseMarkdown(originalBody)}
-        spdxId={data.spdx_id}
+        spdxId={data.original?.spdx_id || data.spdx_id || data.plain_id}
       />
     </div>
 
