@@ -17,6 +17,8 @@ export const ROUTES = {
   FAQ: "/faq/",
   ABOUT: "/about/",
   HELPING: "/helping/",
+  FIND: "/find/",
+  SHAME: "/shame/",
   BLOG_RSS: "/blog/rss.xml",
 } as const;
 

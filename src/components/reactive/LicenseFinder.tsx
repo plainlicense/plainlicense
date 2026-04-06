@@ -380,10 +380,10 @@ export default function LicenseFinder({ id, licenses }: Props) {
         .license-finder {
           margin: 2rem 0;
           padding: 2rem;
-          background: var(--sl-color-gray-6);
-          border: 1px solid var(--sl-color-gray-5);
-          border-radius: 12px;
-          color: var(--sl-color-white);
+          background: var(--pl-surface, #161923);
+          border: 1px solid var(--pl-border, #242836);
+          border-radius: var(--pl-radius-lg, 12px);
+          color: var(--pl-text, #e8eaf0);
         }
 
         /* Mode toggle */
@@ -396,22 +396,24 @@ export default function LicenseFinder({ id, licenses }: Props) {
         .lf-mode-btn {
           padding: 0.4rem 1rem;
           background: transparent;
-          border: 1px solid var(--sl-color-gray-4);
-          color: var(--sl-color-gray-2);
+          border: 1px solid var(--pl-text-faint, #5a5f70);
+          color: var(--pl-text-muted, #8b90a0);
           cursor: pointer;
-          font-size: var(--sl-text-sm);
-          border-radius: 6px;
+          font-size: 0.875rem;
+          border-radius: var(--pl-radius-md, 6px);
+          transition: border-color var(--pl-transition, 0.2s ease), color var(--pl-transition, 0.2s ease);
         }
         .lf-mode-btn--active {
-          background: var(--sl-color-accent);
-          color: var(--sl-color-white);
-          border-color: var(--sl-color-accent);
+          background: var(--pl-accent, #15db95);
+          color: var(--pl-on-accent, #0d0f15);
+          border-color: var(--pl-accent, #15db95);
+          font-weight: 600;
         }
         .lf-mode-btn:hover,
         .lf-mode-btn:focus-visible {
-          border-color: var(--sl-color-accent);
-          outline: 2px solid var(--sl-color-accent);
-          outline-offset: 2px;
+          border-color: var(--pl-accent, #15db95);
+          outline: var(--pl-focus-ring, 2px solid #15db95);
+          outline-offset: var(--pl-focus-offset, 2px);
         }
 
         /* Progress bar */
@@ -419,40 +421,41 @@ export default function LicenseFinder({ id, licenses }: Props) {
           margin-bottom: 1.5rem;
           position: relative;
           height: 4px;
-          background: var(--sl-color-gray-5);
+          background: var(--pl-border, #242836);
           border-radius: 2px;
           overflow: hidden;
         }
         .lf-progress__bar {
           height: 100%;
-          background: var(--sl-color-accent);
+          background: var(--pl-accent, #15db95);
           transition: width 0.3s ease;
         }
         .lf-progress__label {
           display: block;
           text-align: center;
-          font-size: var(--sl-text-xs, 0.75rem);
-          color: var(--sl-color-gray-2);
+          font-size: 0.75rem;
+          color: var(--pl-text-muted, #8b90a0);
           margin-top: 0.5rem;
         }
 
         /* Back button */
         .lf-back-btn {
           background: none;
-          border: 1px solid var(--sl-color-gray-4);
-          color: var(--sl-color-gray-2);
+          border: 1px solid var(--pl-text-faint, #5a5f70);
+          color: var(--pl-text-muted, #8b90a0);
           cursor: pointer;
           margin-bottom: 1rem;
-          font-size: var(--sl-text-sm);
+          font-size: 0.875rem;
           padding: 0.35rem 0.75rem;
-          border-radius: 4px;
+          border-radius: var(--pl-radius-sm, 4px);
+          transition: color var(--pl-transition, 0.2s ease), border-color var(--pl-transition, 0.2s ease);
         }
         .lf-back-btn:hover,
         .lf-back-btn:focus-visible {
-          color: var(--sl-color-white);
-          border-color: var(--sl-color-white);
-          outline: 2px solid var(--sl-color-white);
-          outline-offset: 2px;
+          color: var(--pl-text, #e8eaf0);
+          border-color: var(--pl-text, #e8eaf0);
+          outline: var(--pl-focus-ring, 2px solid #15db95);
+          outline-offset: var(--pl-focus-offset, 2px);
         }
 
         /* Question */
@@ -464,8 +467,8 @@ export default function LicenseFinder({ id, licenses }: Props) {
           margin: 0 0 0.5rem;
         }
         .lf-question__hint {
-          font-size: var(--sl-text-sm);
-          color: var(--sl-color-gray-2);
+          font-size: 0.875rem;
+          color: var(--pl-text-muted, #8b90a0);
           margin: 0 0 1.5rem;
         }
 
@@ -481,24 +484,29 @@ export default function LicenseFinder({ id, licenses }: Props) {
         }
         .lf-option-btn {
           padding: 0.85rem 1.5rem;
-          background: var(--sl-color-accent);
-          color: var(--sl-color-white);
+          background: var(--pl-accent, #15db95);
+          color: var(--pl-on-accent, #0d0f15);
           border: 2px solid transparent;
-          border-radius: 8px;
+          border-radius: var(--pl-radius-md, 8px);
           font-weight: 600;
           cursor: pointer;
-          transition: background 0.2s, border-color 0.2s;
-          font-size: var(--sl-text-body, 1rem);
+          transition: background var(--pl-transition, 0.2s ease), border-color var(--pl-transition, 0.2s ease), transform var(--pl-transition, 0.2s ease), box-shadow var(--pl-transition, 0.2s ease);
+          font-size: 1rem;
         }
-        .lf-option-btn:hover,
+        .lf-option-btn:hover {
+          background: var(--pl-accent-hover, #6af1c2);
+          color: var(--pl-on-accent, #0d0f15);
+          transform: translateY(-2px);
+          box-shadow: 0 4px 16px rgba(var(--pl-accent-rgb, 21, 219, 149), 0.25);
+        }
         .lf-option-btn:focus-visible {
-          background: var(--sl-color-accent-high);
-          outline: 2px solid var(--sl-color-accent);
-          outline-offset: 2px;
+          outline: var(--pl-focus-ring, 2px solid #15db95);
+          outline-offset: var(--pl-focus-offset, 2px);
         }
         .lf-option-btn--selected {
-          border-color: var(--sl-color-white);
-          background: var(--sl-color-accent-high);
+          border-color: var(--pl-on-accent, #0d0f15);
+          background: var(--pl-accent-hover, #6af1c2);
+          color: var(--pl-on-accent, #0d0f15);
         }
 
         /* Secondary actions (I don't care / tell me more) */
@@ -513,25 +521,26 @@ export default function LicenseFinder({ id, licenses }: Props) {
         .lf-explain-btn {
           background: none;
           border: none;
-          color: var(--sl-color-gray-3);
+          color: var(--pl-text-faint, #5a5f70);
           cursor: pointer;
-          font-size: var(--sl-text-sm);
+          font-size: 0.875rem;
           text-decoration: underline;
           text-decoration-style: dotted;
           text-underline-offset: 3px;
           padding: 0.25rem 0.5rem;
+          transition: color var(--pl-transition-fast, 0.15s ease);
         }
         .lf-skip-btn:hover,
         .lf-skip-btn:focus-visible,
         .lf-explain-btn:hover,
         .lf-explain-btn:focus-visible {
-          color: var(--sl-color-white);
-          outline: 2px solid var(--sl-color-accent);
-          outline-offset: 2px;
-          border-radius: 4px;
+          color: var(--pl-text, #e8eaf0);
+          outline: var(--pl-focus-ring, 2px solid #15db95);
+          outline-offset: var(--pl-focus-offset, 2px);
+          border-radius: var(--pl-radius-sm, 4px);
         }
         .lf-skip-btn--selected {
-          color: var(--sl-color-white);
+          color: var(--pl-text, #e8eaf0);
         }
 
         /* Explainer panel */
@@ -539,10 +548,10 @@ export default function LicenseFinder({ id, licenses }: Props) {
           margin: 1rem auto 0;
           max-width: 36rem;
           padding: 1rem 1.25rem;
-          background: var(--sl-color-gray-5);
-          border-radius: 8px;
-          font-size: var(--sl-text-sm);
-          color: var(--sl-color-gray-1);
+          background: var(--pl-border, #242836);
+          border-radius: var(--pl-radius-md, 8px);
+          font-size: 0.875rem;
+          color: var(--pl-text, #e8eaf0);
           line-height: 1.6;
           text-align: left;
         }
@@ -556,7 +565,7 @@ export default function LicenseFinder({ id, licenses }: Props) {
         .lf-form-group {
           text-align: center;
           padding-bottom: 1.5rem;
-          border-bottom: 1px solid var(--sl-color-gray-5);
+          border-bottom: 1px solid var(--pl-border, #242836);
         }
         .lf-form-group:last-of-type {
           border-bottom: none;
@@ -571,19 +580,24 @@ export default function LicenseFinder({ id, licenses }: Props) {
           display: block;
           margin: 0 auto;
           padding: 0.85rem 2rem;
-          background: var(--sl-color-accent);
-          color: var(--sl-color-white);
+          background: var(--pl-accent, #15db95);
+          color: var(--pl-on-accent, #0d0f15);
           border: none;
-          border-radius: 8px;
+          border-radius: var(--pl-radius-md, 8px);
           font-weight: 600;
           cursor: pointer;
-          font-size: var(--sl-text-body, 1rem);
+          font-size: 1rem;
+          transition: background var(--pl-transition, 0.2s ease), transform var(--pl-transition, 0.2s ease), box-shadow var(--pl-transition, 0.2s ease);
         }
-        .lf-submit-btn:hover,
+        .lf-submit-btn:hover {
+          background: var(--pl-accent-hover, #6af1c2);
+          color: var(--pl-on-accent, #0d0f15);
+          transform: translateY(-2px);
+          box-shadow: 0 4px 16px rgba(var(--pl-accent-rgb, 21, 219, 149), 0.25);
+        }
         .lf-submit-btn:focus-visible {
-          background: var(--sl-color-accent-high);
-          outline: 2px solid var(--sl-color-accent);
-          outline-offset: 2px;
+          outline: var(--pl-focus-ring, 2px solid #15db95);
+          outline-offset: var(--pl-focus-offset, 2px);
         }
 
         /* Results */
@@ -592,24 +606,24 @@ export default function LicenseFinder({ id, licenses }: Props) {
         }
         .lf-result {
           padding: 1.25rem 1.5rem;
-          border-radius: 8px;
+          border-radius: var(--pl-radius-md, 8px);
           text-align: left;
           margin-bottom: 0.75rem;
         }
         .lf-result--best {
-          background: rgba(var(--sl-color-accent-rgb, 136, 58, 234), 0.15);
-          border: 1px solid var(--sl-color-accent);
+          background: rgba(var(--pl-accent-rgb, 21, 219, 149), 0.12);
+          border: 1px solid var(--pl-accent, #15db95);
         }
         .lf-result--also {
-          background: var(--sl-color-gray-5);
-          border: 1px solid var(--sl-color-gray-4);
+          background: var(--pl-border, #242836);
+          border: 1px solid var(--pl-text-faint, #5a5f70);
         }
         .lf-result__badge {
           display: inline-block;
-          font-size: var(--sl-text-xs, 0.75rem);
+          font-size: 0.75rem;
           text-transform: uppercase;
           letter-spacing: 0.05em;
-          color: var(--sl-color-accent);
+          color: var(--pl-accent, #15db95);
           margin-bottom: 0.35rem;
           font-weight: 600;
         }
@@ -620,35 +634,39 @@ export default function LicenseFinder({ id, licenses }: Props) {
         }
         .lf-result__pitch {
           margin: 0 0 0.5rem;
-          color: var(--sl-color-gray-2);
-          font-size: var(--sl-text-sm);
+          color: var(--pl-text-muted, #8b90a0);
+          font-size: 0.875rem;
           line-height: 1.5;
         }
         .lf-result__family {
           display: inline-block;
-          font-size: var(--sl-text-xs, 0.75rem);
-          color: var(--sl-color-gray-3);
+          font-size: 0.75rem;
+          color: var(--pl-text-faint, #5a5f70);
           padding: 0.15rem 0.5rem;
-          border: 1px solid var(--sl-color-gray-4);
-          border-radius: 4px;
+          border: 1px solid var(--pl-text-faint, #5a5f70);
+          border-radius: var(--pl-radius-sm, 4px);
           margin-bottom: 0.75rem;
         }
         .lf-result__link {
           display: inline-block;
           margin-left: 0.75rem;
           padding: 0.5rem 1rem;
-          background: var(--sl-color-accent);
-          color: var(--sl-color-white);
+          background: var(--pl-accent, #15db95);
+          color: var(--pl-on-accent, #0d0f15);
           text-decoration: none;
-          border-radius: 6px;
+          border-radius: var(--pl-radius-md, 6px);
           font-weight: 600;
-          font-size: var(--sl-text-sm);
+          font-size: 0.875rem;
+          transition: background var(--pl-transition, 0.2s ease), transform var(--pl-transition, 0.2s ease), box-shadow var(--pl-transition, 0.2s ease);
         }
-        .lf-result__link:hover,
+        .lf-result__link:hover {
+          background: var(--pl-accent-hover, #6af1c2);
+          color: var(--pl-on-accent, #0d0f15);
+          transform: translateY(-1px);
+        }
         .lf-result__link:focus-visible {
-          background: var(--sl-color-accent-high);
-          outline: 2px solid var(--sl-color-accent);
-          outline-offset: 2px;
+          outline: var(--pl-focus-ring, 2px solid #15db95);
+          outline-offset: var(--pl-focus-offset, 2px);
         }
 
         /* Also consider section */
@@ -656,8 +674,8 @@ export default function LicenseFinder({ id, licenses }: Props) {
           margin-top: 1.5rem;
         }
         .lf-also__heading {
-          font-size: var(--sl-text-sm);
-          color: var(--sl-color-gray-3);
+          font-size: 0.875rem;
+          color: var(--pl-text-faint, #5a5f70);
           text-transform: uppercase;
           letter-spacing: 0.05em;
           margin: 0 0 0.75rem;
@@ -668,19 +686,20 @@ export default function LicenseFinder({ id, licenses }: Props) {
         .lf-reset-btn {
           margin-top: 1.5rem;
           background: none;
-          border: 1px solid var(--sl-color-gray-4);
-          color: var(--sl-color-gray-2);
+          border: 1px solid var(--pl-text-faint, #5a5f70);
+          color: var(--pl-text-muted, #8b90a0);
           cursor: pointer;
           padding: 0.5rem 1.25rem;
-          border-radius: 6px;
-          font-size: var(--sl-text-sm);
+          border-radius: var(--pl-radius-md, 6px);
+          font-size: 0.875rem;
+          transition: color var(--pl-transition, 0.2s ease), border-color var(--pl-transition, 0.2s ease);
         }
         .lf-reset-btn:hover,
         .lf-reset-btn:focus-visible {
-          color: var(--sl-color-white);
-          border-color: var(--sl-color-white);
-          outline: 2px solid var(--sl-color-white);
-          outline-offset: 2px;
+          color: var(--pl-text, #e8eaf0);
+          border-color: var(--pl-text, #e8eaf0);
+          outline: var(--pl-focus-ring, 2px solid #15db95);
+          outline-offset: var(--pl-focus-offset, 2px);
         }
 
         /* Utility */

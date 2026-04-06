@@ -1,0 +1,85 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import LicenseFinderWrapper from "../../components/reactive/LicenseFinderWrapper.astro";
+import "../../assets/stylesheets/custom.css";
+
+export const prerender = true;
+---
+
+<BaseLayout
+  title="Find Your License"
+  description="Answer a few questions and we'll recommend the best open source license for your project."
+>
+  <div class="finder-page">
+    <header class="finder-header">
+      <h1>Find the right license</h1>
+      <p class="finder-lead">
+        Not sure which license fits your project? Answer a few quick questions
+        and we'll point you in the right direction.
+      </p>
+    </header>
+
+    <LicenseFinderWrapper id="license-finder" />
+
+    <footer class="finder-footer">
+      <p>
+        Want to browse instead?
+        <a href="/licenses/">See all licenses</a>
+      </p>
+    </footer>
+  </div>
+</BaseLayout>
+
+<style>
+.finder-page {
+  max-width: 52rem;
+  margin: 0 auto;
+  padding: 3rem 1.5rem;
+}
+
+.finder-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.finder-header h1 {
+  font-family: var(--font-heading, "Plus Jakarta Sans", sans-serif);
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  font-weight: 800;
+  margin: 0 0 0.75rem;
+  color: var(--text, #e8eaf0);
+  letter-spacing: -0.02em;
+}
+
+.finder-lead {
+  font-size: 1.1rem;
+  color: var(--text-muted, #8b90a0);
+  margin: 0;
+  line-height: 1.6;
+  max-width: 36rem;
+  margin-inline: auto;
+}
+
+.finder-footer {
+  text-align: center;
+  margin-top: 2.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--bg-border, #242836);
+}
+
+.finder-footer p {
+  color: var(--text-muted, #8b90a0);
+  font-size: 0.95rem;
+}
+
+.finder-footer a {
+  color: var(--emerald, rgb(21, 219, 149));
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.finder-footer a:hover {
+  color: var(--aquamarine, rgb(106, 241, 194));
+  text-decoration: underline;
+}
+</style>

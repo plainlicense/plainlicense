@@ -44,15 +44,39 @@ const limitations = (data.original?.limitations ?? []).filter(
 // Resolve compare_to entries to slugs and names
 const allLicenses = await getPublishedLicenses();
 const spdxLookup = new Map(
-  allLicenses.map(l => [l.data.spdx_id, { slug: getLicenseSlug(l), name: l.data.plain_name, family: l.data.license_family }])
+  allLicenses.flatMap((l) => {
+    const spdxId = l.data.spdx_id;
+    const slug = getLicenseSlug(l);
+    if (!spdxId || !slug) return [];
+
+    return [
+      [
+        spdxId,
+        {
+          slug,
+          name: l.data.plain_name ?? spdxId,
+          family: l.data.license_family,
+        },
+      ],
+    ] as const;
+  }),
 );
-const compareEntries = (data.compare_to ?? []).map(c => ({
-  spdx_id: c.spdx_id,
-  contrast: c.contrast,
-  slug: spdxLookup.get(c.spdx_id)?.slug,
-  name: spdxLookup.get(c.spdx_id)?.name ?? c.spdx_id,
-  family: spdxLookup.get(c.spdx_id)?.family,
-})).filter(c => c.slug);
+const compareEntries = (data.compare_to ?? []).flatMap((c) => {
+  if (!c.spdx_id) return [];
+
+  const match = spdxLookup.get(c.spdx_id);
+  if (!match?.slug) return [];
+
+  return [
+    {
+      spdx_id: c.spdx_id,
+      contrast: c.contrast ?? "",
+      slug: match.slug,
+      name: match.name,
+      family: match.family ?? data.license_family,
+    },
+  ];
+});
 ---
 
 <article
@@ -65,8 +89,8 @@ const compareEntries = (data.compare_to ?? []).map(c => ({
   <ZoneIdentity
     plain_name={data.plain_name}
     license_family={data.license_family}
-    description={data.description}
-    tldr={data.tldr}
+    description={data.description ?? ""}
+    tldr={data.tldr ?? [""]}
     is_dedication={data.is_dedication}
     original={data.original}
     maker_pitch={data.maker_pitch}
@@ -76,31 +100,29 @@ const compareEntries = (data.compare_to ?? []).map(c => ({
   <ZonePermissions permissions={permissions} />
 
   <!-- Zone 3: What you must do -->
-  {conditions.length > 0 && (
-    <ZoneConditions conditions={conditions} />
-  )}
+  {conditions.length > 0 && <ZoneConditions conditions={conditions} />}
 
   <!-- Zone 4: How to give credit -->
-  {data.attribution_required && (
-    <ZoneCredit
-      plain_name={data.plain_name}
-      original={data.original}
-    />
-  )}
+  {
+    data.attribution_required && (
+      <ZoneCredit plain_name={data.plain_name} original={data.original} />
+    )
+  }
 
   <!-- Zone 5: What you cannot do -->
-  {(limitations.length > 0 || (data.commercial_restrictions ?? []).length > 0) && (
-    <ZoneRestrictions
-      limitations={limitations}
-      commercialRestrictions={data.commercial_restrictions ?? []}
-      aboveFold={true}
-    />
-  )}
+  {
+    (limitations.length > 0 ||
+      (data.commercial_restrictions ?? []).length > 0) && (
+      <ZoneRestrictions
+        limitations={limitations}
+        commercialRestrictions={data.commercial_restrictions ?? []}
+        aboveFold={true}
+      />
+    )
+  }
 
   <!-- Compare with similar licenses -->
-  {compareEntries.length > 0 && (
-    <CompareWith entries={compareEntries} />
-  )}
+  {compareEntries.length > 0 && <CompareWith entries={compareEntries} />}
 
   <!-- Below-fold divider -->
   <div class="fold-divider" aria-hidden="true">
@@ -123,36 +145,42 @@ const compareEntries = (data.compare_to ?? []).map(c => ({
 </article>
 
 <style>
-.plain-license {
-  container-type: inline-size;
-}
+  .plain-license {
+    container-type: inline-size;
+  }
 
-.fold-divider {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  margin: 3rem 0 2rem;
-  padding: 0.6rem 0;
-  color: var(--sl-color-gray-3);
-}
+  .fold-divider {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin: 3rem 0 2rem;
+    padding: 0.6rem 0;
+    color: var(--sl-color-gray-3);
+  }
 
-.fold-divider::before,
-.fold-divider::after {
-  content: "";
-  flex: 1;
-  height: 1px;
-  background: linear-gradient(to right, transparent, var(--sl-color-gray-4), var(--sl-color-gray-5), transparent);
-}
+  .fold-divider::before,
+  .fold-divider::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(
+      to right,
+      transparent,
+      var(--sl-color-gray-4),
+      var(--sl-color-gray-5),
+      transparent
+    );
+  }
 
-.fold-label {
-  font-size: var(--sl-text-2xs, 0.6875rem);
-  white-space: nowrap;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  padding: 0.25rem 1rem;
-  background: var(--sl-color-gray-6);
-  border: 1px solid var(--sl-color-gray-5);
-  border-radius: 99px;
-}
+  .fold-label {
+    font-size: var(--sl-text-2xs, 0.6875rem);
+    white-space: nowrap;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 0.25rem 1rem;
+    background: var(--sl-color-gray-6);
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 99px;
+  }
 </style>

@@ -1,0 +1,69 @@
+/*
+ * Design Tokens
+ *
+ * Semantic layer that maps color primitives (colors.css) to functional roles.
+ * Imported by both custom.css (Starlight pages) and BaseLayout.astro
+ * (standalone pages) so every page shares the same interactive vocabulary.
+ */
+
+@import "./colors.css";
+
+:root {
+  /* ── Surfaces ─────────────────────────────────────────────
+   * bg:           page-level background
+   * surface:      cards, panels, elevated elements
+   * surface-alt:  secondary surface for nested/grouped elements
+   * border:       default border color
+   * border-hover: border color on interactive hover
+   */
+  --pl-bg: #0d0f15;
+  --pl-surface: #161923;
+  --pl-surface-alt: #1c1f2b;
+  --pl-border: #242836;
+  --pl-border-hover: #3a3f52;
+
+  /* ── Text ─────────────────────────────────────────────────
+   * text:         primary text
+   * text-muted:   secondary/supporting text
+   * text-faint:   tertiary text, hints, placeholders
+   * on-accent:    text rendered ON an accent-colored background
+   */
+  --pl-text: #e8eaf0;
+  --pl-text-muted: #8b90a0;
+  --pl-text-faint: #5a5f70;
+  --pl-on-accent: #0d0f15;
+
+  /* ── Accent ───────────────────────────────────────────────
+   * accent:       primary accent (emerald)
+   * accent-hover: accent on hover (aquamarine — brighter)
+   * accent-dim:   accent at reduced intensity (castleton green)
+   * accent-ghost: very low-opacity accent for subtle tints
+   */
+  --pl-accent: var(--emerald);
+  --pl-accent-hover: var(--aquamarine);
+  --pl-accent-dim: var(--castleton-green);
+  --pl-accent-ghost: rgba(var(--emerald-rgb), 0.08);
+
+  /* rgb triplets for rgba() usage */
+  --pl-accent-rgb: var(--emerald-rgb);
+  --pl-accent-hover-rgb: var(--aquamarine-rgb);
+
+  /* ── Focus ────────────────────────────────────────────────
+   * Consistent focus ring across all interactive elements
+   */
+  --pl-focus-ring: 2px solid var(--pl-accent);
+  --pl-focus-offset: 2px;
+
+  /* ── Radius ───────────────────────────────────────────────
+   * Consistent border-radius scale
+   */
+  --pl-radius-sm: 4px;
+  --pl-radius-md: 8px;
+  --pl-radius-lg: 12px;
+
+  /* ── Transitions ──────────────────────────────────────────
+   * Shared timing for interactive state changes
+   */
+  --pl-transition-fast: 0.15s ease;
+  --pl-transition: 0.2s ease;
+}

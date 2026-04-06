@@ -5,9 +5,9 @@ plain_id: Plain-Elastic
 spdx_id: Elastic-2.0
 plain_version: 0.1.0
 description: >-
-  The Elastic License 2.0 allows use, copying, and changes but you can't
-  offer the work as a managed service. You must keep notices and may lose
-  patent rights if you sue.
+  The Elastic License 2.0 allows use, copying, and changes but you can't offer
+  the work as a managed service. You must keep notices and may lose patent
+  rights if you sue.
 license_family: source-available
 is_dedication: false
 status: published
@@ -23,11 +23,11 @@ commercial_restrictions:
   - no-managed-service
 compare_to:
   - spdx_id: MPL-2.0
-    contrast: 'Does not restrict commercial use; must share changes to source materials'
+    contrast: Does not restrict commercial use; must share changes to source materials
   - spdx_id: MIT
     contrast: 'Use and share freely, give credit, but no sharing requirement'
 uuid: 00208272-a9cb-41b9-ad99-0bbb4078cb9a
-plain_gunning_fog: 8.71
+plain_gunning_fog: 8.7
 shame_words_count: 0
 original:
   name: Elastic License 2.0

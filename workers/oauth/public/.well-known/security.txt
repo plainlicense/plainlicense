@@ -1,0 +1,15 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+Contact: mailto:adam@plainlicense.org
+Encryption: https://plainlicense.org/.well-known/pgp-key.txt
+Expires: 2028-12-30T00:00:00.000Z
+Preferred-Languages: en
+Policy: https://github.com/plainlicense/plainlicense/blob/main/SECURITY.md
+-----BEGIN PGP SIGNATURE-----
+
+iHUEARYKAB0WIQR9oRDHyod2iqG17mlxKsbgdjZSeAUCadMTvwAKCRBxKsbgdjZS
+eCN2AQCu3lYvkORNVyHFUIv6k+EjDKqZ62Hni+zBWndsObV26wEAx2miPISieRl9
+1U+QgwdeFBFW62rpJHUzlF0wQSxrZQU=
+=8Z9m
+-----END PGP SIGNATURE-----

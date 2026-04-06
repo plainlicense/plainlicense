@@ -4,25 +4,3 @@ import type { Props } from "@astrojs/starlight/props";
 ---
 
 <Default {...Astro.props}><slot /></Default>
-
-<style is:global>
-.site-title::after {
-  content: "BETA";
-  display: inline-block;
-  margin-left: 0.4rem;
-  background-color: var(--sl-color-accent);
-  color: var(--sl-color-gray-6);
-  padding: 0.1rem 0.4rem;
-  border-radius: 4px;
-  font-size: 0.6rem;
-  font-weight: 700;
-  vertical-align: super;
-  pointer-events: none;
-}
-
-@media (max-width: 50rem) {
-  .site-title::after {
-    display: none;
-  }
-}
-</style>

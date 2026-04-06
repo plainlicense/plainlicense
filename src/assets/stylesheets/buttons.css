@@ -1,0 +1,130 @@
+/*
+ * Shared Button Styles
+ *
+ * Reusable across both Starlight doc pages and standalone BaseLayout pages.
+ * All variants use tokens from tokens.css for consistent theming.
+ *
+ * Variants:
+ *   .btn-primary   — solid accent bg, dark text (high emphasis)
+ *   .btn-secondary — bordered, transparent bg (medium emphasis)
+ *   .btn-ghost     — text-only, no border (low emphasis)
+ *   .btn-outline   — accent-bordered, accent text (medium-high emphasis)
+ */
+
+/* ── Base ───────────────────────────────────────────────── */
+.btn-primary,
+.btn-secondary,
+.btn-ghost,
+.btn-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4em;
+  padding: 0.6rem 1.25rem;
+  border-radius: var(--pl-radius-md);
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.4;
+  text-decoration: none;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition:
+    background var(--pl-transition),
+    color var(--pl-transition),
+    border-color var(--pl-transition),
+    transform var(--pl-transition),
+    box-shadow var(--pl-transition);
+}
+
+.btn-primary:focus-visible,
+.btn-secondary:focus-visible,
+.btn-ghost:focus-visible,
+.btn-outline:focus-visible {
+  outline: var(--pl-focus-ring);
+  outline-offset: var(--pl-focus-offset);
+}
+
+/* ── Primary ────────────────────────────────────────────── */
+.btn-primary {
+  background: var(--pl-accent);
+  color: var(--pl-on-accent);
+  border-color: var(--pl-accent);
+}
+
+.btn-primary:hover {
+  background: var(--pl-accent-hover);
+  border-color: var(--pl-accent-hover);
+  color: var(--pl-on-accent);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(var(--pl-accent-rgb), 0.25);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(var(--pl-accent-rgb), 0.15);
+}
+
+/* ── Secondary ──────────────────────────────────────────── */
+.btn-secondary {
+  background: transparent;
+  color: var(--pl-text-muted);
+  border-color: var(--pl-border);
+}
+
+.btn-secondary:hover {
+  border-color: rgba(var(--pl-accent-rgb), 0.5);
+  color: var(--pl-accent);
+  background: var(--pl-accent-ghost);
+  transform: translateY(-2px);
+}
+
+.btn-secondary:active {
+  transform: translateY(0);
+}
+
+/* ── Ghost ──────────────────────────────────────────────── */
+.btn-ghost {
+  background: transparent;
+  color: var(--pl-text-muted);
+  border-color: transparent;
+  padding: 0.5rem 1rem;
+}
+
+.btn-ghost:hover {
+  color: var(--pl-accent);
+  background: var(--pl-accent-ghost);
+}
+
+.btn-ghost:active {
+  background: rgba(var(--pl-accent-rgb), 0.12);
+}
+
+/* ── Outline ────────────────────────────────────────────── */
+.btn-outline {
+  background: transparent;
+  color: var(--pl-accent);
+  border-color: rgba(var(--pl-accent-rgb), 0.35);
+}
+
+.btn-outline:hover {
+  background: var(--pl-accent-ghost);
+  border-color: var(--pl-accent);
+  color: var(--pl-accent);
+  transform: translateY(-1px);
+}
+
+.btn-outline:active {
+  transform: translateY(0);
+}
+
+/* ── Sizes ──────────────────────────────────────────────── */
+.btn-sm {
+  padding: 0.4rem 0.85rem;
+  font-size: 0.85rem;
+}
+
+.btn-lg {
+  padding: 0.75rem 1.75rem;
+  font-size: 1.05rem;
+}
