@@ -20,21 +20,39 @@ attribution_required: true
 credit:
   examples:
     - context: In a source file header
-      code: |-
+      code: >-
         // Copyright (c) 2025 Your Name
-        // You may use this work under the terms of the [Plain MPL](https://plainlicense.org/mpl-2.0/) or the [Mozilla Public License 2.0](https://www.mozilla.org/en-US/MPL/2.0/). 
-        // If you didn't get a copy of the Plain MPL with this work, you can find it at: [plainlicense.org](https://plainlicense.org).
+
+        // You may use this work under the terms of the [Plain
+        MPL](https://plainlicense.org/mpl-2.0/) or the [Mozilla Public License
+        2.0](https://www.mozilla.org/en-US/MPL/2.0/). 
+
+        // If you didn't get a copy of the Plain MPL with this work, you can
+        find it at: [plainlicense.org](https://plainlicense.org).
     - context: In a README or document
-      code: |-
-        You may use this work under the terms of the [Plain MPL](https://plainlicense.org/mpl-2.0/) or the [Mozilla Public License 2.0](https://www.mozilla.org/en-US/MPL/2.0/). 
-        If you didn't get a copy of the Plain MPL with this work, you can find it at: [plainlicense.org](https://plainlicense.org).
+      code: >-
+        You may use this work under the terms of the [Plain
+        MPL](https://plainlicense.org/mpl-2.0/) or the [Mozilla Public License
+        2.0](https://www.mozilla.org/en-US/MPL/2.0/). 
+
+        If you didn't get a copy of the Plain MPL with this work, you can find
+        it at: [plainlicense.org](https://plainlicense.org).
+
         See LICENSE for more details.
     - context: On a website or app
-      code: '© 2026 Your Name — <a href="https://plainlicense.org/mpl-2.0/">Plain MPL</a>'
+      code: >-
+        © 2026 Your Name — <a href="https://plainlicense.org/mpl-2.0/">Plain
+        MPL</a>
   not_required:
-    - Use a specific location for the credit (like a NOTICE file or an "About" page)
+    - >-
+      Use a specific location for the credit (like a NOTICE file or an "About"
+      page)
     - Ask for permission before using the work
-    - Include the full license text everywhere — just include one of the two approved notices. Only use one of the two approved notices, not both. See [How to Provide Notices](#how-to-provide-notices) in the full text for the exact notice templates.
+    - >-
+      Include the full license text everywhere — just include one of the two
+      approved notices. Only use one of the two approved notices, not both. See
+      [How to Provide Notices](#how-to-provide-notices) in the full text for the
+      exact notice templates.
   extra: >-
     The MPL requires you include one of two specific notices with any parts of
     the work you share. See [How to Provide Notices](#how-to-provide-notices) in
@@ -43,18 +61,19 @@ faq:
   - question: Do I have to share my entire project under the MPL?
     answer: >-
       No. The MPL is a "file-level" copyleft license. You only need to share
-      changes to the MPL-licensed materials themselves. Your own new materials can use
-      any license you want.
+      changes to the MPL-licensed materials themselves. Your own new materials
+      can use any license you want.
   - question: Can I use MPL-licensed materials in a proprietary project?
     answer: >-
-      Yes. You can combine MPL-licensed materials with proprietary materials in a larger
-      project. The MPL parts must stay under the MPL, but your own materials can be
-      proprietary.
+      Yes. You can combine MPL-licensed materials with proprietary materials in
+      a larger project. The MPL parts must stay under the MPL, but your own
+      materials can be proprietary.
   - question: Is the MPL compatible with the GPL?
     answer: >-
       Yes. The MPL 2.0 is designed to be compatible with the GPL, LGPL, and
-      AGPL. Materials under the MPL can be combined with GPL-licensed materials in the
-      same project, unless the authors explicitly use the [Same-License Notice](#same-license-notice--optional) to prevent that.
+      AGPL. Materials under the MPL can be combined with GPL-licensed materials
+      in the same project, unless the authors explicitly use the [Same-License
+      Notice](#same-license-notice--optional) to prevent that.
 fair_code: false
 maker_pitch: >-
   People can use your work freely, but must share changes to your source
@@ -66,7 +85,7 @@ compare_to:
   - spdx_id: Elastic-2.0
     contrast: Prevents others from using your work as a commercial service
 uuid: ac0d1786-e005-415d-a0ed-be10bf5cbc65
-plain_gunning_fog: 9.32
+plain_gunning_fog: 9.34
 shame_words_count: 0
 original:
   name: Mozilla Public License 2.0

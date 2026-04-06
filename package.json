@@ -22,8 +22,7 @@
     "@sveltia/cms": "catalog:workers",
     "astro-loader-sveltia-cms": "catalog:workers",
     "astro-og-canvas": "^0.11.0",
-    "starlight-markdown": "^0.1.5",
-    "striptags": "^3.2.0"
+    "starlight-markdown": "^0.1.5"
   },
   "description": "Plain language versions of popular creative licenses",
   "devDependencies": {
@@ -86,6 +85,7 @@
     "starlight-llms-txt": "^0.8.0",
     "starlight-page-actions": "^0.5.0",
     "starlight-tags": "^0.4.0",
+    "striptags": "3.2.0",
     "svgo": "^4.0.1",
     "ts-node": "catalog:workers",
     "tsconfig-paths": "catalog:workers",

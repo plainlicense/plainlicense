@@ -20,6 +20,7 @@ function resolveTemplateVars(
 ): string {
   const vars: Record<string, string> = {
     plain_name: data.plain_name || "",
+    plain_id: data.plain_id || "",
     original_name: data.original?.name || "",
     original_version_name:
       data.original?.version_display || data.original?.name || "",

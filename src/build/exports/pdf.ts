@@ -177,7 +177,11 @@ function generateTypst(
       .replace(/\$/g, "\\$")
       .replace(/@/g, "\\@")
       .replace(/</g, "\\<")
-      .replace(/>/g, "\\>");
+      .replace(/>/g, "\\>")
+      .replace(/\[/g, "\\[")
+      .replace(/\]/g, "\\]")
+      .replace(/\{/g, "\\{")
+      .replace(/\}/g, "\\}");
   }
 
   // Pre-process: annotate terms as footnotes, then resolve all footnotes to Typst
@@ -314,15 +318,14 @@ function generateTypst(
         case "codespan":
           result += `#box(fill: rgb(30, 35, 45), inset: (x: 4pt, y: 2pt), radius: 3pt)[#text(font: "JetBrains Mono", size: 9pt, fill: rgb(200, 210, 225))[${escapeTypst(token.text)}]]`;
           break;
-        case "code":
-          result += `#block(fill: rgb(22, 25, 35), inset: 12pt, radius: 4pt, width: 100%)[\n`;
-          result += `#text(font: "JetBrains Mono", size: 8.5pt, fill: rgb(200, 210, 225))[${escapeTypst(token.text)}]\n`;
-          result += `]\n\n`;
+        case "code": {
+          // Use raw() to avoid // being treated as Typst comments inside content blocks
+          const escaped = token.text.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+          result += `#block(fill: rgb(22, 25, 35), inset: 12pt, radius: 4pt, width: 100%)[#set text(font: "JetBrains Mono", size: 8.5pt, fill: rgb(200, 210, 225)); #raw("${escaped}", block: true)]\n\n`;
           break;
+        }
         case "blockquote":
-          result += `#block(inset: (left: 16pt, y: 8pt), stroke: (left: 3pt + rgb(108, 166, 193)))[\n`;
-          result += `#text(fill: rgb(160, 170, 185), style: "italic")[${processTokens(token.tokens, depth)}]\n`;
-          result += `]\n\n`;
+          result += `#block(inset: (left: 16pt, y: 8pt), stroke: (left: 3pt + rgb(108, 166, 193)))[#text(fill: rgb(160, 170, 185), style: "italic")[${processTokens(token.tokens, depth).trim()}]]\n\n`;
           break;
         case "table": {
           const cols = token.header.length;

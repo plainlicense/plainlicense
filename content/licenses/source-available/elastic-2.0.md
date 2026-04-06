@@ -19,15 +19,22 @@ attribution_required: true
 credit:
   examples:
     - context: In a source file header
-      code: |-
-        // Copyright (c) 2026 Your Name. [Plain Elastic License](https://plainlicense.org/elastic-2.0/).
-        // Keep the copyright, license, and trademark notices with any copy you share.
+      code: >-
+        // Copyright (c) 2026 Your Name. [Plain Elastic
+        License](https://plainlicense.org/elastic-2.0/).
+
+        // Keep the copyright, license, and trademark notices with any copy you
+        share.
     - context: In a README or document
-      code: |-
-        This project is licensed under the [Plain Elastic License](https://plainlicense.org/elastic-2.0/).
+      code: >-
+        This project is licensed under the [Plain Elastic
+        License](https://plainlicense.org/elastic-2.0/).
+
         See LICENSE for details.
     - context: On a website or app
-      code: '© 2026 Your Name — <a href="https://plainlicense.org/elastic-2.0/">Plain Elastic License</a>'
+      code: >-
+        © 2026 Your Name — <a href="https://plainlicense.org/elastic-2.0/">Plain
+        Elastic License</a>
   not_required:
     - Use a specific format or location
     - Ask for permission before using the work
@@ -39,21 +46,27 @@ credit:
 faq:
   - question: Can I use Plain Elastic-licensed materials in my product?
     answer: >-
-      Yes, as long as you don't offer it as a managed service where others
-      use its features directly. You can build products and internal tools
-      with it freely.
+      Yes, as long as you don't offer it as a managed service where others use
+      its features directly. You can build products and internal tools with it
+      freely.
   - question: What counts as a "managed service"?
     answer: >-
-      It means you can't offer the work's features directly to others as a service.
-      You can build a product or service using the work, or use it internally, but it can't be a service
-      where others use the work's features directly.
+      It means you can't offer the work's features directly to others as a
+      service. You can build a product or service using the work, or use it
+      internally, but it can't be a service where others use the work's features
+      directly.
   - question: Is the Plain Elastic License open source?
     answer: >-
-      No. Source-available licenses like the Plain Elastic License are not open source according to the Open Source Initiative. 
-      The definition of open source does not allow for restrictions on *how* you can use the work, like the restriction on offering it as a managed service.
+      No. Source-available licenses like the Plain Elastic License are not open
+      source according to the Open Source Initiative.  The definition of open
+      source does not allow for restrictions on *how* you can use the work, like
+      the restriction on offering it as a managed service.
   - question: Do I have to share my changes if I use this license?
     answer: >-
-      No. The Plain Elastic License does not require you to share your changes. You can keep your changes private if you want. The only requirement is that you keep the copyright, license, and trademark notices with any copy you share.
+      No. The Plain Elastic License does not require you to share your changes.
+      You can keep your changes private if you want. The only requirement is
+      that you keep the copyright, license, and trademark notices with any copy
+      you share.
 fair_code: true
 maker_pitch: 'Use and change freely, but not as a hosted service.'
 commercial_restrictions:
@@ -64,7 +77,7 @@ compare_to:
   - spdx_id: MIT
     contrast: 'Use and share freely, give credit, but no sharing requirement'
 uuid: 00208272-a9cb-41b9-ad99-0bbb4078cb9a
-plain_gunning_fog: 9.02
+plain_gunning_fog: 8.86
 shame_words_count: 0
 original:
   name: Elastic License 2.0
@@ -102,7 +115,10 @@ defined_terms:
   - term: your company
     hover: you and any organization you control or that shares control with you
     footnote: >-
-      "Your company" means you and any organization you are working for, control, or share control with. This only matters if your use of the work is for your company. If you use the work for other purposes, like personal projects, you don't need to worry about this term.
+      "Your company" means you and any organization you are working for,
+      control, or share control with. This only matters if your use of the work
+      is for your company. If you use the work for other purposes, like personal
+      projects, you don't need to worry about this term.
     show_definition: true
 ---
 # Plain Elastic License
