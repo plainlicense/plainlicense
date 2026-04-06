@@ -100,6 +100,12 @@ function wrapConceptsInDom(container: HTMLElement, entries: ConceptEntry[]) {
 					span.setAttribute("aria-label", FILLER_TOOLTIP);
 				} else {
 					span.setAttribute("role", "button");
+					span.addEventListener("keydown", (event) => {
+						if (event.key === "Enter" || event.key === " " || event.key === "Spacebar") {
+							event.preventDefault();
+							span.click();
+						}
+					});
 				}
 				span.setAttribute("tabindex", "0");
 
