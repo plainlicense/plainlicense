@@ -41,7 +41,7 @@
 /* Prose Consistency */
 .sl-markdown-content {
   font-family: var(--sl-font);
-  line-height: 1.6;
+  line-height: var(--pl-line-height, 1.7);
 }
 
 .sl-markdown-content h1,
@@ -51,7 +51,8 @@
 .sl-markdown-content h5,
 .sl-markdown-content h6 {
   font-family: var(--font-heading);
-  color: var(--zaffre);
+  color: var(--pl-accent);
+  line-height: var(--pl-line-height-tight, 1.3);
 }
 
 [data-theme="dark"] .sl-markdown-content h1,
@@ -60,7 +61,7 @@
 [data-theme="dark"] .sl-markdown-content h4,
 [data-theme="dark"] .sl-markdown-content h5,
 [data-theme="dark"] .sl-markdown-content h6 {
-  color: var(--emerald);
+  color: var(--pl-accent);
 }
 
 /* Custom License Page Styles */

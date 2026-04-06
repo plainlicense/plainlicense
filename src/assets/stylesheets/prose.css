@@ -1,0 +1,239 @@
+/*
+ * Shared Prose & Content Page Styles
+ *
+ * Provides consistent styling for all content-heavy pages (About, FAQ,
+ * Contributing, etc.) that use BaseLayout. This replaces the per-layout
+ * duplication of prose styles and gives every content page the same
+ * visual vocabulary as the home/licenses/blog pages.
+ *
+ * Depends on: tokens.css (imported via BaseLayout)
+ */
+
+/* ── Content Page Container ────────────────────────────────
+ * Wide enough to feel spacious, with a readable prose column
+ * centered inside. Matches the 72rem max-width used by the
+ * header/footer and home page sections.
+ */
+.content-page {
+  padding: var(--pl-space-xl) 0 var(--pl-space-2xl);
+}
+
+.content-page .container {
+  max-width: var(--pl-width-content);
+  margin: 0 auto;
+  padding: 0 var(--pl-gutter);
+}
+
+/* ── Page Header ───────────────────────────────────────────
+ * Branded header card with gradient tint, consistent with the
+ * treatment on /licenses, /blog, /find pages.
+ */
+.content-page .page-header {
+  margin-bottom: var(--pl-space-lg);
+  padding: var(--pl-space-lg) var(--pl-space-lg) var(--pl-space-md);
+  border-radius: var(--pl-radius-lg);
+  background:
+    linear-gradient(
+      135deg,
+      rgba(var(--emerald-rgb), 0.06) 0%,
+      transparent 60%
+    ),
+    linear-gradient(
+      225deg,
+      rgba(var(--zaffre-rgb), 0.08) 0%,
+      transparent 50%
+    ),
+    var(--pl-surface);
+  border: 1px solid var(--pl-border);
+}
+
+.content-page .page-header h1 {
+  font-size: var(--pl-text-4xl);
+  font-weight: 800;
+  margin: 0 0 var(--pl-space-sm);
+  color: var(--pl-text);
+  letter-spacing: -0.025em;
+  line-height: var(--pl-line-height-tight);
+}
+
+.content-page .page-header .description {
+  font-size: var(--pl-text-lg);
+  color: var(--pl-text-muted);
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* ── Prose Body ────────────────────────────────────────────
+ * Consistent typography for long-form content.
+ */
+.content-page .prose {
+  line-height: var(--pl-line-height);
+  color: var(--pl-text);
+  max-width: none;
+}
+
+.content-page .prose h2 {
+  font-size: var(--pl-text-2xl);
+  font-weight: 700;
+  margin: var(--pl-space-xl) 0 var(--pl-space-md);
+  color: var(--pl-accent);
+  letter-spacing: -0.015em;
+  line-height: var(--pl-line-height-tight);
+}
+
+.content-page .prose h2:first-child {
+  margin-top: 0;
+}
+
+.content-page .prose h3 {
+  font-size: var(--pl-text-xl);
+  font-weight: 600;
+  margin: var(--pl-space-lg) 0 var(--pl-space-sm);
+  color: var(--pl-text);
+  line-height: var(--pl-line-height-tight);
+}
+
+.content-page .prose h4 {
+  font-size: var(--pl-text-base);
+  font-weight: 700;
+  margin: var(--pl-space-md) 0 var(--pl-space-xs);
+  color: var(--pl-text);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  font-size: var(--pl-text-sm);
+}
+
+.content-page .prose p {
+  margin-bottom: var(--pl-space-md);
+}
+
+.content-page .prose ul,
+.content-page .prose ol {
+  margin-bottom: var(--pl-space-md);
+  padding-left: var(--pl-space-md);
+}
+
+.content-page .prose li {
+  margin-bottom: var(--pl-space-xs);
+  line-height: 1.6;
+}
+
+.content-page .prose li strong {
+  color: var(--pl-text);
+}
+
+/* ── Inline Elements ───────────────────────────────────────── */
+.content-page .prose a {
+  color: var(--pl-accent);
+  text-decoration: underline;
+  text-decoration-color: rgba(var(--pl-accent-rgb), 0.35);
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+  transition:
+    color var(--pl-transition-fast),
+    text-decoration-color var(--pl-transition-fast);
+}
+
+.content-page .prose a:hover {
+  color: var(--pl-accent-hover);
+  text-decoration-color: var(--pl-accent-hover);
+}
+
+.content-page .prose strong {
+  color: var(--pl-text);
+}
+
+.content-page .prose code {
+  background: var(--pl-surface);
+  border: 1px solid var(--pl-border);
+  border-radius: var(--pl-radius-sm);
+  padding: 0.1em 0.35em;
+  font-size: 0.875em;
+  font-family: var(--sl-font-mono, "JetBrains Mono", monospace);
+}
+
+/* ── Block Elements ────────────────────────────────────────── */
+.content-page .prose blockquote {
+  border-left: 3px solid var(--pl-accent);
+  margin-left: 0;
+  padding: var(--pl-space-sm) var(--pl-space-md);
+  color: var(--pl-text-muted);
+  background: var(--pl-accent-ghost);
+  border-radius: 0 var(--pl-radius-md) var(--pl-radius-md) 0;
+}
+
+.content-page .prose blockquote p:last-child {
+  margin-bottom: 0;
+}
+
+.content-page .prose table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: var(--pl-space-md);
+  font-size: var(--pl-text-sm);
+}
+
+.content-page .prose th,
+.content-page .prose td {
+  padding: var(--pl-space-sm) var(--pl-space-sm);
+  border: 1px solid var(--pl-border);
+  text-align: left;
+}
+
+.content-page .prose th {
+  background: var(--pl-surface);
+  font-weight: 600;
+  color: var(--pl-accent);
+  font-size: var(--pl-text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.content-page .prose hr {
+  border: none;
+  border-top: 1px solid var(--pl-border);
+  margin: var(--pl-space-xl) 0;
+}
+
+/* ── Content Cards ─────────────────────────────────────────
+ * Optional .content-card class for visually grouping sections
+ * within prose (e.g., FAQ answers, feature sections).
+ */
+.content-card {
+  background: var(--pl-surface);
+  border: 1px solid var(--pl-border);
+  border-radius: var(--pl-radius-lg);
+  padding: var(--pl-space-md);
+  transition: border-color var(--pl-transition);
+}
+
+.content-card:hover {
+  border-color: var(--pl-border-hover);
+}
+
+/* ── Image Treatment ──────────────────────────────────────── */
+.content-page .prose img {
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--pl-radius-lg);
+  border: 1px solid var(--pl-border);
+}
+
+/* ── Responsive ───────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .content-page {
+    padding: var(--pl-space-lg) 0 var(--pl-space-xl);
+  }
+
+  .content-page .page-header {
+    padding: var(--pl-space-md) var(--pl-space-md) var(--pl-space-sm);
+  }
+
+  .content-page .page-header h1 {
+    font-size: var(--pl-text-3xl);
+  }
+
+  .content-page .prose h2 {
+    font-size: var(--pl-text-xl);
+  }
+}

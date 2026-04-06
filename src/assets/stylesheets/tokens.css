@@ -66,4 +66,43 @@
    */
   --pl-transition-fast: 0.15s ease;
   --pl-transition: 0.2s ease;
+
+  /* ── Layout ───────────────────────────────────────────────
+   * Consistent container widths across all page types
+   */
+  --pl-width-page: 72rem;
+  --pl-width-content: 52rem;
+  --pl-width-narrow: 42rem;
+  --pl-gutter: 1.5rem;
+
+  /* ── Spacing Scale ────────────────────────────────────────
+   * Consistent vertical rhythm
+   */
+  --pl-space-xs: 0.5rem;
+  --pl-space-sm: 0.75rem;
+  --pl-space-md: 1.5rem;
+  --pl-space-lg: 2.5rem;
+  --pl-space-xl: 4rem;
+  --pl-space-2xl: 6rem;
+
+  /* ── Typography ───────────────────────────────────────────
+   * Shared font sizing and line height
+   */
+  --pl-text-xs: 0.8rem;
+  --pl-text-sm: 0.875rem;
+  --pl-text-base: 1rem;
+  --pl-text-lg: 1.1rem;
+  --pl-text-xl: 1.25rem;
+  --pl-text-2xl: 1.5rem;
+  --pl-text-3xl: 2rem;
+  --pl-text-4xl: 2.5rem;
+  --pl-line-height: 1.7;
+  --pl-line-height-tight: 1.3;
+
+  /* ── Shadows ──────────────────────────────────────────────
+   * Consistent elevation
+   */
+  --pl-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.2);
+  --pl-shadow-md: 0 4px 16px rgba(0, 0, 0, 0.25);
+  --pl-shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.35);
 }

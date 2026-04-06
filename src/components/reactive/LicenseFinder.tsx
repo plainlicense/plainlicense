@@ -170,19 +170,34 @@ function ResultCard({
   rank: "best" | "also";
   contrastText?: string;
 }) {
+  const familyLabels: Record<string, string> = {
+    permissive: "Permissive",
+    copyleft: "Copyleft",
+    "public-domain": "Public Domain",
+    "source-available": "Source Available",
+    proprietary: "Proprietary",
+  };
+
   return (
     <div
-      class={`lf-result ${rank === "best" ? "lf-result--best" : "lf-result--also"}`}
+      class={`lf-result cat-${license.license_family} ${rank === "best" ? "lf-result--best" : "lf-result--also"}`}
     >
-      {rank === "best" && <span class="lf-result__badge">Best match</span>}
+      <div class="lf-result__top">
+        <span class="lf-result__spdx">{license.spdx_id}</span>
+        {rank === "best" && <span class="lf-result__badge">Best match</span>}
+      </div>
       <h4 class="lf-result__name">{license.plain_name}</h4>
       <p class="lf-result__pitch">
         {rank === "also" && contrastText ? contrastText : license.maker_pitch}
       </p>
-      <span class="lf-result__family">{license.license_family}</span>
-      <a href={license.url} class="lf-result__link">
-        Read this license
-      </a>
+      <div class="lf-result__footer">
+        <span class="lf-result__family">
+          {familyLabels[license.license_family] ?? license.license_family}
+        </span>
+        <a href={license.url} class="lf-result__link">
+          Read this license &rarr;
+        </a>
+      </div>
     </div>
   );
 }
@@ -396,14 +411,16 @@ export default function LicenseFinder({ id, licenses }: Props) {
           justify-content: center;
         }
         .lf-mode-btn {
-          padding: 0.4rem 1rem;
+          padding: 0.5rem 1.15rem;
           background: transparent;
-          border: 1px solid var(--pl-text-faint, #5a5f70);
+          border: 1px solid var(--pl-border, #242836);
           color: var(--pl-text-muted, #8b90a0);
           cursor: pointer;
-          font-size: 0.875rem;
-          border-radius: var(--pl-radius-md, 6px);
-          transition: border-color var(--pl-transition, 0.2s ease), color var(--pl-transition, 0.2s ease);
+          font-size: 0.9rem;
+          font-weight: 500;
+          border-radius: var(--pl-radius-md, 8px);
+          font-family: inherit;
+          transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
         }
         .lf-mode-btn--active {
           background: var(--pl-accent, #15db95);
@@ -411,9 +428,12 @@ export default function LicenseFinder({ id, licenses }: Props) {
           border-color: var(--pl-accent, #15db95);
           font-weight: 600;
         }
-        .lf-mode-btn:hover,
+        .lf-mode-btn:not(.lf-mode-btn--active):hover {
+          border-color: rgba(var(--pl-accent-rgb, 21, 219, 149), 0.5);
+          color: var(--pl-accent, #15db95);
+          background: rgba(var(--pl-accent-rgb, 21, 219, 149), 0.08);
+        }
         .lf-mode-btn:focus-visible {
-          border-color: var(--pl-accent, #15db95);
           outline: var(--pl-focus-ring, 2px solid #15db95);
           outline-offset: var(--pl-focus-offset, 2px);
         }
@@ -440,22 +460,24 @@ export default function LicenseFinder({ id, licenses }: Props) {
           margin-top: 0.5rem;
         }
 
-        /* Back button */
+        /* Back button — ghost style */
         .lf-back-btn {
-          background: none;
-          border: 1px solid var(--pl-text-faint, #5a5f70);
+          background: transparent;
+          border: none;
           color: var(--pl-text-muted, #8b90a0);
           cursor: pointer;
           margin-bottom: 1rem;
           font-size: 0.875rem;
-          padding: 0.35rem 0.75rem;
-          border-radius: var(--pl-radius-sm, 4px);
-          transition: color var(--pl-transition, 0.2s ease), border-color var(--pl-transition, 0.2s ease);
+          font-family: inherit;
+          padding: 0.4rem 0.75rem;
+          border-radius: var(--pl-radius-md, 8px);
+          transition: color 0.15s ease, background 0.15s ease;
         }
-        .lf-back-btn:hover,
+        .lf-back-btn:hover {
+          color: var(--pl-accent, #15db95);
+          background: rgba(var(--pl-accent-rgb, 21, 219, 149), 0.08);
+        }
         .lf-back-btn:focus-visible {
-          color: var(--pl-text, #e8eaf0);
-          border-color: var(--pl-text, #e8eaf0);
           outline: var(--pl-focus-ring, 2px solid #15db95);
           outline-offset: var(--pl-focus-offset, 2px);
         }
@@ -606,65 +628,119 @@ export default function LicenseFinder({ id, licenses }: Props) {
         .lf-results {
           text-align: center;
         }
+
+        /* Result card — matches license card pattern from /licenses/ */
         .lf-result {
-          padding: 1.25rem 1.5rem;
-          border-radius: var(--pl-radius-md, 8px);
+          position: relative;
+          display: flex;
+          flex-direction: column;
+          padding: 1.5rem;
+          padding-left: 1.75rem;
+          background: var(--pl-surface, #161923);
+          border: 1px solid var(--pl-border, #242836);
+          border-left: 3px solid var(--cat-color, var(--pl-accent, #15db95));
+          border-radius: 10px;
           text-align: left;
-          margin-bottom: 0.75rem;
+          margin-bottom: 1rem;
+          transition:
+            border-color 0.2s ease,
+            transform 0.2s ease,
+            box-shadow 0.2s ease,
+            background 0.2s ease;
+        }
+        .lf-result:hover {
+          border-color: rgba(var(--cat-color-rgb, var(--pl-accent-rgb, 21, 219, 149)), 0.3);
+          border-left-width: 4px;
+          padding-left: calc(1.75rem - 1px);
+          transform: translateY(-2px);
+          box-shadow:
+            0 6px 24px rgba(var(--cat-color-rgb, var(--pl-accent-rgb, 21, 219, 149)), 0.12),
+            0 0 0 1px rgba(var(--cat-color-rgb, var(--pl-accent-rgb, 21, 219, 149)), 0.08);
+          background:
+            radial-gradient(ellipse at top left, rgba(var(--cat-color-rgb, var(--pl-accent-rgb, 21, 219, 149)), 0.04), transparent 70%),
+            var(--pl-surface, #161923);
         }
         .lf-result--best {
-          background: rgba(var(--pl-accent-rgb, 21, 219, 149), 0.12);
-          border: 1px solid var(--pl-accent, #15db95);
+          border-left-width: 4px;
+          padding-left: calc(1.75rem - 1px);
         }
-        .lf-result--also {
-          background: var(--pl-border, #242836);
-          border: 1px solid var(--pl-text-faint, #5a5f70);
+
+        .lf-result__top {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          margin-bottom: 0.75rem;
+        }
+        .lf-result__spdx {
+          font-family: var(--sl-font-mono, "JetBrains Mono", monospace);
+          font-size: 0.75rem;
+          font-weight: 600;
+          background: rgba(var(--cat-color-rgb, var(--pl-accent-rgb, 21, 219, 149)), 0.12);
+          color: var(--cat-color, var(--pl-accent, #15db95));
+          border: 1px solid rgba(var(--cat-color-rgb, var(--pl-accent-rgb, 21, 219, 149)), 0.3);
+          border-radius: 4px;
+          padding: 0.15em 0.5em;
         }
         .lf-result__badge {
-          display: inline-block;
-          font-size: 0.75rem;
+          font-size: 0.7rem;
+          font-weight: 600;
           text-transform: uppercase;
           letter-spacing: 0.05em;
           color: var(--pl-accent, #15db95);
-          margin-bottom: 0.35rem;
-          font-weight: 600;
+          background: rgba(var(--pl-accent-rgb, 21, 219, 149), 0.1);
+          border: 1px solid rgba(var(--pl-accent-rgb, 21, 219, 149), 0.3);
+          border-radius: 4px;
+          padding: 0.15em 0.5em;
         }
         .lf-result__name {
-          font-size: 1.35rem;
+          font-size: 1.1rem;
           font-weight: 700;
-          margin: 0 0 0.35rem;
+          margin: 0 0 0.5rem;
+          color: var(--cat-color, var(--pl-accent, #15db95));
         }
         .lf-result__pitch {
-          margin: 0 0 0.5rem;
+          margin: 0 0 1rem;
           color: var(--pl-text-muted, #8b90a0);
-          font-size: 0.875rem;
+          font-size: 0.9rem;
           line-height: 1.5;
+        }
+        .lf-result__footer {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+          margin-top: auto;
         }
         .lf-result__family {
           display: inline-block;
           font-size: 0.75rem;
-          color: var(--pl-text-faint, #5a5f70);
-          padding: 0.15rem 0.5rem;
-          border: 1px solid var(--pl-text-faint, #5a5f70);
-          border-radius: var(--pl-radius-sm, 4px);
-          margin-bottom: 0.75rem;
+          font-weight: 600;
+          text-transform: uppercase;
+          letter-spacing: 0.04em;
+          color: var(--cat-color, var(--pl-accent, #15db95));
+          background: rgba(var(--cat-color-rgb, var(--pl-accent-rgb, 21, 219, 149)), 0.1);
+          border: 1px solid rgba(var(--cat-color-rgb, var(--pl-accent-rgb, 21, 219, 149)), 0.25);
+          border-radius: 6px;
+          padding: 0.25em 0.65em;
         }
         .lf-result__link {
-          display: inline-block;
-          margin-left: 0.75rem;
-          padding: 0.5rem 1rem;
-          background: var(--pl-accent, #15db95);
-          color: var(--pl-on-accent, #0d0f15);
+          display: inline-flex;
+          align-items: center;
+          gap: 0.3em;
+          margin-left: auto;
+          padding: 0.45rem 1rem;
+          background: transparent;
+          color: var(--cat-color, var(--pl-accent, #15db95));
+          border: 1px solid rgba(var(--cat-color-rgb, var(--pl-accent-rgb, 21, 219, 149)), 0.35);
           text-decoration: none;
-          border-radius: var(--pl-radius-md, 6px);
+          border-radius: var(--pl-radius-md, 8px);
           font-weight: 600;
           font-size: 0.875rem;
-          transition: background var(--pl-transition, 0.2s ease), transform var(--pl-transition, 0.2s ease), box-shadow var(--pl-transition, 0.2s ease);
+          transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
         }
         .lf-result__link:hover {
-          background: var(--pl-accent-hover, #6af1c2);
-          color: var(--pl-on-accent, #0d0f15);
-          transform: translateY(-1px);
+          background: rgba(var(--cat-color-rgb, var(--pl-accent-rgb, 21, 219, 149)), 0.08);
+          border-color: var(--cat-color, var(--pl-accent, #15db95));
+          color: var(--cat-color, var(--pl-accent, #15db95));
         }
         .lf-result__link:focus-visible {
           outline: var(--pl-focus-ring, 2px solid #15db95);
@@ -676,30 +752,36 @@ export default function LicenseFinder({ id, licenses }: Props) {
           margin-top: 1.5rem;
         }
         .lf-also__heading {
-          font-size: 0.875rem;
+          font-size: 0.8rem;
           color: var(--pl-text-faint, #5a5f70);
           text-transform: uppercase;
-          letter-spacing: 0.05em;
+          letter-spacing: 0.06em;
           margin: 0 0 0.75rem;
           text-align: left;
+          font-weight: 600;
         }
 
-        /* Reset button */
+        /* Reset button — matches btn-secondary pattern */
         .lf-reset-btn {
           margin-top: 1.5rem;
-          background: none;
-          border: 1px solid var(--pl-text-faint, #5a5f70);
+          background: transparent;
+          border: 1px solid var(--pl-border, #242836);
           color: var(--pl-text-muted, #8b90a0);
           cursor: pointer;
-          padding: 0.5rem 1.25rem;
-          border-radius: var(--pl-radius-md, 6px);
-          font-size: 0.875rem;
-          transition: color var(--pl-transition, 0.2s ease), border-color var(--pl-transition, 0.2s ease);
+          padding: 0.55rem 1.25rem;
+          border-radius: var(--pl-radius-md, 8px);
+          font-size: 0.9rem;
+          font-weight: 500;
+          font-family: inherit;
+          transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
         }
-        .lf-reset-btn:hover,
+        .lf-reset-btn:hover {
+          border-color: rgba(var(--pl-accent-rgb, 21, 219, 149), 0.5);
+          color: var(--pl-accent, #15db95);
+          background: rgba(var(--pl-accent-rgb, 21, 219, 149), 0.08);
+          transform: translateY(-2px);
+        }
         .lf-reset-btn:focus-visible {
-          color: var(--pl-text, #e8eaf0);
-          border-color: var(--pl-text, #e8eaf0);
           outline: var(--pl-focus-ring, 2px solid #15db95);
           outline-offset: var(--pl-focus-offset, 2px);
         }
