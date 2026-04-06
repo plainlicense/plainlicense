@@ -9,7 +9,9 @@ import Default from "@astrojs/starlight/components/Sidebar.astro";
       id="sidebar-search"
       placeholder="Filter licenses..."
       aria-label="Filter licenses"
+      aria-controls="sidebar-filter-status"
     />
+    <div id="sidebar-filter-status" class="sr-only" aria-live="polite" aria-atomic="true"></div>
   </div>
   <Default {...Astro.props}>
     <slot />
@@ -20,19 +22,36 @@ import Default from "@astrojs/starlight/components/Sidebar.astro";
 const searchInput = document.getElementById(
   "sidebar-search",
 ) as HTMLInputElement;
+const statusEl = document.getElementById("sidebar-filter-status");
 if (searchInput) {
+  let debounceTimer: ReturnType<typeof setTimeout>;
   searchInput.addEventListener("input", (e) => {
     const query = (e.target as HTMLInputElement).value.toLowerCase();
     const sidebarItems = document.querySelectorAll("nav.sidebar-content li");
+    let visibleCount = 0;
 
     sidebarItems.forEach((item) => {
-      const text = item.textContent?.toLowerCase() || "";
+      const el = item as HTMLElement;
+      const text = el.textContent?.toLowerCase() || "";
       if (text.includes(query)) {
-        (item as HTMLElement).style.display = "";
+        el.style.display = "";
+        el.removeAttribute("aria-hidden");
+        visibleCount++;
       } else {
-        (item as HTMLElement).style.display = "none";
+        el.style.display = "none";
+        el.setAttribute("aria-hidden", "true");
       }
     });
+
+    // Announce filter results to screen readers (debounced)
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => {
+      if (statusEl) {
+        statusEl.textContent = query
+          ? `${visibleCount} license${visibleCount !== 1 ? "s" : ""} found`
+          : "";
+      }
+    }, 300);
   });
 }
 </script>

@@ -25,6 +25,13 @@ function fogClass(score: number): string {
   return "level-hard";
 }
 
+/** Return an icon indicator for a readability level (not color-dependent). */
+function fogIcon(score: number): string {
+  if (score <= 8) return "✓";
+  if (score <= 12) return "⚠";
+  return "✗";
+}
+
 interface LicenseRow {
   name: string;
   /** Canonical path segment as returned by getLicenseSlug(), e.g. permissive/mit */
@@ -79,12 +86,12 @@ const rows: LicenseRow[] = licenses
             </td>
             <td class={`num-col ${row.originalFog !== undefined ? fogClass(row.originalFog) : ""}`}>
               {row.originalFog !== undefined
-                ? `${row.originalFog} (${fogLabel(row.originalFog)})`
+                ? `${fogIcon(row.originalFog)} ${row.originalFog} (${fogLabel(row.originalFog)})`
                 : "—"}
             </td>
             <td class={`num-col ${row.plainFog !== undefined ? fogClass(row.plainFog) : ""}`}>
               {row.plainFog !== undefined
-                ? `${row.plainFog} (${fogLabel(row.plainFog)})`
+                ? `${fogIcon(row.plainFog)} ${row.plainFog} (${fogLabel(row.plainFog)})`
                 : "—"}
             </td>
             <td class={`num-col ${row.improvement !== undefined && row.improvement > 0 ? "improvement-positive" : ""}`}>
