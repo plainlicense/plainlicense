@@ -52,6 +52,7 @@
     "types": [
       "css-modules",
       "dom-navigation",
+      "hast",
       "resize-observer-browser",
       "svgo",
       "node",

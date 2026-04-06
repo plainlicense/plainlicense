@@ -5,6 +5,7 @@ import { marked } from "marked";
 import { licenseUrl } from "../../utils/constants";
 import type { ExportContext } from "./index.ts";
 import {
+  buildPlaintextTermSection,
   convertDefinitionLists,
   convertFootnotesToEndnotes,
   extractSemanticBlocks,
@@ -237,6 +238,9 @@ export async function generatePlaintext(ctx: ExportContext) {
       .join("\n\n");
     fullContent += notesHeader + notesBody;
   }
+
+  // Append "Terms We Use" section for plain language term definitions
+  fullContent += buildPlaintextTermSection(body);
 
   fullContent += "\n";
 

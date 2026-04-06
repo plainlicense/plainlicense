@@ -1,0 +1,59 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Concept Mapping File",
+  "description": "Maps concepts from original license text to plain language equivalents",
+  "type": "object",
+  "required": ["license_id", "version", "concepts"],
+  "properties": {
+    "license_id": {
+      "type": "string",
+      "description": "SPDX identifier of the license"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
+      "description": "Semantic version of this mapping"
+    },
+    "last_updated": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "generation_method": {
+      "type": "string",
+      "enum": ["ai-generated", "manual"]
+    },
+    "human_reviewed": {
+      "type": "boolean"
+    },
+    "concepts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "original"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z0-9-]+$",
+            "description": "Unique identifier for this concept"
+          },
+          "original": {
+            "type": "string",
+            "description": "Exact text from the original license"
+          },
+          "plain": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Corresponding plain language text(s)"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["filler"],
+            "description": "Set to 'filler' for legal boilerplate with no plain equivalent"
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": true
+}

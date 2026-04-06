@@ -15,9 +15,3 @@
   --pl-ecru: var(--ecru);
   --pl-night: rgb(6, 12, 14);
 }
-
-[id^="plain-"],
-[id^="original-"] {
-  cursor: help;
-  padding: 2px 4px;
-}

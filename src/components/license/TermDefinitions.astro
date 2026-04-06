@@ -1,0 +1,41 @@
+---
+/**
+ * TermDefinitions: Renders a visible "Terms We Use" section for licenses
+ * that define extended terms beyond the global vocabulary.
+ *
+ * Only shown when the license has `defined_terms` with `show_definition: true`.
+ * Each term also gets the <abbr> hover treatment via its class name.
+ */
+
+interface DefinedTerm {
+  term: string;
+  hover: string;
+  footnote: string;
+  show_definition: boolean;
+}
+
+interface Props {
+  terms: DefinedTerm[];
+}
+
+const { terms } = Astro.props;
+const visible = terms.filter((t) => t.show_definition);
+
+if (visible.length === 0) return;
+---
+
+<section class="term-definitions" aria-label="Terms used in this license">
+  <details open>
+    <summary><h2>Terms We Use</h2></summary>
+    <dl>
+      {visible.map((t) => (
+        <dt>
+          <abbr title={t.hover} tabindex="0" class="plain-term">
+            {t.term}
+          </abbr>
+        </dt>
+        <dd>{t.footnote}</dd>
+      ))}
+    </dl>
+  </details>
+</section>

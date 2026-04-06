@@ -1,0 +1,299 @@
+/* ──────────────────────────────────────────────
+   Compare Tab — concept mapping styles
+   Applied dynamically by ConceptViewer.ts
+   ────────────────────────────────────────────── */
+
+/* ── Column badges (scoped page styles don't reach into this component) ── */
+
+.compare-layout .column-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.85rem;
+  border-radius: 99px;
+  font-size: var(--sl-text-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 1rem;
+}
+
+.compare-layout .column-badge-icon {
+  width: 0.85rem;
+  height: 0.85rem;
+  flex-shrink: 0;
+}
+
+.compare-layout .column-badge--plain {
+  background: rgba(var(--cat-color-rgb, 21, 219, 149), 0.12);
+  color: var(--cat-color, var(--sl-color-accent));
+  border: 1px solid rgba(var(--cat-color-rgb, 21, 219, 149), 0.25);
+}
+
+.compare-layout .column-badge--original {
+  background: rgba(var(--sl-color-gray-3-rgb, 155, 155, 155), 0.1);
+  color: var(--sl-color-gray-2);
+  border: 1px solid var(--sl-color-gray-5);
+}
+
+/* ── Layout ── */
+
+.compare-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+}
+
+@media (min-width: 1024px) {
+  .compare-layout {
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+  }
+}
+
+.compare-original {
+  line-height: 1.8;
+  font-size: var(--sl-text-base);
+  color: var(--sl-color-gray-1);
+}
+
+.compare-teleprompter {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .compare-teleprompter {
+    display: block;
+    position: sticky;
+    top: 4rem;
+    max-height: calc(100vh - 12rem);
+    overflow-y: auto;
+    align-self: start;
+  }
+}
+
+/* ── Concept spans ── */
+
+.concept-span {
+  border-bottom: 2px solid rgba(var(--cat-color-rgb, var(--emerald-rgb)), 0.5);
+  cursor: pointer;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+  border-radius: 2px;
+}
+
+.concept-span:hover,
+.concept-span:focus-visible {
+  border-bottom-width: 3px;
+  border-bottom-color: rgba(var(--cat-color-rgb, var(--emerald-rgb)), 0.85);
+  background-color: rgba(var(--cat-color-rgb, var(--emerald-rgb)), 0.08);
+  outline: none;
+}
+
+/* ── Active concept emphasis (subtle — no dimming) ── */
+
+.concept-span.concept-active {
+  border-bottom-width: 3px;
+  border-bottom-color: var(--cat-color, var(--sl-color-accent));
+  background-color: rgba(var(--cat-color-rgb, var(--emerald-rgb)), 0.14);
+}
+
+.concept-span.concept-child-active {
+  border-bottom-width: 3px;
+  border-bottom-color: rgba(var(--cat-color-rgb, var(--emerald-rgb)), 0.7);
+  background-color: rgba(var(--cat-color-rgb, var(--emerald-rgb)), 0.08);
+}
+
+/* ── Filler (overrides concept styling) ── */
+
+.concept-filler {
+  color: var(--sl-color-gray-4);
+  border-bottom: 2px dashed rgba(200, 60, 60, 0.4);
+  cursor: help;
+  position: relative;
+}
+
+.concept-filler:hover,
+.concept-filler:focus-visible {
+  color: var(--sl-color-gray-3);
+  border-bottom-color: rgba(200, 60, 60, 0.6);
+  outline: none;
+}
+
+/* Filler tooltip via CSS — positioned to the right of the hovered element */
+.concept-filler:hover::after,
+.concept-filler:focus-visible::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  top: 50%;
+  left: calc(100% + 8px);
+  transform: translateY(-50%);
+  white-space: nowrap;
+  padding: 0.35rem 0.65rem;
+  background: var(--sl-color-bg, #0a0c13);
+  border: 1px solid var(--sl-color-gray-5);
+  border-radius: 6px;
+  font-size: var(--sl-text-xs);
+  color: var(--sl-color-gray-2);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* Tooltip arrow */
+.concept-filler:hover::before,
+.concept-filler:focus-visible::before {
+  content: "";
+  position: absolute;
+  bottom: calc(100% + 2px);
+  left: 50%;
+  transform: translateX(-50%);
+  border: 4px solid transparent;
+  border-top-color: var(--sl-color-gray-5);
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* ── Teleprompter ── */
+
+.teleprompter-content {
+  padding: 1.5rem;
+  background: var(--sl-color-gray-7, #0d0f15);
+  border: 1px solid var(--sl-color-gray-5);
+  border-radius: 12px;
+  min-height: 6rem;
+}
+
+.teleprompter-instruction {
+  color: var(--sl-color-gray-4);
+  font-style: italic;
+  font-size: var(--sl-text-sm);
+  line-height: 1.6;
+}
+
+.teleprompter-plain-text {
+  color: var(--sl-color-gray-1);
+  font-size: var(--sl-text-base);
+  line-height: 1.8;
+  animation: teleprompter-fade-in 0.25s ease;
+}
+
+@keyframes teleprompter-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ── Mobile modal ── */
+
+.concept-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+}
+
+.concept-modal.open {
+  display: block;
+}
+
+.concept-modal-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+}
+
+.concept-modal-content {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  max-height: 70vh;
+  background: var(--sl-color-gray-7, #0d0f15);
+  border-top: 1px solid var(--sl-color-gray-5);
+  border-radius: 16px 16px 0 0;
+  overflow-y: auto;
+  transform: translateY(100%);
+  transition: transform 0.3s ease;
+}
+
+.concept-modal.open .concept-modal-content {
+  transform: translateY(0);
+}
+
+.concept-modal-header {
+  position: sticky;
+  top: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  background: var(--sl-color-gray-7, #0d0f15);
+  border-bottom: 1px solid var(--sl-color-gray-5);
+  z-index: 1;
+}
+
+.concept-modal-header h3 {
+  margin: 0;
+  font-size: var(--sl-text-sm);
+  font-weight: 600;
+  color: var(--sl-color-gray-1);
+}
+
+.concept-modal-close {
+  appearance: none;
+  background: none;
+  border: none;
+  color: var(--sl-color-gray-3);
+  font-size: 1.25rem;
+  cursor: pointer;
+  padding: 0.25rem;
+  line-height: 1;
+}
+
+.concept-modal-close:hover {
+  color: var(--sl-color-gray-1);
+}
+
+.concept-modal-body {
+  padding: 1.25rem;
+  color: var(--sl-color-gray-1);
+  font-size: var(--sl-text-base);
+  line-height: 1.8;
+}
+
+/* ── Print ── */
+
+@media print {
+  .compare-teleprompter,
+  .concept-modal {
+    display: none !important;
+  }
+
+  .concept-span {
+    border-bottom: none;
+    background: none;
+    cursor: default;
+  }
+
+  .concept-filler {
+    color: inherit;
+    border-bottom: none;
+    cursor: default;
+  }
+
+  .concept-filler::after,
+  .concept-filler::before {
+    display: none;
+  }
+
+  .compare-original-text.concept-dimmed {
+    color: inherit;
+  }
+
+  .compare-original-text.concept-dimmed .concept-span {
+    color: inherit;
+  }
+}

@@ -14,7 +14,9 @@
 import type { LicenseEntryT } from "../../_types/licenses";
 import { getFamilyData } from "../../data/license-families/index";
 import { getLicenseSlug, getPublishedLicenses } from "../../utils/collections";
+import FAQ from "../reactive/FAQ.astro";
 import CompareWith from "./CompareWith.astro";
+import TermDefinitions from "./TermDefinitions.astro";
 import ZoneConditions from "./zones/ZoneConditions.astro";
 import ZoneCredit from "./zones/ZoneCredit.astro";
 import ZoneIdentity from "./zones/ZoneIdentity.astro";
@@ -132,6 +134,13 @@ const compareEntries = (data.compare_to ?? []).flatMap((c) => {
   <!-- Zone 6: Standard protections -->
   <ZoneProtections protections={family.protections} />
 
+  <!-- Extended term definitions (only for licenses with unique terms) -->
+  {
+    (data.defined_terms ?? []).length > 0 && (
+      <TermDefinitions terms={data.defined_terms} />
+    )
+  }
+
   <!-- Zone 7: Legal interpretation -->
   <ZoneInterpretation
     plain_name={data.plain_name}
@@ -139,6 +148,9 @@ const compareEntries = (data.compare_to ?? []).flatMap((c) => {
     is_dedication={data.is_dedication}
     original={data.original}
   />
+
+  <!-- FAQ (from frontmatter) -->
+  {(data.faq ?? []).length > 0 && <FAQ items={data.faq} />}
 
   <!-- Optional slot for exceptional MDX body content -->
   <slot name="outro" />

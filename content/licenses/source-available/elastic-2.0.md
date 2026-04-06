@@ -15,8 +15,45 @@ tldr:
   - 'You can use, copy, change, and share this work for most purposes.'
   - You cannot offer this work or its features as a managed service to others.
   - 'Keep all copyright, license, and trademark notices with any copy you share.'
-  - There is no warranty. Use at your own risk.
-attribution_required: false
+attribution_required: true
+credit:
+  examples:
+    - context: In a source file header
+      code: |-
+        // Copyright (c) 2026 Your Name. [Plain Elastic License](https://plainlicense.org/elastic-2.0/).
+        // Keep the copyright, license, and trademark notices with any copy you share.
+    - context: In a README or document
+      code: |-
+        This project is licensed under the [Plain Elastic License](https://plainlicense.org/elastic-2.0/).
+        See LICENSE for details.
+    - context: On a website or app
+      code: '© 2026 Your Name — <a href="https://plainlicense.org/elastic-2.0/">Plain Elastic License</a>'
+  not_required:
+    - Use a specific format or location
+    - Ask for permission before using the work
+    - Include the full license text everywhere you use the work
+  extra: >-
+    You **cannot** give others permission to use the work — only the authors can
+    do that. If you share the work, you must include a copy of this license so
+    others can get their own rights directly.
+faq:
+  - question: Can I use Plain Elastic-licensed materials in my product?
+    answer: >-
+      Yes, as long as you don't offer it as a managed service where others
+      use its features directly. You can build products and internal tools
+      with it freely.
+  - question: What counts as a "managed service"?
+    answer: >-
+      It means you can't offer the work's features directly to others as a service.
+      You can build a product or service using the work, or use it internally, but it can't be a service
+      where others use the work's features directly.
+  - question: Is the Plain Elastic License open source?
+    answer: >-
+      No. Source-available licenses like the Plain Elastic License are not open source according to the Open Source Initiative. 
+      The definition of open source does not allow for restrictions on *how* you can use the work, like the restriction on offering it as a managed service.
+  - question: Do I have to share my changes if I use this license?
+    answer: >-
+      No. The Plain Elastic License does not require you to share your changes. You can keep your changes private if you want. The only requirement is that you keep the copyright, license, and trademark notices with any copy you share.
 fair_code: true
 maker_pitch: 'Use and change freely, but not as a hosted service.'
 commercial_restrictions:
@@ -27,7 +64,7 @@ compare_to:
   - spdx_id: MIT
     contrast: 'Use and share freely, give credit, but no sharing requirement'
 uuid: 00208272-a9cb-41b9-ad99-0bbb4078cb9a
-plain_gunning_fog: 8.7
+plain_gunning_fog: 9.02
 shame_words_count: 0
 original:
   name: Elastic License 2.0
@@ -54,6 +91,19 @@ original:
     - trademark-use
     - warranty
   original_gunning_fog: 16.96
+  original_shame_words_count: 17
+defined_terms:
+  - term: managed service
+    hover: a hosted service where others use the work's features directly
+    footnote: >-
+      A "managed service" means offering the work to others as a hosted service,
+      where they use its features without installing it themselves.
+    show_definition: true
+  - term: your company
+    hover: you and any organization you control or that shares control with you
+    footnote: >-
+      "Your company" means you and any organization you are working for, control, or share control with. This only matters if your use of the work is for your company. If you use the work for other purposes, like personal projects, you don't need to worry about this term.
+    show_definition: true
 ---
 # Plain Elastic License
 
@@ -102,6 +152,7 @@ If you use the work in a way that breaks these rules, you lose your rights to us
 
 ## We Offer No Promises or Guarantees
 
+{{block:warranty}}
 We give the work to you **"as is."** This means:
 
 - You get the work *exactly how it is*, including anything broken.
@@ -110,35 +161,15 @@ We give the work to you **"as is."** This means:
 
 ## You Must Give This License to Others
 
-If you share any part of the work with anyone else, you must give them a copy of this license (these rules). You can do that a few ways:
-    1.  Include this complete notice in the work (the Plain Elastic License).
-    2.  Include this notice in materials that come with the work.
-    3.  [Link to this notice][selflink] from the work.
-    4.  Use an accepted standard for linking to licenses, like the [SPDX Identifier][spdx-guide]: `SPDX-LICENSE-IDENTIFIER: Elastic-2.0`.
+If you share any part of the work with anyone else, you must give them a copy of this license (these rules).
+
+{{block:notice}}
 
  You must also include our copyright notice in the work. This tells people who created the work and when.
 
 ## Accepting these Rules
 
 When you use the work in any way, you agree to follow these rules. **If you don't agree to these rules, you can't use the work.** These rules are the *only rules* that apply to your use of the work -- you have no other rights to use it.
-
-## Definitions
-
-`we`
-
-:    The person, people, or company who own the work and give you permission to use it.
-
-`you`
-
-:    The person or group agreeing to these rules.
-
-`your company`
-
-:    The organization you work for and any related organizations. This includes any other businesses that have control over it, are controlled by the organization, or share control with it.
-
-`the work`
-
-:    The materials provided under this license.
 
 [^1]: You *can* build a product or service using the work, including a product or service for your company or customers. It just can't be a service where others use the work's features directly.
 

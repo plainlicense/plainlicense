@@ -120,9 +120,14 @@ export const FAMILY_ORDER = [
 ] as const;
 
 export const FAMILY_DESCRIPTIONS: Record<string, string> = {
-  "public-domain": "No rights reserved — use any way you want.",
-  permissive: "Few restrictions — use freely in almost any project.",
-  copyleft: "Share-alike — changes must stay under the same license.",
-  "source-available": "Source visible but with usage restrictions.",
-  proprietary: "All rights reserved — usage governed by specific terms.",
+  "public-domain":
+    "Use, share and change freely, with no rules or restrictions. Don't need to give credit. Open source.",
+  permissive:
+    "Use, share and change freely, but keep the copyright notice intact, and give credit to the original authors. Open source.",
+  copyleft:
+    "Share-alike — changes must stay under the same license. This can be narrow (file-level) or broad (project-level) depending on the license. Open source.",
+  "source-available":
+    "Also called 'fair code'. Restricts commercial use, changes, or sharing. Otherwise similar to Copyleft. Not open source even if source materials are available.",
+  proprietary:
+    "Significant restrictions on use, sharing and changes. All rights reserved except those given explicitly. Not open source even if source materials are available.",
 };

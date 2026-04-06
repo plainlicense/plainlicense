@@ -2,21 +2,60 @@
 /**
  * Zone 4: How to give credit
  * Only renders when attribution_required is true.
- * Provides a fill-in template and context-specific examples.
+ * Pulls examples, not-required list, and extra notes from frontmatter `credit`.
+ * Falls back to sensible defaults when frontmatter fields are absent.
  */
+
+interface CreditExample {
+  context: string;
+  code: string;
+}
+
+interface CreditData {
+  examples?: CreditExample[];
+  not_required?: string[];
+  extra?: string;
+}
 
 interface Props {
   plain_name: string;
-  original?: {
-    name?: string;
-    version_display?: string;
-    canonical_url?: string;
-  };
+  credit?: CreditData;
 }
 
+import { marked } from "marked";
 import { ICONS } from "../icons";
 
-const { plain_name } = Astro.props as Props;
+const { plain_name, credit } = Astro.props;
+
+const defaultExamples: CreditExample[] = [
+  {
+    context: "In a source file header",
+    code: `// Copyright (c) 2025 Your Name. ${plain_name}.\n// Keep the copyright notice and the ${plain_name} with any copy you share.`,
+  },
+  {
+    context: "In a README or document",
+    code: `This project is licensed under the ${plain_name}.\nSee LICENSE for details.`,
+  },
+  {
+    context: "On a website or app",
+    code: `© 2025 Your Name — ${plain_name}`,
+  },
+];
+
+const defaultNotRequired = [
+  "Use a specific format or location",
+  "Ask for permission before using the work",
+  "Include the full license text everywhere you use the work",
+  "Use our exact wording — just keep the copyright notice and a reference to the license",
+];
+
+const examples = credit?.examples?.length ? credit.examples : defaultExamples;
+const notRequired = credit?.not_required?.length
+  ? credit.not_required
+  : defaultNotRequired;
+const extraHtml = credit?.extra
+  ? marked.parse(credit.extra, { async: false })
+  : "";
 ---
 
 <section class="zone zone-credit" aria-label="How to give credit">
@@ -53,25 +92,20 @@ const { plain_name } = Astro.props as Props;
   <div class="examples">
     <h3 class="examples-heading">Where to put it</h3>
     <div class="example-list">
-      <div class="example-item">
-        <div class="example-context">In a source file header</div>
-        <pre
-          class="example-code"><code>{`// Copyright (c) 2025 Your Name. ${plain_name}.
-// Keep the copyright notice and this license with any copy you share.`}</code></pre>
-      </div>
-      <div class="example-item">
-        <div class="example-context">In a README or document</div>
-        <pre
-          class="example-code"><code>{`This project is licensed under the ${plain_name}.
-See LICENSE for details.`}</code></pre>
-      </div>
-      <div class="example-item">
-        <div class="example-context">On a website or app</div>
-        <pre
-          class="example-code"><code>&copy; 2025 Your Name &mdash; {plain_name}</code></pre>
-      </div>
+      {
+        examples.map((ex) => (
+          <div class="example-item">
+            <div class="example-context">{ex.context}</div>
+            <pre class="example-code">
+              <code>{ex.code}</code>
+            </pre>
+          </div>
+        ))
+      }
     </div>
   </div>
+
+  {extraHtml && <div class="extra-notes" set:html={extraHtml} />}
 
   <div class="not-required-box">
     <p class="not-required-heading">
@@ -89,13 +123,7 @@ See LICENSE for details.`}</code></pre>
       <strong>You do not need to:</strong>
     </p>
     <ul class="not-required-list">
-      <li>Use a specific format or location</li>
-      <li>Ask for permission before using the work</li>
-      <li>Include the full license text everywhere you use the work</li>
-      <li>
-        Use our exact wording — just keep the copyright notice and a reference
-        to the license
-      </li>
+      {notRequired.map((item) => <li>{item}</li>)}
     </ul>
   </div>
 </section>
@@ -206,6 +234,21 @@ See LICENSE for details.`}</code></pre>
 
   .example-code code {
     font-family: var(--sl-font-mono, monospace);
+  }
+
+  .extra-notes {
+    background: var(--sl-color-gray-6);
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+    margin-bottom: 1.5rem;
+    font-size: var(--sl-text-sm);
+    color: var(--sl-color-gray-2);
+    line-height: 1.6;
+  }
+
+  .extra-notes :global(a) {
+    color: var(--sl-color-accent);
   }
 
   .not-required-box {
