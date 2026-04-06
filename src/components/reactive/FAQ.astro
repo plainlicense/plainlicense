@@ -65,9 +65,11 @@ const { id, items = [] } = Astro.props;
     content: "+";
     font-size: 1.2rem;
     color: var(--accent-purple);
+    speak: never;
   }
   details[open] summary::after {
     content: "−";
+    speak: never;
   }
   .faq-answer {
     padding: 1rem;

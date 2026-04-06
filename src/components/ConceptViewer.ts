@@ -98,6 +98,14 @@ function wrapConceptsInDom(container: HTMLElement, entries: ConceptEntry[]) {
 				if (entry.kind === "filler") {
 					span.dataset.tooltip = FILLER_TOOLTIP;
 					span.setAttribute("aria-label", FILLER_TOOLTIP);
+				} else {
+					span.setAttribute("role", "button");
+					span.addEventListener("keydown", (event) => {
+						if (event.key === "Enter" || event.key === " " || event.key === "Spacebar") {
+							event.preventDefault();
+							span.click();
+						}
+					});
 				}
 				span.setAttribute("tabindex", "0");
 
@@ -327,10 +335,38 @@ function setupInteraction(
 		if (modalEl) closeConceptModal(modalEl);
 	});
 	modalEl?.addEventListener("keydown", (e: Event) => {
-		if ((e as KeyboardEvent).key === "Escape" && modalEl) {
+		const ke = e as KeyboardEvent;
+		if (ke.key === "Escape" && modalEl) {
 			closeConceptModal(modalEl);
+			return;
+		}
+		// Focus trap: keep Tab cycling within modal
+		if (ke.key === "Tab" && modalEl) {
+			trapFocus(modalEl, ke);
 		}
 	});
+}
+
+/**
+ * Trap keyboard focus inside a modal element.
+ * Cycles Tab / Shift+Tab between focusable children.
+ */
+function trapFocus(modal: HTMLElement, e: KeyboardEvent) {
+	const focusable = modal.querySelectorAll<HTMLElement>(
+		'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+	);
+	if (focusable.length === 0) return;
+
+	const first = focusable[0];
+	const last = focusable[focusable.length - 1];
+
+	if (e.shiftKey && document.activeElement === first) {
+		e.preventDefault();
+		last.focus();
+	} else if (!e.shiftKey && document.activeElement === last) {
+		e.preventDefault();
+		first.focus();
+	}
 }
 
 /**
@@ -372,6 +408,12 @@ function updateTeleprompter(
 }
 
 /**
+ * The element that had focus before the modal opened. Used to restore
+ * focus after closing the modal.
+ */
+let previouslyFocused: HTMLElement | null = null;
+
+/**
  * Show the mobile concept modal with plain language text.
  */
 function showConceptModal(
@@ -379,6 +421,8 @@ function showConceptModal(
 	body: HTMLElement,
 	concept: ResolvedConcept,
 ) {
+	previouslyFocused = document.activeElement as HTMLElement | null;
+
 	body.textContent = "";
 
 	if (concept.plain_matches.length === 0) {
@@ -410,4 +454,10 @@ function closeConceptModal(modal: HTMLElement) {
 	modal.classList.remove("open");
 	modal.setAttribute("aria-hidden", "true");
 	document.body.style.overflow = "";
+
+	// Restore focus to the element that triggered the modal
+	if (previouslyFocused && typeof previouslyFocused.focus === "function") {
+		previouslyFocused.focus();
+		previouslyFocused = null;
+	}
 }

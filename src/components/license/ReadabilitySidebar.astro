@@ -22,6 +22,13 @@ function readabilityLevel(score: number): string {
   return "Post-graduate";
 }
 
+/** Return a non-color icon to supplement the readability level. */
+function readabilityIcon(score: number): string {
+  if (score <= 8) return "✓";
+  if (score <= 12) return "⚠";
+  return "✗";
+}
+
 const hasData = plain_gunning_fog !== undefined || shame_words_count !== undefined;
 const hasComparison = plain_gunning_fog !== undefined && original_gunning_fog !== undefined;
 const improvement = hasComparison
@@ -40,7 +47,7 @@ const improvement = hasComparison
       <div class="stat-row">
         <span class="stat-label">Reading level</span>
         <span class="stat-value plain-value">
-          {plain_gunning_fog}
+          {readabilityIcon(plain_gunning_fog)} {plain_gunning_fog}
           <small>({readabilityLevel(plain_gunning_fog)})</small>
         </span>
       </div>
@@ -50,7 +57,7 @@ const improvement = hasComparison
       <div class="stat-row">
         <span class="stat-label">Original</span>
         <span class="stat-value original-value">
-          {original_gunning_fog}
+          {readabilityIcon(original_gunning_fog!)} {original_gunning_fog}
           <small>({readabilityLevel(original_gunning_fog!)})</small>
         </span>
       </div>
