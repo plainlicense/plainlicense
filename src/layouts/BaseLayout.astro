@@ -202,7 +202,7 @@ const ogImageUrl = ogImage
         <div id="base-search"></div>
       </div>
     </dialog>
-    <link rel="stylesheet" href="/_pagefind/pagefind-ui.css" />
+    <link rel="stylesheet" href="/pagefind/pagefind-ui.css" />
     <footer class="site-footer">
       <div class="footer-inner">
         <div class="footer-brand">
@@ -278,7 +278,7 @@ const ogImageUrl = ogImage
       if (uiInitialized) return;
       uiInitialized = true;
       const script = document.createElement('script');
-      script.src = '/_pagefind/pagefind-ui.js';
+      script.src = '/pagefind/pagefind-ui.js';
       script.onload = () => {
         // @ts-ignore — PagefindUI is loaded externally
         new (window as any).PagefindUI({
