@@ -26,7 +26,7 @@
 
 .compare-layout .column-badge--plain {
   background: rgba(var(--cat-color-rgb, 21, 219, 149), 0.12);
-  color: var(--cat-color, var(--sl-color-accent));
+  color: var(--sl-color-accent, var(--emerald));
   border: 1px solid rgba(var(--cat-color-rgb, 21, 219, 149), 0.25);
 }
 
@@ -77,7 +77,9 @@
 .concept-span {
   border-bottom: 2px solid rgba(var(--cat-color-rgb, var(--emerald-rgb)), 0.5);
   cursor: pointer;
-  transition: border-color 0.2s ease, background-color 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease;
   border-radius: 2px;
 }
 
@@ -166,12 +168,16 @@
 .teleprompter-instruction {
   color: var(--sl-color-gray-4);
   font-style: italic;
-  font-size: var(--sl-text-sm);
+  font-size: var(--sl-text-base);
   line-height: 1.6;
 }
 
 .teleprompter-plain-text {
   color: var(--sl-color-gray-1);
+  background: rgba(var(--emerald-rgb, 21, 219, 149), 0.08);
+  border-radius: 4px;
+  padding: 0.25rem 0.5rem;
+
   font-size: var(--sl-text-base);
   line-height: 1.8;
   animation: teleprompter-fade-in 0.25s ease;
@@ -237,7 +243,7 @@
 
 .concept-modal-header h3 {
   margin: 0;
-  font-size: var(--sl-text-sm);
+  font-size: var(--sl-text-base);
   font-weight: 600;
   color: var(--sl-color-gray-1);
 }

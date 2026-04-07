@@ -283,6 +283,7 @@ const ogImageUrl = ogImage
         // @ts-ignore — PagefindUI is loaded externally
         new (window as any).PagefindUI({
           element: '#base-search',
+          bundlePath: '/pagefind/',
           showSubResults: true,
           showImages: false,
           autofocus: true,
@@ -655,7 +656,7 @@ const ogImageUrl = ogImage
   }
 
   .search-dialog :global(.pagefind-ui__message) {
-    color: var(--text-muted);
+    color: var(--text);
   }
 
   .search-dialog :global(.pagefind-ui__button) {
