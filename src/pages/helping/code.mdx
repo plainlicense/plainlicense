@@ -1,6 +1,7 @@
 ---
 title: Developer Contributions
 description: How developers can contribute to Plain License
+status: published
 layout: ../../layouts/PageLayout.astro
 ---
 
@@ -16,9 +17,8 @@ We want developers of all skill levels to contribute to Plain License. Whether y
 
 ## Getting Started
 
-**We use a special commit message format** to help us keep track of changes. Before you start contributing, please read our [commit message guidelines][commit-guidelines]. If you mess it up, don't worry! We can fix it later. But it's best to get it right the first time.
-
-**Setting Up Your Environment**. We use [mise][mise] to manage tools and tasks, and [Bun][bun] as our package manager. To get started:
+  **We use a special commit message format** to help us keep track of changes. Before you start contributing, please read our [commit message guidelines][commit-guidelines]. If you mess it up, don't worry! We can fix it later. But it's best to get it right the first time.
+  **Setting Up Your Environment**. We use [mise][mise] to manage tools and tasks, and [Bun][bun] as our package manager. To get started:
 
 1. Install [mise][mise] and [Bun][bun] if you don't have them.
 2. Clone the repository and `cd` into it.
@@ -27,7 +27,7 @@ We want developers of all skill levels to contribute to Plain License. Whether y
 That's it! You're ready to start developing. Here are the commands you'll use most:
 
 | Command | What it does |
-|---------|-------------|
+| --- | --- |
 | `mise run dev` | Start the local dev server |
 | `mise run build` | Build the full site |
 | `mise run lint` | Run all linters (Biome, shellcheck, Astro check) |
@@ -38,41 +38,34 @@ That's it! You're ready to start developing. Here are the commands you'll use mo
 ## A Tour of Our Codebase
 
 - **Framework**: We use [Astro 5][astro] with the [Starlight][starlight] documentation theme. Astro builds fast, static sites from components and content collections. Most of what you see on the site comes from Markdown content files and Astro components.
-
 - **Content**: All content lives in the `content/` directory:
-  - `content/licenses/{category}/{spdx-id}.md` — license pages with YAML frontmatter
-  - `content/blog/` — blog posts
-  - `content/mappings/` — term mappings between original and plain license language
+    - `content/licenses/{category}/{spdx-id}.md` — license pages with YAML frontmatter
+    - `content/blog/` — blog posts
+    - `content/mappings/` — term mappings between original and plain license language
 
   License categories are: `permissive`, `copyleft`, `source-available`, and `public-domain`.
 
 - **Components**: Interactive and layout components live in `src/components/`:
-  - `src/components/overrides/` — Starlight layout overrides (Header, Footer, Sidebar)
-  - `src/components/reactive/` — interactive Preact components (LicenseFinder, ComparisonTable, FAQ)
-  - `src/components/*.astro` — license-specific components (LicenseSummary, DownloadOptions, VersionHistory)
-
+    - `src/components/overrides/` — Starlight layout overrides (Header, Footer, Sidebar)
+    - `src/components/reactive/` — interactive Preact components (LicenseFinder, ComparisonTable, FAQ)
+    - `src/components/*.astro` — license-specific components (LicenseSummary, DownloadOptions, VersionHistory)
 - **Pages**: Static pages (like this one) live in `src/pages/`. They use `.mdx` or `.astro` files.
-
 - **Schemas & Types**: Content schemas are defined in `src/content.config.ts`. Type definitions live in `src/_types/`.
-
 - **Build Pipeline**: `mise run build` runs `astro build` followed by three post-build scripts:
-  1. `src/build/generate-exports.ts` — creates downloadable license files (MD, PDF, TXT)
-  2. `src/build/generate-og-images.ts` — creates social share images
+
+    1. `src/build/generate-exports.ts` — creates downloadable license files (MD, PDF, TXT)
+    2. `src/build/generate-og-images.ts` — creates social share images
 
 - **URL Routing**: License URLs are auto-generated at build time. Adding a file at `content/licenses/{category}/{spdx-id}.md` automatically creates short URLs like `/licenses/{spdx-id}` and `/{spdx-id}` that redirect to the full path.
-
 - **Monorepo Packages**: Each license has a workspace package in `packages/{spdx-id}/` with its own `package.json` for independent versioning. See [Adding a License][adding-license] for the full process.
-
 - **Linting & Formatting**: [Biome][biome] handles TypeScript, JavaScript, JSON, and CSS linting and formatting. Configuration is in `biome.jsonc`.
-
 - **CI/CD**: We use GitHub Actions for our CI/CD process. Workflow files are in `.github/workflows/`, and supporting scripts are in `.github/scripts/`.
-
 - **Deployment**: The site deploys to [Cloudflare Pages][cf-pages]. The configuration is in `wrangler.json`.
 
 ### Key Config Files
 
 | File | Purpose |
-|------|---------|
+| --- | --- |
 | `astro.config.mts` | Astro site configuration and routing |
 | `biome.jsonc` | Linting and formatting rules |
 | `mise.toml` | Tool versions and task definitions |
