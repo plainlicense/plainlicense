@@ -2,6 +2,8 @@
 [![Built with Astro](https://img.shields.io/badge/Built%20with-Astro-FF5D01?style=flat-square&logo=astro&logoColor=white)](https://astro.build)
 [![Deployed on Cloudflare](https://img.shields.io/badge/Deployed%20on-Cloudflare-F48120?style=flat-square&logo=cloudflare&logoColor=white)](https://pages.cloudflare.com)
 
+  <img alt="Plain License logo" src="https://raw.githubusercontent.com/plainlicense/plainlicense/refs/heads/main/src/assets/images/logo_only_color_transp.svg" height="150px" width="150px">
+
 # Plain License
 
 > **Licenses you can actually read.**
